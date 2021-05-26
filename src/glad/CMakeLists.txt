@@ -1,0 +1,6 @@
+INCLUDE_DIRECTORIES(${ivf2_SOURCE_DIR}/include)
+FILE(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/ivf/*.h)
+
+ADD_LIBRARY(glad ${INCLUDE_FILES} glad.c)
+INSTALL_TARGETS(/lib glad)
+

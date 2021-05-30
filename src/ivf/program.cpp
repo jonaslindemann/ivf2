@@ -78,57 +78,49 @@ void Program::use()
 
 void ivf::Program::bindAttribLoc(GLuint idx, const std::string name)
 {
-    glBindAttribLocation(m_id, idx, name.c_str());
+    GL_ERR( glBindAttribLocation(m_id, idx, name.c_str()) );
 }
 
 GLint Program::attribId(const std::string name)
 {
-    GLint id = glGetAttribLocation(m_id, name.c_str());
-    checkPrintError(__FILE__, __LINE__);
+    GL_ERR( GLint id = glGetAttribLocation(m_id, name.c_str()) );
     return id;
 }
 
 GLint Program::uniformLoc(const std::string name)
 {
-    GLint id = glGetUniformLocation(m_id, name.c_str());
-    checkPrintError(__FILE__, __LINE__);
+    GL_ERR( GLint id = glGetUniformLocation(m_id, name.c_str()) );
     return id;
 }
 
 void Program::uniformMatrix4(const std::string name, glm::mat4 matrix)
 {
-    glUniformMatrix4fv(uniformLoc(name), 1, GL_FALSE, glm::value_ptr(matrix));
-	checkPrintError(__FILE__, __LINE__);
+    GL_ERR( glUniformMatrix4fv(uniformLoc(name), 1, GL_FALSE, glm::value_ptr(matrix)) );
 }
 
 void Program::uniformBool(const std::string name, bool flag)
 {
-	glUniform1i(uniformLoc(name), flag);
-    checkPrintError(__FILE__, __LINE__);
+    GL_ERR( glUniform1i(uniformLoc(name), flag) );
 }
 
 void ivf::Program::uniformVec4f(const std::string name, float v0, float v1, float v2, float v3)
 {
-    glUniform4f(uniformLoc(name), v0, v1, v2, v3);
-    checkPrintError();
+    GL_ERR( glUniform4f(uniformLoc(name), v0, v1, v2, v3) );
 }
 
 void ivf::Program::uniformVec3f(const std::string name, float v0, float v1, float v2)
 {
-    glUniform3f(uniformLoc(name), v0, v1, v2);
-    checkPrintError();
+    GL_ERR( glUniform3f(uniformLoc(name), v0, v1, v2) );
 }
 
 void ivf::Program::uniformVec3(const std::string name, const glm::vec3 v)
 {
-    glUniform3f(uniformLoc(name), v.x, v.y, v.z);
-    checkPrintError();
+    GL_ERR( glUniform3f(uniformLoc(name), v.x, v.y, v.z) );
 }
 
 void ivf::Program::uniformVec4(const std::string name, const glm::vec4 v)
 {
-    glUniform4f(uniformLoc(name), v.x, v.y, v.z, v.w);
-    checkPrintError();
+    GL_ERR( glUniform4f(uniformLoc(name), v.x, v.y, v.z, v.w) );
 }
 
 void ivf::Program::printAttribs()

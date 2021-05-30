@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+*.pdb
+*.ini
+*.db
+
+# Directories
+
+build-debug/
+build-release/

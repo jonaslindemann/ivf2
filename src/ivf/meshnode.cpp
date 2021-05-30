@@ -61,6 +61,7 @@ void ivf::MeshNode::createFromGenerator(generator::AnyGenerator<generator::MeshV
 
         mesh()->vertex3f(GLfloat(vertex.position[0]), GLfloat(vertex.position[2]), GLfloat(vertex.position[1]));
         mesh()->normal3f(GLfloat(vertex.normal[0]), GLfloat(vertex.normal[2]), GLfloat(vertex.normal[1]));
+        mesh()->tex2f(vertex.texCoord[0], vertex.texCoord[1]);
 
         vertices.next();
     }

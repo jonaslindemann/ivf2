@@ -4,6 +4,7 @@ out vec4 fragColor;
 in vec3 normal;  
 in vec3 fragPos;  
 in vec4 color;
+in vec2 texCoord;
   
 uniform vec3 lightPos; 
 uniform vec3 viewPos; 
@@ -12,10 +13,13 @@ uniform vec4 diffuseColor;
 uniform vec4 specularColor;
 uniform vec4 ambientColor;
 uniform bool useLighting;
+uniform bool useTexture;
 uniform bool useVertexColors;
 uniform bool usePointFalloff = false;
 uniform float point_falloff_a = 0.0;
 uniform float point_falloff_b = 0.0;
+
+uniform sampler2D texture0;
 
 float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -56,7 +60,10 @@ void main()
         result = (ambientColor.rgb + diffuse*diffuseColor.rgb + specular*specularColor.rgb) * intensity;
 
     if (useLighting)
-        fragColor = vec4(result, 1.0);
+        if (useTexture)
+            fragColor = texture(texture0, texCoord)*vec4(result, 1.0);
+        else
+            fragColor = vec4(result, 1.0);
     else
         if (useVertexColors)
             fragColor = color;

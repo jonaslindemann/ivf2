@@ -10,7 +10,12 @@
 using namespace ivf;
 using namespace std;
 
-GLenum ivf::checkPrintError(const std::string file, const long line)
+void ivf::clearError()
+{
+	GLenum err = glGetError();
+}
+
+GLenum ivf::checkPrintError(const std::string context, const std::string file, const long line)
 {
 	GLenum err = glGetError();
 
@@ -19,13 +24,13 @@ GLenum ivf::checkPrintError(const std::string file, const long line)
 	case GL_NO_ERROR:
 		break;
 	case GL_INVALID_ENUM:
-		cout << file << ", line " << line << " - Error: An unacceptable value is specified for an enumerated argument. (GL_INVALID_ENUM)" << endl;
+		cout << file << ", line " << line << " - " << context << " - Error : An unacceptable value is specified for an enumerated argument. (GL_INVALID_ENUM)" << endl;
 		break;
 	case GL_INVALID_VALUE:
-		cout << file << ", line " << line << " - Error: A numeric argument is out of range. (GL_INVALID_VALUE)" << endl;
+		cout << file << ", line " << line << " - " << context << " - Error: A numeric argument is out of range. (GL_INVALID_VALUE)" << endl;
 		break;
 	case GL_INVALID_OPERATION:
-		cout << file << ", line " << line << " - Error: The specified operation is not allowed in the current state. (GL_INVALID_OPERATION)" << endl;
+		cout << file << ", line " << line << " - " << context << " - Error: The specified operation is not allowed in the current state. (GL_INVALID_OPERATION)" << endl;
 		break;
 	/*
 	case GL_STACK_OVERFLOW:
@@ -39,10 +44,10 @@ GLenum ivf::checkPrintError(const std::string file, const long line)
 		break;
 	*/
 	case GL_OUT_OF_MEMORY:
-		cout << file << ", line " << line << " - Error: There is not enough memory left to execute the command. (GL_OUT_OF_MEMORY)" << endl;
+		cout << file << ", line " << line << " - " << context << " - Error: There is not enough memory left to execute the command. (GL_OUT_OF_MEMORY)" << endl;
 		break;
 	default:
-		cout << file << ", line " << line << " - Error: Unknown error code." << endl;
+		cout << file << ", line " << line << " - " << context << " - Error: Unknown error code." << endl;
 		break;
 	}
 

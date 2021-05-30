@@ -8,33 +8,9 @@
 
 #include <glm/glm.hpp>
 
-#include <ivf/floatfield.h>
-#include <ivf/vertexbuffer.h>
-#include <ivf/vertexarray.h>
-#include <ivf/vertices.h>
-#include <ivf/colors.h>
-#include <ivf/vertexshader.h>
-#include <ivf/fragmentshader.h>
-#include <ivf/program.h>
-#include <ivf/shadermanager.h>
-#include <ivf/transformmanager.h>
-#include <ivf/axis.h>
-#include <ivf/grid.h>
-#include <ivf/utils.h>
-#include <ivf/lightmanager.h>
-#include <ivf/cube.h>
-#include <ivf/cameramanipulator.h>
-#include <ivf/normalfactory.h>
-#include <ivf/material.h>
-#include <ivf/compositenode.h>
-#include <ivf/sphere.h>
-#include <ivf/box.h>
-#include <ivf/roundedbox.h>
-#include <ivf/cappedcylinder.h>
-#include <ivf/cylinder.h>
-#include <ivf/cappedcone.h>
-#include <ivf/cone.h>
-#include <ivf/dodecahedron.h>
+#include <ivf/gl.h>
+#include <ivf/nodes.h>
+#include <ivf/ui.h>
 
 using namespace ivf;
 using namespace std;
@@ -50,7 +26,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_SAMPLES, 4);
 
-	auto window = glfwCreateWindow(800, 800, "OpenGL3", NULL, NULL);
+	auto window = glfwCreateWindow(800, 800, "Example 1", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;

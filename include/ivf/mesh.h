@@ -6,6 +6,7 @@
 #include <ivf/colors.h>
 #include <ivf/normals.h>
 #include <ivf/indices.h>
+#include <ivf/texcoords.h>
 
 #include <ivf/vertexarray.h>
 #include <ivf/vertexbuffer.h>
@@ -27,6 +28,7 @@ namespace ivf {
         std::shared_ptr<Colors> m_colors;
         std::shared_ptr<Indices> m_indices;
         std::shared_ptr<Normals> m_normals;
+        std::shared_ptr<TexCoords> m_texCoords;
 
         std::shared_ptr<Vertices> m_glVerts;
         std::shared_ptr<Colors> m_glColors;
@@ -36,18 +38,21 @@ namespace ivf {
         int m_colorPos;
         int m_normalPos;
 		int m_indexPos;
+        int m_texCoordPos;
 
 		int m_indexSize;
         
         GLint m_vertexAttrId;
         GLint m_colorAttrId;
         GLint m_normalAttrId;
+        GLint m_texCoordAttrId;
 
         std::unique_ptr<VertexArray> m_VAO;
         std::unique_ptr<VertexBuffer> m_vertexVBO;
         std::unique_ptr<VertexBuffer> m_colorVBO;
         std::unique_ptr<VertexBuffer> m_normalVBO;
         std::unique_ptr<IndexBuffer> m_indexVBO;
+        std::unique_ptr<VertexBuffer> m_texCoordVBO;
 
         glm::vec3 m_position;
 
@@ -69,6 +74,7 @@ namespace ivf {
         void setVertexAttrId(GLuint id);
         void setColorAttrId(GLuint id);
         void setNormalAttrId(GLuint id);
+        void setTexCoordAttrId(GLuint id);
         
         void begin(GLuint primType);
         void vertex3f(GLfloat x, GLfloat y, GLfloat z);
@@ -77,6 +83,7 @@ namespace ivf {
         void vertex2d(GLdouble x, GLdouble y);
 		void vertex3d(const glm::dvec3& v);
         void vertex3f(const glm::vec3 v);
+        void tex2f(GLfloat s, GLfloat t);
         void normal3f(GLfloat vx, GLfloat vy, GLfloat vz);
         void normal3d(GLdouble vx, GLdouble vy, GLdouble vz);
         void color3f(GLfloat r, GLfloat g, GLfloat b);

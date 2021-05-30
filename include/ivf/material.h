@@ -10,6 +10,7 @@ namespace ivf {
 	private:
 		bool m_useVertexColor;
 		bool m_useLighting;
+		bool m_useTexture;
 		glm::vec4 m_diffuseColor;
 		glm::vec4 m_specularColor;
 		glm::vec4 m_ambientColor;
@@ -21,6 +22,7 @@ namespace ivf {
 		void setDiffuseColor(glm::vec4 color);
 		void setSpecularColor(glm::vec4 color);
 		void setAmbientColor(glm::vec4 color);
+		void setUseTexture(bool flag);
 
 		void apply();
 	};

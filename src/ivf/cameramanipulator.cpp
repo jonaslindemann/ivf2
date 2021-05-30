@@ -10,20 +10,26 @@ using namespace ivf;
 using namespace std;
 
 CameraManipulator::CameraManipulator(GLFWwindow* window)
-	:m_window(window), 
-	 m_width(-1), 
-	 m_height(-1), 
-	 m_firstClick(true),
-	 m_firstTime(true),
-	 m_mouseX(-1),
-	 m_mouseY(-1),
-	 m_mouseStartX(-1),
-	 m_mouseStartY(-1),
-	 m_cameraTarget(glm::vec3(0.0, 0.0, 0.0)),
-	 m_cameraPosition(glm::vec3(0.0, 0.0, 5.0)),
-	 m_cameraNewPos(m_cameraPosition),
-	 m_cameraNewTarget(m_cameraTarget)
-	
+	:m_window(window),
+	m_width(-1),
+	m_height(-1),
+	m_firstClick(true),
+	m_firstTime(true),
+	m_mouseX(-1),
+	m_mouseY(-1),
+	m_mouseStartX(-1),
+	m_mouseStartY(-1),
+	m_cameraTarget(glm::vec3(0.0, 0.0, 0.0)),
+	m_cameraPosition(glm::vec3(0.0, 0.0, 5.0)),
+	m_cameraNewPos(m_cameraPosition),
+	m_cameraNewTarget(m_cameraTarget),
+	m_leftMouseButton(false),
+	m_middleMouseButton(false),
+	m_rightMouseButton(false),
+	m_anyMouseButton(false),
+	m_shiftKey(false),
+	m_ctrlKey(false),
+	m_altKey(false)
 {
 }
 
@@ -98,7 +104,12 @@ void CameraManipulator::update()
 		m_firstTime = false;
 	}
 
-	if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+	m_leftMouseButton = (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+	m_middleMouseButton = (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS);
+	m_rightMouseButton = (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
+	m_anyMouseButton = m_leftMouseButton || m_middleMouseButton || m_rightMouseButton;
+
+	if (m_anyMouseButton)
 	{
 		glfwGetWindowSize(m_window, &m_width, &m_height);
 
@@ -116,7 +127,10 @@ void CameraManipulator::update()
 		{
 			glfwGetCursorPos(m_window, &m_mouseX, &m_mouseY);
 		}
+	}
 
+	if (m_leftMouseButton)
+	{
 		double rotX = 0.01 * (m_mouseX - m_mouseStartX);
 		double rotY = 0.01 * (m_mouseY - m_mouseStartY);
 
@@ -137,23 +151,8 @@ void CameraManipulator::update()
 		xfmMgr->enableModelMatrix();
 
 	}
-	else if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+	else if (m_rightMouseButton)
 	{
-		if (m_firstClick)
-		{
-			glfwGetCursorPos(m_window, &m_mouseStartX, &m_mouseStartY);
-			m_firstClick = false;
-			m_cameraNewPos = m_cameraPosition;
-			m_cameraNewTarget = m_cameraTarget;
-
-			m_mouseX = m_mouseStartX;
-			m_mouseY = m_mouseStartY;
-		}
-		else
-		{
-			glfwGetCursorPos(m_window, &m_mouseX, &m_mouseY);
-		}
-
 		double movX = -0.01 * (m_mouseX - m_mouseStartX);
 		double movY = 0.01 * (m_mouseY - m_mouseStartY);
 
@@ -171,27 +170,11 @@ void CameraManipulator::update()
 
 		xfmMgr->enableModelMatrix();
 	}
-	else if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS)
+	else if (m_middleMouseButton)
 	{
-		glfwGetWindowSize(m_window, &m_width, &m_height);
-
-		if (m_firstClick)
-		{
-			glfwGetCursorPos(m_window, &m_mouseStartX, &m_mouseStartY);
-			m_firstClick = false;
-			m_cameraNewPos = m_cameraPosition;
-			m_cameraNewTarget = m_cameraTarget;
-
-			m_mouseX = m_mouseStartX;
-			m_mouseY = m_mouseStartY;
-		}
-		else
-		{
-			glfwGetCursorPos(m_window, &m_mouseX, &m_mouseY);
-		}
-
 		double movX = -0.01 * (m_mouseX - m_mouseStartX);
 		double movY = 0.01 * (m_mouseY - m_mouseStartY);
+
 
 		glm::vec3 forward = glm::normalize(m_cameraPosition - m_cameraTarget);
 		glm::vec3 up = glm::vec3(0.0, 1.0, 0.0);
@@ -199,7 +182,18 @@ void CameraManipulator::update()
 		glm::vec3 realUp = glm::normalize(glm::cross(forward, right));
 
 		m_cameraNewPos = m_cameraPosition + float(movY) * forward;
-		m_cameraNewTarget = m_cameraTarget + float(movY) * forward;
+
+		glm::vec3 posTargetDist = m_cameraNewPos - m_cameraNewTarget;
+
+		cout << glm::length(posTargetDist) << endl;
+
+		if (glm::length(posTargetDist) > 1.5f)
+			m_cameraNewTarget = m_cameraTarget;
+		else
+		{
+			m_cameraNewTarget = m_cameraTarget + float(movY + 1.5f) * forward;
+			m_cameraTarget = m_cameraNewTarget;
+		}
 
 		xfmMgr->enableViewMatrix();
 		xfmMgr->identity();
@@ -215,16 +209,17 @@ void CameraManipulator::update()
 		{
 			m_cameraPosition = m_cameraNewPos;
 			m_cameraTarget = m_cameraNewTarget;
-
-			/*
-			xfmMgr->enableViewMatrix();
-			xfmMgr->identity();
-			xfmMgr->lookAt(m_cameraPosition, m_cameraTarget);
-
-			xfmMgr->enableModelMatrix();
-			*/
-
 			m_firstClick = true;
 		}
 	}
+}
+
+glm::vec3 ivf::CameraManipulator::cameraTarget()
+{
+	return m_cameraNewTarget;
+}
+
+glm::vec3 ivf::CameraManipulator::cameraPosition()
+{
+	return m_cameraNewPos;
 }

@@ -50,6 +50,14 @@ void LightManager::disableLighting()
 	this->setUseVertexColors(true);
 }
 
+void ivf::LightManager::setUseTexture(bool flag)
+{
+	m_useTexture = flag;
+
+	ShaderManager::instance()->currentProgram()->use();
+	ShaderManager::instance()->currentProgram()->uniformBool("useTexture", m_useTexture);
+}
+
 void ivf::LightManager::setupDefaultColors()
 {
 	this->setUseLighting(true);

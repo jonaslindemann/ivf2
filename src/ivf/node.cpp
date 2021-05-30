@@ -4,6 +4,7 @@ using namespace ivf;
 
 ivf::Node::Node()
 	:m_material(nullptr),
+	 m_texture(nullptr),
 	 m_useMaterial(true)	
 {
 }
@@ -25,6 +26,13 @@ void ivf::Node::setUseMaterial(bool flag)
 	m_useMaterial = flag;
 }
 
+void Node::setTexture(std::shared_ptr<Texture> texture)
+{
+	m_texture = texture;
+	if (m_material != nullptr)
+		m_material->setUseTexture(true);
+}
+
 bool ivf::Node::useMaterial()
 {
 	return m_useMaterial;
@@ -34,6 +42,8 @@ void Node::doPreDraw()
 {
 	if ((m_material != nullptr)&&(m_useMaterial))
 		m_material->apply();
+	if ((m_texture != nullptr) && (m_useTexture))
+		m_texture->bind();
 }
 
 void ivf::Node::doDraw()
@@ -42,4 +52,5 @@ void ivf::Node::doDraw()
 
 void ivf::Node::doPostDraw()
 {
+	m_texture->unbind();
 }

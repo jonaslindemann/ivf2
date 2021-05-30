@@ -15,6 +15,7 @@ namespace ivf {
     private:
         bool m_useLighting;
         bool m_useVertexColors;
+        bool m_useTexture;
 	    bool m_savedState;
 	    LightManager();
 	    static LightManager* m_instance;
@@ -50,6 +51,8 @@ namespace ivf {
 	    bool useLighting();
 	    void enableLighting();
 	    void disableLighting();
+
+        void setUseTexture(bool flag);
 
         void setupDefaultColors();
 

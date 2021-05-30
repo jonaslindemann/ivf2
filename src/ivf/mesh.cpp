@@ -65,6 +65,7 @@ void Mesh::setSize(GLuint vsize, GLuint isize)
 	m_verts = std::make_shared<Vertices>(vsize);
 	m_colors = std::make_shared<Colors>(vsize);
 	m_normals = std::make_shared<Normals>(vsize);
+	m_texCoords = std::make_shared<TexCoords>(vsize);
 
 	m_glVerts = nullptr;
 	m_glColors = nullptr;
@@ -81,13 +82,16 @@ void Mesh::setSize(GLuint vsize, GLuint isize)
 	m_colorPos = 0;
 	m_indexPos = 0;
 	m_normalPos = 0;
+	m_texCoordPos = 0;
 
 	m_vertexAttrId = -1; 
 	m_colorAttrId = -1;
+	m_texCoordAttrId = -1;
 
 	this->setVertexAttrId(ShaderManager::instance()->currentProgram()->attribId("aPos"));
 	this->setColorAttrId(ShaderManager::instance()->currentProgram()->attribId("aColor"));
 	this->setNormalAttrId(ShaderManager::instance()->currentProgram()->attribId("aNormal"));
+	this->setTexCoordAttrId(ShaderManager::instance()->currentProgram()->attribId("aTex"));
 }
 
 void ivf::Mesh::setGenerateNormals(bool flag)
@@ -113,6 +117,11 @@ void Mesh::setColorAttrId(GLuint id)
 void Mesh::setNormalAttrId(GLuint id)
 {
     m_normalAttrId = id;
+}
+
+void ivf::Mesh::setTexCoordAttrId(GLuint id)
+{
+	m_texCoordAttrId = id;
 }
 
 void Mesh::begin(GLuint primType)
@@ -141,6 +150,11 @@ void Mesh::vertex3d(const glm::dvec3& v)
 void ivf::Mesh::vertex3f(const glm::vec3 v)
 {
 	this->vertex3f(v.x, v.y, v.z);
+}
+
+void ivf::Mesh::tex2f(GLfloat s, GLfloat t)
+{
+	m_texCoords->setTexCoord(m_texCoordPos++, s, t);
 }
 
 void ivf::Mesh::normal3f(GLfloat vx, GLfloat vy, GLfloat vz)
@@ -287,8 +301,16 @@ void Mesh::end()
 		glVertexAttribPointer(m_normalAttrId, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 	}
 
+	if (m_texCoordAttrId != -1)
+	{
+		m_texCoordVBO = std::make_unique<VertexBuffer>();
+		m_texCoordVBO->setArray(m_texCoords.get());
+		glEnableVertexAttribArray(m_texCoordAttrId);
+		glVertexAttribPointer(m_texCoordAttrId, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	}
+
 	m_VAO->unbind();
-	err = checkPrintError(__FILE__, __LINE__);
+	err = checkPrintError("Mesh", __FILE__, __LINE__);
 }
 
 void Mesh::draw()

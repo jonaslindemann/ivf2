@@ -32,12 +32,12 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
     program->addShader(vertexShader);
     program->addShader(fragmentShader);
 
+    m_linkErrors = !program->link();
+
     program->bindAttribLoc(0, "aPos");
     program->bindAttribLoc(1, "aColor");
     program->bindAttribLoc(2, "aTex");
     program->bindAttribLoc(3, "aNormal");
-
-    m_linkErrors = !program->link();
 
     program->use();
     

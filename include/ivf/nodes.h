@@ -14,4 +14,5 @@
 #include <ivf/cappedcone.h>
 #include <ivf/cone.h>
 #include <ivf/dodecahedron.h>
+#include <ivf/capsule.h>
 

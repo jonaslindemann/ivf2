@@ -5,7 +5,8 @@ using namespace ivf;
 ivf::Node::Node()
 	:m_material(nullptr),
 	 m_texture(nullptr),
-	 m_useMaterial(true)	
+	 m_useMaterial(true),
+	 m_useTexture(false)
 {
 }
 

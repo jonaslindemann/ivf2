@@ -1,4 +1,4 @@
- #include <iostream>
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <string>
@@ -40,7 +40,7 @@ int main()
 	}
 
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1); 
+	glfwSwapInterval(1);
 
 	gladLoadGL();
 
@@ -54,7 +54,7 @@ int main()
 
 	ShaderManagerPtr shaderMgr = ShaderManager::create();
 	shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag");
-	
+
 	if (shaderMgr->compileLinkErrors())
 	{
 		cout << "Couldn't compile shaders, exiting..." << endl;
@@ -67,7 +67,7 @@ int main()
 	AxisPtr axis = Axis::create();
 
 	MaterialPtr material = Material::create();
-	material->setDiffuseColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+	material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	material->setUseTexture(true);
 	material->setUseTexture(false);
 
@@ -94,7 +94,7 @@ int main()
 	ConePtr cone = Cone::create();
 	cone->setMaterial(material);
 	cone->setPos(glm::vec3(3.0, 0.0, 0.0));
-		
+
 	CappedConePtr capCone = CappedCone::create();
 	capCone->setMaterial(material);
 	capCone->setPos(glm::vec3(-3.0, 0.0, 3.0));
@@ -102,6 +102,10 @@ int main()
 	DodecahedronPtr dodeka = Dodecahedron::create();
 	dodeka->setMaterial(material);
 	dodeka->setPos(glm::vec3(0.0, 0.0, 3.0));
+
+	CapsulePtr capsule = Capsule::create();
+	capsule->setMaterial(material);
+	capsule->setPos(glm::vec3(3.0, 0.0, 3.0));
 
 	scene->add(box);
 	scene->add(rbox);
@@ -111,6 +115,7 @@ int main()
 	scene->add(cone);
 	scene->add(capCone);
 	scene->add(dodeka);
+	scene->add(capsule);
 
 	scene->add(axis);
 

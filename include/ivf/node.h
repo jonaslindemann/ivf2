@@ -24,6 +24,7 @@ namespace ivf {
 
 		void setUseTexture(bool flag);
 		bool useTexture();
+
 	protected:
 		virtual void doPreDraw();
 		virtual void doDraw();

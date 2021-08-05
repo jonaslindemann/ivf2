@@ -14,6 +14,7 @@ namespace ivf {
 		glm::vec4 m_diffuseColor;
 		glm::vec4 m_specularColor;
 		glm::vec4 m_ambientColor;
+		float m_shininess;
 	public:
 		Material();
 
@@ -23,6 +24,7 @@ namespace ivf {
 		void setSpecularColor(glm::vec4 color);
 		void setAmbientColor(glm::vec4 color);
 		void setUseTexture(bool flag);
+		void setShininess(float shininess);
 
 		void apply();
 	};

@@ -62,6 +62,15 @@ int main()
 	}
 
 	LightManagerPtr lightMgr = LightManager::create();
+
+	auto pointLight1 = lightMgr->addPointLight();
+	pointLight1->setEnabled(true);
+	pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+	pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+	pointLight1->setAttenuation(1.0, 0.0, 0.0);
+	pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
+	lightMgr->apply();
+
 	CompositeNodePtr scene = CompositeNode::create();
 
 	AxisPtr axis = Axis::create();
@@ -71,6 +80,7 @@ int main()
 	sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
 	sphereMaterial->setUseTexture(true);
 	sphereMaterial->setUseTexture(false);
+	sphereMaterial->setShininess(100.0);
 
 	TexturePtr textureCat = Texture::create();
 	textureCat->load("assets/pop_cat.png");

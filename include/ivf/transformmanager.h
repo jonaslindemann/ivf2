@@ -29,6 +29,11 @@ namespace ivf {
         std::vector<glm::mat4> m_modelStack;
         std::vector<glm::mat4> m_projectionStack;
         std::vector<glm::mat4> m_viewStack;
+
+        GLint m_modelId;
+        GLint m_viewId;
+        GLint m_projectionId;
+        GLint m_viewPosId;
     
         TransformManager();
         static TransformManager* m_instance;

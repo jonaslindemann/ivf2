@@ -98,14 +98,50 @@ void Program::uniformMatrix4(const std::string name, glm::mat4 matrix)
     GL_ERR( glUniformMatrix4fv(uniformLoc(name), 1, GL_FALSE, glm::value_ptr(matrix)) );
 }
 
-void Program::uniformBool(const std::string name, bool flag)
+void ivf::Program::uniformMatrix4(GLint id, glm::mat4 matrix)
+{
+    GL_ERR(glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix)));
+}
+
+void Program:: uniformBool(const std::string name, bool flag)
 {
     GL_ERR( glUniform1i(uniformLoc(name), flag) );
 }
 
+void ivf::Program::uniformBool(GLint id, bool flag)
+{
+    GL_ERR( glUniform1i(id, flag) );
+}
+
+void Program::uniformInt(const std::string name, int value)
+{
+    GL_ERR( glUniform1i(uniformLoc(name), value) );
+}
+
+void ivf::Program::uniformInt(GLint id, int value)
+{
+    GL_ERR(glUniform1i(id, value));
+}
+
+void ivf::Program::uniformFloat(const std::string name, float value)
+{
+    GL_ERR( glUniform1f(uniformLoc(name), value) );
+}
+
+void ivf::Program::uniformFloat(GLint id, float value)
+{
+    GL_ERR( glUniform1f(id, value) );
+}
+
+
 void ivf::Program::uniformVec4f(const std::string name, float v0, float v1, float v2, float v3)
 {
     GL_ERR( glUniform4f(uniformLoc(name), v0, v1, v2, v3) );
+}
+
+void ivf::Program::uniformVec4f(GLint id, float v0, float v1, float v2, float v3)
+{
+    GL_ERR(glUniform4f(id, v0, v1, v2, v3));
 }
 
 void ivf::Program::uniformVec3f(const std::string name, float v0, float v1, float v2)
@@ -113,14 +149,29 @@ void ivf::Program::uniformVec3f(const std::string name, float v0, float v1, floa
     GL_ERR( glUniform3f(uniformLoc(name), v0, v1, v2) );
 }
 
+void ivf::Program::uniformVec3f(GLint id, float v0, float v1, float v2)
+{
+    GL_ERR(glUniform3f(id, v0, v1, v2));
+}
+
 void ivf::Program::uniformVec3(const std::string name, const glm::vec3 v)
 {
     GL_ERR( glUniform3f(uniformLoc(name), v.x, v.y, v.z) );
 }
 
+void ivf::Program::uniformVec3(GLint id, const glm::vec3 v)
+{
+    GL_ERR(glUniform3f(id, v.x, v.y, v.z));
+}
+
 void ivf::Program::uniformVec4(const std::string name, const glm::vec4 v)
 {
     GL_ERR( glUniform4f(uniformLoc(name), v.x, v.y, v.z, v.w) );
+}
+
+void ivf::Program::uniformVec4(GLint id, const glm::vec4 v)
+{
+    GL_ERR(glUniform4f(id, v.x, v.y, v.z, v.w));
 }
 
 void ivf::Program::printAttribs()

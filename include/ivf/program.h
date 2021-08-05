@@ -39,12 +39,25 @@ namespace ivf {
         GLint uniformLoc(const std::string name);
         
         void uniformMatrix4(const std::string name, glm::mat4 matrix);
+        void uniformMatrix4(GLint id, glm::mat4 matrix);
+
 		void uniformBool(const std::string name, bool flag);
+        void uniformBool(GLint id, bool flag);
+
+        void uniformInt(const std::string name, int value);
+        void uniformInt(GLint id, int value);
+
+        void uniformFloat(const std::string name, float value);
+        void uniformFloat(GLint id, float value);
         
         void uniformVec4f(const std::string name, float v0, float v1, float v2, float v3);
+        void uniformVec4f(GLint id, float v0, float v1, float v2, float v3);
         void uniformVec3f(const std::string name, float v0, float v1, float v2);
+        void uniformVec3f(GLint id, float v0, float v1, float v2);
         void uniformVec3(const std::string name, const glm::vec3 v);
+        void uniformVec3(GLint id, const glm::vec3 v);
         void uniformVec4(const std::string name, const glm::vec4 v);
+        void uniformVec4(GLint id, const glm::vec4 v);
 
         void printAttribs();
         

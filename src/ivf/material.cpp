@@ -10,7 +10,8 @@ Material::Material()
 	 m_specularColor(glm::vec4(1.0, 1.0, 1.0, 1.0)),
 	 m_useLighting(true),
 	 m_useVertexColor(false), 
-	 m_useTexture(false)
+	 m_useTexture(false),
+	 m_shininess(70.0)
 {
 }
 
@@ -39,6 +40,11 @@ void ivf::Material::setUseTexture(bool flag)
 	m_useTexture = flag;
 }
 
+void ivf::Material::setShininess(float shininess)
+{
+	m_shininess = shininess;
+}
+
 void ivf::Material::apply()
 {
 	LightManager::instance()->setUseLighting(m_useLighting);
@@ -48,4 +54,5 @@ void ivf::Material::apply()
 	LightManager::instance()->setAmbientColor(m_ambientColor);
 	LightManager::instance()->setSpecularColor(m_specularColor);
 	LightManager::instance()->setUseTexture(m_useTexture);
+	LightManager::instance()->setShininess(m_shininess);
 }

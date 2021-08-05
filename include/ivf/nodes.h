@@ -15,4 +15,11 @@
 #include <ivf/cone.h>
 #include <ivf/dodecahedron.h>
 #include <ivf/capsule.h>
-
+#include <ivf/cappedtube.h>
+#include <ivf/tube.h>
+#include <ivf/disk.h>
+#include <ivf/plane.h>
+#include <ivf/instancenode.h>
+#include <ivf/pointlight.h>
+#include <ivf/dirlight.h>
+#include <ivf/spotlight.h>

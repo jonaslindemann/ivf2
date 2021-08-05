@@ -32,6 +32,8 @@ void Node::setTexture(std::shared_ptr<Texture> texture)
 	m_texture = texture;
 	if (m_material != nullptr)
 		m_material->setUseTexture(true);
+
+	m_useTexture = true;
 }
 
 bool ivf::Node::useMaterial()
@@ -39,9 +41,19 @@ bool ivf::Node::useMaterial()
 	return m_useMaterial;
 }
 
+void ivf::Node::setUseTexture(bool flag)
+{
+	m_useTexture = flag;
+}
+
+bool ivf::Node::useTexture()
+{
+	return m_useTexture;
+}
+
 void Node::doPreDraw()
 {
-	if ((m_material != nullptr)&&(m_useMaterial))
+	if ((m_material != nullptr) && (m_useMaterial))
 		m_material->apply();
 	if ((m_texture != nullptr) && (m_useTexture))
 		m_texture->bind();

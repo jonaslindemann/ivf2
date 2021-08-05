@@ -17,6 +17,7 @@ namespace ivf {
         GLint m_magFilter;
         GLint m_intFormat;
         GLint m_level;
+        GLint m_texUnit;
         GLenum m_format;
         GLenum m_type;
     public:
@@ -33,6 +34,9 @@ namespace ivf {
         void setFormat(GLenum format);
         void setType(GLenum type);
         void setLevel(GLint level);
+        void setTexUnit(GLint unit);
+
+        GLint texUnit();
 
         GLuint id();
     };

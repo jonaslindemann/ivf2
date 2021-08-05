@@ -15,10 +15,11 @@ Texture::Texture()
 	 m_wrapS(GL_REPEAT),
 	 m_minFilter(GL_LINEAR_MIPMAP_LINEAR),
 	 m_magFilter(GL_LINEAR),
-	 m_intFormat(GL_RGB),
+	 m_intFormat(GL_RGBA),
 	 m_level(0),
 	 m_format(GL_RGBA),
-	 m_type(GL_UNSIGNED_BYTE)
+	 m_type(GL_UNSIGNED_BYTE),
+	 m_texUnit(0)
 {
 	glGenTextures(1, &m_id);
 }
@@ -36,6 +37,7 @@ std::shared_ptr<Texture> Texture::create()
 void Texture::bind()
 {
 	GL_ERR_BEGIN;
+	glActiveTexture(GL_TEXTURE0 + m_texUnit);
 	glBindTexture(GL_TEXTURE_2D, m_id);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, m_wrapS);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, m_wrapT);
@@ -55,7 +57,7 @@ bool Texture::load(const std::string filename)
 	{
 		this->bind();
 		GL_ERR_BEGIN;
-		glTexImage2D(GL_TEXTURE_2D, m_level, m_intFormat, width, height, 0, m_format, m_type, data);
+		glTexImage2D(GL_TEXTURE_2D, m_level, m_format, width, height, 0, m_intFormat, m_type, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		GL_ERR_END("Texture::load()");
 		this->unbind();
@@ -94,6 +96,16 @@ void ivf::Texture::setType(GLenum type)
 void ivf::Texture::setLevel(GLint level)
 {
 	m_level = level;
+}
+
+void ivf::Texture::setTexUnit(GLint unit)
+{
+	m_texUnit = unit;
+}
+
+GLint ivf::Texture::texUnit()
+{
+	return m_texUnit;
 }
 
 GLuint ivf::Texture::id()

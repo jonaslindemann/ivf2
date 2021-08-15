@@ -23,3 +23,4 @@
 #include <ivf/pointlight.h>
 #include <ivf/dirlight.h>
 #include <ivf/spotlight.h>
+#include <ivf/textnode.h>

@@ -10,8 +10,9 @@ using namespace ivf;
 using namespace std;
 
 Program::Program()
+    :m_id(-1),
+     m_name("generic")
 {
-    m_id = -1;
 }
 
 Program::~Program()
@@ -204,4 +205,14 @@ void ivf::Program::printAttribs()
 GLuint Program::id()
 {
     return m_id;
+}
+
+std::string ivf::Program::name()
+{
+    return m_name;
+}
+
+void ivf::Program::setName(std::string name)
+{
+    m_name = name;
 }

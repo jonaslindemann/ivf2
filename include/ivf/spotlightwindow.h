@@ -11,6 +11,8 @@ namespace ivf {
 		float m_constAttenuation;
 		float m_linearAttenuation;
 		float m_quadraticAttenuation;
+		float m_cutoff;
+		float m_outerCutoff;
 		glm::vec3 m_direction;
 		glm::vec3 m_position;
 		glm::vec3 m_diffuseColor;
@@ -21,6 +23,8 @@ namespace ivf {
 		float m_constAttenuationPrev;
 		float m_linearAttenuationPrev;
 		float m_quadraticAttenuationPrev;
+		float m_cutoffPrev;
+		float m_outerCutoffPrev;
 		glm::vec3 m_directionPrev;
 		glm::vec3 m_positionPrev;
 		glm::vec3 m_diffuseColorPrev;

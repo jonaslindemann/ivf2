@@ -10,6 +10,8 @@ SpotLightWindow::SpotLightWindow(ivf::SpotLightPtr spotLight, std::string captio
 	 m_constAttenuation(spotLight->constAttenuation()),
 	 m_linearAttenuation(spotLight->linearAttenutation()),
 	 m_quadraticAttenuation(spotLight->quadraticAttenuation()),
+	 m_cutoff(spotLight->innerCutoff()),
+	 m_outerCutoff(spotLight->outerCutoff()),
 	 m_diffuseColor(spotLight->diffuseColor()),
 	 m_specularColor(spotLight->specularColor()),
 	 m_ambientColor(spotLight->ambientColor()),
@@ -19,6 +21,8 @@ SpotLightWindow::SpotLightWindow(ivf::SpotLightPtr spotLight, std::string captio
 	 m_constAttenuationPrev(spotLight->constAttenuation()),
 	 m_linearAttenuationPrev(spotLight->linearAttenutation()),
 	 m_quadraticAttenuationPrev(spotLight->quadraticAttenuation()),
+	 m_cutoffPrev(spotLight->innerCutoff()),
+	 m_outerCutoffPrev(spotLight->outerCutoff()),
 	 m_diffuseColorPrev(spotLight->diffuseColor()),
 	 m_specularColorPrev(spotLight->specularColor()),
 	 m_ambientColorPrev(spotLight->ambientColor()),
@@ -45,10 +49,14 @@ void SpotLightWindow::doDraw()
 	ImGui::SliderFloat("Kc", &m_constAttenuation, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 	ImGui::SliderFloat("Kl", &m_linearAttenuation, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 	ImGui::SliderFloat("Kq", &m_quadraticAttenuation, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+	ImGui::SliderFloat("Inner cutoff", &m_cutoff, 0.0f, 90.0f);
+	ImGui::SliderFloat("Outer cutoff", &m_outerCutoff, 0.0f, 90.0f);
 
 	m_isDirty = (m_constAttenuation != m_constAttenuationPrev) ||
 		(m_linearAttenuation != m_linearAttenuationPrev) ||
 		(m_quadraticAttenuation != m_quadraticAttenuationPrev) ||
+		(m_cutoff != m_cutoffPrev) ||
+		(m_outerCutoff != m_outerCutoffPrev) ||
 		(m_enabled != m_enabledPrev) ||
 		(m_diffuseColor != m_diffuseColorPrev) ||
 		(m_specularColor != m_specularColorPrev) ||
@@ -65,6 +73,8 @@ void SpotLightWindow::doDraw()
 	m_enabledPrev = m_enabled;
 	m_positionPrev = m_position;
 	m_directionPrev = m_direction;
+	m_cutoffPrev = m_cutoff;
+	m_outerCutoffPrev = m_outerCutoff;
 
 	m_spotLight->setPosition(m_position);
 	m_spotLight->setDirection(m_direction);
@@ -72,6 +82,7 @@ void SpotLightWindow::doDraw()
 	m_spotLight->setDiffuseColor(m_diffuseColor);
 	m_spotLight->setSpecularColor(m_specularColor);
 	m_spotLight->setAmbientColor(m_ambientColor);
+	m_spotLight->setCutoff(m_cutoff, m_outerCutoff);
 	m_spotLight->setEnabled(m_enabled);
 }
  

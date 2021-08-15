@@ -30,6 +30,8 @@ namespace ivf {
 		float innerCutoff();
 		float outerCutoff();
 
+		void apply();
+
 	};
 
 	typedef std::shared_ptr<SpotLight> SpotLightPtr;

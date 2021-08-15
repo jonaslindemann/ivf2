@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -24,7 +25,7 @@ namespace ivf {
         bool m_vertexCompileErrors;
         bool m_fragCompileErrors;
 
-        std::vector<std::shared_ptr<Program>> m_programs;
+        std::map<std::string, std::shared_ptr<Program>> m_programs;
         std::shared_ptr<Program> m_currentProgram;
     
     public:
@@ -54,7 +55,7 @@ namespace ivf {
             m_instance = 0;
         }
     
-        std::shared_ptr<Program> loadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader);
+        std::shared_ptr<Program> loadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader, const std::string name);
         std::shared_ptr<Program> currentProgram();
     
         void apply();

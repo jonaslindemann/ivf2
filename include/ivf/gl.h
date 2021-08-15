@@ -15,4 +15,5 @@
 #include <ivf/normalfactory.h>
 #include <ivf/texture.h>
 #include <ivf/material.h>
+#include <ivf/fontmanager.h>
 

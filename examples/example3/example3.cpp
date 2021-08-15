@@ -53,7 +53,7 @@ int main()
 	UiRendererPtr ui = UiRenderer::create(window);
 
 	ShaderManagerPtr shaderMgr = ShaderManager::create();
-	shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag");
+	shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag", "basic");
 	
 	if (shaderMgr->compileLinkErrors())
 	{

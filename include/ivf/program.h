@@ -18,6 +18,7 @@ namespace ivf {
     
     class Program : public GLBase {
     protected:
+        std::string m_name;
         std::vector<std::shared_ptr<Shader>> m_shaders;
         GLuint m_id;
     public:
@@ -62,6 +63,8 @@ namespace ivf {
         void printAttribs();
         
         GLuint id();
+        std::string name();
+        void setName(std::string name);
     };
 
     typedef std::shared_ptr<Program> ProgramPtr;

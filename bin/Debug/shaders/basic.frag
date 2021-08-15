@@ -65,11 +65,15 @@ in vec2 texCoord;
 uniform vec3 lightPos; 
 uniform vec3 viewPos; 
 uniform vec4 lightColor;
+uniform vec3 textColor;
 
 uniform bool useLighting;
 uniform bool useTexture;
 uniform bool useVertexColors;
 uniform bool usePointFalloff = false;
+uniform bool textRendering = false;
+uniform bool useFixedTextColor = false;
+
 uniform float point_falloff_a = 0.0;
 uniform float point_falloff_b = 0.0;
 
@@ -127,7 +131,13 @@ void main()
         if (useTexture)
             //fragColor = vec4(texCoord, 0.0, 1.0);
             //fragColor = texture(texture0, texCoord) * vec4(1.0, 0.0, 0.0, 1.0); 
-            fragColor = texture(texture0, texCoord) * vec4(result, 1.0);
+            if (textRendering)
+                if (useFixedTextColor)
+                    fragColor = vec4(textColor.r, textColor.g, textColor.b, texture(texture0, texCoord).r);
+                else
+                    fragColor = vec4(result.r, result.g, result.b, texture(texture0, texCoord).r);
+            else
+                fragColor = texture(texture0, texCoord) * vec4(result, 1.0);
         else
             fragColor = vec4(result, 1.0);
     else
@@ -223,6 +233,8 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     vec3 ambient = light.ambientColor * material.ambientColor;
     vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
+
+    //ambient = vec3(light.cutOff, light.outerCutOff, 0.0);
 
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;

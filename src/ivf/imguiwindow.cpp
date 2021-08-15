@@ -25,7 +25,7 @@ void ivf::UiWindow::draw()
 {
 	if (m_visible)
 	{
-		ImGui::Begin(m_name.c_str()); //, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+		ImGui::Begin(m_name.c_str(), 0, ImGuiWindowFlags_AlwaysAutoResize); //, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 		doDraw();
 		ImGui::End();
 	}

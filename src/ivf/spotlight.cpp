@@ -1,6 +1,11 @@
 #include <ivf/spotlight.h>
 
 #include <ivf/lightmanager.h>
+#include <ivf/shadermanager.h>
+
+#include <sstream>
+#include <iostream>
+#include <string>
 
 using namespace ivf;
 
@@ -9,8 +14,8 @@ SpotLight::SpotLight()
 	 m_constAttenuation(1.0),
 	 m_linearAttenuation(0.0),
 	 m_quadraticAttenuation(0.0),
-	 m_cutoff(glm::radians(12.5f)),
-	 m_outerCutoff(glm::radians(20.0f))
+	 m_cutoff(25.5f),
+	 m_outerCutoff(30.0f)
 {
 	setLightArrayName("spotLights");
 }
@@ -67,3 +72,26 @@ float ivf::SpotLight::outerCutoff()
 {
 	return m_outerCutoff;
 }
+
+void ivf::SpotLight::apply()
+{
+	std::string prefix;
+	std::stringstream ss;
+
+	ss << lightArrayName() << "[" << index() << "].";
+	prefix = ss.str();
+
+	ShaderManager::instance()->currentProgram()->use();
+	ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "diffuseColor", diffuseColor());
+	ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "specularColor", specularColor());
+	ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "ambientColor", ambientColor());
+	ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "position", position());
+	ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "direction", direction());
+	ShaderManager::instance()->currentProgram()->uniformBool(prefix + "enabled", enabled());
+	ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "constant", constAttenuation());
+	ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "linear", linearAttenutation());
+	ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "quadratic", quadraticAttenuation());
+	ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "cutOff", glm::cos(glm::radians(innerCutoff())));
+	ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "outerCutOff", glm::cos(glm::radians(outerCutoff())));
+}
+

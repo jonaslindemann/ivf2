@@ -16,7 +16,7 @@ ShaderManager::ShaderManager()
     m_fragCompileErrors = false;
 }
 
-std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string vertexSource, const std::string fragmentSource)
+std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string vertexSource, const std::string fragmentSource, const std::string name)
 {
     cout << "ShaderManager: Loading shaders." << endl;
     cout << "\tVertex shader = " << vertexSource << endl;
@@ -40,8 +40,14 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
     program->bindAttribLoc(3, "aNormal");
 
     program->use();
-    
-    m_programs.push_back(program);
+
+    auto it = m_programs.find(name);
+
+    if (it == m_programs.end())
+        m_programs[name] = program;
+    else
+        it->second = program;
+     
     m_currentProgram = program;
 
     program->printAttribs();

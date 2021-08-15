@@ -42,7 +42,7 @@ int main()
 	glViewport(0, 0, width, height);
 
 	ShaderManagerPtr shaderMgr = ShaderManager::create();
-	shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag");
+	shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag", "basic");
 	
 	if (shaderMgr->compileLinkErrors())
 	{

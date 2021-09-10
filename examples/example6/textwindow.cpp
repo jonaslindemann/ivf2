@@ -11,7 +11,7 @@ TextWindow::TextWindow(TextNodePtr node)
 		m_alignX(int(node->alignX())),
 		m_alignY(int(node->alignY()))
 {
-	m_textArray.assign(0);
+	m_textArray.fill(0);
 	m_text = m_textNode->text();
 	std::copy(m_text.begin(), m_text.end(), m_textArray.data());
 }

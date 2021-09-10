@@ -10,7 +10,7 @@ if (WIN32)
         target_link_libraries(example2 ivf2 generator glad glfw3 imgui stb )
     endif()
 else()
-    add_executable(example2 example2.cpp)
+    add_executable(example2 example2.cpp examplewindow1.cpp examplewindow2.cpp)
     target_link_libraries(example2 ivf2 generator glad glfw3 imgui stb dl pthread )
 endif()
 

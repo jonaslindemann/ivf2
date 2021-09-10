@@ -21,8 +21,9 @@ namespace ivf {
         void addMesh(std::shared_ptr<Mesh> mesh);
         std::vector<std::shared_ptr<Mesh>> meshes();
 
-        void newMesh(int vsize, int isize = 0);
+        void newMesh(int vsize, int isize = 0, GLuint primType=GL_TRIANGLES);
         std::shared_ptr<Mesh> mesh(int idx = 0);
+        std::shared_ptr<Mesh> lastMesh();
         void clear();
 
         void createFromGenerator(generator::AnyGenerator<generator::MeshVertex>& vertices, generator::AnyGenerator<generator::Triangle>& triangles);

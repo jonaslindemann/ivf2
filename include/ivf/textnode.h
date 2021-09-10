@@ -17,10 +17,24 @@ namespace ivf {
 		unsigned int glyphAdvance;   // Horizontal offset to advance to next glyph
 	};
 
+	enum class TextAlignX {
+		LEFT,
+		CENTER,
+		RIGHT
+	};
+
+	enum class TextAlignY {
+		BOTTOM,
+		MIDDLE,
+		TOP
+	};
+
 	class TextNode : public TransformNode {
 	private:
 		std::string m_text;
 		std::map<GLchar, CharacterInfo> m_charMap;
+
+		
 
 		GLuint m_vertexAttrId;
 		GLuint m_texAttrId;
@@ -30,6 +44,7 @@ namespace ivf {
 		GLuint m_textRenderingId;
 		GLuint m_useFixedTextColorId;
 		GLuint m_textColorId;
+		GLuint m_useTextureId;
 
 		bool m_textRendering;
 		bool m_useFixedTextColor;
@@ -37,6 +52,12 @@ namespace ivf {
 
 		int m_maxPixels;
 		float m_scale;
+
+		TextAlignX m_textAlignX;
+		TextAlignY m_textAlignY;
+
+		float m_textWidth;
+		float m_textHeight;
 
 		GLuint m_VAO;
 		GLuint m_vertexVBO;
@@ -47,6 +68,7 @@ namespace ivf {
 
 		void updateCharMap();
 		void prepareBuffers();
+		void updateTextSize();
 	public:
 		TextNode();
 
@@ -54,6 +76,18 @@ namespace ivf {
 
 		void setText(const std::string text);
 		std::string text();
+
+		void setSize(const float size);
+		float size();
+
+		void setAlignX(const TextAlignX align);
+		void setAlignY(const TextAlignY align);
+
+		TextAlignX alignX();
+		TextAlignY alignY();
+
+		float textWidth();
+		float textHeight();
 
 	protected:
 		virtual void doDraw();

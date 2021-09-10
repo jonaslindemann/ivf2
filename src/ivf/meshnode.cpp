@@ -25,9 +25,9 @@ std::vector<std::shared_ptr<Mesh>> ivf::MeshNode::meshes()
 	return m_meshes;
 }
 
-void MeshNode::newMesh(int vsize, int isize)
+void MeshNode::newMesh(int vsize, int isize, GLuint primType)
 {
-	this->addMesh(std::make_shared<Mesh>(vsize, isize));
+	this->addMesh(std::make_shared<Mesh>(vsize, isize, primType));
 }
 
 std::shared_ptr<Mesh> ivf::MeshNode::mesh(int idx) 
@@ -36,6 +36,14 @@ std::shared_ptr<Mesh> ivf::MeshNode::mesh(int idx)
 		return m_meshes[idx];
 	else
 		return nullptr;
+}
+
+std::shared_ptr<Mesh> ivf::MeshNode::lastMesh()
+{
+    if (m_meshes.size()!=0)
+        return m_meshes[m_meshes.size()-1];
+    else
+        return nullptr;
 }
 
 void ivf::MeshNode::clear()

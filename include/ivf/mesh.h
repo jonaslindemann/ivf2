@@ -61,7 +61,7 @@ namespace ivf {
 		void setupPrim();
 
     public:
-        Mesh(GLuint vsize, GLuint isize=0);
+        Mesh(GLuint vsize, GLuint isize=0, GLuint primType=GL_TRIANGLES);
         virtual ~Mesh();
 
         static std::shared_ptr<Mesh> create(GLuint vsize, GLuint isize = 0);

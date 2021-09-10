@@ -18,11 +18,11 @@ glm::vec3 computeNormal(
 	return glm::normalize(glm::cross(c - a, b - a));
 }
 
-Mesh::Mesh(GLuint vsize, GLuint isize)
+Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType)
 	:m_position(0.0f),
 	 m_generateNormals(true)
 {
-	m_primType = GL_TRIANGLES;
+	m_primType = primType;
 	this->setSize(vsize, isize);
 }
 
@@ -319,7 +319,7 @@ void Mesh::draw()
 	if (m_indices != nullptr)
 		glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0);
 	else
-		glDrawArrays(m_primType, 0, m_verts->size());
+		glDrawArrays(m_primType, 0, m_verts->size()/3); 
     m_VAO->unbind();
 }
 

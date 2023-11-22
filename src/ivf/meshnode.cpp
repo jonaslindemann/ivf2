@@ -3,6 +3,9 @@
 #include <generator/generator.hpp>
 #include <generator/utils.hpp>
 
+#include <iostream>
+
+using namespace std;
 using namespace ivf;
 using namespace generator;
 
@@ -46,6 +49,11 @@ std::shared_ptr<Mesh> ivf::MeshNode::lastMesh()
         return nullptr;
 }
 
+std::shared_ptr<Mesh> ivf::MeshNode::currentMesh()
+{
+    return lastMesh();
+}
+
 void ivf::MeshNode::clear()
 {
 	m_meshes.clear();
@@ -86,9 +94,41 @@ void ivf::MeshNode::createFromGenerator(generator::AnyGenerator<generator::MeshV
     mesh()->end();
 }
 
+void ivf::MeshNode::debugFromGenerator(generator::AnyGenerator<generator::MeshVertex>& vertices, generator::AnyGenerator<generator::Triangle>& triangles)
+{
+    GLuint nVertices = count(vertices);
+    GLuint nTriangles = count(triangles);
+
+    while (!vertices.done())
+    {
+        MeshVertex vertex = vertices.generate();
+
+        cout << "v: (" << vertex.position[0] << ", " << vertex.position[1] << ", " << vertex.position[2] << ")" << endl;
+        cout << "n: (" << vertex.normal[0] << ", " << vertex.normal[1] << ", " << vertex.normal[2] << ")" << endl;
+        cout << "t: (" << vertex.texCoord[0] << ", " << vertex.texCoord[1] << ")" << endl;
+
+        vertices.next();
+    }
+
+    while (!triangles.done())
+    {
+        Triangle triangle = triangles.generate();
+
+        cout << "i: (" << triangle.vertices[0] << ", " << triangle.vertices[1] << ", " << triangle.vertices[2] << endl;
+
+        triangles.next();
+    }
+}
+
 void MeshNode::refresh()
 {
 	this->doSetup();
+}
+
+void ivf::MeshNode::print()
+{
+    for (auto& mesh : m_meshes)
+        mesh->print();
 }
 
 void ivf::MeshNode::doDraw()

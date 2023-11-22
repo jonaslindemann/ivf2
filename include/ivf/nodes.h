@@ -25,3 +25,5 @@
 #include <ivf/spotlight.h>
 #include <ivf/textnode.h>
 #include <ivf/extrusion.h>
+#include <ivf/solidline.h>
+#include <ivf/solidpath.h>

@@ -1,6 +1,9 @@
 #include <ivf/field.h>
 
+#include <iostream>
+
 using namespace ivf;
+using namespace std;
 
 Field::Field(GLuint rows, GLuint cols)
 {
@@ -51,4 +54,8 @@ void* Field::data()
 GLenum Field::dataType()
 {
 	return GL_NONE;
+}
+
+void ivf::Field::print()
+{
 }

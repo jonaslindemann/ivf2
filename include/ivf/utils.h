@@ -21,6 +21,21 @@
 
 namespace ivf {
 
+	class LinearInterpolFunc {
+	private:
+		std::vector<glm::vec3> m_points;
+
+		float tri(float t);
+	public:
+		LinearInterpolFunc();
+
+		void addPoint(glm::vec3 p);
+		void clear();
+		int size();
+
+		glm::vec3 operator()(float t);
+	};
+
 	void clearError();
 	GLenum checkPrintError(const std::string context, const std::string file="", const long line=0);   
 	float random(float a, float b);

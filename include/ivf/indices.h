@@ -15,7 +15,12 @@ namespace ivf {
 		void setIndex(GLuint idx, GLuint i0, GLuint i1);
 		void setIndex(GLuint idx, GLuint i0, GLuint i1, GLuint i2);
 		void setIndex(GLuint idx, GLuint i0, GLuint i1, GLuint i2, GLuint i3);
-    };  
+
+		void index(GLuint idx, GLuint& i0);
+		void index(GLuint idx, GLuint& i0, GLuint& i1);
+		void index(GLuint idx, GLuint& i0, GLuint& i1, GLuint& i2);
+		void index(GLuint idx, GLuint& i0, GLuint& i1, GLuint& i2, GLuint& i3);
+	};
 	typedef std::shared_ptr<Indices> IndicesPtr;
 };
 

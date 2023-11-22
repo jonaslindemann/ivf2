@@ -28,6 +28,8 @@ namespace ivf {
 		virtual GLenum dataType();
         
         virtual void* data();
+
+        virtual void print();
     };
     typedef std::shared_ptr<IntField> IntFieldPtr;
     

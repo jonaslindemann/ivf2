@@ -1,6 +1,9 @@
 #include <ivf/intfield.h>
 
+#include <iostream>
+
 using namespace ivf;
+using namespace std;
 
 IntField::IntField(GLuint rows, GLuint cols)
 :Field(rows, cols)
@@ -28,6 +31,23 @@ void IntField::zero()
 void* IntField::data()
 {
     return m_data;
+}
+
+void ivf::IntField::print()
+{
+    cout << "---------" << endl;
+    cout << "Integer field (" << this->rows() << ", " << this->cols() << ")" << endl;
+    for (auto i = 0; i < this->rows(); i++)
+    {
+        for (auto j = 0; j < this->cols(); j++)
+        {
+            cout << this->at(i, j);
+            if (j < this->cols() - 1)
+                cout << ", ";
+            else
+                cout << endl;
+        }
+    }
 }
 
 GLuint IntField::at(GLuint row, GLuint col)

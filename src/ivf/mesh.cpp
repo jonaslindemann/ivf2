@@ -1,6 +1,7 @@
 #include <ivf/mesh.h>
 
 #include <memory>
+#include <iostream>
 
 #include <glad/glad.h>
 
@@ -9,6 +10,7 @@
 #include <ivf/utils.h>
 
 using namespace ivf;
+using namespace std;
 
 glm::vec3 computeNormal(
 	glm::vec3 const& a,
@@ -162,6 +164,11 @@ void ivf::Mesh::normal3f(GLfloat vx, GLfloat vy, GLfloat vz)
 	m_normals->setNormal(m_normalPos++, vx, vy, vz);
 }
 
+void ivf::Mesh::normal3f(const glm::vec3 v)
+{
+	this->normal3f(v.x, v.y, v.z);
+}
+
 void ivf::Mesh::normal3d(GLdouble vx, GLdouble vy, GLdouble vz)
 {
 	this->normal3f(GLfloat(vx), GLfloat(vy), GLfloat(vz));
@@ -310,16 +317,20 @@ void Mesh::end()
 	}
 
 	m_VAO->unbind();
-	err = checkPrintError("Mesh", __FILE__, __LINE__);
+ 	err = checkPrintError("Mesh", __FILE__, __LINE__);
 }
 
 void Mesh::draw()
 {
     m_VAO->bind();
 	if (m_indices != nullptr)
-		glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0);
+	{
+		GL_ERR(glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0));
+	}
 	else
-		glDrawArrays(m_primType, 0, m_verts->size()/3); 
+	{
+		GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
+	}
     m_VAO->unbind();
 }
 
@@ -342,6 +353,11 @@ glm::vec3 ivf::Mesh::pos()
 	return m_position;
 }
 
+GLuint ivf::Mesh::currentIndexPos()
+{
+	return m_indexPos;
+}
+
 std::shared_ptr<Normals> ivf::Mesh::normals()
 {
 	return m_normals;
@@ -350,4 +366,31 @@ std::shared_ptr<Normals> ivf::Mesh::normals()
 std::shared_ptr<Vertices> ivf::Mesh::vertices()
 {
 	return m_verts;
+}
+
+std::shared_ptr<Indices> ivf::Mesh::indices()
+{
+	return m_indices;
+}
+
+void ivf::Mesh::print()
+{
+	if (m_indices != nullptr)
+	{
+		//GL_ERR(glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0));
+	}
+	else
+	{
+		//GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
+		cout << "---------" << endl;
+		cout << "Vertices:" << endl;
+		if (m_verts!=nullptr)
+			m_verts->print();
+		cout << "Normals:" << endl;
+		if (m_normals!=nullptr)
+			m_normals->print();
+		cout << "Colors:" << endl;
+		if (m_colors != nullptr)
+			m_colors->print();
+	}
 }

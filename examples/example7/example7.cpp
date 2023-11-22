@@ -17,113 +17,127 @@ using namespace std;
 
 int main()
 {
-	int width, height;
+    int width, height;
 
-	glfwInit();
+    glfwInit();
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
-	auto window = glfwCreateWindow(800, 800, "Example 1", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
+    auto window = glfwCreateWindow(800, 800, "Example 1", NULL, NULL);
+    if (window == NULL)
+    {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+        return -1;
+    }
 
-	glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window);
 
-	gladLoadGL();
+    gladLoadGL();
 
-	glfwGetWindowSize(window, &width, &height); 
-	glViewport(0, 0, width, height);
+    glfwGetWindowSize(window, &width, &height);
+    glViewport(0, 0, width, height);
 
-	ShaderManagerPtr shaderMgr = ShaderManager::create();
-	shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag", "basic");
-	
-	if (shaderMgr->compileLinkErrors())
-	{
-		cout << "Couldn't compile shaders, exiting..." << endl;
-		return -1;
-	}
+    ShaderManagerPtr shaderMgr = ShaderManager::create();
+    shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag", "basic");
 
-	LightManagerPtr lightMgr = LightManager::create();
+    if (shaderMgr->compileLinkErrors())
+    {
+        cout << "Couldn't compile shaders, exiting..." << endl;
+        return -1;
+    }
 
-	auto pointLight1 = lightMgr->addPointLight();
-	pointLight1->setEnabled(true);
-	pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-	pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-	pointLight1->setAttenuation(1.0, 0.0, 0.0);
-	pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
-	lightMgr->apply();
+    LightManagerPtr lightMgr = LightManager::create();
 
-	CompositeNodePtr scene = CompositeNode::create();
+    auto pointLight1 = lightMgr->addPointLight();
+    pointLight1->setEnabled(true);
+    pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+    pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+    pointLight1->setAttenuation(1.0, 0.0, 0.0);
+    pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
+    lightMgr->apply();
 
-	AxisPtr axis = Axis::create();
-	GridPtr grid = Grid::create();
+    CompositeNodePtr scene = CompositeNode::create();
 
-	scene->add(axis);
-	scene->add(grid);
+    AxisPtr axis = Axis::create();
+    GridPtr grid = Grid::create();
 
-	ExtrusionPtr extrusion = Extrusion::create();
+    scene->add(axis);
+    scene->add(grid);
 
-	glm::vec3 p(0.0f, 0.0f, 0.0f);
+    auto yellowMat = Material::create();
+    yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
 
-	for (int i = 0; i < 20; i++)
-	{
-		extrusion->addPathPoint(p);
-		p += glm::vec3(random(-1.0, 1.0), random(-1.0, 1.0), random(-1.0, 1.0));
-	}
+    auto redMat = Material::create();
+    redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
-	extrusion->addSectionPoint(glm::vec2(-0.1, -0.1));
-	extrusion->addSectionPoint(glm::vec2( 0.1, -0.1));
-	extrusion->addSectionPoint(glm::vec2( 0.1,  0.1));
-	extrusion->addSectionPoint(glm::vec2(-0.1,  0.1));
+    auto greenMat = Material::create();
+    greenMat->setDiffuseColor(glm::vec4(0.0, 1.0, 0.0, 1.0));
 
-	extrusion->refresh();
+    auto line = SolidLine::create(glm::vec3(0.0, -1.0, -1.0), glm::vec3(0.0, 1.0, 1.0), 0.1);
+    line->setMaterial(yellowMat);
 
-	scene->add(extrusion);
+    auto extrusion = Extrusion::create();
 
-	CameraManipulatorPtr camManip = CameraManipulator::create(window);
+    extrusion->createCircleSection(0.1);
 
-	glEnable(GL_DEPTH_TEST);
+    glm::vec3 pos;
 
-	double previousTime = glfwGetTime();
-	int frameCount = 0;
+    float angle = 0.0f;
+    constexpr float da = glm::pi<float>() / 36.0f;
 
-	while (!glfwWindowShouldClose(window)) 
-	{
-		// Measure speed
+    while (angle < glm::quarter_pi<float>())
+    {
+        pos = glm::vec3(2.0 * cos(angle), 0.0, 2.0 * sin(angle));
+        extrusion->addPathPoint(pos);
+        angle += da;
+    }
+    // pos = glm::vec3(2.0 * cos(0.0f), 0.0, 2.0 * sin(0.0f));
+    // extrusion->addPathPoint(pos);
 
-		double currentTime = glfwGetTime();
-		frameCount++;
+    extrusion->refresh();
 
-		// If a second has passed.
+    extrusion->setMaterial(yellowMat);
 
-		if (currentTime - previousTime >= 1.0)
-		{
-			// Display the frame count here any way you want.
+    auto sphere1 = Sphere::create();
+    sphere1->setPos(glm::vec3(-8.0, 0.0, 0.0));
+    sphere1->setMaterial(redMat);
 
-			std::cout << frameCount << endl;
-			frameCount = 0;
-			previousTime = currentTime;
-		}
+    auto sphere2 = Sphere::create();
+    sphere2->setPos(glm::vec3(8.0, 0.0, 0.0));
+    sphere2->setMaterial(greenMat);
 
-		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    scene->add(sphere1);
+    scene->add(sphere2);
+    scene->add(line);
+    scene->add(extrusion);
 
-		camManip->update();
+    CameraManipulatorPtr camManip = CameraManipulator::create(window);
 
-		scene->draw();
+    glEnable(GL_DEPTH_TEST);
 
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	}
+    double previousTime = glfwGetTime();
+    int frameCount = 0;
 
-	glfwDestroyWindow(window);
-	glfwTerminate();
-	return 0;
+    while (!glfwWindowShouldClose(window))
+    {
+        // If a second has passed.
+
+        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        camManip->update();
+
+        scene->draw();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return 0;
 }

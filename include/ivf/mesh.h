@@ -85,6 +85,7 @@ namespace ivf {
         void vertex3f(const glm::vec3 v);
         void tex2f(GLfloat s, GLfloat t);
         void normal3f(GLfloat vx, GLfloat vy, GLfloat vz);
+        void normal3f(const glm::vec3 v);
         void normal3d(GLdouble vx, GLdouble vy, GLdouble vz);
         void color3f(GLfloat r, GLfloat g, GLfloat b);
         void color4f(GLfloat r, GLfloat g, GLfloat b, GLfloat a);
@@ -103,8 +104,13 @@ namespace ivf {
         void setPos(glm::vec3 pos);
         glm::vec3 pos();
 
+        GLuint currentIndexPos();
+
         std::shared_ptr<Normals> normals();
         std::shared_ptr<Vertices> vertices();
+        std::shared_ptr<Indices> indices();
+
+        void print();
     };
 
     typedef std::shared_ptr<Mesh> MeshPtr;

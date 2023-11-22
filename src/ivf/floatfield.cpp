@@ -1,6 +1,9 @@
 #include <ivf/floatfield.h>
 
+#include <iostream>
+
 using namespace ivf;
+using namespace std;
 
 FloatField::FloatField(GLuint rows, GLuint cols)
 :Field(rows, cols)
@@ -60,4 +63,21 @@ size_t FloatField::memSize()
 GLenum FloatField::dataType()
 {
 	return GL_FLOAT;
+}
+
+void ivf::FloatField::print()
+{
+    cout << "---------" << endl;
+    cout << "Float field (" << this->rows() << ", " << this->cols() << ")" << endl;
+    for (auto i = 0; i < this->rows(); i++)
+    {
+        for (auto j = 0; j < this->cols(); j++)
+        {
+            cout << this->at(i, j);
+            if (j < this->cols() - 1)
+                cout << ", ";
+            else
+                cout << endl;
+        }
+    }
 }

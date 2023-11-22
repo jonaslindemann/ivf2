@@ -10,6 +10,50 @@
 using namespace ivf;
 using namespace std;
 
+float LinearInterpolFunc::tri(float t)
+{
+	if (abs(t) < 1)
+		return 1.0 - abs(t);
+	else
+		return 0.0f;
+}
+
+LinearInterpolFunc::LinearInterpolFunc()
+{
+}
+
+void LinearInterpolFunc::addPoint(glm::vec3 p)
+{
+	m_points.push_back(p);
+}
+
+void ivf::LinearInterpolFunc::clear()
+{
+	m_points.clear();
+}
+
+int ivf::LinearInterpolFunc::size()
+{
+	return m_points.size();
+}
+
+glm::vec3 LinearInterpolFunc::operator()(float t)
+{
+	glm::vec3 pos(0.0, 0.0, 0.0);
+
+	float tt = 0.0;
+
+	if ((t>0.0)&&(t<=float(m_points.size() - 1)))
+		tt = t * float(m_points.size()-1);
+	else if (t>float(m_points.size() - 1))
+		tt = float(m_points.size() - 1);
+
+	for (int i = 0; i < m_points.size(); i++)
+		pos += m_points[i] * tri(tt - float(i));
+
+	return pos;
+}
+
 void ivf::clearError()
 {
 	GLenum err = glGetError();

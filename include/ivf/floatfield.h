@@ -29,6 +29,8 @@ namespace ivf {
         
         virtual void* data();
 		virtual GLenum dataType();
+
+        virtual void print();
     };
 
     typedef std::shared_ptr<FloatField> FloatFieldPtr;

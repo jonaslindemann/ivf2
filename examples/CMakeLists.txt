@@ -1,3 +1,7 @@
 #subdirs(example1 example2 example3 example4 example5 example6 example7 example8)
 add_subdirectory(example1)
 add_subdirectory(example2)
+add_subdirectory(example3)
+add_subdirectory(example4)
+add_subdirectory(example5)
+add_subdirectory(example6)

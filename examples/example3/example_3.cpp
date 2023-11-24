@@ -1,23 +1,20 @@
- #include <iostream>
+#include <iostream>
 #include <memory>
 #include <vector>
 #include <string>
 
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 
 #include <glad/glad.h>
-
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
-#include <ivf/ui.h>
+#include <ivfui/ui.h>
 
 using namespace ivf;
+using namespace ivfui;
 using namespace std;
 
 int main()
@@ -77,9 +74,9 @@ int main()
 	GridPtr grid = Grid::create();
 
 	MaterialPtr sphereMaterial = Material::create();
-	sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 0.0f, 1.0f, 1.0f));
+	sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	sphereMaterial->setUseTexture(true);
-	sphereMaterial->setUseTexture(false);
+	//sphereMaterial->setUseTexture(false);
 	sphereMaterial->setShininess(100.0);
 
 	TexturePtr textureCat = Texture::create();

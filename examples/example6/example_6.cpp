@@ -5,20 +5,16 @@
 #include <map>
 
 #include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
 
 #include <glad/glad.h>
-
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
-#include <ivf/ui.h>
+#include <ivfui/ui.h>
 
-#include "textwindow.h"
+#include "text_window.h"
 
 using namespace ivf;
 using namespace std;

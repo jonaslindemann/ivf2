@@ -1,17 +1,11 @@
 file(GLOB SOURCE_FILES *.cpp)
 file(GLOB INCLUDE_FILES *.h)
 
-if (WIN32)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_executable(example5d example5.cpp )
-        target_link_libraries(example5d ivf2d generatord gladd glfw3d imguid stbd freetype)
-    else()
-        add_executable(example5 example5.cpp )
-        target_link_libraries(example5 ivf2 generator glad glfw3 imgui stb freetype )
-    endif()
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_executable(example_5d example_5.cpp)
+    target_link_libraries(example_5d PRIVATE ivfd ivfuid generatord gladd glfw stbd imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL glm::glm)
+    target_include_directories(example_5d PRIVATE ${Stb_INCLUDE_DIR})
 else()
-    add_executable(example5 example5.cpp )
-    target_link_libraries(example5 ivf2 generator glad glfw3 imgui stb freetype dl pthread )
 endif()
 
 

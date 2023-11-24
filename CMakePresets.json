@@ -1,0 +1,13 @@
+{
+    "version": 3,
+    "configurePresets": [
+      {
+        "name": "default",
+        "toolchainFile": "c:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      },
+      {
+        "name": "linux",
+        "toolchainFile": "/home/lindemann/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      }
+    ]
+  }

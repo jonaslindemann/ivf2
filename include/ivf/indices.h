@@ -1,7 +1,6 @@
-#ifndef __arc2_indices__
-#define __arc2_indices__
+#pragma once
 
-#include <ivf/intfield.h>
+#include <ivf/int_field.h>
 
 namespace ivf {
     
@@ -23,6 +22,3 @@ namespace ivf {
 	};
 	typedef std::shared_ptr<Indices> IndicesPtr;
 };
-
-
-#endif

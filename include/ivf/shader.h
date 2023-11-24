@@ -1,5 +1,4 @@
-#ifndef __ivf2_shader__
-#define __ivf2_shader__
+#pragma once
 
 #include <ivf/glbase.h>
 
@@ -31,5 +30,3 @@ namespace ivf {
     typedef std::shared_ptr<Shader> ShaderPtr;
 
 };
-
-#endif

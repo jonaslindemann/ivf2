@@ -1,7 +1,6 @@
-#ifndef __arc2_vertices__
-#define __arc2_vertices__
+#pragma once
 
-#include <ivf/floatfield.h>
+#include <ivf/float_field.h>
 
 #include <glm/glm.hpp>
 
@@ -22,6 +21,3 @@ namespace ivf {
     typedef std::shared_ptr<Vertices> VerticesPtr;
     
 };
-
-
-#endif

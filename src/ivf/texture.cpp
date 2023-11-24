@@ -1,7 +1,6 @@
 #include <ivf/texture.h>
 
-#include <ivf/shadermanager.h>
-
+#include <ivf/shader_manager.h>
 #include <ivf/utils.h>
 
 #include <iostream>

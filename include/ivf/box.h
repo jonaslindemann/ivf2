@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ivf/meshnode.h>
+#include <ivf/mesh_node.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>

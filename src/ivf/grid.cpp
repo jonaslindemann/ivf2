@@ -1,6 +1,6 @@
 #include <ivf/grid.h>
 
-#include <ivf/lightmanager.h>
+#include <ivf/light_manager.h>
 
 #include <iostream>
 

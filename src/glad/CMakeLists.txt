@@ -1,6 +1,8 @@
-INCLUDE_DIRECTORIES(${ivf2_SOURCE_DIR}/include)
-FILE(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/ivf/*.h)
+include_directories(${ivf2_SOURCE_DIR}/include)
+file(GLOB SOURCE_FILES *.cpp)
+file(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/glad/*.h)
 
-ADD_LIBRARY(glad ${INCLUDE_FILES} glad.c)
-INSTALL_TARGETS(/lib glad)
+add_library(glad ${INCLUDE_FILES} ${SOURCE_FILES})
+set_target_properties(glad PROPERTIES LINKER_LANGUAGE C)
+install_targets(/lib glad)
 

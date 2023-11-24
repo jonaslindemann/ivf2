@@ -1,16 +1,15 @@
-#ifndef __ivf2_mesh__
-#define __ivf2_mesh__
+#pragma once
 
 #include <ivf/glbase.h>
 #include <ivf/vertices.h>
 #include <ivf/colors.h>
 #include <ivf/normals.h>
 #include <ivf/indices.h>
-#include <ivf/texcoords.h>
+#include <ivf/tex_coords.h>
 
-#include <ivf/vertexarray.h>
-#include <ivf/vertexbuffer.h>
-#include <ivf/indexbuffer.h>
+#include <ivf/vertex_array.h>
+#include <ivf/vertex_buffer.h>
+#include <ivf/index_buffer.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -116,5 +115,3 @@ namespace ivf {
     typedef std::shared_ptr<Mesh> MeshPtr;
 
 };
-
-#endif

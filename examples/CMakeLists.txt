@@ -1,1 +1,3 @@
-subdirs(example1 example2 example3 example4 example5 example6 example7 example8)
+#subdirs(example1 example2 example3 example4 example5 example6 example7 example8)
+add_subdirectory(example1)
+add_subdirectory(example2)

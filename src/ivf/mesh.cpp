@@ -5,8 +5,8 @@
 
 #include <glad/glad.h>
 
-#include <ivf/shadermanager.h>
-#include <ivf/transformmanager.h>
+#include <ivf/shader_manager.h>
+#include <ivf/transform_manager.h>
 #include <ivf/utils.h>
 
 using namespace ivf;

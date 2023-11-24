@@ -1,7 +1,6 @@
-#ifndef __arc2_extrusion__
-#define __arc2_extrusion__
+#pragma once
 
-#include <ivf/meshnode.h>
+#include <ivf/mesh_node.h>
 
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
@@ -54,5 +53,3 @@ namespace ivf {
     typedef std::shared_ptr<Extrusion> ExtrusionPtr;
 
 };
-
-#endif

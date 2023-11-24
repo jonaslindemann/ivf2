@@ -1,11 +1,10 @@
-#ifndef __ivf2_utils__
-#define __ivf2_utils__
+#pragma once
 
 #include <glad/glad.h>
 
 #include <string>
 
-#include <ivf/transformmanager.h>
+#include <ivf/transform_manager.h>
 
 #ifdef _DEBUG
 #define GL_ERR(stmt) ivf::clearError(); \
@@ -43,5 +42,3 @@ namespace ivf {
 
 	TransformManager* xfmMgr();
 };
-
-#endif

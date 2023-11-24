@@ -1,7 +1,7 @@
 #ifndef __ivf2_axis__
 #define __ivf2_axis__
 
-#include <ivf/meshnode.h>
+#include <ivf/mesh_node.h>
 
 namespace ivf {
     

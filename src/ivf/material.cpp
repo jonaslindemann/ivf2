@@ -1,6 +1,6 @@
 #include <ivf/material.h>
 
-#include <ivf/lightmanager.h>
+#include <ivf/light_manager.h>
 
 using namespace ivf;
 

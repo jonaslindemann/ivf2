@@ -1,6 +1,6 @@
 #include <ivf/extrusion.h>
 
-#include <ivf/lightmanager.h>
+#include <ivf/light_manager.h>
 #include <ivf/geometry.h>
 
 #include <glm/gtx/intersect.hpp>

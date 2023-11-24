@@ -4,7 +4,7 @@
 
 #include <ivf/glbase.h>
 #include <ivf/field.h>
-#include <stb/stb_image.h>
+#include <stb_image.h>
 
 namespace ivf {
 

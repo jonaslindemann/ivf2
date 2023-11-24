@@ -1,7 +1,6 @@
-#ifndef __ivf2_grid__
-#define __ivf2_grid__
+#pragma once
 
-#include <ivf/meshnode.h>
+#include <ivf/mesh_node.h>
 
 namespace ivf {
     
@@ -37,5 +36,3 @@ namespace ivf {
 
     typedef std::shared_ptr<Grid> GridPtr;
 };
-
-#endif

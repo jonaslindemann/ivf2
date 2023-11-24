@@ -1,5 +1,4 @@
-#ifndef __ivf2_glbase__
-#define __ivf2_glbase__
+#pragma once
 
 #include <ivf/base.h>
 
@@ -15,5 +14,3 @@ namespace ivf {
 
     typedef std::shared_ptr<GLBase> GLBasePtr;
 };
-
-#endif

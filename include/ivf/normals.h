@@ -1,7 +1,6 @@
-#ifndef __arc2_normals__
-#define __arc2_normals__
+#pragma once    
 
-#include <ivf/floatfield.h>
+#include <ivf/float_field.h>
 
 #include <glm/glm.hpp>
 
@@ -23,6 +22,3 @@ namespace ivf {
     typedef std::shared_ptr<Normals> NormalsPtr;
     
 };
-
-
-#endif

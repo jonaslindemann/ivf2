@@ -38,5 +38,6 @@
 
 build-debug/
 build-release/
+build/
 lib/
 *.lastcodeanalysissucceeded

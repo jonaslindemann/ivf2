@@ -1,5 +1,4 @@
-#ifndef __ivf2_field__
-#define __ivf2_field__
+#pragma once
 
 #include <ivf/base.h>
 
@@ -34,5 +33,3 @@ namespace ivf {
     typedef std::shared_ptr<Field> FieldPtr;
     
 };
-
-#endif

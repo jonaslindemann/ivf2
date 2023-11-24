@@ -1,7 +1,6 @@
-#ifndef __arc2_colors__
-#define __arc2_colors__
+#pragma once
 
-#include <ivf/floatfield.h>
+#include <ivf/float_field.h>
 
 namespace ivf {
     
@@ -18,6 +17,3 @@ namespace ivf {
     typedef std::shared_ptr<Colors> ColorsPtr;
     
 };
-
-
-#endif

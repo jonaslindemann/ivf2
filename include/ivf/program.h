@@ -1,5 +1,4 @@
-#ifndef __ivf2_program__
-#define __ivf2_program__
+#pragma once 
 
 #include <ivf/glbase.h>
 #include <ivf/shader.h>
@@ -70,5 +69,3 @@ namespace ivf {
     typedef std::shared_ptr<Program> ProgramPtr;
 
 };
-
-#endif

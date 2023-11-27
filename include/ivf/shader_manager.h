@@ -1,68 +1,66 @@
 #pragma once
 
-#include <ivf/vertex_shader.h>
 #include <ivf/fragment_shader.h>
 #include <ivf/program.h>
 #include <ivf/transform_manager.h>
+#include <ivf/vertex_shader.h>
 
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
-#include <map>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+/**
+ * @brief The namespace ivf contains classes and functions related to the IVF (Interactive Visualization Framework)
+ * library.
+ */
 namespace ivf {
-    
-    class ShaderManager {
-    private:
-        ShaderManager();
-        static ShaderManager* m_instance;
 
-        bool m_linkErrors;
-        bool m_vertexCompileErrors;
-        bool m_fragCompileErrors;
+/**
+ * @class ShaderManager
+ * @brief A class that manages shaders and shader programs.
+ *
+ * The ShaderManager class provides functionality to load, compile, and link shaders,
+ * as well as manage shader programs. It allows loading shaders from files or strings,
+ * and provides methods to retrieve the current shader program and apply it.
+ * The class also provides error checking for shader compilation and linking.
+ */
+class ShaderManager {
+private:
+    ShaderManager();
+    static ShaderManager *m_instance;
 
-        std::map<std::string, std::shared_ptr<Program>> m_programs;
-        std::shared_ptr<Program> m_currentProgram;
-    
-    public:
-        static ShaderManager* instance()
-        {
-            if (!m_instance)
-            {
-                if (!m_instance)
-                    m_instance = new ShaderManager();
-            }
-            return m_instance;
-        }
+    bool m_linkErrors;
+    bool m_vertexCompileErrors;
+    bool m_fragCompileErrors;
 
-        static ShaderManager* create()
-        {
-            if (!m_instance)
-            {
-                if (!m_instance)
-                    m_instance = new ShaderManager();
-            }
-            return m_instance;
-        }
+    std::map<std::string, std::shared_ptr<Program>> m_programs;
+    ProgramPtr m_currentProgram;
 
-        static void drop()
-        {
-            delete m_instance;
-            m_instance = 0;
-        }
-    
-        std::shared_ptr<Program> loadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader, const std::string name);
-        std::shared_ptr<Program> currentProgram();
-    
-        void apply();
+public:
+    virtual ~ShaderManager();
 
-        bool compileLinkErrors();
-    
-    };
+    static ShaderManager *instance();
+    static ShaderManager *create();
+    static void drop();
 
-    typedef ShaderManager* ShaderManagerPtr;
-    
+    ProgramPtr loadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
+                                    const std::string name);
+
+    ProgramPtr loadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
+                                      const std::string name);
+
+    ProgramPtr loadBasicShader();
+    ProgramPtr currentProgram();
+
+    void apply();
+
+    bool compileLinkErrors();
 };
+
+typedef ShaderManager *ShaderManagerPtr;
+
+}; // namespace ivf

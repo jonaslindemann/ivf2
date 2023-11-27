@@ -6,6 +6,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_link_libraries(example_5d PRIVATE ivfd ivfuid generatord gladd glfw stbd imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL glm::glm)
     target_include_directories(example_5d PRIVATE ${Stb_INCLUDE_DIR})
 else()
+    add_executable(example_5 example_5.cpp)
+    target_link_libraries(example_5 PRIVATE ivf ivfui generator glad glfw stb imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL glm::glm)
+    target_include_directories(example_5 PRIVATE ${Stb_INCLUDE_DIR})
 endif()
 
 

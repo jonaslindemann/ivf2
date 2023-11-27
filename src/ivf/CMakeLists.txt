@@ -3,7 +3,7 @@ FILE(GLOB SOURCE_FILES *.cpp)
 FILE(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/ivf/*.h)
 
 ADD_LIBRARY(ivf ${INCLUDE_FILES} ${SOURCE_FILES})
-target_include_directories(ivf PRIVATE ${GLAD_INCLUDE_DIR} glm::glm)
+target_include_directories(ivf PRIVATE glm::glm)
 INSTALL_TARGETS(/lib ivf)
 
  

@@ -17,6 +17,7 @@
 #include "text_window.h"
 
 using namespace ivf;
+using namespace ivfui;
 using namespace std;
 
 int main()

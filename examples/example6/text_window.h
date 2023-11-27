@@ -1,11 +1,11 @@
 #pragma once
 
-#include <ivf/imguiwindow.h>
-#include <ivf/textnode.h>
+#include <ivfui/ui_window.h>
+#include <ivf/text_node.h>
 
 #include <array>
 
-class TextWindow : public ivf::UiWindow {
+class TextWindow : public ivfui::UiWindow {
 private:
 	std::string m_text;
 	std::array<char, 255> m_textArray;

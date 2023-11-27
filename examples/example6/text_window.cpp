@@ -1,4 +1,4 @@
-#include "textwindow.h"
+#include "text_window.h"
 
 using namespace ivf;
 

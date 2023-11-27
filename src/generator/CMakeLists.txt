@@ -140,5 +140,5 @@ set(GENERATOR_SOURCES
 	TubeMesh.cpp
 )
 
-add_library(generator${SUFFIX} STATIC ${GENERATOR_SOURCES} ${GENERATOR_HEADERS})
+add_library(generator STATIC ${GENERATOR_SOURCES} ${GENERATOR_HEADERS})
 

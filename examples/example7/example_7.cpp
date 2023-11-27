@@ -3,16 +3,15 @@
 #include <vector>
 
 #include <glad/glad.h>
-
 #include <GLFW/glfw3.h>
-
 #include <glm/glm.hpp>
 
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
-#include <ivf/ui.h>
+#include <ivfui/ui.h>
 
 using namespace ivf;
+using namespace ivfui;
 using namespace std;
 
 int main()

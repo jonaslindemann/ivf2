@@ -8,6 +8,8 @@
 #include <mutex>
 #include <string>
 
+#include <ivfui/ui_manager.h>
+
 namespace ivfui {
 
 class GLFWWindow {
@@ -41,6 +43,8 @@ private:
     int m_frameCount;
 
     int m_lastError;
+
+    UiRendererPtr m_uiRenderer;
 
 public:
     GLFWWindow(int width, int height, const std::string title, GLFWmonitor *monitor = nullptr,
@@ -86,14 +90,14 @@ public:
     void clearError();
     void setError(int error);
 
-
-
 public:
     void doKey(int key, int scancode, int action, int mods);
     void doMousePosition(double x, double y);
     void doMouseButton(int button, int action, int mods);
     void doResize(int width, int height);
     void doDraw();
+    void doDrawUi();
+    void doUpdateOtherUi();
     int doSetup();
 
     virtual void onKey(int key, int scancode, int action, int mods);
@@ -101,6 +105,8 @@ public:
     virtual void onMouseButton(int button, int action, int mods);
     virtual void onResize(int width, int height);
     virtual void onDraw();
+    virtual void onDrawUi();
+    virtual void onUpdateOtherUi();
     virtual int onSetup();
 };
 

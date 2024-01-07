@@ -2,10 +2,6 @@
 #include <memory>
 #include <vector>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
 #include <ivfui/ui.h>
@@ -26,8 +22,7 @@ int main()
     glfwWindowHint(GLFW_SAMPLES, 4);
 
     auto window = glfwCreateWindow(800, 800, "Example 1", NULL, NULL);
-    if (window == NULL)
-    {
+    if (window == NULL) {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
@@ -41,10 +36,9 @@ int main()
     glViewport(0, 0, width, height);
 
     ShaderManagerPtr shaderMgr = ShaderManager::create();
-    shaderMgr->loadProgramFromFiles("shaders/basic.vert", "shaders/basic.frag", "basic");
+    shaderMgr->loadBasicShader();
 
-    if (shaderMgr->compileLinkErrors())
-    {
+    if (shaderMgr->compileLinkErrors()) {
         cout << "Couldn't compile shaders, exiting..." << endl;
         return -1;
     }
@@ -88,8 +82,7 @@ int main()
     float angle = 0.0f;
     constexpr float da = glm::pi<float>() / 36.0f;
 
-    while (angle < glm::quarter_pi<float>())
-    {
+    while (angle < glm::quarter_pi<float>()) {
         pos = glm::vec3(2.0 * cos(angle), 0.0, 2.0 * sin(angle));
         extrusion->addPathPoint(pos);
         angle += da;
@@ -121,8 +114,7 @@ int main()
     double previousTime = glfwGetTime();
     int frameCount = 0;
 
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         // If a second has passed.
 
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);

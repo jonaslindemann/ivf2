@@ -30,6 +30,13 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonit
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
+
+    this->makeCurrent();
+
+    if (!gladLoadGL())
+        exit(EXIT_FAILURE);
+
+    m_uiRenderer = UiRenderer::create(m_window);
 }
 
 GLFWWindow::~GLFWWindow()
@@ -42,7 +49,6 @@ void GLFWWindow::makeCurrent()
 {
     if (m_window) {
         glfwMakeContextCurrent(m_window);
-        gladLoadGL();
         glfwSwapInterval(1);
     }
 }
@@ -215,8 +221,16 @@ void GLFWWindow::draw()
         m_runSetup = false;
     }
 
+    m_uiRenderer->beginFrame();
+    this->doDrawUi();
+    if ((!m_uiRenderer->wantCaptureMouse()) && (!m_uiRenderer->wantCaptureKeyboard()))
+        this->doUpdateOtherUi();
+    m_uiRenderer->endFrame();
+
     if (m_enabled && (result == 0))
         this->doDraw();
+
+    m_uiRenderer->draw();
 
     this->swapBuffers();
 }
@@ -280,6 +294,16 @@ void GLFWWindow::doDraw()
     m_frameTime = m_t1 - m_t0;
 }
 
+void ivfui::GLFWWindow::doDrawUi()
+{
+    onDrawUi();
+}
+
+void ivfui::GLFWWindow::doUpdateOtherUi()
+{
+    onUpdateOtherUi();
+}
+
 void ivfui::GLFWWindow::setError(int error)
 {
     m_lastError = error;
@@ -314,6 +338,14 @@ void GLFWWindow::onResize(int width, int height)
 void GLFWWindow::onDraw()
 {
     glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void ivfui::GLFWWindow::onDrawUi()
+{
+}
+
+void ivfui::GLFWWindow::onUpdateOtherUi()
+{
 }
 
 int GLFWWindow::onSetup()

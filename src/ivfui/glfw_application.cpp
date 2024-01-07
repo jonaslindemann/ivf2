@@ -4,14 +4,16 @@
 
 #include <iostream>
 
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 using namespace ivfui;
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     auto win = GLFWWindowTracker::instance()->get(window);
 
-    if (win->useEscQuit())
-    {
+    if (win->useEscQuit()) {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             win->close();
     }
@@ -68,6 +70,8 @@ void GLFWApplication::addWindow(GLFWWindowPtr window)
     glfwSetCursorPosCallback(window->ref(), mouse_pos_callback);
     glfwSetWindowSizeCallback(window->ref(), window_resize_callback);
 
+    ImGui_ImplGlfw_InstallCallbacks(window->ref());
+
     GLFWWindowTracker::instance()->addWindow(window);
 }
 
@@ -77,15 +81,12 @@ int GLFWApplication::loop()
 
     int anyError = 0;
 
-    while (!shouldClose)
-    {
-        for (auto window : m_windows)
-        {
+    while (!shouldClose) {
+        for (auto window : m_windows) {
             if (window->lastError() != 0)
                 anyError = window->lastError();
 
-            if (!window->isClosing())
-            {
+            if (!window->isClosing()) {
                 window->draw();
                 shouldClose = false;
             }

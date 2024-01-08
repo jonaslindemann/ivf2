@@ -150,7 +150,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Example 1");
+    auto window = ExampleWindow::create(800, 800, "Example 2");
     window->maximize();
 
     app->addWindow(window);

@@ -13,113 +13,111 @@ using namespace ivf;
 using namespace ivfui;
 using namespace std;
 
-int main()
-{
-    int width, height;
+class ExampleWindow : public GLFWWindow {
+private:
+    CompositeNodePtr m_scene;
+    CameraManipulatorPtr m_camManip;
 
-    glfwInit();
+    bool m_showDemoWindow = false;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4);
-
-    auto window = glfwCreateWindow(800, 800, "Example 3", NULL, NULL);
-    if (window == NULL) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
+public:
+    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    {
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
-
-    gladLoadGL();
-
-    // During init, enable debug output
-
-    glfwGetWindowSize(window, &width, &height);
-    glViewport(0, 0, width, height);
-    glEnable(GL_DEPTH_TEST);
-
-    UiRendererPtr ui = UiRenderer::create(window);
-
-    ShaderManagerPtr shaderMgr = ShaderManager::create();
-    shaderMgr->loadBasicShader();
-
-    if (shaderMgr->compileLinkErrors()) {
-        cout << "Couldn't compile shaders, exiting..." << endl;
-        return -1;
+    static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
+    {
+        return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    LightManagerPtr lightMgr = LightManager::create();
+    int onSetup()
+    {
+        glEnable(GL_DEPTH_TEST);
 
-    auto pointLight1 = lightMgr->addPointLight();
-    pointLight1->setEnabled(true);
-    pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-    pointLight1->setAttenuation(1.0, 0.0, 0.0);
-    pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
-    lightMgr->apply();
+        ShaderManagerPtr shaderMgr = ShaderManager::create();
+        shaderMgr->loadBasicShader();
 
-    CompositeNodePtr scene = CompositeNode::create();
+        if (shaderMgr->compileLinkErrors()) {
+            cout << "Couldn't compile shaders, exiting..." << endl;
+            return -1;
+        }
 
-    AxisPtr axis = Axis::create();
-    GridPtr grid = Grid::create();
+        auto lightMgr = LightManager::create();
 
-    MaterialPtr sphereMaterial = Material::create();
-    sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    sphereMaterial->setUseTexture(true);
-    // sphereMaterial->setUseTexture(false);
-    sphereMaterial->setShininess(100.0);
+        auto pointLight1 = lightMgr->addPointLight();
+        pointLight1->setEnabled(true);
+        pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight1->setAttenuation(1.0, 0.0, 0.0);
+        pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
+        lightMgr->apply();
 
-    TexturePtr textureCat = Texture::create();
-    textureCat->load("assets/pop_cat.png");
+        m_scene = CompositeNode::create();
 
-    TexturePtr textureBrick = Texture::create();
-    textureBrick->load("assets/brick.png");
+        auto axis = Axis::create();
+        auto grid = Grid::create();
 
-    SpherePtr sphere = Sphere::create();
-    sphere->setTexture(textureCat);
-    sphere->setMaterial(sphereMaterial);
-    sphere->setPos(glm::vec3(0.0, 3.0, 0.0));
+        auto sphereMaterial = Material::create();
+        sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        sphereMaterial->setUseTexture(true);
+        // sphereMaterial->setUseTexture(false);
+        sphereMaterial->setShininess(100.0);
 
-    BoxPtr box = Box::create();
-    box->setTexture(textureBrick);
-    box->setMaterial(sphereMaterial);
-    box->setPos(glm::vec3(3.0, 0.0, 0.0));
+        auto textureCat = Texture::create();
+        textureCat->load("assets/pop_cat.png");
 
-    scene->add(box);
-    scene->add(sphere);
+        auto textureBrick = Texture::create();
+        textureBrick->load("assets/brick.png");
 
-    scene->add(axis);
-    scene->add(grid);
+        auto sphere = Sphere::create();
+        sphere->setTexture(textureCat);
+        sphere->setMaterial(sphereMaterial);
+        sphere->setPos(glm::vec3(0.0, 3.0, 0.0));
 
-    CameraManipulatorPtr camManip = CameraManipulator::create(window);
+        auto box = Box::create();
+        box->setTexture(textureBrick);
+        box->setMaterial(sphereMaterial);
+        box->setPos(glm::vec3(3.0, 0.0, 0.0));
 
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+        m_scene->add(box);
+        m_scene->add(sphere);
 
+        m_scene->add(axis);
+        m_scene->add(grid);
+
+        m_camManip = CameraManipulator::create(this->ref());
+
+        return 0;
+    }
+
+    void onDraw()
+    {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        scene->draw();
-
-        ui->beginFrame();
-
-        if ((!ui->wantCaptureMouse()) && (!ui->wantCaptureKeyboard()))
-            camManip->update();
-
-        ui->endFrame();
-
-        ui->draw();
-
-        glfwSwapBuffers(window);
+        m_scene->draw();
     }
 
-    ui->shutdown();
+    void onUpdateOtherUi()
+    {
+        m_camManip->update();
+    }
+};
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 0;
+typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;
+
+int main()
+{
+    auto app = GLFWApplication::create();
+
+    app->hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    app->hint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    app->hint(GLFW_SAMPLES, 4);
+
+    auto window = ExampleWindow::create(800, 800, "Example 3");
+    window->maximize();
+
+    app->addWindow(window);
+    return app->loop();
 }

@@ -14,164 +14,171 @@ using namespace ivf;
 using namespace ivfui;
 using namespace std;
 
-int main()
-{
-    int width, height;
+class ExampleWindow : public GLFWWindow {
+private:
+    CompositeNodePtr m_scene;
+    CameraManipulatorPtr m_camManip;
 
-    glfwInit();
+    PointLightWindowPtr m_pointLightControl1;
+    PointLightWindowPtr m_pointLightControl2;
+    DirectionalLightWindowPtr m_dirLightControl;
+    SpotLightWindowPtr m_spotLightControl;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    LightManagerPtr m_lightMgr;
 
-    auto window = glfwCreateWindow(800, 800, "Example 5", NULL, NULL);
+    FpsWindowPtr m_fpsWindow;
 
-    if (window == nullptr) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
+    bool m_showDemoWindow = false;
+
+public:
+    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title), m_lightMgr(nullptr)
+    {
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(0);
-
-    gladLoadGL();
-
-    UiRendererPtr ui = UiRenderer::create(window);
-
-    // During init, enable debug output
-
-    glfwGetWindowSize(window, &width, &height);
-    glViewport(0, 0, width, height);
-    glEnable(GL_DEPTH_TEST);
-
-    auto shaderMgr = ShaderManager::create();
-    shaderMgr->loadBasicShader();
-
-    if (shaderMgr->compileLinkErrors()) {
-        cout << "Couldn't compile shaders, exiting..." << endl;
-        return -1;
+    static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
+    {
+        return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    // ---------------------------------------------------------------------------
+    int onSetup()
+    {
+        glEnable(GL_DEPTH_TEST);
 
-    shaderMgr->currentProgram()->use();
+        ShaderManagerPtr shaderMgr = ShaderManager::create();
+        shaderMgr->loadBasicShader();
 
-    auto lightMgr = LightManager::create();
-    lightMgr->enableLighting();
+        if (shaderMgr->compileLinkErrors()) {
+            cout << "Couldn't compile shaders, exiting..." << endl;
+            return -1;
+        }
 
-    auto pointLight1 = lightMgr->addPointLight();
-    pointLight1->setEnabled(false);
-    pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-    pointLight1->setAttenuation(1.0, 0.14, 0.07);
-    pointLight1->setPosition(glm::vec3(2.0, 2.0, 2.0));
+        m_lightMgr = LightManager::create();
+        m_lightMgr->enableLighting();
 
-    auto pointLight2 = lightMgr->addPointLight();
-    pointLight2->setEnabled(false);
-    pointLight2->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    pointLight2->setAttenuation(1.0, 0.14, 0.07);
-    pointLight2->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-    pointLight2->setPosition(glm::vec3(-2.0, -2.0, -2.0));
+        auto pointLight1 = m_lightMgr->addPointLight();
+        pointLight1->setEnabled(false);
+        pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight1->setAttenuation(1.0, 0.14, 0.07);
+        pointLight1->setPosition(glm::vec3(2.0, 2.0, 2.0));
 
-    auto dirLight = lightMgr->addDirectionalLight();
-    dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
-    dirLight->setEnabled(false);
+        auto pointLight2 = m_lightMgr->addPointLight();
+        pointLight2->setEnabled(false);
+        pointLight2->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight2->setAttenuation(1.0, 0.14, 0.07);
+        pointLight2->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight2->setPosition(glm::vec3(-2.0, -2.0, -2.0));
 
-    auto spotLight = lightMgr->addSpotLight();
-    spotLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    spotLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-    spotLight->setDirection(glm::vec3(0.0, 0.0, -1.0));
-    spotLight->setPosition(glm::vec3(0.0, 0.0, 10.0));
-    spotLight->setCutoff(12.0f, 13.0f);
-    spotLight->setEnabled(true);
+        auto dirLight = m_lightMgr->addDirectionalLight();
+        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
+        dirLight->setEnabled(false);
 
-    lightMgr->apply();
+        auto spotLight = m_lightMgr->addSpotLight();
+        spotLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        spotLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        spotLight->setDirection(glm::vec3(0.0, 0.0, -1.0));
+        spotLight->setPosition(glm::vec3(0.0, 0.0, 10.0));
+        spotLight->setCutoff(12.0f, 13.0f);
+        spotLight->setEnabled(true);
 
-    auto scene = CompositeNode::create();
-    auto axis = Axis::create();
+        m_lightMgr->apply();
 
-    auto texture = Texture::create();
-    texture->load("assets/planks.png");
+        m_scene = CompositeNode::create();
+        auto axis = Axis::create();
 
-    auto sphere = Sphere::create(0.15);
+        auto texture = Texture::create();
+        texture->load("assets/planks.png");
 
-    for (auto i = 0; i < 11; i++)
-        for (auto j = 0; j < 11; j++)
-            for (auto k = 0; k < 11; k++) {
-                if (true) {
-                    auto instSphere = InstanceNode::create();
-                    instSphere->setNode(sphere);
-                    instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+        auto sphere = Sphere::create(0.15);
 
-                    auto material = Material::create();
-                    material->setDiffuseColor(glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                    material->setShininess(40.0);
+        for (auto i = 0; i < 11; i++)
+            for (auto j = 0; j < 11; j++)
+                for (auto k = 0; k < 11; k++) {
+                    if (true) {
+                        auto instSphere = InstanceNode::create();
+                        instSphere->setNode(sphere);
+                        instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
 
-                    instSphere->setMaterial(material);
-                    // instSphere->setTexture(texture);
-                    scene->add(instSphere);
+                        auto material = Material::create();
+                        material->setDiffuseColor(
+                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+                        material->setShininess(40.0);
+
+                        instSphere->setMaterial(material);
+                        // instSphere->setTexture(texture);
+                        m_scene->add(instSphere);
+                    }
+                    else {
+                        auto sphere = Sphere::create(0.15);
+                        sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+
+                        auto material = Material::create();
+                        material->setDiffuseColor(
+                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+                        material->setShininess(40.0);
+
+                        sphere->setMaterial(material);
+                        // instSphere->setTexture(texture);
+                        m_scene->add(sphere);
+                    }
                 }
-                else {
-                    auto sphere = Sphere::create(0.15);
-                    sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
 
-                    auto material = Material::create();
-                    material->setDiffuseColor(glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                    material->setShininess(40.0);
+        m_scene->add(axis);
 
-                    sphere->setMaterial(material);
-                    // instSphere->setTexture(texture);
-                    scene->add(sphere);
-                }
-            }
+        m_pointLightControl1 = PointLightWindow::create(pointLight1, "pointLight1");
+        m_pointLightControl2 = PointLightWindow::create(pointLight2, "pointLight2");
+        m_dirLightControl = DirectionalLightWindow::create(dirLight, "dirLight");
+        m_spotLightControl = SpotLightWindow::create(spotLight, "spotLight");
 
-    scene->add(axis);
+        m_fpsWindow = FpsWindow::create();
 
-    auto pointLightControl1 = PointLightWindow::create(pointLight1, "pointLight1");
-    auto pointLightControl2 = PointLightWindow::create(pointLight2, "pointLight2");
-    auto dirLightControl = DirectionalLightWindow::create(dirLight, "dirLight");
-    auto spotLightControl = SpotLightWindow::create(spotLight, "spotLight");
+        m_camManip = CameraManipulator::create(this->ref());
 
-    auto fpsWindow = FpsWindow::create();
+        return 0;
+    }
 
-    auto camManip = CameraManipulator::create(window);
-
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-
+    void onDraw()
+    {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ui->beginFrame();
+        if ((m_pointLightControl1->isDirty()) || (m_pointLightControl2->isDirty()) || (m_dirLightControl->isDirty()) ||
+            (m_spotLightControl->isDirty()))
+            m_lightMgr->apply();
 
-        pointLightControl1->draw();
-        pointLightControl2->draw();
-        dirLightControl->draw();
-        spotLightControl->draw();
-        fpsWindow->draw();
-
-        if ((!ui->wantCaptureMouse()) && (!ui->wantCaptureKeyboard()))
-            camManip->update();
-
-        ui->endFrame();
-
-        if ((pointLightControl1->isDirty()) || (pointLightControl2->isDirty()) || (dirLightControl->isDirty()) ||
-            (spotLightControl->isDirty()))
-            lightMgr->apply();
-
-        scene->draw();
-
-        ui->draw();
-
-        glfwSwapBuffers(window);
+        m_scene->draw();
     }
 
-    ui->shutdown();
+    void onDrawUi()
+    {
+        m_pointLightControl1->draw();
+        m_pointLightControl2->draw();
+        m_dirLightControl->draw();
+        m_spotLightControl->draw();
+        m_fpsWindow->draw();
+    }
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 0;
+    void onUpdateOtherUi()
+    {
+        m_camManip->update();
+    }
+};
+
+typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;
+
+int main()
+{
+    auto app = GLFWApplication::create();
+
+    app->hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    app->hint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    app->hint(GLFW_SAMPLES, 4);
+
+    auto window = ExampleWindow::create(800, 800, "Example 5");
+    window->maximize();
+
+    app->addWindow(window);
+    return app->loop();
 }

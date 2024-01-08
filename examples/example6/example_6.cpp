@@ -16,119 +16,113 @@ using namespace ivf;
 using namespace ivfui;
 using namespace std;
 
-int main()
-{
-    int width, height;
+class ExampleWindow : public GLFWWindow {
+private:
+    CompositeNodePtr m_scene;
+    CameraManipulatorPtr m_camManip;
 
-    glfwInit();
+    FpsWindowPtr m_fpsWindow;
+    TextWindowPtr m_textWindow;
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    bool m_showDemoWindow = false;
 
-    auto window = glfwCreateWindow(800, 800, "Example 5", NULL, NULL);
-    if (window == nullptr) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return -1;
+public:
+    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    {
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSwapInterval(0);
-
-    gladLoadGL();
-
-    UiRendererPtr ui = UiRenderer::create(window);
-
-    // During init, enable debug output
-
-    glfwGetWindowSize(window, &width, &height);
-    glViewport(0, 0, width, height);
-    glEnable(GL_DEPTH_TEST);
-
-    // Font manager
-
-    auto fontMgr = FontManager::create();
-    fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
-
-    auto shaderMgr = ShaderManager::create();
-    shaderMgr->loadBasicShader();
-
-    if (shaderMgr->compileLinkErrors()) {
-        cout << "Couldn't compile shaders, exiting..." << endl;
-        return -1;
+    static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
+    {
+        return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    // ---------------------------------------------------------------------------
+    int onSetup()
+    {
+        glEnable(GL_DEPTH_TEST);
 
-    shaderMgr->currentProgram()->use();
+        auto fontMgr = FontManager::create();
+        fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
 
-    auto lightMgr = LightManager::create();
-    lightMgr->enableLighting();
+        ShaderManagerPtr shaderMgr = ShaderManager::create();
+        shaderMgr->loadBasicShader();
 
-    auto dirLight = lightMgr->addDirectionalLight();
-    dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
-    dirLight->setEnabled(true);
+        if (shaderMgr->compileLinkErrors()) {
+            cout << "Couldn't compile shaders, exiting..." << endl;
+            return -1;
+        }
 
-    lightMgr->apply();
+        auto lightMgr = LightManager::create();
+        lightMgr->enableLighting();
 
-    auto material = Material::create();
-    material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    material->setShininess(40.0);
+        auto dirLight = lightMgr->addDirectionalLight();
+        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
+        dirLight->setEnabled(true);
 
-    auto scene = CompositeNode::create();
-    auto axis = Axis::create();
+        lightMgr->apply();
 
-    auto text = TextNode::create();
-    text->setText("Ivf++ 2.0");
-    text->setAlignX(TextAlignX::CENTER);
-    text->setAlignY(TextAlignY::MIDDLE);
+        auto material = Material::create();
+        material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        material->setShininess(40.0);
 
-    auto texture = Texture::create();
-    texture->load("assets/planks.png");
+        m_scene = CompositeNode::create();
+        auto axis = Axis::create();
 
-    text->setMaterial(material);
+        auto text = TextNode::create();
+        text->setText("Ivf++ 2.0");
+        text->setAlignX(TextAlignX::CENTER);
+        text->setAlignY(TextAlignY::MIDDLE);
 
-    scene->add(axis);
-    scene->add(text);
+        auto texture = Texture::create();
+        texture->load("assets/planks.png");
 
-    auto fpsWindow = FpsWindow::create();
+        text->setMaterial(material);
 
-    auto textWindow = TextWindow::create(text);
+        m_scene->add(axis);
+        m_scene->add(text);
 
-    auto camManip = CameraManipulator::create(window);
+        m_fpsWindow = FpsWindow::create();
+        m_textWindow = TextWindow::create(text);
 
-    while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
+        m_camManip = CameraManipulator::create(this->ref());
 
+        return 0;
+    }
+
+    void onDraw()
+    {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        ui->beginFrame();
-
-        fpsWindow->draw();
-        textWindow->draw();
-
-        if ((!ui->wantCaptureMouse()) && (!ui->wantCaptureKeyboard()))
-            camManip->update();
-
-        ui->endFrame();
-
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-        scene->draw();
-
-        ui->draw();
-
-        glfwSwapBuffers(window);
+        m_scene->draw();
     }
 
-    ui->shutdown();
+    void onDrawUi()
+    {
+        m_fpsWindow->draw();
+        m_textWindow->draw();
+    }
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    return 0;
+    void onUpdateOtherUi()
+    {
+        m_camManip->update();
+    }
+};
+
+typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;
+
+int main()
+{
+    auto app = GLFWApplication::create();
+
+    app->hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    app->hint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    app->hint(GLFW_SAMPLES, 4);
+
+    auto window = ExampleWindow::create(800, 800, "Example 6");
+    window->maximize();
+
+    app->addWindow(window);
+    return app->loop();
 }

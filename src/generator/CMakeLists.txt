@@ -42,6 +42,7 @@ set(GENERATOR_HEADERS
 	${GENERATOR_INCLUDE_DIR}/KnotPath.hpp
 	${GENERATOR_INCLUDE_DIR}/LatheMesh.hpp
 	${GENERATOR_INCLUDE_DIR}/LinePath.hpp
+	${GENERATOR_INCLUDE_DIR}/PolyLinePath.hpp
 	${GENERATOR_INCLUDE_DIR}/LineShape.hpp
 	${GENERATOR_INCLUDE_DIR}/math.hpp
 	${GENERATOR_INCLUDE_DIR}/MergeMesh.hpp
@@ -119,6 +120,7 @@ set(GENERATOR_SOURCES
 	IcoSphereMesh.cpp
 	KnotPath.cpp
 	LinePath.cpp
+	PolyLinePath.cpp
 	LineShape.cpp
 	ObjWriter.cpp
 	RectangleShape.cpp

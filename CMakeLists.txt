@@ -19,12 +19,11 @@ find_package(glm CONFIG REQUIRED)
 find_package(Stb REQUIRED)
 find_package(Freetype REQUIRED)
 
-if(WIN32)
-    set(CMAKE_DEBUG_POSTFIX d)
-endif()
+#if(WIN32)
+#    set(CMAKE_DEBUG_POSTFIX d)
+#endif()
 
 include_directories( ${PROJECT_SOURCE_DIR}/include ${GLM_DIR} ${GENERATOR_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${STB_DIR} ${IMGUI_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
-link_directories( ${PROJECT_SOURCE_DIR}/lib ${GENERATOR_LIB_DIR} )
 
 add_subdirectory(src)
 add_subdirectory(examples)

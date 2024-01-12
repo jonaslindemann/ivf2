@@ -8,33 +8,54 @@
 
 using namespace generator;
 
+gml::dvec3 interpolate(const std::vector<gml::dvec3> &polyline, double t)
+{
+    if (polyline.empty()) {
+        // Handle empty polyline
+        return gml::dvec3(0.0f, 0.0f, 0.0f);
+    }
+
+    if (t <= 0.0)
+        return polyline.front();
+    if (t >= 1.0)
+        return polyline.back();
+
+    double totalLength = 0.0;
+    std::vector<double> lengths(polyline.size());
+    for (size_t i = 1; i < polyline.size(); ++i) {
+        double segmentLength = gml::length(polyline[i] - polyline[i - 1]);
+        totalLength += segmentLength;
+        lengths[i] = totalLength;
+    }
+
+    double targetLength = t * totalLength;
+    for (size_t i = 1; i < polyline.size(); ++i) {
+        if (lengths[i] >= targetLength) {
+            double segmentLength = lengths[i] - lengths[i - 1];
+            double segmentT = (targetLength - lengths[i - 1]) / segmentLength;
+            return polyline[i - 1] + segmentT * (polyline[i] - polyline[i - 1]);
+        }
+    }
+
+    return polyline.back();
+}
+
 PolyLinePath::PolyLinePath(int segments)
     : parametricPath_{[this, segments](double t) {
                           PathVertex vertex;
 
-                          // o ----- o ----- o ----- o ----- o
-                          // 0       1       2       3       4
-
-                          // size() == 5
-                          // segments == 4
-                          // 0.0 <= t < 1.0
-
-                          double dt = 1.0 / (segments - 1);     // 0.25
-                          int index = static_cast<int>(t / dt); // 0, 1, 2, 3
-                          double t0 = index * dt;               // 0.0, 0.25, 0.5, 0.75
-                          double t1 = (index + 1) * dt;         // 0.25, 0.5, 0.75, 1.0
-
-                          gml::dvec3 start = this->points_[index];
-                          gml::dvec3 end = this->points_[index + 1];
-
-                          vertex.position = start + t * (end - start);
-                          vertex.tangent = gml::normalize(end - start);
-                          vertex.normal = gml::dvec3(0.0, 0.0, 1.0);
+                          vertex.position = interpolate(points_, t);
+                          gml::dvec3 start = interpolate(points_, t - 0.001);
+                          gml::dvec3 end = interpolate(points_, t + 0.001);
+                          vertex.tangent = normalize(end - start);
+                          // vertex.normal = vertex.tangent;
+                          vertex.normal = gml::cross(gml::dvec3(1.0, 1.0, 0.0), vertex.tangent);
                           vertex.texCoord = t;
 
                           return vertex;
                       },
-                      segments}
+                      segments},
+      segments_{segments}
 {
 }
 
@@ -55,7 +76,6 @@ void generator::PolyLinePath::clearPoints()
 
 void generator::PolyLinePath::setSegments(int segments)
 {
-    //
 }
 
 void generator::PolyLinePath::setPoint(int index, const gml::dvec3 &point)

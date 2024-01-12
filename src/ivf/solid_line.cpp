@@ -17,8 +17,8 @@ std::shared_ptr<SolidLine> SolidLine::create(glm::vec3 p0, glm::vec3 p1, double 
 
 void SolidLine::doSetup()
 {
-    gml::dvec3 p0(m_p0.x, m_p0.y, m_p0.z);
-    gml::dvec3 p1(m_p1.x, m_p1.y, m_p1.z);
+    gml::dvec3 p0(m_p0.x, m_p0.z, m_p0.y);
+    gml::dvec3 p1(m_p1.x, m_p1.z, m_p1.y);
     gml::dvec3 n(1.0, 0.0, 0.0);
 
     LinePath line(p0, p1, n, 8);

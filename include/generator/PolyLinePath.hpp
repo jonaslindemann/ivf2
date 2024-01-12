@@ -21,13 +21,14 @@ private:
     Impl parametricPath_;
 
     std::vector<gml::dvec3> points_;
+    int segments_;
 
 public:
     /// @param start Start point of the line.
     /// @param end End point of the line.
     /// @param normal Line normal. Should be parallel to the line.
     /// @param segments Number of subdivisions along the line.
-    PolyLinePath(int segments = 8);
+    PolyLinePath(int segments = 200);
 
     void addPoint(const gml::dvec3 &point);
     void setPoints(const std::vector<gml::dvec3> &points);

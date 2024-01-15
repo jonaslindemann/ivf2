@@ -353,6 +353,31 @@ glm::vec3 ivf::Mesh::pos()
 	return m_position;
 }
 
+int ivf::Mesh::vertPos() const
+{
+    return m_vertPos;
+}
+
+int ivf::Mesh::colorPos() const
+{
+    return m_colorPos;
+}
+
+int ivf::Mesh::normalPos() const
+{
+    return m_normalPos;
+}
+
+int ivf::Mesh::indexPos() const
+{
+    return m_indexPos;
+}
+
+int ivf::Mesh::texCoordPos() const
+{
+    return m_texCoordPos;
+}
+
 GLuint ivf::Mesh::currentIndexPos()
 {
 	return m_indexPos;

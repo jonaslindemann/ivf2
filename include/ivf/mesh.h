@@ -103,6 +103,12 @@ namespace ivf {
         void setPos(glm::vec3 pos);
         glm::vec3 pos();
 
+        int vertPos() const;
+        int colorPos() const;
+        int normalPos() const;
+        int indexPos() const;
+        int texCoordPos() const;
+
         GLuint currentIndexPos();
 
         std::shared_ptr<Normals> normals();

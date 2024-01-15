@@ -58,10 +58,15 @@ public:
 
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
-        yellowMat->setUseVertexColor(true);
+
+        auto sphere = Sphere::create(0.25);
+        sphere->setMaterial(yellowMat);
+
+        m_scene->add(sphere);
 
         auto lineGrid = LineGrid::create();
         lineGrid->setMaterial(yellowMat);
+        lineGrid->setColor(1.0, 1.0, 0.0, 1.0);
 
         m_scene->add(lineGrid);
 

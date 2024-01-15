@@ -17,6 +17,8 @@ private:
     GLint m_xDivisions;
     GLint m_yDivisions;
     GridAlign m_align;
+    bool m_useColor;
+    GLfloat m_color[4];
 
 public:
     LineGrid(GLfloat width = 2.0, GLfloat height = 2.0, GLint xDiv = 10, GLint yDiv = 10);
@@ -27,6 +29,10 @@ public:
 
     void setSize(GLfloat width, GLfloat height);
     void setDivisions(GLint xDivisions, GLint yDivisions);
+    void setColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a = 1.0);
+    void setUseColor(bool value);
+    bool useColor() const;
+    void getColor(GLfloat& r, GLfloat& g, GLfloat& b, GLfloat& a);
 
     GLfloat width() const;
     GLfloat height() const;

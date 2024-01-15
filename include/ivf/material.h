@@ -6,31 +6,31 @@
 
 namespace ivf {
 
-	class Material : public GLBase {
-	private:
-		bool m_useVertexColor;
-		bool m_useLighting;
-		bool m_useTexture;
-		glm::vec4 m_diffuseColor;
-		glm::vec4 m_specularColor;
-		glm::vec4 m_ambientColor;
-		float m_shininess;
-	public:
-		Material();
+class Material : public GLBase {
+private:
+    bool m_useVertexColor;
+    bool m_useLighting;
+    bool m_useTexture;
+    glm::vec4 m_diffuseColor;
+    glm::vec4 m_specularColor;
+    glm::vec4 m_ambientColor;
+    float m_shininess;
 
-		static std::shared_ptr<Material> create();
+public:
+    Material();
 
-		void setDiffuseColor(glm::vec4 color);
-		void setSpecularColor(glm::vec4 color);
-		void setAmbientColor(glm::vec4 color);
-		void setUseTexture(bool flag);
-		void setShininess(float shininess);
+    static std::shared_ptr<Material> create();
 
-		void apply();
-	};
+    void setDiffuseColor(glm::vec4 color);
+    void setSpecularColor(glm::vec4 color);
+    void setAmbientColor(glm::vec4 color);
+    void setUseTexture(bool flag);
+    void setUseVertexColor(bool flag);
+    void setShininess(float shininess);
 
-	typedef std::shared_ptr<Material> MaterialPtr;
+    void apply();
+};
 
-}
+typedef std::shared_ptr<Material> MaterialPtr;
 
-
+} // namespace ivf

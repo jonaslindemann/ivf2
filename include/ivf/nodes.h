@@ -16,6 +16,7 @@
 #include <ivf/extrusion.h>
 #include <ivf/grid.h>
 #include <ivf/instance_node.h>
+#include <ivf/line_grid.h>
 #include <ivf/normal_factory.h>
 #include <ivf/plane.h>
 #include <ivf/point_light.h>

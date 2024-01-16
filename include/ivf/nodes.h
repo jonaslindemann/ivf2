@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ivf/arrow.h>
 #include <ivf/axis.h>
 #include <ivf/box.h>
 #include <ivf/capped_cone.h>

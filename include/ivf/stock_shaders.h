@@ -23,13 +23,15 @@ uniform mat4 projection;
 void main()
 {
     fragPos = vec3(model * vec4(aPos, 1.0));
+    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    normal = normalMatrix * aNormal;
 
     color = aColor;
-    normal = aNormal;  
     texCoord = aTex;
     
     gl_Position = projection * view * vec4(fragPos, 1.0);
-})";
+}
+)";
 
 std::string basic_frag_shader_source = R"(
 #version 330 core

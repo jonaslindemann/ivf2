@@ -6,32 +6,36 @@
 
 namespace ivf {
 
-	class Node : public GLBase {
-	private:
-		std::shared_ptr<Material> m_material;
-		std::shared_ptr<Texture> m_texture;
-		bool m_useMaterial;
-		bool m_useTexture;
-	public:
-		Node();
-		void draw();
+class Node : public GLBase {
+private:
+    std::shared_ptr<Material> m_material;
+    std::shared_ptr<Texture> m_texture;
+    bool m_useMaterial;
+    bool m_useTexture;
+    bool m_visible;
 
-		void setMaterial(std::shared_ptr<Material> material);
-		void setTexture(std::shared_ptr<Texture> texture);
+public:
+    Node();
+    void draw();
 
-		void setUseMaterial(bool flag);
-		bool useMaterial();
+    void setMaterial(std::shared_ptr<Material> material);
+    void setTexture(std::shared_ptr<Texture> texture);
 
-		void setUseTexture(bool flag);
-		bool useTexture();
+    void setUseMaterial(bool flag);
+    bool useMaterial();
 
-	protected:
-		virtual void doPreDraw();
-		virtual void doDraw();
-		virtual void doPostDraw();
-	};
+    void setUseTexture(bool flag);
+    bool useTexture();
 
-	typedef std::shared_ptr<Node> NodePtr;
+    void setVisible(bool flag);
+    bool visible() const;
 
-}
+protected:
+    virtual void doPreDraw();
+    virtual void doDraw();
+    virtual void doPostDraw();
+};
 
+typedef std::shared_ptr<Node> NodePtr;
+
+} // namespace ivf

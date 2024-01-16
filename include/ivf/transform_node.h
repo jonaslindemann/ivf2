@@ -6,28 +6,36 @@
 
 namespace ivf {
 
-    class TransformNode : public Node {
-    private:
-        glm::vec3 m_pos;
-        glm::vec3 m_rotAxis;
-        float m_rotAngle;
-        glm::vec3 m_scale;
-        bool m_useTransform;
-    public:
-        TransformNode();
+class TransformNode : public Node {
+private:
+    glm::vec3 m_pos;
+    glm::vec3 m_rotAxis;
+    float m_rotAngle;
+    glm::vec3 m_scale;
+    bool m_useTransform;
 
-        void setPos(glm::vec3 pos);
-        glm::vec3 pos();
+public:
+    TransformNode();
 
-        void setUseTransform(bool flag);
-        bool useTransform();
-    protected:
-        virtual void doPreDraw();
-        virtual void doPostDraw();
-    };
+    void setPos(glm::vec3 pos);
+    glm::vec3 pos();
 
-    typedef std::shared_ptr<TransformNode> TransformNodePtr;
+    void setUseTransform(bool flag);
+    bool useTransform();
 
+    void setRotAxis(glm::vec3 axis);
+    glm::vec3 rotAxis() const;
+
+    void setRotAngle(float angle);
+    float rotAngle() const;
+
+    void rotateTowards(glm::vec3 target);
+
+protected:
+    virtual void doPreDraw();
+    virtual void doPostDraw();
 };
 
+typedef std::shared_ptr<TransformNode> TransformNodePtr;
 
+}; // namespace ivf

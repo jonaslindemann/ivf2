@@ -10,16 +10,11 @@
 using namespace ivf;
 using namespace std;
 
-TransformManager* TransformManager::m_instance = 0;
+TransformManager *TransformManager::m_instance = 0;
 
 TransformManager::TransformManager()
-    :m_modelMatrix(1.0),
-     m_projectionMatrix(1.0),
-     m_viewMatrix(1.0),
-     m_modelId(-1),
-     m_viewId(-1),
-     m_viewPosId(-1),
-     m_projectionId(-1)
+    : m_modelMatrix(1.0), m_projectionMatrix(1.0), m_viewMatrix(1.0), m_modelId(-1), m_viewId(-1), m_viewPosId(-1),
+      m_projectionId(-1)
 {
     m_modelId = ShaderManager::instance()->currentProgram()->uniformLoc("model");
     m_viewId = ShaderManager::instance()->currentProgram()->uniformLoc("view");
@@ -60,9 +55,9 @@ void display_4x4(string tag, glm::mat4 m4)
 
 void TransformManager::updateShaderMvpMatrix()
 {
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_projectionMatrix);
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_projectionMatrix);
     ShaderManager::instance()->currentProgram()->uniformVec3(m_viewPosId, m_viewPos);
 }
 
@@ -78,28 +73,22 @@ void TransformManager::pushMatrix()
 
 void TransformManager::popMatrix()
 {
-    if (m_matrixMode == MatrixMode::MODEL)
-    {
-        if (m_modelStack.size()!=0)
-        {
+    if (m_matrixMode == MatrixMode::MODEL) {
+        if (m_modelStack.size() != 0) {
             m_modelMatrix = m_modelStack.back();
             m_modelStack.pop_back();
             ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
         }
     }
-    else if (m_matrixMode == MatrixMode::PROJECTION)
-    {
-        if (m_projectionStack.size()!=0)
-        {
+    else if (m_matrixMode == MatrixMode::PROJECTION) {
+        if (m_projectionStack.size() != 0) {
             m_projectionMatrix = m_projectionStack.back();
             m_projectionStack.pop_back();
             ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_modelMatrix);
         }
     }
-    else
-    {
-        if (m_viewStack.size() != 0)
-        {
+    else {
+        if (m_viewStack.size() != 0) {
             m_viewMatrix = m_viewStack.back();
             m_viewStack.pop_back();
             ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_modelMatrix);
@@ -140,21 +129,24 @@ void ivf::TransformManager::scale(float sx, float sy, float sz)
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
-void TransformManager::lookAt(float xe, float ye, float ze,
-                              float xc, float yc, float zc,
-                              float xu, float yu, float zu)
+void ivf::TransformManager::multMatrix(glm::mat4 m)
+{
+    m_modelMatrix = m_modelMatrix * m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+}
+
+void TransformManager::lookAt(float xe, float ye, float ze, float xc, float yc, float zc, float xu, float yu, float zu)
 {
     glm::mat4 m = glm::lookAt(glm::vec3(xe, ye, ze), glm::vec3(xc, yc, zc), glm::vec3(xu, yu, zu));
     m_viewMatrix = m_viewMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
 }
 
-void TransformManager::lookAt(double xe, double ye, double ze,
-	double xc, double yc, double zc,
-	double xu, double yu, double zu)
+void TransformManager::lookAt(double xe, double ye, double ze, double xc, double yc, double zc, double xu, double yu,
+                              double zu)
 {
-	glm::mat4 m = glm::lookAt(glm::vec3(xe, ye, ze), glm::vec3(xc, yc, zc), glm::vec3(xu, yu, zu));
-	m_viewMatrix = m_viewMatrix * m;
+    glm::mat4 m = glm::lookAt(glm::vec3(xe, ye, ze), glm::vec3(xc, yc, zc), glm::vec3(xu, yu, zu));
+    m_viewMatrix = m_viewMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
 }
 
@@ -185,7 +177,6 @@ TransformManager::MatrixMode ivf::TransformManager::matrixMode()
     return m_matrixMode;
 }
 
-
 void TransformManager::ortho2d(float left, float right, float bottom, float top)
 {
     glm::mat4 m = glm::ortho(left, right, bottom, top);
@@ -204,20 +195,16 @@ void TransformManager::identity()
 {
     glm::mat4 m(1.0);
 
-    if (m_matrixMode == MatrixMode::MODEL)
-    {
+    if (m_matrixMode == MatrixMode::MODEL) {
         m_modelMatrix = m;
         ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
     }
-    else if (m_matrixMode == MatrixMode::PROJECTION)
-    {
+    else if (m_matrixMode == MatrixMode::PROJECTION) {
         m_projectionMatrix = m;
         ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_projectionMatrix);
     }
-    else
-    {
+    else {
         m_viewMatrix = m;
         ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
     }
 }
-

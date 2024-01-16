@@ -59,8 +59,12 @@ public:
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
 
+        auto redMat = Material::create();
+        redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
+
         auto sphere = Sphere::create(0.25);
         sphere->setMaterial(yellowMat);
+        sphere->setPos(glm::vec3(0.0, 5.0, 0.0));
 
         m_scene->add(sphere);
 
@@ -69,6 +73,13 @@ public:
         lineGrid->setColor(1.0, 1.0, 0.0, 1.0);
 
         m_scene->add(lineGrid);
+
+        auto arrow = Arrow::create();
+        arrow->rotateTowards(glm::vec3(0.0, 0.0, 1.0));
+        arrow->setRotAngle(30.0);
+        arrow->setMaterial(redMat);
+
+        m_scene->add(arrow);
 
         m_camManip = CameraManipulator::create(this->ref());
 

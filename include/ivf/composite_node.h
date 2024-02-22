@@ -18,6 +18,8 @@ namespace ivf {
 		std::vector<std::shared_ptr<Node>> nodes();
 		void clear();
 
+		NodePtr at(size_t index);
+
 	protected:
 		virtual void doDraw();
 	};

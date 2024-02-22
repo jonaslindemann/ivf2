@@ -27,31 +27,36 @@ std::shared_ptr<Arrow> Arrow::create()
 void ivf::Arrow::setArrowType(ArrowType arrowType)
 {
     m_arrowType = arrowType;
+    refresh();
 }
 
 ArrowType ivf::Arrow::arrowType() const
 {
-    return ArrowType();
+    return m_arrowType;
 }
 
 void ivf::Arrow::setLength(GLfloat length)
 {
     m_length = length;
+    refresh();
 }
 
 void ivf::Arrow::setBodyRadius(GLfloat radius)
 {
     m_bodyRadius = radius;
+    refresh();
 }
 
 void ivf::Arrow::setConeRadius(GLfloat radius)
 {
     m_coneRadius = radius;
+    refresh();
 }
 
 void ivf::Arrow::setConeLength(GLfloat length)
 {
     m_coneLength = length;
+    refresh();
 }
 
 GLfloat ivf::Arrow::length() const
@@ -90,11 +95,17 @@ void ivf::Arrow::doSetup()
     m_rightArrowCone->setUseTransform(true);
 
     m_arrowBody->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
-    m_leftArrowCone->setPos(glm::vec3(0.0f, -m_length / 2.0 - m_coneLength / 2.0, 0.0f));
-    m_rightArrowCone->setPos(glm::vec3(0.0f, m_length / 2.0 + m_coneLength / 2.0, 0.0f));
+    m_arrowBody->setRotAxis(glm::vec3(0.0, 0.0, 1.0));
+    m_arrowBody->setRotAngle(90.0);
+
+    m_leftArrowCone->setPos(glm::vec3(-m_length / 2.0 - m_coneLength / 2.0, 0.0f, 0.0f));
+    m_rightArrowCone->setPos(glm::vec3(m_length / 2.0 + m_coneLength / 2.0, 0.0f, 0.0f));
+
+    m_rightArrowCone->setRotAxis(glm::vec3(0.0f, 0.0f, 1.0f));
+    m_rightArrowCone->setRotAngle(-90.0);
 
     m_leftArrowCone->setRotAxis(glm::vec3(0.0f, 0.0f, 1.0f));
-    m_leftArrowCone->setRotAngle(glm::pi<float>());
+    m_leftArrowCone->setRotAngle(90.0);
 
     switch (m_arrowType) {
     case ArrowType::DoubleSided:

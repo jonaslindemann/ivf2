@@ -28,5 +28,6 @@
 #include <ivf/sphere.h>
 #include <ivf/spot_light.h>
 #include <ivf/text_node.h>
+#include <ivf/transform.h>
 #include <ivf/tube.h>
 #include <ivf/utils.h>

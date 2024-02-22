@@ -29,6 +29,23 @@ glm::mat4 ivf::createRotationMatrixTowards(glm::vec3 currentDirection, glm::vec3
     return rotationMatrix;
 }
 
+
+void ivf::vectorToEuler(const glm::vec3 &unitVector, float &ax, float &ay)
+{
+    // Ensure the vector is normalized
+    glm::vec3 dir = glm::normalize(unitVector);
+
+    // Pitch (ax) is the angle between the vector and the xz-plane
+    ax = std::atan2(dir.x, -dir.z);
+
+    // Yaw (ay) is the angle between the vector's projection on the xz-plane and the z-axis
+    ay = std::atan2(-dir.x, -dir.z);
+
+    // Convert radians to degrees
+    ax = glm::degrees(ax);
+    ay = glm::degrees(ay);
+}
+
 float LinearInterpolFunc::tri(float t)
 {
     if (abs(t) < 1)

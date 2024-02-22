@@ -13,6 +13,8 @@ private:
     float m_rotAngle;
     glm::vec3 m_scale;
     bool m_useTransform;
+    glm::vec3 m_vecRot;
+    glm::vec3 m_eulerAngles;
 
 public:
     TransformNode();
@@ -29,7 +31,12 @@ public:
     void setRotAngle(float angle);
     float rotAngle() const;
 
+    void setEulerAngles(float ax, float ay, float az);
+    void setEulerAngles(glm::vec3 angles);
+
     void rotateTowards(glm::vec3 target);
+    void alignWithAxisAngle(glm::vec3 axis, float angle);
+    void rotateToVector(glm::vec3 v);
 
 protected:
     virtual void doPreDraw();

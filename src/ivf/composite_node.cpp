@@ -28,6 +28,11 @@ void ivf::CompositeNode::clear()
 	 m_nodes.clear();
 }
 
+NodePtr ivf::CompositeNode::at(size_t index)
+{
+	return nodes().at(index);
+}
+
 void ivf::CompositeNode::doDraw()
 {
 	for (auto node : m_nodes)

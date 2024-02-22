@@ -45,4 +45,5 @@ double random(double a, double b);
 TransformManager *xfmMgr();
 
 glm::mat4 createRotationMatrixTowards(glm::vec3 currentDirection, glm::vec3 targetDirection);
+void vectorToEuler(const glm::vec3 &unitVector, float &ax, float &ay);
 }; // namespace ivf

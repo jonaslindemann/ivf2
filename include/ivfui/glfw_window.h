@@ -90,6 +90,10 @@ public:
     void clearError();
     void setError(int error);
 
+    double frameTime() const;
+    int frameCount() const;
+    double elapsedTime() const;
+
 public:
     void doKey(int key, int scancode, int action, int mods);
     void doMousePosition(double x, double y);

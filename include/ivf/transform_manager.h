@@ -79,8 +79,14 @@ public:
     void translate(glm::vec3 pos);
     void translate2f(float tx, float ty);
     void rotate(float rx, float ry, float rz, float angle);
+    void rotateDeg(float rx, float ry, float rz, float angle);
+    void rotateDeg(glm::vec3 axis, float angle);
+    void rotate(float ax, float ay, float az);
+    void rotateDeg(float ax, float ay, float az);
+    void rotateToVector(glm::vec3 v);
     void scale(float sx, float sy, float sz);
     void multMatrix(glm::mat4 m);
+    void alignWithAxisAngle(glm::vec3 axis, float angle);
 
     void identity();
 

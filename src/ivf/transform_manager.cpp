@@ -122,6 +122,54 @@ void TransformManager::rotate(float rx, float ry, float rz, float angle)
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
+void ivf::TransformManager::rotateDeg(float rx, float ry, float rz, float angle)
+{
+    glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(angle), glm::vec3(rx, ry, rz));
+	m_modelMatrix = m_modelMatrix * m;
+	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+}
+
+void ivf::TransformManager::rotateDeg(glm::vec3 axis, float angle)
+{
+    glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(angle), axis);
+	m_modelMatrix = m_modelMatrix * m;
+	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+}
+
+void ivf::TransformManager::rotate(float ax, float ay, float az)
+{
+    glm::mat4 m = glm::rotate(glm::mat4(1.0), ax, glm::vec3(1.0, 0.0, 0.0));
+	m = m * glm::rotate(glm::mat4(1.0), ay, glm::vec3(0.0, 1.0, 0.0));
+	m = m * glm::rotate(glm::mat4(1.0), az, glm::vec3(0.0, 0.0, 1.0));
+	m_modelMatrix = m_modelMatrix * m;
+	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+}
+
+void ivf::TransformManager::rotateDeg(float ax, float ay, float az)
+{
+    glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(ax), glm::vec3(1.0, 0.0, 0.0));
+	m = m * glm::rotate(glm::mat4(1.0), glm::radians(ay), glm::vec3(0.0, 1.0, 0.0));
+	m = m * glm::rotate(glm::mat4(1.0), glm::radians(az), glm::vec3(0.0, 0.0, 1.0));
+	m_modelMatrix = m_modelMatrix * m;
+	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+}
+
+void ivf::TransformManager::rotateToVector(glm::vec3 v)
+{
+    float yaw = glm::degrees(atan2(v.y, v.x));
+
+    // Pitch (around Y axis)
+    float lengthYZ = sqrt(v.x * v.x + v.y * v.y);
+    float pitch = glm::degrees(atan2(-v.z, lengthYZ));
+
+    // Yaw (around Z axis)
+    float sin_yaw = sin(yaw);
+    float cos_yaw = cos(yaw);
+    float roll = glm::degrees(atan2(cos_yaw * v.y + sin_yaw * v.x, v.z));
+
+    this->rotateDeg(0.0, -yaw, roll);
+}
+
 void ivf::TransformManager::scale(float sx, float sy, float sz)
 {
     glm::mat4 m = glm::scale(glm::mat4(1.0), glm::vec3(sx, sy, sz));
@@ -133,6 +181,13 @@ void ivf::TransformManager::multMatrix(glm::mat4 m)
 {
     m_modelMatrix = m_modelMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+}
+
+void ivf::TransformManager::alignWithAxisAngle(glm::vec3 axis, float angle)
+{
+    glm::mat4 m = glm::rotate(glm::mat4(1.0), angle, axis);
+	m_modelMatrix = m_modelMatrix * m;
+	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void TransformManager::lookAt(float xe, float ye, float ze, float xc, float yc, float zc, float xu, float yu, float zu)

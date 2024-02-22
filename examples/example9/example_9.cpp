@@ -16,12 +16,13 @@ private:
     CompositeNodePtr m_scene;
     CameraManipulatorPtr m_camManip;
 
-    ArrowPtr m_arrow;
-
-    double m_t = 0.0;
+    CubePtr m_cube;
+    SpherePtr m_sphere;
+    TransformPtr m_sphereXfm;
 
 public:
-    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title) 
+        : GLFWWindow(width, height, title)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -52,7 +53,6 @@ public:
         dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
         dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
         dirLight->setEnabled(true);
-
         lightMgr->apply();
 
         m_scene = CompositeNode::create();
@@ -67,23 +67,22 @@ public:
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
-        auto arrow = Arrow::create();
-        arrow->setArrowType(ArrowType::RightSided);
-        arrow->setLength(0.5);
-        arrow->setBodyRadius(0.05);
-        arrow->setConeRadius(0.1);
-        arrow->setMaterial(redMat);
+        m_cube = Cube::create();
+        m_cube->setMaterial(redMat);
+        
+        m_sphere = Sphere::create();
+        m_sphere->setMaterial(yellowMat);
+        m_sphere->setRadius(0.25);
+        m_sphere->refresh();
+        m_sphere->setPos(glm::vec3(2.0, 0.0, 0.0));
 
-        for (auto i = 0; i < 5; i++)
-            for (auto j = 0; j < 5; j++)
-                for (auto k = 0; k < 5; k++)
-                {
-                    auto xfm = Transform::create();
-                    xfm->add(arrow);
-                    xfm->setPos(glm::vec3(-2.0 + i, -2.0 + j, -2.0 + k));
-                    xfm->rotateToVector(glm::vec3(random(-1.0, 1.0), random(-1.0, 1.0), random(-1.0, 1.0)));
-                    m_scene->add(xfm);
-                }
+        m_sphereXfm = Transform::create();
+        m_sphereXfm->add(m_sphere); 
+
+        m_scene->add(m_cube);
+        m_scene->add(m_sphereXfm);
+
+
 
         m_camManip = CameraManipulator::create(this->ref());
 
@@ -94,6 +93,12 @@ public:
     {
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        m_cube->setRotAxis(glm::vec3(1.0, 1.0, 1.0));
+        m_cube->setRotAngle(20.0*elapsedTime());
+
+        m_sphereXfm->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
+        m_sphereXfm->setRotAngle(20.0*elapsedTime());
 
         m_scene->draw();
     }

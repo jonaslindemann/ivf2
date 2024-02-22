@@ -319,6 +319,21 @@ void ivfui::GLFWWindow::setError(int error)
     m_lastError = error;
 }
 
+double ivfui::GLFWWindow::frameTime() const
+{
+    return m_frameTime;
+}
+
+int ivfui::GLFWWindow::frameCount() const
+{
+    return m_frameCount;
+}
+
+double ivfui::GLFWWindow::elapsedTime() const
+{
+    return glfwGetTime();
+}
+
 void ivfui::GLFWWindow::clearError()
 {
     m_lastError = 0;

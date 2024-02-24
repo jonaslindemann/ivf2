@@ -32,8 +32,7 @@ private:
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title), m_lightMgr(nullptr)
-    {
-    }
+    {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
     {
@@ -47,7 +46,8 @@ public:
         ShaderManagerPtr shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
-        if (shaderMgr->compileLinkErrors()) {
+        if (shaderMgr->compileLinkErrors())
+        {
             cout << "Couldn't compile shaders, exiting..." << endl;
             return -1;
         }
@@ -94,8 +94,10 @@ public:
 
         for (auto i = 0; i < 11; i++)
             for (auto j = 0; j < 11; j++)
-                for (auto k = 0; k < 11; k++) {
-                    if (true) {
+                for (auto k = 0; k < 11; k++)
+                {
+                    if (true)
+                    {
                         auto instSphere = InstanceNode::create();
                         instSphere->setNode(sphere);
                         instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
@@ -109,7 +111,8 @@ public:
                         // instSphere->setTexture(texture);
                         m_scene->add(instSphere);
                     }
-                    else {
+                    else
+                    {
                         auto sphere = Sphere::create(0.15);
                         sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
 

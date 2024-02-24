@@ -27,6 +27,14 @@ public:
     void setUseTexture(bool flag);
     void setUseVertexColor(bool flag);
     void setShininess(float shininess);
+    void setUseLighting(bool flag);
+    bool useLighting() const;
+    bool useTexture() const;
+    bool useVertexColor() const;
+    glm::vec4 diffuseColor() const;
+    glm::vec4 specularColor() const;
+    glm::vec4 ambientColor() const;
+    float shininess() const;
 
     void apply();
 };

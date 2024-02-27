@@ -14,6 +14,6 @@ target_include_directories(ivf PRIVATE glm::glm)
 #target_link_libraries(ivf generator glad)
 add_dependencies(ivf glad generator)
 INSTALL_TARGETS(/lib ivf) 
-endif()
+endif() 
 
  

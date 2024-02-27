@@ -60,7 +60,6 @@ public:
         auto sphereMaterial = Material::create();
         sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
         sphereMaterial->setUseTexture(true);
-        // sphereMaterial->setUseTexture(false);
         sphereMaterial->setShininess(100.0);
 
         auto textureCat = Texture::create();

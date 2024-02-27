@@ -31,3 +31,4 @@
 #include <ivf/transform.h>
 #include <ivf/tube.h>
 #include <ivf/utils.h>
+#include <ivf/line_trace.h>

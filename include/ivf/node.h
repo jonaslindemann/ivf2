@@ -8,14 +8,13 @@ namespace ivf {
 
 class Node : public GLBase {
 private:
-    std::shared_ptr<Material> m_material;
-    std::shared_ptr<Texture> m_texture;
-    bool m_useMaterial;
-    bool m_useTexture;
-    bool m_visible;
+    std::shared_ptr<Material> m_material{nullptr};
+    std::shared_ptr<Texture> m_texture{nullptr};
+    bool m_useMaterial{true};
+    bool m_useTexture{false};
+    bool m_visible{true};
 
 public:
-    Node();
     void draw();
 
     void setMaterial(std::shared_ptr<Material> material);

@@ -1,5 +1,4 @@
-#ifndef __ivf2_axis__
-#define __ivf2_axis__
+#pragma once
 
 #include <ivf/mesh_node.h>
 
@@ -26,5 +25,3 @@ namespace ivf {
     typedef std::shared_ptr<Axis> AxisPtr;
 
 };
-
-#endif

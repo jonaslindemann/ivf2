@@ -2,10 +2,3 @@
 
 using namespace ivf;
 
-Base::Base()
-{
-}
-
-Base::~Base()
-{
-}

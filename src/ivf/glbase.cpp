@@ -2,10 +2,3 @@
 
 using namespace ivf;
 
-GLBase::GLBase()
-{
-}
-
-GLBase::~GLBase()
-{
-}

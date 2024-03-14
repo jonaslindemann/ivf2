@@ -7,9 +7,6 @@
 namespace ivf {
     
     class GLBase : public Base {
-    public:
-        GLBase();
-        virtual ~GLBase();
     };
 
     typedef std::shared_ptr<GLBase> GLBasePtr;

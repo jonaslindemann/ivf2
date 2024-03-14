@@ -10,11 +10,17 @@ namespace ivf {
 
 	class Box : public MeshNode {
 	private:
-		glm::vec3 m_size;
-		glm::uvec3 m_segments;
+        glm::vec3 m_size{1.0f, 1.0f, 1.0f};
+        glm::uvec3 m_segments{8, 8, 8};
 	public:
 
 		Box(glm::vec3 size = { 1.0f, 1.0f, 1.0f }, glm::vec3 segments = { 8, 8, 8 });
+        Box(double w, double h, double d, int i, int j, int k);
+		virtual ~Box();
+        Box(const Box& other);
+		Box& operator=(const Box& other);
+		Box(Box&& other);
+		Box& operator=(Box&& other);
 
 		static std::shared_ptr<Box> create(glm::vec3 size = { 1.0f, 1.0f, 1.0f }, glm::vec3 segments = { 8, 8, 8 });
 

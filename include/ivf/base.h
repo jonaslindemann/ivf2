@@ -1,5 +1,4 @@
-#ifndef __ivf2_base__
-#define __ivf2_base__
+#pragma once
 
 #include <memory>
 
@@ -9,11 +8,11 @@ namespace ivf {
     private:
         
     public:
-        Base();
-        virtual ~Base();        
+        Base() = default;
+        virtual ~Base() = default;       
     };
 
     typedef std::shared_ptr<Base> BasePtr;
 };
 
-#endif
+

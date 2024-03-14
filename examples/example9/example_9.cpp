@@ -67,6 +67,14 @@ public:
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
+        auto B1 = Box::create();
+        B1->setMaterial(yellowMat);
+        auto B2 = Box::create();
+        B2->setMaterial(redMat);
+
+        B2 = std::move(B1);
+
+
         m_cube = Cube::create();
         m_cube->setMaterial(redMat);
         

@@ -5,8 +5,8 @@
 using namespace ivf;
 
 Axis::Axis(GLfloat size)
+	:m_size(size)
 {
-    m_size = size;
     this->newMesh(6);
     this->doSetup();
 }

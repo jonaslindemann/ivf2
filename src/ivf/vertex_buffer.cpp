@@ -31,7 +31,7 @@ void VertexBuffer::unbind()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::setArray(Field* field)
+void VertexBuffer:: (Field* field)
 {
     this->bind();
     glBufferData(GL_ARRAY_BUFFER, field->memSize(), field->data(), GL_STATIC_DRAW);

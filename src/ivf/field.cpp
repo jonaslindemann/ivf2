@@ -5,57 +5,38 @@
 using namespace ivf;
 using namespace std;
 
-Field::Field(GLuint rows, GLuint cols)
-{
-    m_size[0] = rows;
-    m_size[1] = cols;
-}
-
-Field::~Field()
-{
-    
-}
-
-std::shared_ptr<Field> ivf::Field::create(GLuint rows, GLuint cols)
-{
-    return std::make_shared<Field>(rows, cols);
-}
-
-GLuint Field::rows()
+GLuint Field::rows() const
 {
     return m_size[0];
 }
 
-GLuint Field::cols()
+GLuint Field::cols() const
 {
     return m_size[1];
 }
 
-GLuint Field::size()
+GLuint Field::size() const
 {
-    return m_size[0]*m_size[1];
+    return m_size[0] * m_size[1];
 }
 
 void Field::zero()
-{
-    
-}
+{}
 
 size_t Field::memSize()
 {
     return 0;
 }
 
-void* Field::data()
+void *Field::data()
 {
-    return 0;
+    return nullptr;
 }
 
 GLenum Field::dataType()
 {
-	return GL_NONE;
+    return GL_NONE;
 }
 
 void ivf::Field::print()
-{
-}
+{}

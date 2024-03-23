@@ -6,7 +6,7 @@ using namespace ivf;
 
 using namespace std;
 
-VertexBuffer::VertexBuffer ()
+VertexBuffer::VertexBuffer()
 {
     glGenBuffers(1, &m_id);
 }
@@ -31,7 +31,7 @@ void VertexBuffer::unbind()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer:: (Field* field)
+void VertexBuffer::setArray(Field *field)
 {
     this->bind();
     glBufferData(GL_ARRAY_BUFFER, field->memSize(), field->data(), GL_STATIC_DRAW);

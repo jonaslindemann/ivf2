@@ -21,8 +21,7 @@ private:
     TransformPtr m_sphereXfm;
 
 public:
-    ExampleWindow(int width, int height, std::string title) 
-        : GLFWWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -67,17 +66,15 @@ public:
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
-        auto B1 = Box::create();
-        B1->setMaterial(yellowMat);
-        auto B2 = Box::create();
-        B2->setMaterial(redMat);
-
-        B2 = std::move(B1);
-
+        auto sph1 = Sphere::create();
+        sph1->setMaterial(yellowMat);
+        sph1->setRadius(0.5);
+        sph1->refresh();
+        sph1->setPos(glm::vec3(0.0, 0.0, 0.0));
 
         m_cube = Cube::create();
         m_cube->setMaterial(redMat);
-        
+
         m_sphere = Sphere::create();
         m_sphere->setMaterial(yellowMat);
         m_sphere->setRadius(0.25);
@@ -85,12 +82,10 @@ public:
         m_sphere->setPos(glm::vec3(2.0, 0.0, 0.0));
 
         m_sphereXfm = Transform::create();
-        m_sphereXfm->add(m_sphere); 
+        m_sphereXfm->add(m_sphere);
 
         m_scene->add(m_cube);
         m_scene->add(m_sphereXfm);
-
-
 
         m_camManip = CameraManipulator::create(this->ref());
 
@@ -103,10 +98,10 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         m_cube->setRotAxis(glm::vec3(1.0, 1.0, 1.0));
-        m_cube->setRotAngle(20.0*elapsedTime());
+        m_cube->setRotAngle(20.0 * elapsedTime());
 
         m_sphereXfm->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
-        m_sphereXfm->setRotAngle(20.0*elapsedTime());
+        m_sphereXfm->setRotAngle(20.0 * elapsedTime());
 
         m_scene->draw();
     }

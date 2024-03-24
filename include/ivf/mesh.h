@@ -11,6 +11,7 @@
 #include <ivf/vertex_buffer.h>
 #include <ivf/index_buffer.h>
 
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/vec3.hpp>

@@ -8,6 +8,7 @@ usage() {
     echo "-d, --debug           Configure/build for debug (default)."
     echo "-c, --configure       Configure only."
     echo "-b, --build           Configure and build"
+    echo "--requires            Install required packages."
     echo "--clean               Clean build dirs."
 }
 
@@ -17,6 +18,10 @@ parse_long_options() {
         --help)
             usage
             exit 0
+            ;;
+        --requires)
+            REQUIRES=1
+            shift
             ;;
         --release)
             RELEASE=1
@@ -48,6 +53,7 @@ parse_long_options() {
 }
 
 # Default values
+REQUIRES=0
 DEBUG=0
 RELEASE=0
 BUILD=0
@@ -112,6 +118,12 @@ if [ $DEBUG -eq 0 ] && [ $RELEASE -eq 0 ]; then
 fi
 
 # Your script's logic here
+
+if [ $REQUIRES -eq 1 ]; then
+    echo "-- Installing required packages (vcpkg)."
+    vcpkg install
+fi
+
 if [ $DEBUG -eq 1 ]; then
     echo "-- Debug build is enabled."
 fi
@@ -153,7 +165,7 @@ if [ $BUILD -eq 1 ]; then
 
     if [ $RELEASE -eq 1 ]; then
         echo "-- Building release build."
-        cmake --build $DEBUG_DIR --config Release
+        cmake --build $RELEASE_DIR --config Release
     fi
 fi
 

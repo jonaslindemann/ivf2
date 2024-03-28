@@ -7,7 +7,7 @@
       },
       {
         "name": "linux",
-        "toolchainFile": "/home/lindemann/vcpkg/scripts/buildsystems/vcpkg.cmake"
+        "toolchainFile": "/home/bmjl/vcpkg/scripts/buildsystems/vcpkg.cmake"
       }
     ]
   }

@@ -121,6 +121,8 @@ void CameraManipulator::update()
     m_rightMouseButton = (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
     m_anyMouseButton = m_leftMouseButton || m_middleMouseButton || m_rightMouseButton;
 
+    m_shiftKey = (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
+
     if (m_anyMouseButton)
     {
         glfwGetWindowSize(m_window, &m_width, &m_height);
@@ -162,7 +164,7 @@ void CameraManipulator::update()
 
         xfmMgr->enableModelMatrix();
     }
-    else if (m_rightMouseButton)
+    else if ((m_rightMouseButton) && (!m_shiftKey))
     {
         double movX = -m_mouseScaleX * (m_mouseX - m_mouseStartX);
         double movY = m_mouseScaleY * (m_mouseY - m_mouseStartY);
@@ -175,19 +177,13 @@ void CameraManipulator::update()
         m_cameraNewPos = m_cameraPosition + float(movX) * right + float(movY) * realUp;
         m_cameraNewTarget = m_cameraTarget + float(movX) * right + float(movY) * realUp;
 
-        std::printf("forward: %f %f %f\n", forward.x, forward.y, forward.z);
-        std::printf("up: %f %f %f\n", up.x, up.y, up.z);
-        std::printf("right: %f %f %f\n", right.x, right.y, right.z);
-        std::printf("realUp: %f %f %f\n", realUp.x, realUp.y, realUp.z);
-        std::printf("movX: %f movY: %f\n", movX, movY);
-
         xfmMgr->enableViewMatrix();
         xfmMgr->identity();
         xfmMgr->lookAt(m_cameraNewPos, m_cameraNewTarget);
 
         xfmMgr->enableModelMatrix();
     }
-    else if (m_middleMouseButton)
+    else if ((m_middleMouseButton) || ((m_rightMouseButton) && (m_shiftKey)))
     {
         double movX = -m_mouseScaleX * (m_mouseX - m_mouseStartX);
         double movY = m_mouseScaleY * (m_mouseY - m_mouseStartY);

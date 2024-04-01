@@ -20,8 +20,7 @@ private:
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
-    {
-    }
+    {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
     {
@@ -35,7 +34,8 @@ public:
         auto shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
-        if (shaderMgr->compileLinkErrors()) {
+        if (shaderMgr->compileLinkErrors())
+        {
             cout << "Couldn't compile shaders, exiting..." << endl;
             return -1;
         }
@@ -53,12 +53,11 @@ public:
         m_scene = CompositeNode::create();
 
         auto axis = Axis::create();
-        auto grid = Grid::create();
 
         m_scene->add(axis);
-        m_scene->add(grid);
 
-        for (auto i = 0; i < 500; i++) {
+        for (auto i = 0; i < 500; i++)
+        {
             double r = random(0.0, 9.0);
 
             TransformNodePtr node;
@@ -104,6 +103,11 @@ public:
 
         m_camManip->update();
         m_scene->draw();
+    }
+
+    void onResize(int width, int height)
+    {
+        m_camManip->update();
     }
 };
 

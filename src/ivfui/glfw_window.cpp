@@ -26,7 +26,8 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonit
 {
     m_window = glfwCreateWindow(width, height, title.c_str(), monitor, shared);
 
-    if (!m_window) {
+    if (!m_window)
+    {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
@@ -47,7 +48,8 @@ GLFWWindow::~GLFWWindow()
 
 void GLFWWindow::makeCurrent()
 {
-    if (m_window) {
+    if (m_window)
+    {
         glfwMakeContextCurrent(m_window);
         glfwSwapInterval(1);
     }
@@ -74,7 +76,8 @@ void GLFWWindow::swapBuffers()
 
 void GLFWWindow::destroy()
 {
-    if (m_window) {
+    if (m_window)
+    {
         glfwDestroyWindow(m_window);
         m_window = nullptr;
     }
@@ -144,7 +147,8 @@ void GLFWWindow::setUseEscQuit(bool flag)
 
 int GLFWWindow::width()
 {
-    if (m_window) {
+    if (m_window)
+    {
         glfwGetFramebufferSize(m_window, &m_width, &m_height);
         return m_width;
     }
@@ -154,7 +158,8 @@ int GLFWWindow::width()
 
 int GLFWWindow::height()
 {
-    if (m_window) {
+    if (m_window)
+    {
         glfwGetFramebufferSize(m_window, &m_width, &m_height);
         return m_height;
     }
@@ -164,12 +169,14 @@ int GLFWWindow::height()
 
 void GLFWWindow::getSize(int &width, int &height)
 {
-    if (m_window) {
+    if (m_window)
+    {
         glfwGetFramebufferSize(m_window, &m_width, &m_height);
         width = m_width;
         height = m_height;
     }
-    else {
+    else
+    {
         width = -1;
         height = -1;
     }
@@ -213,7 +220,8 @@ void GLFWWindow::draw()
 
     auto result = 0;
 
-    if (m_runSetup) {
+    if (m_runSetup)
+    {
         result = this->doSetup();
         setError(result);
         if (result != 0)
@@ -235,7 +243,8 @@ void GLFWWindow::draw()
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
 
-    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
         GLFWwindow *backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
@@ -345,20 +354,16 @@ int GLFWWindow::doSetup()
 }
 
 void GLFWWindow::onKey(int key, int scancode, int action, int mods)
-{
-}
+{}
 
 void GLFWWindow::onMousePosition(double x, double y)
-{
-}
+{}
 
 void GLFWWindow::onMouseButton(int button, int action, int mods)
-{
-}
+{}
 
 void GLFWWindow::onResize(int width, int height)
-{
-}
+{}
 
 void GLFWWindow::onDraw()
 {
@@ -366,12 +371,10 @@ void GLFWWindow::onDraw()
 }
 
 void ivfui::GLFWWindow::onDrawUi()
-{
-}
+{}
 
 void ivfui::GLFWWindow::onUpdateOtherUi()
-{
-}
+{}
 
 int GLFWWindow::onSetup()
 {

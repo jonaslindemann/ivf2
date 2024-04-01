@@ -22,8 +22,7 @@ private:
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
-    {
-    }
+    {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
     {
@@ -37,7 +36,8 @@ public:
         ShaderManagerPtr shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
-        if (shaderMgr->compileLinkErrors()) {
+        if (shaderMgr->compileLinkErrors())
+        {
             cout << "Couldn't compile shaders, exiting..." << endl;
             return -1;
         }
@@ -98,6 +98,11 @@ public:
     }
 
     void onUpdateOtherUi()
+    {
+        m_camManip->update();
+    }
+
+    void onResize(int width, int height)
     {
         m_camManip->update();
     }

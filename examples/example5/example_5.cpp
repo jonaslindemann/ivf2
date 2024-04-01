@@ -166,6 +166,11 @@ public:
     {
         m_camManip->update();
     }
+
+    void onResize(int width, int height)
+    {
+        m_camManip->update();
+    }
 };
 
 typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;

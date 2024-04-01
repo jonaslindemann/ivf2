@@ -24,7 +24,11 @@ find_package(Freetype REQUIRED)
 #    set(CMAKE_DEBUG_POSTFIX d)
 #endif()
 
-add_compile_definitions(_DEBUG)
+if (APPLE OR UNIX)
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+		add_compile_definitions(_DEBUG)
+	endif()
+endif()
 
 include_directories( ${PROJECT_SOURCE_DIR}/include ${GLM_DIR} ${GENERATOR_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${STB_DIR} ${Stb_INCLUDE_DIR} ${IMGUI_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
 

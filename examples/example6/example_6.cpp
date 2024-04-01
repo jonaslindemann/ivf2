@@ -12,7 +12,6 @@
 
 #include "text_window.h"
 
-
 using namespace ivf;
 using namespace ivfui;
 using namespace std;
@@ -29,8 +28,7 @@ private:
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
-    {
-    }
+    {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
     {
@@ -47,7 +45,8 @@ public:
         ShaderManagerPtr shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
-        if (shaderMgr->compileLinkErrors()) {
+        if (shaderMgr->compileLinkErrors())
+        {
             cout << "Couldn't compile shaders, exiting..." << endl;
             return -1;
         }
@@ -108,6 +107,11 @@ public:
     {
         m_camManip->update();
     }
+
+    void onResize(int width, int height)
+    {
+        m_camManip->update();
+    }
 };
 
 typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;
@@ -123,7 +127,6 @@ int main()
 #ifdef __APPLE__
     app->hint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
 
     auto window = ExampleWindow::create(800, 800, "Example 6");
     window->maximize();

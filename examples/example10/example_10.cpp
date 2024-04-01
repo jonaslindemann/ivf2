@@ -24,16 +24,16 @@ public:
     void setParameters(float a = 1.0, float b = 1.0, float c = 1.0, float d = 0.0, float e = 1.0, float f = 0.0,
                        float g = 1.0, float h = 1.0, float i = 0.0)
     {
-		m_a = a;
-		m_b = b;
-		m_c = c;
-		m_d = d;
-		m_e = e;
-		m_f = f;
-		m_g = g;
-		m_h = h;
-		m_i = i;
-	}
+        m_a = a;
+        m_b = b;
+        m_c = c;
+        m_d = d;
+        m_e = e;
+        m_f = f;
+        m_g = g;
+        m_h = h;
+        m_i = i;
+    }
 
     glm::vec3 operator()(float t)
     {
@@ -127,6 +127,11 @@ public:
     }
 
     void onUpdateOtherUi()
+    {
+        m_camManip->update();
+    }
+
+    void onResize(int width, int height)
     {
         m_camManip->update();
     }

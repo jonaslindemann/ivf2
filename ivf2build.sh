@@ -59,6 +59,13 @@ RELEASE=0
 BUILD=0
 CONFIGURE=0
 CLEAN=0
+PRESET=linux
+
+if [[ $OSTYPE == "linux-gnu" ]]; then
+    PRESET=linux
+elif [[ $OSTYPE == "darwin"* ]]; then
+    PRESET=macos
+fi
 
 DEBUG_DIR=build-debug
 RELEASE_DIR=build-release
@@ -148,12 +155,12 @@ if [ $CONFIGURE -eq 1 ]; then
 
     if [ $DEBUG -eq 1 ]; then
         echo "-- Configuring debug build."
-        cmake -B $DEBUG_DIR -DCMAKE_BUILD_TYPE=Debug --preset linux
+        cmake -B $DEBUG_DIR -DCMAKE_BUILD_TYPE=Debug --preset $PRESET
     fi
 
     if [ $RELEASE -eq 1 ]; then
         echo "-- Configuring release build."
-        cmake -B $RELEASE_DIR -DCMAKE_BUILD_TYPE=Release --preset linux
+        cmake -B $RELEASE_DIR -DCMAKE_BUILD_TYPE=Release --preset $PRESET
     fi
 fi
 

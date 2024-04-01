@@ -8,6 +8,10 @@
       {
         "name": "linux",
         "toolchainFile": "/home/bmjl/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      },
+      {
+        "name": "macos",
+        "toolchainFile": "/Users/lindemann/vcpkg/scripts/buildsystems/vcpkg.cmake"
       }
     ]
   }

@@ -12,6 +12,7 @@
 
 #include "text_window.h"
 
+
 using namespace ivf;
 using namespace ivfui;
 using namespace std;
@@ -119,6 +120,10 @@ int main()
     app->hint(GLFW_CONTEXT_VERSION_MINOR, 3);
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
+#ifdef __APPLE__
+    app->hint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
 
     auto window = ExampleWindow::create(800, 800, "Example 6");
     window->maximize();

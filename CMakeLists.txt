@@ -4,6 +4,7 @@ project(ivf2)
 
 enable_language(CXX)
 enable_language(C)
+set(CMAKE_CXX_STANDARD 20)
 
 set( LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib )
 set( EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin )
@@ -22,6 +23,8 @@ find_package(Freetype REQUIRED)
 #if(WIN32)
 #    set(CMAKE_DEBUG_POSTFIX d)
 #endif()
+
+add_compile_definitions(_DEBUG)
 
 include_directories( ${PROJECT_SOURCE_DIR}/include ${GLM_DIR} ${GENERATOR_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${STB_DIR} ${Stb_INCLUDE_DIR} ${IMGUI_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
 

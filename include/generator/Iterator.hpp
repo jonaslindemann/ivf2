@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <stdexcept>
+#include <iterator>
 
 
 #include "utils.hpp"

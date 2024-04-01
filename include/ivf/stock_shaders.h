@@ -165,8 +165,6 @@ void main()
 
     if (useLighting)
         if (useTexture)
-            //fragColor = vec4(texCoord, 0.0, 1.0);
-            //fragColor = texture(texture0, texCoord) * vec4(1.0, 0.0, 0.0, 1.0); 
             if (textRendering)
                 if (useFixedTextColor)
                     fragColor = vec4(textColor.r, textColor.g, textColor.b, texture(texture0, texCoord).r);

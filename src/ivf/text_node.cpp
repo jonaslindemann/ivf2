@@ -33,7 +33,7 @@ TextNode::TextNode()
     m_useTextureId = ShaderManager::instance()->currentProgram()->uniformLoc("useTexture");
 
 	this->setUseMaterial(true);
-	this->setUseTexture(true);
+    this->setUseTexture(false);
 
     m_vertexAttrId = ShaderManager::instance()->currentProgram()->attribId("aPos");
     m_texAttrId = ShaderManager::instance()->currentProgram()->attribId("aTex");
@@ -135,6 +135,8 @@ void ivf::TextNode::updateCharMap()
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
+    glActiveTexture(GL_TEXTURE0);
+
     for (unsigned char c = 0; c < 128; c++)
     {
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
@@ -150,7 +152,7 @@ void ivf::TextNode::updateCharMap()
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            GL_RGBA,
+            GL_RED,
             face->glyph->bitmap.width,
             face->glyph->bitmap.rows,
             0,
@@ -159,11 +161,25 @@ void ivf::TextNode::updateCharMap()
             face->glyph->bitmap.buffer
         );
 
+        /*
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            GL_RED,
+            face->glyph->bitmap.width,
+            face->glyph->bitmap.rows,
+            0,
+            GL_RED,
+            GL_UNSIGNED_BYTE,
+            face->glyph->bitmap.buffer
+            );
+        */
+
         // set texture options
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         // now store character for later use
         CharacterInfo character = {
             texture,
@@ -172,8 +188,8 @@ void ivf::TextNode::updateCharMap()
             static_cast<unsigned int>(face->glyph->advance.x)
         };
         m_charMap.insert(std::pair<char, CharacterInfo>(c, character));
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
-    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void ivf::TextNode::prepareBuffers()
@@ -211,13 +227,21 @@ void ivf::TextNode::prepareBuffers()
         { 0.0f, 0.0f, 1.0f }
     };
 
+    GLuint indices[6] = { 0, 1, 2, 3, 4, 5 };
+
     glGenVertexArrays(1, &m_VAO);
+
     glGenBuffers(1, &m_vertexVBO);
     glGenBuffers(1, &m_texVBO);
     glGenBuffers(1, &m_colorVBO);
     glGenBuffers(1, &m_normalVBO);
+    glGenBuffers(1, &m_indexVBO);
 
     glBindVertexArray(m_VAO);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6, indices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 3, 0, GL_DYNAMIC_DRAW);
@@ -248,14 +272,13 @@ void ivf::TextNode::prepareBuffers()
 
 void ivf::TextNode::doDraw()
 {
-    glActiveTexture(GL_TEXTURE0);
-    glBindVertexArray(m_VAO);
 
     ShaderManager::instance()->currentProgram()->uniformBool(m_textRenderingId, m_textRendering);
     ShaderManager::instance()->currentProgram()->uniformBool(m_useFixedTextColorId, m_useFixedTextColor);
     ShaderManager::instance()->currentProgram()->uniformVec3(m_textColorId, m_textColor);
     ShaderManager::instance()->currentProgram()->uniformBool(m_useTextureId, true);
 
+    GL_ERR(glActiveTexture(GL_TEXTURE0));
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -294,8 +317,6 @@ void ivf::TextNode::doDraw()
         float w = ch.glyphSize.x * scale;
         float h = ch.glyphSize.y * scale;
 
-        GLuint indices[6] = { 0, 1, 2, 3, 4, 5 };
-
         float vertices[6][3] = {
             { xpos,     ypos + h,   0.0f },
             { xpos,     ypos,       0.0f },
@@ -308,20 +329,26 @@ void ivf::TextNode::doDraw()
 
         // render glyph texture over quad
 
-        glBindTexture(GL_TEXTURE_2D, ch.textureID);
+        GL_ERR(glBindTexture(GL_TEXTURE_2D, ch.textureID));
 
         // update content of VBO memory
+
+        GL_ERR(glBindVertexArray(m_VAO));
 
         GL_ERR(glBindBuffer(GL_ARRAY_BUFFER, m_vertexVBO));
         GL_ERR(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW)); // be sure to use glBufferSubData and not glBufferData
         GL_ERR(glBindBuffer(GL_ARRAY_BUFFER, 0));
 
-        GL_ERR(glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, indices));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
+        GL_ERR(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 
         x += (ch.glyphAdvance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+
+        GL_ERR(glBindTexture(GL_TEXTURE_2D, 0));
+        GL_ERR(glBindVertexArray(0));
     }
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
 
     ShaderManager::instance()->currentProgram()->uniformBool(m_textRenderingId, false);
     ShaderManager::instance()->currentProgram()->uniformBool(m_useTextureId, false);

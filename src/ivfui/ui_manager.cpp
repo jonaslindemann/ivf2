@@ -51,7 +51,7 @@ UiRenderer::UiRenderer(GLFWwindow *window)
 
     // Setup Platform/Renderer backends
 
-    const char *glsl_version = "#version 130";
+    const char *glsl_version = "#version 150";
     ImGui_ImplGlfw_InitForOpenGL(window, false);
     ImGui_ImplOpenGL3_Init(glsl_version);
 }

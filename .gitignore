@@ -36,8 +36,10 @@
 
 # Directories
 
+bin/example_*
 build-debug/
 build-release/
 build/
 lib/
+vcpkg_installed/
 *.lastcodeanalysissucceeded

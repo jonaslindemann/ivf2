@@ -1,0 +1,189 @@
+\doxysection{ivf\+::Line\+Grid Class Reference}
+\hypertarget{classivf_1_1_line_grid}{}\label{classivf_1_1_line_grid}\index{ivf::LineGrid@{ivf::LineGrid}}
+Inheritance diagram for ivf\+::Line\+Grid\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classivf_1_1_line_grid}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_line_grid_a20e32c85b49b17914a859f619fa83bc3}\label{classivf_1_1_line_grid_a20e32c85b49b17914a859f619fa83bc3} 
+{\bfseries Line\+Grid} (GLfloat width=2.\+0, GLfloat height=2.\+0, GLint x\+Div=10, GLint y\+Div=10)
+\item 
+\Hypertarget{classivf_1_1_line_grid_a32eabd39c5f64a352438c8177325fadc}\label{classivf_1_1_line_grid_a32eabd39c5f64a352438c8177325fadc} 
+void {\bfseries set\+Size} (GLfloat width, GLfloat height)
+\item 
+\Hypertarget{classivf_1_1_line_grid_a76665926459d1bfde79fc8669e10802a}\label{classivf_1_1_line_grid_a76665926459d1bfde79fc8669e10802a} 
+void {\bfseries set\+Divisions} (GLint x\+Divisions, GLint y\+Divisions)
+\item 
+\Hypertarget{classivf_1_1_line_grid_a5315d6d21ed5a5707e1c6f91ba1fd026}\label{classivf_1_1_line_grid_a5315d6d21ed5a5707e1c6f91ba1fd026} 
+void {\bfseries set\+Color} (GLfloat r, GLfloat g, GLfloat b, GLfloat a=1.\+0)
+\item 
+\Hypertarget{classivf_1_1_line_grid_a540c0327291ad04c3e80b83939df1908}\label{classivf_1_1_line_grid_a540c0327291ad04c3e80b83939df1908} 
+void {\bfseries set\+Use\+Color} (bool value)
+\item 
+\Hypertarget{classivf_1_1_line_grid_a39d1ec029e85c73df36bbd6ceb408575}\label{classivf_1_1_line_grid_a39d1ec029e85c73df36bbd6ceb408575} 
+bool {\bfseries use\+Color} () const
+\item 
+\Hypertarget{classivf_1_1_line_grid_a8330fec08be22d456ac08536c4b6c5a6}\label{classivf_1_1_line_grid_a8330fec08be22d456ac08536c4b6c5a6} 
+void {\bfseries get\+Color} (GLfloat \&r, GLfloat \&g, GLfloat \&b, GLfloat \&a)
+\item 
+\Hypertarget{classivf_1_1_line_grid_a1822dead41aad478f70c341a0c6d5f78}\label{classivf_1_1_line_grid_a1822dead41aad478f70c341a0c6d5f78} 
+GLfloat {\bfseries width} () const
+\item 
+\Hypertarget{classivf_1_1_line_grid_a4d9a478d8f9b3824c4ed174c89964331}\label{classivf_1_1_line_grid_a4d9a478d8f9b3824c4ed174c89964331} 
+GLfloat {\bfseries height} () const
+\item 
+\Hypertarget{classivf_1_1_line_grid_a9519568c05d4a8f8d208af103b4af625}\label{classivf_1_1_line_grid_a9519568c05d4a8f8d208af103b4af625} 
+GLint {\bfseries x\+Divisions} () const
+\item 
+\Hypertarget{classivf_1_1_line_grid_aa2d8e28aa124f6f72ce9cf7249fe85e7}\label{classivf_1_1_line_grid_aa2d8e28aa124f6f72ce9cf7249fe85e7} 
+GLint {\bfseries y\+Divisions} () const
+\item 
+\Hypertarget{classivf_1_1_line_grid_af81dabfa3b6a96b930550d43ee5626ef}\label{classivf_1_1_line_grid_af81dabfa3b6a96b930550d43ee5626ef} 
+void {\bfseries set\+Align} (Grid\+Align align)
+\item 
+\Hypertarget{classivf_1_1_line_grid_a5e0972aac7ca18b04933aa3a08a5398e}\label{classivf_1_1_line_grid_a5e0972aac7ca18b04933aa3a08a5398e} 
+Grid\+Align {\bfseries align} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries add\+Mesh} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ mesh)
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ $>$ {\bfseries meshes} ()
+\item 
+void {\bfseries new\+Mesh} (int vsize, int isize=0, GLuint prim\+Type=GL\+\_\+\+TRIANGLES)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries mesh} (int idx=0)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries last\+Mesh} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries current\+Mesh} ()
+\item 
+void {\bfseries clear} ()
+\item 
+void {\bfseries create\+From\+Generator} (generator\+::\+Any\+Generator$<$ generator\+::\+Mesh\+Vertex $>$ \&vertices, generator\+::\+Any\+Generator$<$ generator\+::\+Triangle $>$ \&triangles)
+\item 
+void {\bfseries debug\+From\+Generator} (generator\+::\+Any\+Generator$<$ generator\+::\+Mesh\+Vertex $>$ \&vertices, generator\+::\+Any\+Generator$<$ generator\+::\+Triangle $>$ \&triangles)
+\item 
+void {\bfseries refresh} ()
+\item 
+void {\bfseries print} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries set\+Pos} (glm\+::vec3 pos)
+\item 
+glm\+::vec3 {\bfseries pos} ()
+\item 
+void {\bfseries set\+Use\+Transform} (bool flag)
+\item 
+bool {\bfseries use\+Transform} ()
+\item 
+void {\bfseries set\+Rot\+Axis} (glm\+::vec3 axis)
+\item 
+glm\+::vec3 {\bfseries rot\+Axis} () const
+\item 
+void {\bfseries set\+Rot\+Angle} (float angle)
+\item 
+float {\bfseries rot\+Angle} () const
+\item 
+void {\bfseries set\+Euler\+Angles} (float ax, float ay, float az)
+\item 
+void {\bfseries set\+Euler\+Angles} (glm\+::vec3 angles)
+\item 
+void {\bfseries rotate\+Towards} (glm\+::vec3 target)
+\item 
+void {\bfseries align\+With\+Axis\+Angle} (glm\+::vec3 axis, float angle)
+\item 
+void {\bfseries rotate\+To\+Vector} (glm\+::vec3 v)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_node}{ivf\+::\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries draw} ()
+\item 
+void {\bfseries set\+Material} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_material}{Material}} $>$ material)
+\item 
+void {\bfseries set\+Texture} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_texture}{Texture}} $>$ texture)
+\item 
+void {\bfseries set\+Use\+Material} (bool flag)
+\item 
+bool {\bfseries use\+Material} ()
+\item 
+void {\bfseries set\+Use\+Texture} (bool flag)
+\item 
+bool {\bfseries use\+Texture} ()
+\item 
+void {\bfseries set\+Visible} (bool flag)
+\item 
+bool {\bfseries visible} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_line_grid_a60e3b4f5b3af2328c4ebfe76d6c85efe}\label{classivf_1_1_line_grid_a60e3b4f5b3af2328c4ebfe76d6c85efe} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_line_grid}{Line\+Grid}} $>$ {\bfseries create} (GLfloat width=2.\+0, GLfloat height=2.\+0, GLint x\+Div=10, GLint y\+Div=10)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh_node}{Mesh\+Node}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_line_grid_ae187f8956a0fd46e7535d84e742b6f7e}{do\+Setup}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_line_grid_a83e9fc6e1ec89802f5e3c5058233f390}{do\+Pre\+Draw}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_line_grid_a1e2e9bc97259ec6c92fc33a526863913}{do\+Post\+Draw}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_mesh_node_aa91fd06f989967f997f82db12e11c582}{do\+Draw}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classivf_1_1_line_grid_a1e2e9bc97259ec6c92fc33a526863913}\label{classivf_1_1_line_grid_a1e2e9bc97259ec6c92fc33a526863913} 
+\index{ivf::LineGrid@{ivf::LineGrid}!doPostDraw@{doPostDraw}}
+\index{doPostDraw@{doPostDraw}!ivf::LineGrid@{ivf::LineGrid}}
+\doxysubsubsection{\texorpdfstring{doPostDraw()}{doPostDraw()}}
+{\footnotesize\ttfamily void Line\+Grid\+::do\+Post\+Draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}.
+
+\Hypertarget{classivf_1_1_line_grid_a83e9fc6e1ec89802f5e3c5058233f390}\label{classivf_1_1_line_grid_a83e9fc6e1ec89802f5e3c5058233f390} 
+\index{ivf::LineGrid@{ivf::LineGrid}!doPreDraw@{doPreDraw}}
+\index{doPreDraw@{doPreDraw}!ivf::LineGrid@{ivf::LineGrid}}
+\doxysubsubsection{\texorpdfstring{doPreDraw()}{doPreDraw()}}
+{\footnotesize\ttfamily void Line\+Grid\+::do\+Pre\+Draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}.
+
+\Hypertarget{classivf_1_1_line_grid_ae187f8956a0fd46e7535d84e742b6f7e}\label{classivf_1_1_line_grid_ae187f8956a0fd46e7535d84e742b6f7e} 
+\index{ivf::LineGrid@{ivf::LineGrid}!doSetup@{doSetup}}
+\index{doSetup@{doSetup}!ivf::LineGrid@{ivf::LineGrid}}
+\doxysubsubsection{\texorpdfstring{doSetup()}{doSetup()}}
+{\footnotesize\ttfamily void ivf\+::\+Line\+Grid\+::do\+Setup (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/line\+\_\+grid.\+h\item 
+src/ivf/line\+\_\+grid.\+cpp\end{DoxyCompactItemize}

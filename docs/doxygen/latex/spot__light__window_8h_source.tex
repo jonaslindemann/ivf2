@@ -1,0 +1,58 @@
+\doxysection{spot\+\_\+light\+\_\+window.\+h}
+\hypertarget{spot__light__window_8h_source}{}\label{spot__light__window_8h_source}\index{include/ivfui/spot\_light\_window.h@{include/ivfui/spot\_light\_window.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivfui/ui\_window.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <ivf/spot\_light.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{namespace\ }ivfui\ \{}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivfui_1_1_spot_light_window}{SpotLightWindow}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivfui_1_1_ui_window}{ivfui::UiWindow}}\ \{}
+\DoxyCodeLine{00010\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ ivf::SpotLightPtr\ m\_spotLight;}
+\DoxyCodeLine{00012\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_constAttenuation;}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_linearAttenuation;}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_quadraticAttenuation;}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_cutoff;}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_outerCutoff;}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ glm::vec3\ m\_direction;}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ glm::vec3\ m\_position;}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ glm::vec3\ m\_diffuseColor;}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ glm::vec3\ m\_specularColor;}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ glm::vec3\ m\_ambientColor;}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_enabled;}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_constAttenuationPrev;}
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_linearAttenuationPrev;}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_quadraticAttenuationPrev;}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_cutoffPrev;}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_outerCutoffPrev;}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ glm::vec3\ m\_directionPrev;}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ glm::vec3\ m\_positionPrev;}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ glm::vec3\ m\_diffuseColorPrev;}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ glm::vec3\ m\_specularColorPrev;}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ glm::vec3\ m\_ambientColorPrev;}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_enabledPrev;}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_isDirty;}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivfui_1_1_spot_light_window}{SpotLightWindow}}(ivf::SpotLightPtr\ spotLight,\ std::string\ caption);}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<SpotLightWindow>\ create(ivf::SpotLightPtr\ spotLight,\ std::string\ caption);}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ doDraw()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ isDirty();}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \ \ \ \ \};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<SpotLightWindow>\ SpotLightWindowPtr;}
+\DoxyCodeLine{00049\ \}}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ }
+
+\end{DoxyCode}

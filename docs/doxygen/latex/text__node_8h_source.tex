@@ -1,0 +1,105 @@
+\doxysection{text\+\_\+node.\+h}
+\hypertarget{text__node_8h_source}{}\label{text__node_8h_source}\index{include/ivf/text\_node.h@{include/ivf/text\_node.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/transform\_node.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <glad/glad.h>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structivf_1_1_character_info}{CharacterInfo}}\ \{}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ GLuint\ \ \ \ \ \ \ textureID;\ \textcolor{comment}{//\ ID\ handle\ of\ the\ glyph\ texture}}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ glm::ivec2\ \ \ glyphSize;\ \ \ \ \ \ \textcolor{comment}{//\ Size\ of\ glyph}}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ glm::ivec2\ \ \ glyphBearing;\ \ \ \textcolor{comment}{//\ Offset\ from\ baseline\ to\ left/top\ of\ glyph}}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{int}\ glyphAdvance;\ \ \ \textcolor{comment}{//\ Horizontal\ offset\ to\ advance\ to\ next\ glyph}}
+\DoxyCodeLine{00018\ \ \ \ \ \};}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keyword}{enum\ class}\ TextAlignX\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ LEFT,}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ CENTER,}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ RIGHT}
+\DoxyCodeLine{00024\ \ \ \ \ \};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keyword}{enum\ class}\ TextAlignY\ \{}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ BOTTOM,}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ MIDDLE,}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ TOP}
+\DoxyCodeLine{00030\ \ \ \ \ \};}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_text_node}{TextNode}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_transform_node}{TransformNode}}\ \{}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ std::string\ m\_text;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ std::map<GLchar,\ CharacterInfo>\ m\_charMap;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ GLuint\ m\_vertexAttrId;}
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ GLuint\ m\_texAttrId;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ GLuint\ m\_normalAttrId;}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ GLuint\ m\_colorAttrId;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \ \ \ \ GLuint\ m\_textRenderingId;}
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ GLuint\ m\_useFixedTextColorId;}
+\DoxyCodeLine{00046\ \ \ \ \ \ \ \ \ GLuint\ m\_textColorId;}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ GLuint\ m\_useTextureId;}
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_textRendering;}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_useFixedTextColor;}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ glm::vec3\ m\_textColor;}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ m\_maxPixels;}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_scale;}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \ \ \ \ \ \ \ \ TextAlignX\ m\_textAlignX;}
+\DoxyCodeLine{00057\ \ \ \ \ \ \ \ \ TextAlignY\ m\_textAlignY;}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_textWidth;}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ m\_textHeight;}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ GLuint\ m\_VAO;}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ GLuint\ m\_vertexVBO;}
+\DoxyCodeLine{00064\ \ \ \ \ \ \ \ \ GLuint\ m\_texVBO;}
+\DoxyCodeLine{00065\ \ \ \ \ \ \ \ \ GLuint\ m\_normalVBO;}
+\DoxyCodeLine{00066\ \ \ \ \ \ \ \ \ GLuint\ m\_colorVBO;}
+\DoxyCodeLine{00067\ \ \ \ \ \ \ \ \ GLuint\ m\_indexVBO;}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ updateCharMap();}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ prepareBuffers();}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ updateTextSize();}
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00073\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_text_node}{TextNode}}();}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<TextNode>\ create();}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setText(\textcolor{keyword}{const}\ std::string\ text);}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ std::string\ text();}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSize(\textcolor{keyword}{const}\ \textcolor{keywordtype}{float}\ size);}
+\DoxyCodeLine{00081\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ size();}
+\DoxyCodeLine{00082\ }
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setAlignX(\textcolor{keyword}{const}\ TextAlignX\ align);}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setAlignY(\textcolor{keyword}{const}\ TextAlignY\ align);}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \ \ \ \ TextAlignX\ alignX();}
+\DoxyCodeLine{00087\ \ \ \ \ \ \ \ \ TextAlignY\ alignY();}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ textWidth();}
+\DoxyCodeLine{00090\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{float}\ textHeight();}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doDraw();}
+\DoxyCodeLine{00094\ \ \ \ \ \};}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<TextNode>\ TextNodePtr;}
+\DoxyCodeLine{00097\ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ }
+
+\end{DoxyCode}

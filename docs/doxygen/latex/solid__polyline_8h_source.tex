@@ -1,0 +1,47 @@
+\doxysection{solid\+\_\+polyline.\+h}
+\hypertarget{solid__polyline_8h_source}{}\label{solid__polyline_8h_source}\index{include/ivf/solid\_polyline.h@{include/ivf/solid\_polyline.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/mesh\_node.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <glm/gtc/constants.hpp>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <gml/gml.hpp>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <generator/PolyLinePath.hpp>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_solid_poly_line}{SolidPolyLine}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_mesh_node}{MeshNode}}\ \{}
+\DoxyCodeLine{00014\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_radius;}
+\DoxyCodeLine{00016\ \ \ \ \ generator::PolyLinePath\ m\_polyPath;}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_segments;}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_solid_poly_line}{SolidPolyLine}}(\textcolor{keywordtype}{double}\ radius\ =\ 0.1,\ \textcolor{keywordtype}{int}\ segments\ =\ 8);}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<SolidPolyLine>\ create(\textcolor{keywordtype}{double}\ radius\ =\ 0.1,\ \textcolor{keywordtype}{int}\ segments\ =\ 8);}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{void}\ setRadius(\textcolor{keywordtype}{double}\ radius);}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{void}\ addPoint(\textcolor{keyword}{const}\ gml::dvec3\ \&point);}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{void}\ addPoint(\textcolor{keywordtype}{double}\ x,\ \textcolor{keywordtype}{double}\ y,\ \textcolor{keywordtype}{double}\ z);}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{void}\ setPoints(\textcolor{keyword}{const}\ std::vector<gml::dvec3>\ \&points);}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{void}\ clearPoints();}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{void}\ setSegments(\textcolor{keywordtype}{int}\ segments);}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{void}\ setPoint(\textcolor{keywordtype}{int}\ index,\ \textcolor{keyword}{const}\ gml::dvec3\ \&point);}
+\DoxyCodeLine{00032\ \ \ \ \ gml::dvec3\ point(\textcolor{keywordtype}{int}\ index)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keywordtype}{int}\ pointCount();}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doSetup();}
+\DoxyCodeLine{00037\ \};}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{keyword}{typedef}\ std::shared\_ptr<SolidPolyLine>\ SolidPolyLinePtr;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \}\ \textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

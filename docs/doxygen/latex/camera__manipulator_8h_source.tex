@@ -1,0 +1,77 @@
+\doxysection{camera\+\_\+manipulator.\+h}
+\hypertarget{camera__manipulator_8h_source}{}\label{camera__manipulator_8h_source}\index{include/ivfui/camera\_manipulator.h@{include/ivfui/camera\_manipulator.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <glad/glad.h>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <GLFW/glfw3.h>}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{keyword}{namespace\ }ivfui\ \{}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivfui_1_1_camera_manipulator}{CameraManipulator}}\ \{}
+\DoxyCodeLine{00013\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00014\ \ \ \ \ GLFWwindow\ *m\_window;}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_width;}
+\DoxyCodeLine{00016\ \ \ \ \ \textcolor{keywordtype}{int}\ m\_height;}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_firstClick;}
+\DoxyCodeLine{00018\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_firstTime;}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_leftMouseButton;}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_middleMouseButton;}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_rightMouseButton;}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_anyMouseButton;}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_shiftKey;}
+\DoxyCodeLine{00024\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_ctrlKey;}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_altKey;}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_mouseStartX;}
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_mouseStartY;}
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_mouseX;}
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_mouseY;}
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_mouseScaleX;}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_mouseScaleY;}
+\DoxyCodeLine{00032\ \ \ \ \ glm::vec3\ m\_cameraTarget;}
+\DoxyCodeLine{00033\ \ \ \ \ glm::vec3\ m\_cameraPosition;}
+\DoxyCodeLine{00034\ \ \ \ \ glm::vec3\ m\_cameraNewPos;}
+\DoxyCodeLine{00035\ \ \ \ \ glm::vec3\ m\_cameraNewTarget;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_fov;}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_nearZ;}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{double}\ m\_farZ;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{void}\ updateProjectMatrix();}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordtype}{void}\ updateLookAt();}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00046\ \ \ \ \ \mbox{\hyperlink{classivfui_1_1_camera_manipulator}{CameraManipulator}}(GLFWwindow\ *window);}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<CameraManipulator>\ create(GLFWwindow\ *window);}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \textcolor{keywordtype}{void}\ update();}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \ \ \ \ glm::vec3\ cameraTarget();}
+\DoxyCodeLine{00053\ \ \ \ \ glm::vec3\ cameraPosition();}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ setCameraTarget(glm::vec3\ target);}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{void}\ setCameraPosition(glm::vec3\ position);}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{void}\ setFov(\textcolor{keywordtype}{double}\ fov);}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordtype}{void}\ setNearZ(\textcolor{keywordtype}{double}\ nearZ);}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{void}\ setFarZ(\textcolor{keywordtype}{double}\ farZ);}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \ \ \ \ \textcolor{keywordtype}{double}\ fov();}
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{double}\ nearZ();}
+\DoxyCodeLine{00064\ \ \ \ \ \textcolor{keywordtype}{double}\ farZ();}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keywordtype}{void}\ setMouseScaling(\textcolor{keywordtype}{double}\ sx,\ \textcolor{keywordtype}{double}\ sy);}
+\DoxyCodeLine{00067\ \};}
+\DoxyCodeLine{00068\ }
+\DoxyCodeLine{00069\ \textcolor{keyword}{typedef}\ std::shared\_ptr<CameraManipulator>\ CameraManipulatorPtr;}
+\DoxyCodeLine{00070\ }
+\DoxyCodeLine{00071\ \}\ \textcolor{comment}{//\ namespace\ ivfui}}
+
+\end{DoxyCode}

@@ -1,0 +1,196 @@
+\doxysection{ivfui\+::GLFWScene\+Window Class Reference}
+\hypertarget{classivfui_1_1_g_l_f_w_scene_window}{}\label{classivfui_1_1_g_l_f_w_scene_window}\index{ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}}
+Inheritance diagram for ivfui\+::GLFWScene\+Window\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classivfui_1_1_g_l_f_w_scene_window}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_a419c25d70a6f1581dd6e48c693bbd28c}\label{classivfui_1_1_g_l_f_w_scene_window_a419c25d70a6f1581dd6e48c693bbd28c} 
+{\bfseries GLFWScene\+Window} (int width, int height, const std\+::string title, GLFWmonitor \texorpdfstring{$\ast$}{*}monitor=nullptr, GLFWwindow \texorpdfstring{$\ast$}{*}shared=nullptr)
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_a837839b37c77190e85e1ff50ca5c7763}\label{classivfui_1_1_g_l_f_w_scene_window_a837839b37c77190e85e1ff50ca5c7763} 
+void {\bfseries add} (ivf\+::\+Node\+Ptr node)
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_ab0541a15defbe954f74d066c6eaa7942}\label{classivfui_1_1_g_l_f_w_scene_window_ab0541a15defbe954f74d066c6eaa7942} 
+void {\bfseries remove} (ivf\+::\+Node\+Ptr node)
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_a4bf4cfc7d747d5d08d56d95aab3fe4bb}\label{classivfui_1_1_g_l_f_w_scene_window_a4bf4cfc7d747d5d08d56d95aab3fe4bb} 
+void {\bfseries clear} ()
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_aae9136dba198710a6dc6198f965f1010}\label{classivfui_1_1_g_l_f_w_scene_window_aae9136dba198710a6dc6198f965f1010} 
+void {\bfseries add\+Ui\+Window} (ivfui\+::\+Ui\+Window\+Ptr ui\+Window)
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_a47cb1937fde9e4c5bffe067379877798}\label{classivfui_1_1_g_l_f_w_scene_window_a47cb1937fde9e4c5bffe067379877798} 
+ivf\+::\+Composite\+Node\+Ptr {\bfseries scene} ()
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_adf9d358a136ce1775e547493ef91ae24}\label{classivfui_1_1_g_l_f_w_scene_window_adf9d358a136ce1775e547493ef91ae24} 
+ivfui\+::\+Camera\+Manipulator\+Ptr {\bfseries camera\+Manipulator} ()
+\item 
+virtual void \mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window_aeda5081abb01e2ff5c6fc22d3afb14f3}{on\+Resize}} (int width, int height) override
+\item 
+virtual void \mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window_aa59eda2af94a644292ab7b4ed14319c2}{on\+Update\+Other\+Ui}} () override
+\item 
+virtual void \mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window_a9e5373cf363ba6248ad8b55b43ad7884}{on\+Draw}} () override
+\item 
+virtual void \mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window_ad86dc30ce039a5c2694e92930e0c2df9}{on\+Draw\+Ui}} () override
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_a397b2d19cbfce21647ee3807ad505c0d}\label{classivfui_1_1_g_l_f_w_scene_window_a397b2d19cbfce21647ee3807ad505c0d} 
+virtual void {\bfseries on\+Update\+Ui} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{ivfui\+::\+GLFWWindow}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries GLFWWindow} (int width, int height, const std\+::string title, GLFWmonitor \texorpdfstring{$\ast$}{*}monitor=nullptr, GLFWwindow \texorpdfstring{$\ast$}{*}shared=nullptr)
+\item 
+void {\bfseries make\+Current} ()
+\item 
+bool {\bfseries is\+Closing} ()
+\item 
+void {\bfseries close} ()
+\item 
+void {\bfseries swap\+Buffers} ()
+\item 
+void {\bfseries destroy} ()
+\item 
+int {\bfseries width} ()
+\item 
+int {\bfseries height} ()
+\item 
+void {\bfseries get\+Size} (int \&width, int \&height)
+\item 
+void {\bfseries set\+Window\+Icon} (const std\+::string filename)
+\item 
+void {\bfseries maximize} ()
+\item 
+void {\bfseries enable} ()
+\item 
+void {\bfseries disable} ()
+\item 
+bool {\bfseries is\+Enabled} ()
+\item 
+void {\bfseries draw} ()
+\item 
+GLFWwindow \texorpdfstring{$\ast$}{*} {\bfseries ref} ()
+\item 
+int {\bfseries mouse\+Button} ()
+\item 
+int {\bfseries mouse\+Action} ()
+\item 
+int {\bfseries mouse\+Mods} ()
+\item 
+int {\bfseries mouseX} ()
+\item 
+int {\bfseries mouseY} ()
+\item 
+bool {\bfseries is\+Any\+Mouse\+Button\+Down} ()
+\item 
+bool {\bfseries is\+Shift\+Down} ()
+\item 
+bool {\bfseries is\+Ctrl\+Down} ()
+\item 
+bool {\bfseries is\+Alt\+Down} ()
+\item 
+bool {\bfseries use\+Esc\+Quit} ()
+\item 
+void {\bfseries set\+Use\+Esc\+Quit} (bool flag)
+\item 
+int {\bfseries last\+Error} ()
+\item 
+void {\bfseries clear\+Error} ()
+\item 
+void {\bfseries set\+Error} (int error)
+\item 
+double {\bfseries frame\+Time} () const
+\item 
+int {\bfseries frame\+Count} () const
+\item 
+double {\bfseries elapsed\+Time} () const
+\item 
+void {\bfseries do\+Key} (int key, int scancode, int action, int mods)
+\item 
+void {\bfseries do\+Mouse\+Position} (double x, double y)
+\item 
+void {\bfseries do\+Mouse\+Button} (int button, int action, int mods)
+\item 
+void {\bfseries do\+Resize} (int width, int height)
+\item 
+void {\bfseries do\+Draw} ()
+\item 
+void {\bfseries do\+Draw\+Ui} ()
+\item 
+void {\bfseries do\+Update\+Other\+Ui} ()
+\item 
+int {\bfseries do\+Setup} ()
+\item 
+virtual void {\bfseries on\+Key} (int key, int scancode, int action, int mods)
+\item 
+virtual void {\bfseries on\+Mouse\+Position} (double x, double y)
+\item 
+virtual void {\bfseries on\+Mouse\+Button} (int button, int action, int mods)
+\item 
+virtual int {\bfseries on\+Setup} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_a9ba5e376c95b3360a2a934530ec38daa}\label{classivfui_1_1_g_l_f_w_scene_window_a9ba5e376c95b3360a2a934530ec38daa} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window}{GLFWScene\+Window}} $>$ {\bfseries create} (int width, int height, const std\+::string title, GLFWmonitor \texorpdfstring{$\ast$}{*}monitor=nullptr, GLFWwindow \texorpdfstring{$\ast$}{*}shared=nullptr)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{ivfui\+::\+GLFWWindow}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{GLFWWindow}} $>$ {\bfseries create} (int width, int height, const std\+::string title, GLFWmonitor \texorpdfstring{$\ast$}{*}monitor=nullptr, GLFWwindow \texorpdfstring{$\ast$}{*}shared=nullptr)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_a9e5373cf363ba6248ad8b55b43ad7884}\label{classivfui_1_1_g_l_f_w_scene_window_a9e5373cf363ba6248ad8b55b43ad7884} 
+\index{ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}!onDraw@{onDraw}}
+\index{onDraw@{onDraw}!ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}}
+\doxysubsubsection{\texorpdfstring{onDraw()}{onDraw()}}
+{\footnotesize\ttfamily void GLFWScene\+Window\+::on\+Draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{ivfui\+::\+GLFWWindow}}.
+
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_ad86dc30ce039a5c2694e92930e0c2df9}\label{classivfui_1_1_g_l_f_w_scene_window_ad86dc30ce039a5c2694e92930e0c2df9} 
+\index{ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}!onDrawUi@{onDrawUi}}
+\index{onDrawUi@{onDrawUi}!ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}}
+\doxysubsubsection{\texorpdfstring{onDrawUi()}{onDrawUi()}}
+{\footnotesize\ttfamily void ivfui\+::\+GLFWScene\+Window\+::on\+Draw\+Ui (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{ivfui\+::\+GLFWWindow}}.
+
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_aeda5081abb01e2ff5c6fc22d3afb14f3}\label{classivfui_1_1_g_l_f_w_scene_window_aeda5081abb01e2ff5c6fc22d3afb14f3} 
+\index{ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}!onResize@{onResize}}
+\index{onResize@{onResize}!ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}}
+\doxysubsubsection{\texorpdfstring{onResize()}{onResize()}}
+{\footnotesize\ttfamily void GLFWScene\+Window\+::on\+Resize (\begin{DoxyParamCaption}\item[{int}]{width,  }\item[{int}]{height }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{ivfui\+::\+GLFWWindow}}.
+
+\Hypertarget{classivfui_1_1_g_l_f_w_scene_window_aa59eda2af94a644292ab7b4ed14319c2}\label{classivfui_1_1_g_l_f_w_scene_window_aa59eda2af94a644292ab7b4ed14319c2} 
+\index{ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}!onUpdateOtherUi@{onUpdateOtherUi}}
+\index{onUpdateOtherUi@{onUpdateOtherUi}!ivfui::GLFWSceneWindow@{ivfui::GLFWSceneWindow}}
+\doxysubsubsection{\texorpdfstring{onUpdateOtherUi()}{onUpdateOtherUi()}}
+{\footnotesize\ttfamily void GLFWScene\+Window\+::on\+Update\+Other\+Ui (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{ivfui\+::\+GLFWWindow}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivfui/glfw\+\_\+scene\+\_\+window.\+h\item 
+src/ivfui/glfw\+\_\+scene\+\_\+window.\+cpp\end{DoxyCompactItemize}

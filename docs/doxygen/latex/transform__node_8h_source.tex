@@ -1,0 +1,54 @@
+\doxysection{transform\+\_\+node.\+h}
+\hypertarget{transform__node_8h_source}{}\label{transform__node_8h_source}\index{include/ivf/transform\_node.h@{include/ivf/transform\_node.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/node.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_transform_node}{TransformNode}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_node}{Node}}\ \{}
+\DoxyCodeLine{00010\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00011\ \ \ \ \ glm::vec3\ m\_pos;}
+\DoxyCodeLine{00012\ \ \ \ \ glm::vec3\ m\_rotAxis;}
+\DoxyCodeLine{00013\ \ \ \ \ \textcolor{keywordtype}{float}\ m\_rotAngle;}
+\DoxyCodeLine{00014\ \ \ \ \ glm::vec3\ m\_scale;}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_useTransform;}
+\DoxyCodeLine{00016\ \ \ \ \ glm::vec3\ m\_vecRot;}
+\DoxyCodeLine{00017\ \ \ \ \ glm::vec3\ m\_eulerAngles;}
+\DoxyCodeLine{00018\ }
+\DoxyCodeLine{00019\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00020\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_transform_node}{TransformNode}}();}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{void}\ setPos(glm::vec3\ pos);}
+\DoxyCodeLine{00023\ \ \ \ \ glm::vec3\ pos();}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{void}\ setUseTransform(\textcolor{keywordtype}{bool}\ flag);}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keywordtype}{bool}\ useTransform();}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keywordtype}{void}\ setRotAxis(glm::vec3\ axis);}
+\DoxyCodeLine{00029\ \ \ \ \ glm::vec3\ rotAxis()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{void}\ setRotAngle(\textcolor{keywordtype}{float}\ angle);}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{float}\ rotAngle()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{void}\ setEulerAngles(\textcolor{keywordtype}{float}\ ax,\ \textcolor{keywordtype}{float}\ ay,\ \textcolor{keywordtype}{float}\ az);}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{void}\ setEulerAngles(glm::vec3\ angles);}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{void}\ rotateTowards(glm::vec3\ target);}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{void}\ alignWithAxisAngle(glm::vec3\ axis,\ \textcolor{keywordtype}{float}\ angle);}
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keywordtype}{void}\ rotateToVector(glm::vec3\ v);}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doPreDraw();}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doPostDraw();}
+\DoxyCodeLine{00044\ \};}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \textcolor{keyword}{typedef}\ std::shared\_ptr<TransformNode>\ TransformNodePtr;}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \};\ \textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

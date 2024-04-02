@@ -1,0 +1,49 @@
+\doxysection{sphere.\+h}
+\hypertarget{sphere_8h_source}{}\label{sphere_8h_source}\index{include/ivf/sphere.h@{include/ivf/sphere.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/mesh\_node.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <glm/gtc/constants.hpp>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <gml/gml.hpp>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_sphere}{Sphere}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_mesh_node}{MeshNode}}\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ m\_radius;}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ m\_slices;}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{int}\ m\_segments;}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ m\_sliceStart;}
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ m\_sliceSweep;}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ m\_segmentStart;}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{double}\ m\_segmentSweep;}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_sphere}{Sphere}}(\textcolor{keywordtype}{double}\ radius\ =\ 1.0,\ \textcolor{keywordtype}{int}\ slices\ =\ 32,\ \textcolor{keywordtype}{int}\ segments\ =\ 16,\ \textcolor{keywordtype}{double}\ sliceStart\ =\ 0.0,\ \textcolor{keywordtype}{double}\ sliceSweep\ =\ 2\ *\ glm::pi<double>(),\ \textcolor{keywordtype}{double}\ segmentStart\ =\ 0.0,\ \textcolor{keywordtype}{double}\ segmentSweep\ =\ glm::pi<double>());}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<Sphere>\ create(\textcolor{keywordtype}{double}\ radius\ =\ 1.0,\ \textcolor{keywordtype}{int}\ slices\ =\ 32,\ \textcolor{keywordtype}{int}\ segments\ =\ 16,\ \textcolor{keywordtype}{double}\ sliceStart\ =\ 0.0,\ \textcolor{keywordtype}{double}\ sliceSweep\ =\ 2\ *\ glm::pi<double>(),\ \textcolor{keywordtype}{double}\ segmentStart\ =\ 0.0,\ \textcolor{keywordtype}{double}\ segmentSweep\ =\ glm::pi<double>());}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ set(\textcolor{keywordtype}{double}\ radius\ =\ 1.0,\ \textcolor{keywordtype}{int}\ slices\ =\ 32,\ \textcolor{keywordtype}{int}\ segments\ =\ 16,\ \textcolor{keywordtype}{double}\ sliceStart\ =\ 0.0,\ \textcolor{keywordtype}{double}\ sliceSweep\ =\ 2\ *\ glm::pi<double>(),\ \textcolor{keywordtype}{double}\ segmentStart\ =\ 0.0,\ \textcolor{keywordtype}{double}\ segmentSweep\ =\ glm::pi<double>());}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setRadius(\textcolor{keywordtype}{double}\ radius);}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSlices(\textcolor{keywordtype}{int}\ slices);}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSegments(\textcolor{keywordtype}{int}\ segments);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSliceStart(\textcolor{keywordtype}{double}\ sliceStart);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSliceSweep(\textcolor{keywordtype}{double}\ sliceSweep);}
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSegmentStart(\textcolor{keywordtype}{double}\ segmentStart);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSegmentSweep(\textcolor{keywordtype}{double}\ segmentSweep);}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doSetup();}
+\DoxyCodeLine{00037\ \ \ \ \ \};}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<Sphere>\ SpherePtr;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \}}
+\DoxyCodeLine{00042\ }
+\DoxyCodeLine{00043\ }
+
+\end{DoxyCode}

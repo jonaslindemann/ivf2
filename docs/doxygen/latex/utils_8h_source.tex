@@ -1,0 +1,57 @@
+\doxysection{utils.\+h}
+\hypertarget{utils_8h_source}{}\label{utils_8h_source}\index{include/ivf/utils.h@{include/ivf/utils.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <glad/glad.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <ivf/transform\_manager.h>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_linear_interpol_func}{LinearInterpolFunc}}\ \{}
+\DoxyCodeLine{00012\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00013\ \ \ \ \ std::vector<glm::vec3>\ m\_points;}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keywordtype}{float}\ tri(\textcolor{keywordtype}{float}\ t);}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_linear_interpol_func}{LinearInterpolFunc}}();}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{void}\ addPoint(glm::vec3\ p);}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{void}\ clear();}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{int}\ size();}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ glm::vec3\ operator()(\textcolor{keywordtype}{float}\ t);}
+\DoxyCodeLine{00025\ \};}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keywordtype}{void}\ clearError();}
+\DoxyCodeLine{00028\ GLenum\ checkPrintError(\textcolor{keyword}{const}\ std::string\ context,\ \textcolor{keyword}{const}\ std::string\ file\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{long}\ line\ =\ 0);}
+\DoxyCodeLine{00029\ \textcolor{keywordtype}{float}\ random(\textcolor{keywordtype}{float}\ a,\ \textcolor{keywordtype}{float}\ b);}
+\DoxyCodeLine{00030\ \textcolor{keywordtype}{double}\ random(\textcolor{keywordtype}{double}\ a,\ \textcolor{keywordtype}{double}\ b);}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}\ *xfmMgr();}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ glm::mat4\ createRotationMatrixTowards(glm::vec3\ currentDirection,\ glm::vec3\ targetDirection);}
+\DoxyCodeLine{00035\ \textcolor{keywordtype}{void}\ vectorToEuler(\textcolor{keyword}{const}\ glm::vec3\ \&unitVector,\ \textcolor{keywordtype}{float}\ \&ax,\ \textcolor{keywordtype}{float}\ \&ay);}
+\DoxyCodeLine{00036\ \};\ \textcolor{comment}{//\ namespace\ ivf}}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#ifdef\ \_DEBUG}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ GL\_ERR(stmt)\ \(\backslash\)}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{ivf::clearError();\ \ \ \(\backslash\)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{stmt;\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \(\backslash\)}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{ivf::checkPrintError(\#stmt,\ \_\_FILE\_\_,\ \_\_LINE\_\_);\ \(\backslash\)}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ GL\_ERR\_BEGIN\ ivf::clearError();}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ GL\_ERR\_END(name)\ ivf::checkPrintError(name,\ \_\_FILE\_\_,\ \_\_LINE\_\_);}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ GL\_ERR(stmt)\ stmt;}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ GL\_ERR\_BEGIN}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ GL\_ERR\_END(name)}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00051\ }
+
+\end{DoxyCode}

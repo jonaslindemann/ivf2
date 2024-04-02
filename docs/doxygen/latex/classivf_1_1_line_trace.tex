@@ -1,0 +1,177 @@
+\doxysection{ivf\+::Line\+Trace Class Reference}
+\hypertarget{classivf_1_1_line_trace}{}\label{classivf_1_1_line_trace}\index{ivf::LineTrace@{ivf::LineTrace}}
+Inheritance diagram for ivf\+::Line\+Trace\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classivf_1_1_line_trace}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_line_trace_ac6dbc7e7b77a0fd8d3b9a8d7f15b8cc3}\label{classivf_1_1_line_trace_ac6dbc7e7b77a0fd8d3b9a8d7f15b8cc3} 
+{\bfseries Line\+Trace} (int num\+Vertices)
+\item 
+\Hypertarget{classivf_1_1_line_trace_adba786cbd724d726bfe37845621a6eaf}\label{classivf_1_1_line_trace_adba786cbd724d726bfe37845621a6eaf} 
+void {\bfseries set\+Color} (GLfloat r, GLfloat g, GLfloat b, GLfloat a=1.\+0)
+\item 
+\Hypertarget{classivf_1_1_line_trace_a2e64d8dcfd6c468f439125ce990a062b}\label{classivf_1_1_line_trace_a2e64d8dcfd6c468f439125ce990a062b} 
+void {\bfseries set\+Use\+Color} (bool value)
+\item 
+\Hypertarget{classivf_1_1_line_trace_af232d730366f6e25485caa2cb00effb8}\label{classivf_1_1_line_trace_af232d730366f6e25485caa2cb00effb8} 
+bool {\bfseries use\+Color} () const
+\item 
+\Hypertarget{classivf_1_1_line_trace_ae267f5707d53f4f48d9172b533e2ae97}\label{classivf_1_1_line_trace_ae267f5707d53f4f48d9172b533e2ae97} 
+void {\bfseries get\+Color} (GLfloat \&r, GLfloat \&g, GLfloat \&b, GLfloat \&a)
+\item 
+\Hypertarget{classivf_1_1_line_trace_ae896d5667cc5333f703026d7ba05b3cc}\label{classivf_1_1_line_trace_ae896d5667cc5333f703026d7ba05b3cc} 
+void {\bfseries set\+Num\+Vertices} (int num\+Vertices)
+\item 
+\Hypertarget{classivf_1_1_line_trace_a3c58dc348320b9a7a44875b073a2d43f}\label{classivf_1_1_line_trace_a3c58dc348320b9a7a44875b073a2d43f} 
+int {\bfseries num\+Vertices} () const
+\item 
+\Hypertarget{classivf_1_1_line_trace_a30d47a66ab09dae5ea009d688cd99efb}\label{classivf_1_1_line_trace_a30d47a66ab09dae5ea009d688cd99efb} 
+void {\bfseries add} (glm\+::vec3 \&vertex)
+\item 
+\Hypertarget{classivf_1_1_line_trace_aa48805dcba1759724d93ad325d9cc563}\label{classivf_1_1_line_trace_aa48805dcba1759724d93ad325d9cc563} 
+void {\bfseries clear} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries add\+Mesh} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ mesh)
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ $>$ {\bfseries meshes} ()
+\item 
+void {\bfseries new\+Mesh} (int vsize, int isize=0, GLuint prim\+Type=GL\+\_\+\+TRIANGLES)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries mesh} (int idx=0)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries last\+Mesh} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries current\+Mesh} ()
+\item 
+void {\bfseries clear} ()
+\item 
+void {\bfseries create\+From\+Generator} (generator\+::\+Any\+Generator$<$ generator\+::\+Mesh\+Vertex $>$ \&vertices, generator\+::\+Any\+Generator$<$ generator\+::\+Triangle $>$ \&triangles)
+\item 
+void {\bfseries debug\+From\+Generator} (generator\+::\+Any\+Generator$<$ generator\+::\+Mesh\+Vertex $>$ \&vertices, generator\+::\+Any\+Generator$<$ generator\+::\+Triangle $>$ \&triangles)
+\item 
+void {\bfseries refresh} ()
+\item 
+void {\bfseries print} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries set\+Pos} (glm\+::vec3 pos)
+\item 
+glm\+::vec3 {\bfseries pos} ()
+\item 
+void {\bfseries set\+Use\+Transform} (bool flag)
+\item 
+bool {\bfseries use\+Transform} ()
+\item 
+void {\bfseries set\+Rot\+Axis} (glm\+::vec3 axis)
+\item 
+glm\+::vec3 {\bfseries rot\+Axis} () const
+\item 
+void {\bfseries set\+Rot\+Angle} (float angle)
+\item 
+float {\bfseries rot\+Angle} () const
+\item 
+void {\bfseries set\+Euler\+Angles} (float ax, float ay, float az)
+\item 
+void {\bfseries set\+Euler\+Angles} (glm\+::vec3 angles)
+\item 
+void {\bfseries rotate\+Towards} (glm\+::vec3 target)
+\item 
+void {\bfseries align\+With\+Axis\+Angle} (glm\+::vec3 axis, float angle)
+\item 
+void {\bfseries rotate\+To\+Vector} (glm\+::vec3 v)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_node}{ivf\+::\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries draw} ()
+\item 
+void {\bfseries set\+Material} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_material}{Material}} $>$ material)
+\item 
+void {\bfseries set\+Texture} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_texture}{Texture}} $>$ texture)
+\item 
+void {\bfseries set\+Use\+Material} (bool flag)
+\item 
+bool {\bfseries use\+Material} ()
+\item 
+void {\bfseries set\+Use\+Texture} (bool flag)
+\item 
+bool {\bfseries use\+Texture} ()
+\item 
+void {\bfseries set\+Visible} (bool flag)
+\item 
+bool {\bfseries visible} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_line_trace_af7b6cfc88d58d3ec3aea06b4408f18b1}\label{classivf_1_1_line_trace_af7b6cfc88d58d3ec3aea06b4408f18b1} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_line_trace}{Line\+Trace}} $>$ {\bfseries create} (int num\+Vertices)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh_node}{Mesh\+Node}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_line_trace_a82c6d0559be98a479981e9ecef0cd6f6}{do\+Setup}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_line_trace_a1692b14d3d952e7eaae2f9e79b2c2faf}{do\+Pre\+Draw}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_line_trace_a0dba3b9738ee0698063696b4a49f3bd3}{do\+Post\+Draw}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_mesh_node_aa91fd06f989967f997f82db12e11c582}{do\+Draw}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classivf_1_1_line_trace_a0dba3b9738ee0698063696b4a49f3bd3}\label{classivf_1_1_line_trace_a0dba3b9738ee0698063696b4a49f3bd3} 
+\index{ivf::LineTrace@{ivf::LineTrace}!doPostDraw@{doPostDraw}}
+\index{doPostDraw@{doPostDraw}!ivf::LineTrace@{ivf::LineTrace}}
+\doxysubsubsection{\texorpdfstring{doPostDraw()}{doPostDraw()}}
+{\footnotesize\ttfamily void Line\+Trace\+::do\+Post\+Draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}.
+
+\Hypertarget{classivf_1_1_line_trace_a1692b14d3d952e7eaae2f9e79b2c2faf}\label{classivf_1_1_line_trace_a1692b14d3d952e7eaae2f9e79b2c2faf} 
+\index{ivf::LineTrace@{ivf::LineTrace}!doPreDraw@{doPreDraw}}
+\index{doPreDraw@{doPreDraw}!ivf::LineTrace@{ivf::LineTrace}}
+\doxysubsubsection{\texorpdfstring{doPreDraw()}{doPreDraw()}}
+{\footnotesize\ttfamily void Line\+Trace\+::do\+Pre\+Draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}.
+
+\Hypertarget{classivf_1_1_line_trace_a82c6d0559be98a479981e9ecef0cd6f6}\label{classivf_1_1_line_trace_a82c6d0559be98a479981e9ecef0cd6f6} 
+\index{ivf::LineTrace@{ivf::LineTrace}!doSetup@{doSetup}}
+\index{doSetup@{doSetup}!ivf::LineTrace@{ivf::LineTrace}}
+\doxysubsubsection{\texorpdfstring{doSetup()}{doSetup()}}
+{\footnotesize\ttfamily void ivf\+::\+Line\+Trace\+::do\+Setup (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/line\+\_\+trace.\+h\item 
+src/ivf/line\+\_\+trace.\+cpp\end{DoxyCompactItemize}

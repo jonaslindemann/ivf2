@@ -1,0 +1,72 @@
+\doxysection{ivf\+::Ref\+Pointer\+Base\texorpdfstring{$<$}{<} T, R \texorpdfstring{$>$}{>} Class Template Reference}
+\hypertarget{classivf_1_1_ref_pointer_base}{}\label{classivf_1_1_ref_pointer_base}\index{ivf::RefPointerBase$<$ T, R $>$@{ivf::RefPointerBase$<$ T, R $>$}}
+
+
+{\ttfamily \#include $<$smartptr.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_aadd13e543c506bed0dc6f2867395c260}\label{classivf_1_1_ref_pointer_base_aadd13e543c506bed0dc6f2867395c260} 
+{\bfseries Ref\+Pointer\+Base} (T \texorpdfstring{$\ast$}{*}object=0)
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_a732ee691edc8acf2608e39fa4066214e}\label{classivf_1_1_ref_pointer_base_a732ee691edc8acf2608e39fa4066214e} 
+{\bfseries Ref\+Pointer\+Base} (const \mbox{\hyperlink{classivf_1_1_ref_pointer_base}{Ref\+Pointer\+Base}} \&ivf\+Object)
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_af197d401fc039a5e5c535986e10135ed}\label{classivf_1_1_ref_pointer_base_af197d401fc039a5e5c535986e10135ed} 
+{\bfseries operator T\texorpdfstring{$\ast$}{*}} () const
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_a45b6817e73c913c604f57138b10798ab}\label{classivf_1_1_ref_pointer_base_a45b6817e73c913c604f57138b10798ab} 
+T \& {\bfseries operator\texorpdfstring{$\ast$}{*}} () const
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_a211331996ae758f874b8f270a9a36b28}\label{classivf_1_1_ref_pointer_base_a211331996ae758f874b8f270a9a36b28} 
+T \texorpdfstring{$\ast$}{*} {\bfseries operator-\/$>$} () const
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_ab39e0cbad98a9b58c9de778bfe54598a}\label{classivf_1_1_ref_pointer_base_ab39e0cbad98a9b58c9de778bfe54598a} 
+\mbox{\hyperlink{classivf_1_1_ref_pointer_base}{Ref\+Pointer\+Base}} \& {\bfseries operator=} (const \mbox{\hyperlink{classivf_1_1_ref_pointer_base}{Ref\+Pointer\+Base}} \&Ivf\+Pointer\+Ref\+Base)
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_a9ce12b359d88baffa154fc4a71a8ded4}\label{classivf_1_1_ref_pointer_base_a9ce12b359d88baffa154fc4a71a8ded4} 
+\mbox{\hyperlink{classivf_1_1_ref_pointer_base}{Ref\+Pointer\+Base}} \& {\bfseries operator=} (T \texorpdfstring{$\ast$}{*}ivf\+Object)
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_aa8672112be579c9e0a4880213dc31831}\label{classivf_1_1_ref_pointer_base_aa8672112be579c9e0a4880213dc31831} 
+bool {\bfseries operator==} (T \texorpdfstring{$\ast$}{*}ivf\+Object) const
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_ae49d509f99c9811e305184299fb47620}\label{classivf_1_1_ref_pointer_base_ae49d509f99c9811e305184299fb47620} 
+bool {\bfseries operator!=} (T \texorpdfstring{$\ast$}{*}ivf\+Object) const
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_aed6c338089d698fc47f0d440a8342719}\label{classivf_1_1_ref_pointer_base_aed6c338089d698fc47f0d440a8342719} 
+bool {\bfseries operator==} (const \mbox{\hyperlink{classivf_1_1_ref_pointer_base}{Ref\+Pointer\+Base}} \&Ivf\+Pointer\+Ref\+Base) const
+\item 
+\Hypertarget{classivf_1_1_ref_pointer_base_a7dec15106c35837c401934c5503374da}\label{classivf_1_1_ref_pointer_base_a7dec15106c35837c401934c5503374da} 
+bool {\bfseries operator!=} (const \mbox{\hyperlink{classivf_1_1_ref_pointer_base}{Ref\+Pointer\+Base}} \&Ivf\+Pointer\+Ref\+Base) const
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$class T, class R$>$\newline
+class ivf\+::\+Ref\+Pointer\+Base$<$ T, R $>$}
+Smart pointer class
+
+CIvf\+Pointer handles the Ivf++ reference counting scheme of the CIvf\+Base class. To declare a Ivf++ smart pointer use the Ivf\+Smart\+Pointer() macro. See the following example\+:
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\textcolor{keywordtype}{int}\ main()}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{\ \ \ CIvfPointer<CIvfMaterial>\ material\ =\ \textcolor{keyword}{new}\ CIvfMaterial();\ \textcolor{comment}{//\ addReference()\ called.}}
+\DoxyCodeLine{\ \ \ CIvfPointer<CIvfMaterial>\ material2;}
+\DoxyCodeLine{\ \ \ material2\ =\ material;\ \textcolor{comment}{//\ addReference()\ called}}
+\DoxyCodeLine{\ \ \ .}
+\DoxyCodeLine{\ \ \ .}
+\DoxyCodeLine{}
+\DoxyCodeLine{\ \ \ \textcolor{keywordflow}{return}\ 0;}
+\DoxyCodeLine{\}}
+\DoxyCodeLine{\textcolor{comment}{//\ material\ calls\ deleteReference()}}
+\DoxyCodeLine{\textcolor{comment}{//\ material2\ calls\ deleteRefernce()\ and\ deletes\ CIvfMaterial\ object}}
+
+\end{DoxyCode}
+ 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/smartptr.\+h\end{DoxyCompactItemize}

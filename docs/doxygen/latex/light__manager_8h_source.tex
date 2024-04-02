@@ -1,0 +1,113 @@
+\doxysection{light\+\_\+manager.\+h}
+\hypertarget{light__manager_8h_source}{}\label{light__manager_8h_source}\index{include/ivf/light\_manager.h@{include/ivf/light\_manager.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/glbase.h>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <ivf/shader.h>}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <ivf/dir\_light.h>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <ivf/point\_light.h>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <ivf/spot\_light.h>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_light_manager}{LightManager}}\ \{}
+\DoxyCodeLine{00018\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_useLighting;}
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_useVertexColors;}
+\DoxyCodeLine{00021\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_useTexture;}
+\DoxyCodeLine{00022\ \ \ \ \ \textcolor{keywordtype}{bool}\ m\_savedState;}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \ \ \ \ GLint\ m\_useLightingId;}
+\DoxyCodeLine{00025\ \ \ \ \ GLint\ m\_useVertexColorsId;}
+\DoxyCodeLine{00026\ \ \ \ \ GLint\ m\_useTextureId;}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ GLint\ m\_pointLightCountId;}
+\DoxyCodeLine{00029\ \ \ \ \ GLint\ m\_directionalLightCountId;}
+\DoxyCodeLine{00030\ \ \ \ \ GLint\ m\_spotLightCountId;}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ GLint\ m\_diffuseColorId;}
+\DoxyCodeLine{00033\ \ \ \ \ GLint\ m\_specularColorId;}
+\DoxyCodeLine{00034\ \ \ \ \ GLint\ m\_ambientColorId;}
+\DoxyCodeLine{00035\ \ \ \ \ GLint\ m\_shininessId;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ std::vector<PointLightPtr>\ m\_pointLights;}
+\DoxyCodeLine{00038\ \ \ \ \ std::vector<DirectionalLightPtr>\ m\_dirLights;}
+\DoxyCodeLine{00039\ \ \ \ \ std::vector<SpotLightPtr>\ m\_spotLights;}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_light_manager}{LightManager}}();}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classivf_1_1_light_manager}{LightManager}}\ *m\_instance;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classivf_1_1_light_manager}{LightManager}}\ *instance()}
+\DoxyCodeLine{00046\ \ \ \ \ \{}
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_instance)}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ \ \ \ \ m\_instance\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classivf_1_1_light_manager}{LightManager}}();}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_instance;}
+\DoxyCodeLine{00051\ \ \ \ \ \}}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classivf_1_1_light_manager}{LightManager}}\ *create()}
+\DoxyCodeLine{00054\ \ \ \ \ \{}
+\DoxyCodeLine{00055\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ instance();}
+\DoxyCodeLine{00056\ \ \ \ \ \}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ drop()}
+\DoxyCodeLine{00059\ \ \ \ \ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ m\_instance;}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ m\_instance\ =\ 0;}
+\DoxyCodeLine{00062\ \ \ \ \ \}}
+\DoxyCodeLine{00063\ }
+\DoxyCodeLine{00064\ \ \ \ \ PointLightPtr\ addPointLight();}
+\DoxyCodeLine{00065\ \ \ \ \ DirectionalLightPtr\ addDirectionalLight();}
+\DoxyCodeLine{00066\ \ \ \ \ SpotLightPtr\ addSpotLight();}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00068\ \ \ \ \ PointLightPtr\ getPointLight(\textcolor{keywordtype}{int}\ idx);}
+\DoxyCodeLine{00069\ \ \ \ \ DirectionalLightPtr\ getDirectionalLight(\textcolor{keywordtype}{int}\ idx);}
+\DoxyCodeLine{00070\ \ \ \ \ SpotLightPtr\ getSpotLight(\textcolor{keywordtype}{int}\ idx);}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ pointLightCount();}
+\DoxyCodeLine{00073\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ dirLightCount();}
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ spotLightCount();}
+\DoxyCodeLine{00075\ }
+\DoxyCodeLine{00076\ \ \ \ \ \textcolor{keywordtype}{void}\ setUseLighting(\textcolor{keywordtype}{bool}\ flag);}
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{keywordtype}{void}\ setUseVertexColors(\textcolor{keywordtype}{bool}\ flag);}
+\DoxyCodeLine{00078\ \ \ \ \ \textcolor{keywordtype}{bool}\ useLighting();}
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordtype}{void}\ enableLighting();}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordtype}{void}\ disableLighting();}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordtype}{void}\ setUseTexture(\textcolor{keywordtype}{bool}\ flag);}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordtype}{void}\ setupDefaultColors();}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordtype}{void}\ apply();}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ setDiffuseColor(glm::vec3\ color);}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordtype}{void}\ setDiffuseColor(glm::vec4\ color);}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordtype}{void}\ setDiffuseColor(GLfloat\ red,\ GLfloat\ green,\ GLfloat\ blue,\ GLfloat\ alpha\ =\ 1.0f);}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordtype}{void}\ setSpecularColor(glm::vec3\ color);}
+\DoxyCodeLine{00093\ \ \ \ \ \textcolor{keywordtype}{void}\ setSpecularColor(glm::vec4\ color);}
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{keywordtype}{void}\ setSpecularColor(GLfloat\ red,\ GLfloat\ green,\ GLfloat\ blue,\ GLfloat\ alpha\ =\ 1.0f);}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordtype}{void}\ setAmbientColor(glm::vec3\ color);}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordtype}{void}\ setAmbientColor(glm::vec4\ color);}
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordtype}{void}\ setAmbientColor(GLfloat\ red,\ GLfloat\ green,\ GLfloat\ blue,\ GLfloat\ alpha\ =\ 1.0f);}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ \textcolor{keywordtype}{void}\ setShininess(\textcolor{keywordtype}{float}\ shininess);}
+\DoxyCodeLine{00101\ }
+\DoxyCodeLine{00102\ \ \ \ \ \textcolor{keywordtype}{void}\ saveState();}
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keywordtype}{void}\ restoreState();}
+\DoxyCodeLine{00104\ \};}
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classivf_1_1_light_manager}{LightManager}}\ *\mbox{\hyperlink{classivf_1_1_light_manager}{LightManagerPtr}};}
+\DoxyCodeLine{00107\ \};\ \textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

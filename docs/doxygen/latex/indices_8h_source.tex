@@ -1,0 +1,30 @@
+\doxysection{indices.\+h}
+\hypertarget{indices_8h_source}{}\label{indices_8h_source}\index{include/ivf/indices.h@{include/ivf/indices.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/int\_field.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00006\ \ \ \ \ }
+\DoxyCodeLine{00007\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_indices}{Indices}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ \{}
+\DoxyCodeLine{00008\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00009\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_indices}{Indices}}(GLuint\ nIndices,\ GLuint\ cols);}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<Indices>\ create(GLuint\ nIndices,\ GLuint\ cols);}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setIndex(GLuint\ idx,\ GLuint\ i0);}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setIndex(GLuint\ idx,\ GLuint\ i0,\ GLuint\ i1);}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setIndex(GLuint\ idx,\ GLuint\ i0,\ GLuint\ i1,\ GLuint\ i2);}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setIndex(GLuint\ idx,\ GLuint\ i0,\ GLuint\ i1,\ GLuint\ i2,\ GLuint\ i3);}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ index(GLuint\ idx,\ GLuint\&\ i0);}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ index(GLuint\ idx,\ GLuint\&\ i0,\ GLuint\&\ i1);}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ index(GLuint\ idx,\ GLuint\&\ i0,\ GLuint\&\ i1,\ GLuint\&\ i2);}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ index(GLuint\ idx,\ GLuint\&\ i0,\ GLuint\&\ i1,\ GLuint\&\ i2,\ GLuint\&\ i3);}
+\DoxyCodeLine{00022\ \ \ \ \ \};}
+\DoxyCodeLine{00023\ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<Indices>\ IndicesPtr;}
+\DoxyCodeLine{00024\ \};}
+
+\end{DoxyCode}

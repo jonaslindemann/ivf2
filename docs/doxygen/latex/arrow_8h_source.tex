@@ -1,0 +1,59 @@
+\doxysection{arrow.\+h}
+\hypertarget{arrow_8h_source}{}\label{arrow_8h_source}\index{include/ivf/arrow.h@{include/ivf/arrow.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/arrow.h>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <ivf/capped\_cone.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <ivf/capped\_cylinder.h>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <ivf/composite\_node.h>}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{keyword}{enum\ class}\ ArrowType\ \{}
+\DoxyCodeLine{00011\ \ \ \ \ DoubleSided,}
+\DoxyCodeLine{00012\ \ \ \ \ LeftSided,}
+\DoxyCodeLine{00013\ \ \ \ \ RightSided}
+\DoxyCodeLine{00014\ \};}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_arrow}{Arrow}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_composite_node}{CompositeNode}}\ \{}
+\DoxyCodeLine{00017\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00018\ \ \ \ \ ArrowType\ m\_arrowType;}
+\DoxyCodeLine{00019\ \ \ \ \ CappedCylinderPtr\ m\_arrowBody;}
+\DoxyCodeLine{00020\ \ \ \ \ CappedConePtr\ m\_leftArrowCone;}
+\DoxyCodeLine{00021\ \ \ \ \ CappedConePtr\ m\_rightArrowCone;}
+\DoxyCodeLine{00022\ \ \ \ \ GLfloat\ m\_length;}
+\DoxyCodeLine{00023\ \ \ \ \ GLfloat\ m\_bodyRadius;}
+\DoxyCodeLine{00024\ \ \ \ \ GLfloat\ m\_coneRadius;}
+\DoxyCodeLine{00025\ \ \ \ \ GLfloat\ m\_coneLength;}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00028\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_arrow}{Arrow}}();}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<Arrow>\ create();}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{void}\ setArrowType(ArrowType\ arrowType);}
+\DoxyCodeLine{00033\ \ \ \ \ ArrowType\ arrowType()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{void}\ setLength(GLfloat\ length);}
+\DoxyCodeLine{00036\ \ \ \ \ \textcolor{keywordtype}{void}\ setBodyRadius(GLfloat\ radius);}
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{void}\ setConeRadius(GLfloat\ radius);}
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keywordtype}{void}\ setConeLength(GLfloat\ length);}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ GLfloat\ length()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00041\ \ \ \ \ GLfloat\ bodyRadius()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00042\ \ \ \ \ GLfloat\ coneRadius()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00043\ \ \ \ \ GLfloat\ coneLength()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{void}\ refresh();}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doSetup();}
+\DoxyCodeLine{00049\ \};}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \textcolor{keyword}{typedef}\ std::shared\_ptr<Arrow>\ ArrowPtr;}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \}\ \textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

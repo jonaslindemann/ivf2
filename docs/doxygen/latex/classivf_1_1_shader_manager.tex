@@ -1,0 +1,55 @@
+\doxysection{ivf\+::Shader\+Manager Class Reference}
+\hypertarget{classivf_1_1_shader_manager}{}\label{classivf_1_1_shader_manager}\index{ivf::ShaderManager@{ivf::ShaderManager}}
+
+
+A class that manages shaders and shader programs.  
+
+
+
+
+{\ttfamily \#include $<$shader\+\_\+manager.\+h$>$}
+
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_shader_manager_a1cc8608d1455fea734c5b20b6e35b2c5}\label{classivf_1_1_shader_manager_a1cc8608d1455fea734c5b20b6e35b2c5} 
+Program\+Ptr {\bfseries load\+Program\+From\+Files} (const std\+::string vertex\+Shader, const std\+::string fragment\+Shader, const std\+::string name)
+\item 
+\Hypertarget{classivf_1_1_shader_manager_a9eb7256fc6fc1ff6325e00c3befff74b}\label{classivf_1_1_shader_manager_a9eb7256fc6fc1ff6325e00c3befff74b} 
+Program\+Ptr {\bfseries load\+Program\+From\+Strings} (const std\+::string vertex\+Shader\+Source, const std\+::string fragment\+Shader\+Source, const std\+::string name)
+\item 
+\Hypertarget{classivf_1_1_shader_manager_af1283a3b1e2eb47c2b703c83e0abc5b0}\label{classivf_1_1_shader_manager_af1283a3b1e2eb47c2b703c83e0abc5b0} 
+Program\+Ptr {\bfseries load\+Basic\+Shader} ()
+\item 
+\Hypertarget{classivf_1_1_shader_manager_a6cc27007a929a437f789528615fa2acd}\label{classivf_1_1_shader_manager_a6cc27007a929a437f789528615fa2acd} 
+Program\+Ptr {\bfseries current\+Program} ()
+\item 
+\Hypertarget{classivf_1_1_shader_manager_a3ec47430d133fc98e1a3e8de087f82be}\label{classivf_1_1_shader_manager_a3ec47430d133fc98e1a3e8de087f82be} 
+void {\bfseries apply} ()
+\item 
+\Hypertarget{classivf_1_1_shader_manager_a8a658f54ef6f0ae80667b55d060fad2d}\label{classivf_1_1_shader_manager_a8a658f54ef6f0ae80667b55d060fad2d} 
+bool {\bfseries compile\+Link\+Errors} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_shader_manager_ad0c27625f06cc78bf8716485f5bce8e2}\label{classivf_1_1_shader_manager_ad0c27625f06cc78bf8716485f5bce8e2} 
+static \mbox{\hyperlink{classivf_1_1_shader_manager}{Shader\+Manager}} \texorpdfstring{$\ast$}{*} {\bfseries instance} ()
+\item 
+\Hypertarget{classivf_1_1_shader_manager_afd66676e587866bbe1d99ff45dc6651a}\label{classivf_1_1_shader_manager_afd66676e587866bbe1d99ff45dc6651a} 
+static \mbox{\hyperlink{classivf_1_1_shader_manager}{Shader\+Manager}} \texorpdfstring{$\ast$}{*} {\bfseries create} ()
+\item 
+\Hypertarget{classivf_1_1_shader_manager_a1b01f5312e768d902ce9d50335445991}\label{classivf_1_1_shader_manager_a1b01f5312e768d902ce9d50335445991} 
+static void {\bfseries drop} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+A class that manages shaders and shader programs. 
+
+The \doxylink{classivf_1_1_shader_manager}{Shader\+Manager} class provides functionality to load, compile, and link shaders, as well as manage shader programs. It allows loading shaders from files or strings, and provides methods to retrieve the current shader program and apply it. The class also provides error checking for shader compilation and linking. 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/shader\+\_\+manager.\+h\item 
+src/ivf/shader\+\_\+manager.\+cpp\end{DoxyCompactItemize}

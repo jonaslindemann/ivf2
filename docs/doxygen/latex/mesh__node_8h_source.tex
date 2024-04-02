@@ -1,0 +1,54 @@
+\doxysection{mesh\+\_\+node.\+h}
+\hypertarget{mesh__node_8h_source}{}\label{mesh__node_8h_source}\index{include/ivf/mesh\_node.h@{include/ivf/mesh\_node.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/transform\_node.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <generator/generator.hpp>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <ivf/mesh.h>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <ivf/material.h>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_mesh_node}{MeshNode}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_transform_node}{TransformNode}}\ \{}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00016\ \ \ \ \ \ \ \ \ std::vector<std::shared\_ptr<Mesh>>\ m\_meshes;}
+\DoxyCodeLine{00017\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_mesh_node}{MeshNode}}();}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<MeshNode>\ create();}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ addMesh(std::shared\_ptr<Mesh>\ mesh);}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ std::vector<std::shared\_ptr<Mesh>>\ meshes();}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ newMesh(\textcolor{keywordtype}{int}\ vsize,\ \textcolor{keywordtype}{int}\ isize\ =\ 0,\ GLuint\ primType=GL\_TRIANGLES);}
+\DoxyCodeLine{00026\ \ \ \ \ \ \ \ \ std::shared\_ptr<Mesh>\ mesh(\textcolor{keywordtype}{int}\ idx\ =\ 0);}
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ std::shared\_ptr<Mesh>\ lastMesh();}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ std::shared\_ptr<Mesh>\ currentMesh();}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ clear();}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ createFromGenerator(generator::AnyGenerator<generator::MeshVertex>\&\ vertices,\ generator::AnyGenerator<generator::Triangle>\&\ triangles);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ debugFromGenerator(generator::AnyGenerator<generator::MeshVertex>\&\ vertices,\ generator::AnyGenerator<generator::Triangle>\&\ triangles);}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ refresh();}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ print();}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doDraw();}
+\DoxyCodeLine{00040\ }
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doSetup();}
+\DoxyCodeLine{00042\ \ \ \ \ \};}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<MeshNode>\ MeshNodePtr;}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ \};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ }
+
+\end{DoxyCode}

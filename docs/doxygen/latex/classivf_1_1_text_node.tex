@@ -1,0 +1,128 @@
+\doxysection{ivf\+::Text\+Node Class Reference}
+\hypertarget{classivf_1_1_text_node}{}\label{classivf_1_1_text_node}\index{ivf::TextNode@{ivf::TextNode}}
+Inheritance diagram for ivf\+::Text\+Node\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=5.000000cm]{classivf_1_1_text_node}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_text_node_a7d5c3da892df00be7d1a0c1e048ec516}\label{classivf_1_1_text_node_a7d5c3da892df00be7d1a0c1e048ec516} 
+void {\bfseries set\+Text} (const std\+::string text)
+\item 
+\Hypertarget{classivf_1_1_text_node_a99447daf84bc51030dfb0e2f3071de5d}\label{classivf_1_1_text_node_a99447daf84bc51030dfb0e2f3071de5d} 
+std\+::string {\bfseries text} ()
+\item 
+\Hypertarget{classivf_1_1_text_node_a608417b794b2acc0d0bc50634f30f54d}\label{classivf_1_1_text_node_a608417b794b2acc0d0bc50634f30f54d} 
+void {\bfseries set\+Size} (const float size)
+\item 
+\Hypertarget{classivf_1_1_text_node_afa951ab3ba80b26c64a5d18813841ea3}\label{classivf_1_1_text_node_afa951ab3ba80b26c64a5d18813841ea3} 
+float {\bfseries size} ()
+\item 
+\Hypertarget{classivf_1_1_text_node_a06fe37b3599069205cd6ec8a243e829e}\label{classivf_1_1_text_node_a06fe37b3599069205cd6ec8a243e829e} 
+void {\bfseries set\+AlignX} (const Text\+AlignX align)
+\item 
+\Hypertarget{classivf_1_1_text_node_ac25e33f71bffc9f625d49b963aabc7ad}\label{classivf_1_1_text_node_ac25e33f71bffc9f625d49b963aabc7ad} 
+void {\bfseries set\+AlignY} (const Text\+AlignY align)
+\item 
+\Hypertarget{classivf_1_1_text_node_af1c3ab0715d39f338b336ca44755b369}\label{classivf_1_1_text_node_af1c3ab0715d39f338b336ca44755b369} 
+Text\+AlignX {\bfseries alignX} ()
+\item 
+\Hypertarget{classivf_1_1_text_node_ae8949790c479470f70fb508d1b77c9cc}\label{classivf_1_1_text_node_ae8949790c479470f70fb508d1b77c9cc} 
+Text\+AlignY {\bfseries alignY} ()
+\item 
+\Hypertarget{classivf_1_1_text_node_ac1f1e80473bb2aab79a8ef1a474ff35f}\label{classivf_1_1_text_node_ac1f1e80473bb2aab79a8ef1a474ff35f} 
+float {\bfseries text\+Width} ()
+\item 
+\Hypertarget{classivf_1_1_text_node_a3d9cc8fb63496f7ce1df10fc3eee85ec}\label{classivf_1_1_text_node_a3d9cc8fb63496f7ce1df10fc3eee85ec} 
+float {\bfseries text\+Height} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries set\+Pos} (glm\+::vec3 pos)
+\item 
+glm\+::vec3 {\bfseries pos} ()
+\item 
+void {\bfseries set\+Use\+Transform} (bool flag)
+\item 
+bool {\bfseries use\+Transform} ()
+\item 
+void {\bfseries set\+Rot\+Axis} (glm\+::vec3 axis)
+\item 
+glm\+::vec3 {\bfseries rot\+Axis} () const
+\item 
+void {\bfseries set\+Rot\+Angle} (float angle)
+\item 
+float {\bfseries rot\+Angle} () const
+\item 
+void {\bfseries set\+Euler\+Angles} (float ax, float ay, float az)
+\item 
+void {\bfseries set\+Euler\+Angles} (glm\+::vec3 angles)
+\item 
+void {\bfseries rotate\+Towards} (glm\+::vec3 target)
+\item 
+void {\bfseries align\+With\+Axis\+Angle} (glm\+::vec3 axis, float angle)
+\item 
+void {\bfseries rotate\+To\+Vector} (glm\+::vec3 v)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_node}{ivf\+::\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries draw} ()
+\item 
+void {\bfseries set\+Material} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_material}{Material}} $>$ material)
+\item 
+void {\bfseries set\+Texture} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_texture}{Texture}} $>$ texture)
+\item 
+void {\bfseries set\+Use\+Material} (bool flag)
+\item 
+bool {\bfseries use\+Material} ()
+\item 
+void {\bfseries set\+Use\+Texture} (bool flag)
+\item 
+bool {\bfseries use\+Texture} ()
+\item 
+void {\bfseries set\+Visible} (bool flag)
+\item 
+bool {\bfseries visible} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_text_node_a8f2c3a5f1dbb4874b05b4ebb35fa9705}\label{classivf_1_1_text_node_a8f2c3a5f1dbb4874b05b4ebb35fa9705} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_text_node}{Text\+Node}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_text_node_a803243f7b12cdca4cfbe2cbfe78e17eb}{do\+Draw}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_transform_node_a76c460dbfca2a8e2aad4ac6fba484bb6}{do\+Pre\+Draw}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_transform_node_a0eb0a1ef66794b901c49fd5500aa8489}{do\+Post\+Draw}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classivf_1_1_text_node_a803243f7b12cdca4cfbe2cbfe78e17eb}\label{classivf_1_1_text_node_a803243f7b12cdca4cfbe2cbfe78e17eb} 
+\index{ivf::TextNode@{ivf::TextNode}!doDraw@{doDraw}}
+\index{doDraw@{doDraw}!ivf::TextNode@{ivf::TextNode}}
+\doxysubsubsection{\texorpdfstring{doDraw()}{doDraw()}}
+{\footnotesize\ttfamily void ivf\+::\+Text\+Node\+::do\+Draw (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_node}{ivf\+::\+Node}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/text\+\_\+node.\+h\item 
+src/ivf/text\+\_\+node.\+cpp\end{DoxyCompactItemize}

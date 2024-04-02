@@ -1,0 +1,78 @@
+\doxysection{program.\+h}
+\hypertarget{program_8h_source}{}\label{program_8h_source}\index{include/ivf/program.h@{include/ivf/program.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/glbase.h>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <ivf/shader.h>}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <glad/glad.h>}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <glm/gtc/matrix\_transform.hpp>}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#include\ <glm/gtc/type\_ptr.hpp>}}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00017\ }
+\DoxyCodeLine{00018\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_program}{Program}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_g_l_base}{GLBase}}\ \{}
+\DoxyCodeLine{00019\ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00020\ \ \ \ \ std::string\ m\_name;}
+\DoxyCodeLine{00021\ \ \ \ \ std::vector<std::shared\_ptr<Shader>>\ m\_shaders;}
+\DoxyCodeLine{00022\ \ \ \ \ GLuint\ m\_id;}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00025\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_program}{Program}}();}
+\DoxyCodeLine{00026\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classivf_1_1_program}{\string~Program}}();}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<Program>\ create();}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{void}\ addShader(std::shared\_ptr<Shader>\ shader);}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{void}\ clear();}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{size\_t}\ shaderCount();}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{bool}\ link();}
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keywordtype}{void}\ use();}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ \textcolor{keywordtype}{void}\ bindAttribLoc(GLuint\ idx,\ \textcolor{keyword}{const}\ std::string\ name);}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \ \ \ \ GLint\ attribId(\textcolor{keyword}{const}\ std::string\ name);}
+\DoxyCodeLine{00040\ \ \ \ \ GLint\ uniformLoc(\textcolor{keyword}{const}\ std::string\ name);}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformMatrix4(\textcolor{keyword}{const}\ std::string\ name,\ glm::mat4\ matrix);}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformMatrix4(GLint\ \textcolor{keywordtype}{id},\ glm::mat4\ matrix);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformBool(\textcolor{keyword}{const}\ std::string\ name,\ \textcolor{keywordtype}{bool}\ flag);}
+\DoxyCodeLine{00046\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformBool(GLint\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{bool}\ flag);}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformInt(\textcolor{keyword}{const}\ std::string\ name,\ \textcolor{keywordtype}{int}\ value);}
+\DoxyCodeLine{00049\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformInt(GLint\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{int}\ value);}
+\DoxyCodeLine{00050\ }
+\DoxyCodeLine{00051\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformFloat(\textcolor{keyword}{const}\ std::string\ name,\ \textcolor{keywordtype}{float}\ value);}
+\DoxyCodeLine{00052\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformFloat(GLint\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{float}\ value);}
+\DoxyCodeLine{00053\ }
+\DoxyCodeLine{00054\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec4f(\textcolor{keyword}{const}\ std::string\ name,\ \textcolor{keywordtype}{float}\ v0,\ \textcolor{keywordtype}{float}\ v1,\ \textcolor{keywordtype}{float}\ v2,\ \textcolor{keywordtype}{float}\ v3);}
+\DoxyCodeLine{00055\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec4f(GLint\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{float}\ v0,\ \textcolor{keywordtype}{float}\ v1,\ \textcolor{keywordtype}{float}\ v2,\ \textcolor{keywordtype}{float}\ v3);}
+\DoxyCodeLine{00056\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec3f(\textcolor{keyword}{const}\ std::string\ name,\ \textcolor{keywordtype}{float}\ v0,\ \textcolor{keywordtype}{float}\ v1,\ \textcolor{keywordtype}{float}\ v2);}
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec3f(GLint\ \textcolor{keywordtype}{id},\ \textcolor{keywordtype}{float}\ v0,\ \textcolor{keywordtype}{float}\ v1,\ \textcolor{keywordtype}{float}\ v2);}
+\DoxyCodeLine{00058\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec3(\textcolor{keyword}{const}\ std::string\ name,\ \textcolor{keyword}{const}\ glm::vec3\ v);}
+\DoxyCodeLine{00059\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec3(GLint\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ glm::vec3\ v);}
+\DoxyCodeLine{00060\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec4(\textcolor{keyword}{const}\ std::string\ name,\ \textcolor{keyword}{const}\ glm::vec4\ v);}
+\DoxyCodeLine{00061\ \ \ \ \ \textcolor{keywordtype}{void}\ uniformVec4(GLint\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ glm::vec4\ v);}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \ \ \textcolor{keywordtype}{void}\ printAttribs();}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ \ \ \ \ GLuint\ id();}
+\DoxyCodeLine{00066\ \ \ \ \ std::string\ name();}
+\DoxyCodeLine{00067\ \ \ \ \ \textcolor{keywordtype}{void}\ setName(std::string\ name);}
+\DoxyCodeLine{00068\ \};}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \textcolor{keyword}{typedef}\ std::shared\_ptr<Program>\ ProgramPtr;}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \};\ \textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

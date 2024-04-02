@@ -1,0 +1,52 @@
+\doxysection{box.\+h}
+\hypertarget{box_8h_source}{}\label{box_8h_source}\index{include/ivf/box.h@{include/ivf/box.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/mesh\_node.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <glm/gtc/constants.hpp>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <gml/gml.hpp>}}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \ \ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_box}{Box}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_mesh_node}{MeshNode}}\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00013\ \ \ \ \ \ \ \ \ glm::vec3\ m\_size\{1.0f,\ 1.0f,\ 1.0f\};}
+\DoxyCodeLine{00014\ \ \ \ \ \ \ \ \ glm::uvec3\ m\_segments\{8,\ 8,\ 8\};}
+\DoxyCodeLine{00015\ \ \ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_box}{Box}}(glm::vec3\ size\ =\ \{\ 1.0f,\ 1.0f,\ 1.0f\ \},\ glm::vec3\ segments\ =\ \{\ 8,\ 8,\ 8\ \});}
+\DoxyCodeLine{00018\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_box}{Box}}(\textcolor{keywordtype}{double}\ w,\ \textcolor{keywordtype}{double}\ h,\ \textcolor{keywordtype}{double}\ d,\ \textcolor{keywordtype}{int}\ i,\ \textcolor{keywordtype}{int}\ j,\ \textcolor{keywordtype}{int}\ k);}
+\DoxyCodeLine{00019\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classivf_1_1_box}{\string~Box}}();}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_box}{Box}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classivf_1_1_box}{Box}}\&\ other);}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_box}{Box}}\&\ operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{classivf_1_1_box}{Box}}\&\ other);}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_box}{Box}}(\mbox{\hyperlink{classivf_1_1_box}{Box}}\&\&\ other);}
+\DoxyCodeLine{00023\ \ \ \ \ \ \ \ \ \mbox{\hyperlink{classivf_1_1_box}{Box}}\&\ operator=(\mbox{\hyperlink{classivf_1_1_box}{Box}}\&\&\ other);}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<Box>\ create(glm::vec3\ size\ =\ \{\ 1.0f,\ 1.0f,\ 1.0f\ \},\ glm::vec3\ segments\ =\ \{\ 8,\ 8,\ 8\ \});}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ set(glm::vec3\ size\ =\ \{\ 1.0f,\ 1.0f,\ 1.0f\ \},\ glm::vec3\ segments\ =\ \{\ 8,\ 8,\ 8\ \});}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSize(\textcolor{keywordtype}{double}\ w,\ \textcolor{keywordtype}{double}\ h,\ \textcolor{keywordtype}{double}\ d);}
+\DoxyCodeLine{00030\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSize(glm::vec3\ size);}
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ glm::vec3\ size();}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSegments(\textcolor{keywordtype}{int}\ i,\ \textcolor{keywordtype}{int}\ j,\ \textcolor{keywordtype}{int}\ k);}
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ \textcolor{keywordtype}{void}\ setSegments(glm::uvec3\ segments);}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ glm::uvec3\ segments();}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ \textcolor{keyword}{protected}:}
+\DoxyCodeLine{00039\ \ \ \ \ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ doSetup();}
+\DoxyCodeLine{00040\ \ \ \ \ \};}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{typedef}\ std::shared\_ptr<Box>\ BoxPtr;}
+\DoxyCodeLine{00043\ }
+\DoxyCodeLine{00044\ \}}
+\DoxyCodeLine{00045\ }
+\DoxyCodeLine{00046\ }
+
+\end{DoxyCode}

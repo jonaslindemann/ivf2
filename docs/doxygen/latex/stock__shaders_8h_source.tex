@@ -1,0 +1,286 @@
+\doxysection{stock\+\_\+shaders.\+h}
+\hypertarget{stock__shaders_8h_source}{}\label{stock__shaders_8h_source}\index{include/ivf/stock\_shaders.h@{include/ivf/stock\_shaders.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ std::string\ basic\_vert\_shader\_source\ =\ R\textcolor{stringliteral}{"{}(}}
+\DoxyCodeLine{00008\ \textcolor{stringliteral}{\#version\ 330\ core}}
+\DoxyCodeLine{00009\ \textcolor{stringliteral}{layout\ (location\ =\ 0)\ in\ vec3\ aPos;}}
+\DoxyCodeLine{00010\ \textcolor{stringliteral}{layout\ (location\ =\ 1)\ in\ vec4\ aColor;}}
+\DoxyCodeLine{00011\ \textcolor{stringliteral}{layout\ (location\ =\ 2)\ in\ vec2\ aTex;}}
+\DoxyCodeLine{00012\ \textcolor{stringliteral}{layout\ (location\ =\ 3)\ in\ vec3\ aNormal;}}
+\DoxyCodeLine{00013\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00014\ \textcolor{stringliteral}{out\ vec3\ fragPos;}}
+\DoxyCodeLine{00015\ \textcolor{stringliteral}{out\ vec3\ normal;}}
+\DoxyCodeLine{00016\ \textcolor{stringliteral}{out\ vec4\ color;}}
+\DoxyCodeLine{00017\ \textcolor{stringliteral}{out\ vec2\ texCoord;}}
+\DoxyCodeLine{00018\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00019\ \textcolor{stringliteral}{uniform\ mat4\ model;}}
+\DoxyCodeLine{00020\ \textcolor{stringliteral}{uniform\ mat4\ view;}}
+\DoxyCodeLine{00021\ \textcolor{stringliteral}{uniform\ mat4\ projection;}}
+\DoxyCodeLine{00022\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00023\ \textcolor{stringliteral}{void\ main()}}
+\DoxyCodeLine{00024\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00025\ \textcolor{stringliteral}{\ \ \ \ fragPos\ =\ vec3(model\ *\ vec4(aPos,\ 1.0));}}
+\DoxyCodeLine{00026\ \textcolor{stringliteral}{\ \ \ \ mat3\ normalMatrix\ =\ transpose(inverse(mat3(model)));}}
+\DoxyCodeLine{00027\ \textcolor{stringliteral}{\ \ \ \ normal\ =\ normalMatrix\ *\ aNormal;}}
+\DoxyCodeLine{00028\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00029\ \textcolor{stringliteral}{\ \ \ \ color\ =\ aColor;}}
+\DoxyCodeLine{00030\ \textcolor{stringliteral}{\ \ \ \ texCoord\ =\ aTex;}}
+\DoxyCodeLine{00031\ \textcolor{stringliteral}{\ \ \ \ }}
+\DoxyCodeLine{00032\ \textcolor{stringliteral}{\ \ \ \ gl\_Position\ =\ projection\ *\ view\ *\ vec4(fragPos,\ 1.0);}}
+\DoxyCodeLine{00033\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00034\ \textcolor{stringliteral}{)"{};}}
+\DoxyCodeLine{00035\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00036\ \textcolor{stringliteral}{std::string\ basic\_frag\_shader\_source\ =\ R}\textcolor{stringliteral}{"{}(}}
+\DoxyCodeLine{00037\ \textcolor{stringliteral}{\#version\ 330\ core}}
+\DoxyCodeLine{00038\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00039\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00040\ \textcolor{stringliteral}{//\ A\ lot\ of\ information\ from:}}
+\DoxyCodeLine{00041\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00042\ \textcolor{stringliteral}{//\ https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/2.lighting/6.multiple\_lights/6.multiple\_lights.fs}}
+\DoxyCodeLine{00043\ \textcolor{stringliteral}{//}}
+\DoxyCodeLine{00044\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00045\ \textcolor{stringliteral}{out\ vec4\ fragColor;}}
+\DoxyCodeLine{00046\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00047\ \textcolor{stringliteral}{struct\ Material\ }}
+\DoxyCodeLine{00048\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00049\ \textcolor{stringliteral}{\ \ \ \ vec3\ diffuseColor;}}
+\DoxyCodeLine{00050\ \textcolor{stringliteral}{\ \ \ \ vec3\ specularColor;}}
+\DoxyCodeLine{00051\ \textcolor{stringliteral}{\ \ \ \ vec3\ ambientColor;}}
+\DoxyCodeLine{00052\ \textcolor{stringliteral}{\ \ \ \ float\ shininess;}}
+\DoxyCodeLine{00053\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00054\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00055\ \textcolor{stringliteral}{struct\ DirLight\ }}
+\DoxyCodeLine{00056\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00057\ \textcolor{stringliteral}{\ \ \ \ bool\ enabled;}}
+\DoxyCodeLine{00058\ \textcolor{stringliteral}{\ \ \ \ vec3\ direction;\ }}
+\DoxyCodeLine{00059\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00060\ \textcolor{stringliteral}{\ \ \ \ vec3\ ambientColor;}}
+\DoxyCodeLine{00061\ \textcolor{stringliteral}{\ \ \ \ vec3\ diffuseColor;}}
+\DoxyCodeLine{00062\ \textcolor{stringliteral}{\ \ \ \ vec3\ specularColor;}}
+\DoxyCodeLine{00063\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00064\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00065\ \textcolor{stringliteral}{struct\ PointLight\ }}
+\DoxyCodeLine{00066\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00067\ \textcolor{stringliteral}{\ \ \ \ bool\ enabled;}}
+\DoxyCodeLine{00068\ \textcolor{stringliteral}{\ \ \ \ vec3\ position;\ \ \ \ }}
+\DoxyCodeLine{00069\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00070\ \textcolor{stringliteral}{\ \ \ \ float\ constant;}}
+\DoxyCodeLine{00071\ \textcolor{stringliteral}{\ \ \ \ float\ linear;}}
+\DoxyCodeLine{00072\ \textcolor{stringliteral}{\ \ \ \ float\ quadratic;}}
+\DoxyCodeLine{00073\ \textcolor{stringliteral}{\ \ \ \ }}
+\DoxyCodeLine{00074\ \textcolor{stringliteral}{\ \ \ \ vec3\ ambientColor;}}
+\DoxyCodeLine{00075\ \textcolor{stringliteral}{\ \ \ \ vec3\ diffuseColor;}}
+\DoxyCodeLine{00076\ \textcolor{stringliteral}{\ \ \ \ vec3\ specularColor;}}
+\DoxyCodeLine{00077\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00078\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00079\ \textcolor{stringliteral}{struct\ SpotLight\ }}
+\DoxyCodeLine{00080\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00081\ \textcolor{stringliteral}{\ \ \ \ bool\ enabled;}}
+\DoxyCodeLine{00082\ \textcolor{stringliteral}{\ \ \ \ vec3\ position;}}
+\DoxyCodeLine{00083\ \textcolor{stringliteral}{\ \ \ \ vec3\ direction;}}
+\DoxyCodeLine{00084\ \textcolor{stringliteral}{\ \ \ \ float\ cutOff;}}
+\DoxyCodeLine{00085\ \textcolor{stringliteral}{\ \ \ \ float\ outerCutOff;}}
+\DoxyCodeLine{00086\ \textcolor{stringliteral}{\ \ }}
+\DoxyCodeLine{00087\ \textcolor{stringliteral}{\ \ \ \ float\ constant;}}
+\DoxyCodeLine{00088\ \textcolor{stringliteral}{\ \ \ \ float\ linear;}}
+\DoxyCodeLine{00089\ \textcolor{stringliteral}{\ \ \ \ float\ quadratic;}}
+\DoxyCodeLine{00090\ \textcolor{stringliteral}{\ \ }}
+\DoxyCodeLine{00091\ \textcolor{stringliteral}{\ \ \ \ vec3\ ambientColor;}}
+\DoxyCodeLine{00092\ \textcolor{stringliteral}{\ \ \ \ vec3\ diffuseColor;}}
+\DoxyCodeLine{00093\ \textcolor{stringliteral}{\ \ \ \ vec3\ specularColor;\ \ \ \ \ \ \ }}
+\DoxyCodeLine{00094\ \textcolor{stringliteral}{\};}}
+\DoxyCodeLine{00095\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00096\ \textcolor{stringliteral}{in\ vec3\ normal;\ \ }}
+\DoxyCodeLine{00097\ \textcolor{stringliteral}{in\ vec3\ fragPos;\ \ }}
+\DoxyCodeLine{00098\ \textcolor{stringliteral}{in\ vec4\ color;}}
+\DoxyCodeLine{00099\ \textcolor{stringliteral}{in\ vec2\ texCoord;}}
+\DoxyCodeLine{00100\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00101\ \textcolor{stringliteral}{uniform\ vec3\ lightPos;\ }}
+\DoxyCodeLine{00102\ \textcolor{stringliteral}{uniform\ vec3\ viewPos;\ }}
+\DoxyCodeLine{00103\ \textcolor{stringliteral}{uniform\ vec4\ lightColor;}}
+\DoxyCodeLine{00104\ \textcolor{stringliteral}{uniform\ vec3\ textColor;}}
+\DoxyCodeLine{00105\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00106\ \textcolor{stringliteral}{uniform\ bool\ useLighting;}}
+\DoxyCodeLine{00107\ \textcolor{stringliteral}{uniform\ bool\ useTexture;}}
+\DoxyCodeLine{00108\ \textcolor{stringliteral}{uniform\ bool\ useVertexColors;}}
+\DoxyCodeLine{00109\ \textcolor{stringliteral}{uniform\ bool\ usePointFalloff\ =\ false;}}
+\DoxyCodeLine{00110\ \textcolor{stringliteral}{uniform\ bool\ textRendering\ =\ false;}}
+\DoxyCodeLine{00111\ \textcolor{stringliteral}{uniform\ bool\ useFixedTextColor\ =\ false;}}
+\DoxyCodeLine{00112\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00113\ \textcolor{stringliteral}{uniform\ float\ point\_falloff\_a\ =\ 0.0;}}
+\DoxyCodeLine{00114\ \textcolor{stringliteral}{uniform\ float\ point\_falloff\_b\ =\ 0.0;}}
+\DoxyCodeLine{00115\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00116\ \textcolor{stringliteral}{uniform\ int\ pointLightCount\ =\ 0;}}
+\DoxyCodeLine{00117\ \textcolor{stringliteral}{uniform\ int\ dirLightCount\ =\ 0;}}
+\DoxyCodeLine{00118\ \textcolor{stringliteral}{uniform\ int\ spotLightCount\ =\ 0;}}
+\DoxyCodeLine{00119\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00120\ \textcolor{stringliteral}{uniform\ sampler2D\ texture0;}}
+\DoxyCodeLine{00121\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00122\ \textcolor{stringliteral}{\#define\ NR\_POINT\_LIGHTS\ 8}}
+\DoxyCodeLine{00123\ \textcolor{stringliteral}{\#define\ NR\_DIR\_LIGHTS\ 8}}
+\DoxyCodeLine{00124\ \textcolor{stringliteral}{\#define\ NR\_SPOT\_LIGHTS\ 8}}
+\DoxyCodeLine{00125\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00126\ \textcolor{stringliteral}{uniform\ PointLight\ pointLights[NR\_POINT\_LIGHTS];}}
+\DoxyCodeLine{00127\ \textcolor{stringliteral}{uniform\ DirLight\ dirLights[NR\_DIR\_LIGHTS];}}
+\DoxyCodeLine{00128\ \textcolor{stringliteral}{uniform\ SpotLight\ spotLights[NR\_SPOT\_LIGHTS];}}
+\DoxyCodeLine{00129\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00130\ \textcolor{stringliteral}{uniform\ Material\ material;}}
+\DoxyCodeLine{00131\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00132\ \textcolor{stringliteral}{vec3\ calcDirLight(DirLight\ light,\ vec3\ normal,\ vec3\ viewDir);}}
+\DoxyCodeLine{00133\ \textcolor{stringliteral}{vec3\ calcPointLight(PointLight\ light,\ vec3\ normal,\ vec3\ fragPos,\ vec3\ viewDir);}}
+\DoxyCodeLine{00134\ \textcolor{stringliteral}{vec3\ calcSpotLight(SpotLight\ light,\ vec3\ normal,\ vec3\ fragPos,\ vec3\ viewDir);}}
+\DoxyCodeLine{00135\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00136\ \textcolor{stringliteral}{float\ rand(vec2\ co)\{}}
+\DoxyCodeLine{00137\ \textcolor{stringliteral}{\ \ return\ fract(sin(dot(co.xy\ ,vec2(12.9898,78.233)))\ *\ 43758.5453);}}
+\DoxyCodeLine{00138\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00139\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00140\ \textcolor{stringliteral}{void\ main()}}
+\DoxyCodeLine{00141\ \textcolor{stringliteral}{\{\ \ \ }}
+\DoxyCodeLine{00142\ \textcolor{stringliteral}{\ \ \ \ vec3\ norm\ =\ normalize(normal);}}
+\DoxyCodeLine{00143\ \textcolor{stringliteral}{\ \ \ \ vec3\ lightDir\ =\ normalize(lightPos\ -\/\ fragPos);\ \ \ }}
+\DoxyCodeLine{00144\ \textcolor{stringliteral}{\ \ \ \ vec3\ viewDir\ =\ normalize(viewPos\ -\/\ fragPos);}}
+\DoxyCodeLine{00145\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00146\ \textcolor{stringliteral}{\ \ \ \ vec3\ result\ =\ vec3(0.0,\ 0.0,\ 0.0);}}
+\DoxyCodeLine{00147\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00148\ \textcolor{stringliteral}{\ \ \ \ for(int\ i\ =\ 0;\ i\ <\ pointLightCount;\ i++)}}
+\DoxyCodeLine{00149\ \textcolor{stringliteral}{\ \ \ \ \{}}
+\DoxyCodeLine{00150\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ if\ (pointLights[i].enabled)}}
+\DoxyCodeLine{00151\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ calcPointLight(pointLights[i],\ norm,\ fragPos,\ viewDir);\ \ \ \ }}
+\DoxyCodeLine{00152\ \textcolor{stringliteral}{\ \ \ \ \}}}
+\DoxyCodeLine{00153\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00154\ \textcolor{stringliteral}{\ \ \ \ for(int\ i\ =\ 0;\ i\ <\ dirLightCount;\ i++)}}
+\DoxyCodeLine{00155\ \textcolor{stringliteral}{\ \ \ \ \{}}
+\DoxyCodeLine{00156\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ if\ (dirLights[i].enabled)}}
+\DoxyCodeLine{00157\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ calcDirLight(dirLights[i],\ norm,\ viewDir);\ \ \ \ }}
+\DoxyCodeLine{00158\ \textcolor{stringliteral}{\ \ \ \ \}}}
+\DoxyCodeLine{00159\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00160\ \textcolor{stringliteral}{\ \ \ \ for(int\ i\ =\ 0;\ i\ <\ spotLightCount;\ i++)}}
+\DoxyCodeLine{00161\ \textcolor{stringliteral}{\ \ \ \ \{}}
+\DoxyCodeLine{00162\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ if\ (spotLights[i].enabled)}}
+\DoxyCodeLine{00163\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ result\ +=\ calcSpotLight(spotLights[i],\ norm,\ fragPos,\ viewDir);}}
+\DoxyCodeLine{00164\ \textcolor{stringliteral}{\ \ \ \ \}}}
+\DoxyCodeLine{00165\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00166\ \textcolor{stringliteral}{\ \ \ \ if\ (useLighting)}}
+\DoxyCodeLine{00167\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ if\ (useTexture)}}
+\DoxyCodeLine{00168\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ if\ (textRendering)}}
+\DoxyCodeLine{00169\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ if\ (useFixedTextColor)}}
+\DoxyCodeLine{00170\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fragColor\ =\ vec4(textColor.r,\ textColor.g,\ textColor.b,\ texture(texture0,\ texCoord).r);}}
+\DoxyCodeLine{00171\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ else}}
+\DoxyCodeLine{00172\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fragColor\ =\ vec4(result.r,\ result.g,\ result.b,\ texture(texture0,\ texCoord).r);}}
+\DoxyCodeLine{00173\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ else}}
+\DoxyCodeLine{00174\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ fragColor\ =\ texture(texture0,\ texCoord)\ *\ vec4(result,\ 1.0);}}
+\DoxyCodeLine{00175\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ else}}
+\DoxyCodeLine{00176\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ fragColor\ =\ vec4(result,\ 1.0);}}
+\DoxyCodeLine{00177\ \textcolor{stringliteral}{\ \ \ \ else}}
+\DoxyCodeLine{00178\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ if\ (useVertexColors)}}
+\DoxyCodeLine{00179\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ fragColor\ =\ color;}}
+\DoxyCodeLine{00180\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ else}}
+\DoxyCodeLine{00181\ \textcolor{stringliteral}{\ \ \ \ \ \ \ \ \ \ \ \ fragColor\ =\ vec4(material.diffuseColor,\ 1.0);}}
+\DoxyCodeLine{00182\ \textcolor{stringliteral}{\}\ }}
+\DoxyCodeLine{00183\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00184\ \textcolor{stringliteral}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00185\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00186\ \textcolor{stringliteral}{//\ calculates\ the\ color\ when\ using\ a\ directional\ light.}}
+\DoxyCodeLine{00187\ \textcolor{stringliteral}{vec3\ calcDirLight(DirLight\ light,\ vec3\ normal,\ vec3\ viewDir)}}
+\DoxyCodeLine{00188\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00189\ \textcolor{stringliteral}{\ \ \ \ vec3\ lightDir\ =\ normalize(-\/light.direction);}}
+\DoxyCodeLine{00190\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00191\ \textcolor{stringliteral}{\ \ \ \ //\ diffuse\ shading}}
+\DoxyCodeLine{00192\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00193\ \textcolor{stringliteral}{\ \ \ \ float\ diff\ =\ max(dot(normal,\ lightDir),\ 0.0);}}
+\DoxyCodeLine{00194\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00195\ \textcolor{stringliteral}{\ \ \ \ //\ specular\ shading}}
+\DoxyCodeLine{00196\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00197\ \textcolor{stringliteral}{\ \ \ \ vec3\ reflectDir\ =\ reflect(-\/lightDir,\ normal);}}
+\DoxyCodeLine{00198\ \textcolor{stringliteral}{\ \ \ \ float\ spec\ =\ pow(max(dot(viewDir,\ reflectDir),\ 0.0),\ material.shininess);}}
+\DoxyCodeLine{00199\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00200\ \textcolor{stringliteral}{\ \ \ \ //\ combine\ results}}
+\DoxyCodeLine{00201\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00202\ \textcolor{stringliteral}{\ \ \ \ vec3\ ambient\ =\ light.ambientColor\ *\ material.ambientColor;}}
+\DoxyCodeLine{00203\ \textcolor{stringliteral}{\ \ \ \ vec3\ diffuse\ =\ light.diffuseColor\ *\ diff\ *\ material.diffuseColor;}}
+\DoxyCodeLine{00204\ \textcolor{stringliteral}{\ \ \ \ vec3\ specular\ =\ light.specularColor\ *\ spec\ *\ material.specularColor;}}
+\DoxyCodeLine{00205\ \textcolor{stringliteral}{\ \ \ \ return\ (ambient\ +\ diffuse\ +\ specular);}}
+\DoxyCodeLine{00206\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00207\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00208\ \textcolor{stringliteral}{//\ calculates\ the\ color\ when\ using\ a\ point\ light.}}
+\DoxyCodeLine{00209\ \textcolor{stringliteral}{vec3\ calcPointLight(PointLight\ light,\ vec3\ normal,\ vec3\ fragPos,\ vec3\ viewDir)}}
+\DoxyCodeLine{00210\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00211\ \textcolor{stringliteral}{\ \ \ \ vec3\ lightDir\ =\ normalize(light.position\ -\/\ fragPos);}}
+\DoxyCodeLine{00212\ \textcolor{stringliteral}{\ }}
+\DoxyCodeLine{00213\ \textcolor{stringliteral}{\ \ \ \ //\ diffuse\ shading}}
+\DoxyCodeLine{00214\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00215\ \textcolor{stringliteral}{\ \ \ \ float\ diff\ =\ max(dot(normal,\ lightDir),\ 0.0);}}
+\DoxyCodeLine{00216\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00217\ \textcolor{stringliteral}{\ \ \ \ //\ specular\ shading}}
+\DoxyCodeLine{00218\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00219\ \textcolor{stringliteral}{\ \ \ \ vec3\ reflectDir\ =\ reflect(-\/lightDir,\ normal);}}
+\DoxyCodeLine{00220\ \textcolor{stringliteral}{\ \ \ \ float\ spec\ =\ pow(max(dot(viewDir,\ reflectDir),\ 0.0),\ material.shininess);}}
+\DoxyCodeLine{00221\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00222\ \textcolor{stringliteral}{\ \ \ \ //\ attenuation}}
+\DoxyCodeLine{00223\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00224\ \textcolor{stringliteral}{\ \ \ \ float\ distance\ =\ length(light.position\ -\/\ fragPos);}}
+\DoxyCodeLine{00225\ \textcolor{stringliteral}{\ \ \ \ float\ attenuation\ =\ 1.0\ /\ (light.constant\ +\ light.linear\ *\ distance\ +\ light.quadratic\ *\ (distance\ *\ distance));\ \ \ \ }}
+\DoxyCodeLine{00226\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00227\ \textcolor{stringliteral}{\ \ \ \ //\ combine\ results}}
+\DoxyCodeLine{00228\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00229\ \textcolor{stringliteral}{\ \ \ \ vec3\ ambient\ =\ light.ambientColor\ *\ material.ambientColor;}}
+\DoxyCodeLine{00230\ \textcolor{stringliteral}{\ \ \ \ vec3\ diffuse\ =\ light.diffuseColor\ *\ diff\ *\ material.diffuseColor;}}
+\DoxyCodeLine{00231\ \textcolor{stringliteral}{\ \ \ \ vec3\ specular\ =\ light.specularColor\ *\ spec\ *\ material.specularColor;}}
+\DoxyCodeLine{00232\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00233\ \textcolor{stringliteral}{\ \ \ \ ambient\ *=\ attenuation;}}
+\DoxyCodeLine{00234\ \textcolor{stringliteral}{\ \ \ \ diffuse\ *=\ attenuation;}}
+\DoxyCodeLine{00235\ \textcolor{stringliteral}{\ \ \ \ specular\ *=\ attenuation;}}
+\DoxyCodeLine{00236\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00237\ \textcolor{stringliteral}{\ \ \ \ return\ (ambient\ +\ diffuse\ +\ specular);}}
+\DoxyCodeLine{00238\ \textcolor{stringliteral}{\}}}
+\DoxyCodeLine{00239\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00240\ \textcolor{stringliteral}{//\ calculates\ the\ color\ when\ using\ a\ spot\ light.}}
+\DoxyCodeLine{00241\ \textcolor{stringliteral}{vec3\ calcSpotLight(SpotLight\ light,\ vec3\ normal,\ vec3\ fragPos,\ vec3\ viewDir)}}
+\DoxyCodeLine{00242\ \textcolor{stringliteral}{\{}}
+\DoxyCodeLine{00243\ \textcolor{stringliteral}{\ \ \ \ vec3\ lightDir\ =\ normalize(light.position\ -\/\ fragPos);}}
+\DoxyCodeLine{00244\ \textcolor{stringliteral}{\ \ \ \ }}
+\DoxyCodeLine{00245\ \textcolor{stringliteral}{\ \ \ \ //\ diffuse\ shading}}
+\DoxyCodeLine{00246\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00247\ \textcolor{stringliteral}{\ \ \ \ float\ diff\ =\ max(dot(normal,\ lightDir),\ 0.0);}}
+\DoxyCodeLine{00248\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00249\ \textcolor{stringliteral}{\ \ \ \ //\ specular\ shading}}
+\DoxyCodeLine{00250\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00251\ \textcolor{stringliteral}{\ \ \ \ vec3\ reflectDir\ =\ reflect(-\/lightDir,\ normal);}}
+\DoxyCodeLine{00252\ \textcolor{stringliteral}{\ \ \ \ float\ spec\ =\ pow(max(dot(viewDir,\ reflectDir),\ 0.0),\ material.shininess);}}
+\DoxyCodeLine{00253\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00254\ \textcolor{stringliteral}{\ \ \ \ //\ attenuation}}
+\DoxyCodeLine{00255\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00256\ \textcolor{stringliteral}{\ \ \ \ float\ distance\ =\ length(light.position\ -\/\ fragPos);}}
+\DoxyCodeLine{00257\ \textcolor{stringliteral}{\ \ \ \ float\ attenuation\ =\ 1.0\ /\ (light.constant\ +\ light.linear\ *\ distance\ +\ light.quadratic\ *\ (distance\ *\ distance));\ \ \ \ }}
+\DoxyCodeLine{00258\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00259\ \textcolor{stringliteral}{\ \ \ \ //\ spotlight\ intensity}}
+\DoxyCodeLine{00260\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00261\ \textcolor{stringliteral}{\ \ \ \ float\ theta\ =\ dot(lightDir,\ normalize(-\/light.direction));\ }}
+\DoxyCodeLine{00262\ \textcolor{stringliteral}{\ \ \ \ float\ epsilon\ =\ light.cutOff\ -\/\ light.outerCutOff;}}
+\DoxyCodeLine{00263\ \textcolor{stringliteral}{\ \ \ \ float\ intensity\ =\ clamp((theta\ -\/\ light.outerCutOff)\ /\ epsilon,\ 0.0,\ 1.0);}}
+\DoxyCodeLine{00264\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00265\ \textcolor{stringliteral}{\ \ \ \ //\ combine\ results}}
+\DoxyCodeLine{00266\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00267\ \textcolor{stringliteral}{\ \ \ \ vec3\ ambient\ =\ light.ambientColor\ *\ material.ambientColor;}}
+\DoxyCodeLine{00268\ \textcolor{stringliteral}{\ \ \ \ vec3\ diffuse\ =\ light.diffuseColor\ *\ diff\ *\ material.diffuseColor;}}
+\DoxyCodeLine{00269\ \textcolor{stringliteral}{\ \ \ \ vec3\ specular\ =\ light.specularColor\ *\ spec\ *\ material.specularColor;}}
+\DoxyCodeLine{00270\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00271\ \textcolor{stringliteral}{\ \ \ \ //ambient\ =\ vec3(light.cutOff,\ light.outerCutOff,\ 0.0);}}
+\DoxyCodeLine{00272\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00273\ \textcolor{stringliteral}{\ \ \ \ ambient\ *=\ attenuation\ *\ intensity;}}
+\DoxyCodeLine{00274\ \textcolor{stringliteral}{\ \ \ \ diffuse\ *=\ attenuation\ *\ intensity;}}
+\DoxyCodeLine{00275\ \textcolor{stringliteral}{\ \ \ \ specular\ *=\ attenuation\ *\ intensity;}}
+\DoxyCodeLine{00276\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00277\ \textcolor{stringliteral}{\ \ \ \ return\ (ambient\ +\ diffuse\ +\ specular);}}
+\DoxyCodeLine{00278\ \textcolor{stringliteral}{\})"{};}}
+\DoxyCodeLine{00279\ \textcolor{stringliteral}{}}
+\DoxyCodeLine{00280\ \textcolor{stringliteral}{\};\ }\textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

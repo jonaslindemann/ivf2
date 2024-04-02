@@ -1,0 +1,45 @@
+\doxysection{int\+\_\+field.\+h}
+\hypertarget{int__field_8h_source}{}\label{int__field_8h_source}\index{include/ivf/int\_field.h@{include/ivf/int\_field.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/field.h>}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <glad/glad.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00008\ }
+\DoxyCodeLine{00009\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivf_1_1_field}{Field}}\ \{}
+\DoxyCodeLine{00010\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00011\ \ \ \ \ std::unique\_ptr<GLuint[]>\ m\_data;}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00014\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}(GLuint\ rows,\ GLuint\ cols);}
+\DoxyCodeLine{00015\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ \&other);}
+\DoxyCodeLine{00016\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ \&operator=(\textcolor{keyword}{const}\ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ \&other);}
+\DoxyCodeLine{00017\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}(\mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ \&\&other);}
+\DoxyCodeLine{00018\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ \&operator=(\mbox{\hyperlink{classivf_1_1_int_field}{IntField}}\ \&\&other);}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<IntField>\ create(GLuint\ rows,\ GLuint\ cols);}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \ \ \ \ GLuint\ at(GLuint\ row,\ GLuint\ col);}
+\DoxyCodeLine{00023\ \ \ \ \ GLuint\ at(GLuint\ pos);}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keywordtype}{void}\ set(GLuint\ row,\ GLuint\ col,\ GLuint\ value);}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{size\_t}\ memSize();}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ zero();}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keyword}{virtual}\ GLenum\ dataType();}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ *data();}
+\DoxyCodeLine{00034\ }
+\DoxyCodeLine{00035\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ print();}
+\DoxyCodeLine{00036\ \};}
+\DoxyCodeLine{00037\ \textcolor{keyword}{typedef}\ std::shared\_ptr<IntField>\ IntFieldPtr;}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \};\ \textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

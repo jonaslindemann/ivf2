@@ -1,0 +1,124 @@
+\doxysection{transform\+\_\+manager.\+h}
+\hypertarget{transform__manager_8h_source}{}\label{transform__manager_8h_source}\index{include/ivf/transform\_manager.h@{include/ivf/transform\_manager.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#include\ <ivf/glbase.h>}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <ivf/shader.h>}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#include\ <ivf/smartptr.h>}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ GLM\_ENABLE\_EXPERIMENTAL}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <glm/glm.hpp>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <glm/gtc/matrix\_transform.hpp>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ <glm/gtc/type\_ptr.hpp>}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespaceivf}{ivf}}\ \{}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}\ \{}
+\DoxyCodeLine{00018\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00019\ \ \ \ \ \textcolor{keyword}{enum\ class}\ MatrixMode\ \{}
+\DoxyCodeLine{00020\ \ \ \ \ \ \ \ \ MODEL,}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ VIEW,}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ PROJECTION}
+\DoxyCodeLine{00023\ \ \ \ \ \};}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ MatrixMode\ m\_matrixMode;}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ glm::vec3\ m\_viewPos;}
+\DoxyCodeLine{00028\ }
+\DoxyCodeLine{00029\ \ \ \ \ glm::mat4\ m\_modelMatrix;}
+\DoxyCodeLine{00030\ \ \ \ \ glm::mat4\ m\_viewMatrix;}
+\DoxyCodeLine{00031\ \ \ \ \ glm::mat4\ m\_projectionMatrix;}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \ \ \ \ std::vector<glm::mat4>\ m\_modelStack;}
+\DoxyCodeLine{00034\ \ \ \ \ std::vector<glm::mat4>\ m\_projectionStack;}
+\DoxyCodeLine{00035\ \ \ \ \ std::vector<glm::mat4>\ m\_viewStack;}
+\DoxyCodeLine{00036\ }
+\DoxyCodeLine{00037\ \ \ \ \ GLint\ m\_modelId;}
+\DoxyCodeLine{00038\ \ \ \ \ GLint\ m\_viewId;}
+\DoxyCodeLine{00039\ \ \ \ \ GLint\ m\_projectionId;}
+\DoxyCodeLine{00040\ \ \ \ \ GLint\ m\_viewPosId;}
+\DoxyCodeLine{00041\ }
+\DoxyCodeLine{00042\ \ \ \ \ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}();}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}\ *m\_instance;}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keywordtype}{void}\ updateShaderMvpMatrix();}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00048\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}\ *instance()}
+\DoxyCodeLine{00049\ \ \ \ \ \{}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_instance)\ \{}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_instance)}
+\DoxyCodeLine{00052\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_instance\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}();}
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00054\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_instance;}
+\DoxyCodeLine{00055\ \ \ \ \ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ \ \ \ \ \textcolor{keyword}{static}\ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}\ *create()}
+\DoxyCodeLine{00058\ \ \ \ \ \{}
+\DoxyCodeLine{00059\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_instance)\ \{}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (!m\_instance)}
+\DoxyCodeLine{00061\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ m\_instance\ =\ \textcolor{keyword}{new}\ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}();}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00063\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ m\_instance;}
+\DoxyCodeLine{00064\ \ \ \ \ \}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ drop()}
+\DoxyCodeLine{00067\ \ \ \ \ \{}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ \textcolor{keyword}{delete}\ m\_instance;}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ m\_instance\ =\ 0;}
+\DoxyCodeLine{00070\ \ \ \ \ \}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{comment}{//\ Generic\ functions}}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00074\ \ \ \ \ \textcolor{keywordtype}{void}\ pushMatrix();}
+\DoxyCodeLine{00075\ \ \ \ \ \textcolor{keywordtype}{void}\ popMatrix();}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \ \ \textcolor{comment}{//\ Generic\ transforms}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keywordtype}{void}\ translate3f(\textcolor{keywordtype}{float}\ tx,\ \textcolor{keywordtype}{float}\ ty,\ \textcolor{keywordtype}{float}\ tz);}
+\DoxyCodeLine{00080\ \ \ \ \ \textcolor{keywordtype}{void}\ translate(glm::vec3\ pos);}
+\DoxyCodeLine{00081\ \ \ \ \ \textcolor{keywordtype}{void}\ translate2f(\textcolor{keywordtype}{float}\ tx,\ \textcolor{keywordtype}{float}\ ty);}
+\DoxyCodeLine{00082\ \ \ \ \ \textcolor{keywordtype}{void}\ rotate(\textcolor{keywordtype}{float}\ rx,\ \textcolor{keywordtype}{float}\ ry,\ \textcolor{keywordtype}{float}\ rz,\ \textcolor{keywordtype}{float}\ angle);}
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keywordtype}{void}\ rotateDeg(\textcolor{keywordtype}{float}\ rx,\ \textcolor{keywordtype}{float}\ ry,\ \textcolor{keywordtype}{float}\ rz,\ \textcolor{keywordtype}{float}\ angle);}
+\DoxyCodeLine{00084\ \ \ \ \ \textcolor{keywordtype}{void}\ rotateDeg(glm::vec3\ axis,\ \textcolor{keywordtype}{float}\ angle);}
+\DoxyCodeLine{00085\ \ \ \ \ \textcolor{keywordtype}{void}\ rotate(\textcolor{keywordtype}{float}\ ax,\ \textcolor{keywordtype}{float}\ ay,\ \textcolor{keywordtype}{float}\ az);}
+\DoxyCodeLine{00086\ \ \ \ \ \textcolor{keywordtype}{void}\ rotateDeg(\textcolor{keywordtype}{float}\ ax,\ \textcolor{keywordtype}{float}\ ay,\ \textcolor{keywordtype}{float}\ az);}
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keywordtype}{void}\ rotateToVector(glm::vec3\ v);}
+\DoxyCodeLine{00088\ \ \ \ \ \textcolor{keywordtype}{void}\ scale(\textcolor{keywordtype}{float}\ sx,\ \textcolor{keywordtype}{float}\ sy,\ \textcolor{keywordtype}{float}\ sz);}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordtype}{void}\ multMatrix(glm::mat4\ m);}
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keywordtype}{void}\ alignWithAxisAngle(glm::vec3\ axis,\ \textcolor{keywordtype}{float}\ angle);}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \ \ \ \ \textcolor{keywordtype}{void}\ identity();}
+\DoxyCodeLine{00093\ }
+\DoxyCodeLine{00094\ \ \ \ \ \textcolor{comment}{//\ Projection\ matrices}}
+\DoxyCodeLine{00095\ }
+\DoxyCodeLine{00096\ \ \ \ \ \textcolor{keywordtype}{void}\ ortho2d(\textcolor{keywordtype}{float}\ left,\ \textcolor{keywordtype}{float}\ right,\ \textcolor{keywordtype}{float}\ bottom,\ \textcolor{keywordtype}{float}\ top);}
+\DoxyCodeLine{00097\ \ \ \ \ \textcolor{keywordtype}{void}\ perspective(\textcolor{keywordtype}{float}\ fovy,\ \textcolor{keywordtype}{float}\ aspect,\ \textcolor{keywordtype}{float}\ zNear,\ \textcolor{keywordtype}{float}\ zFar);}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00099\ \ \ \ \ \textcolor{comment}{//\ Viewing\ transforms}}
+\DoxyCodeLine{00100\ }
+\DoxyCodeLine{00101\ \ \ \ \ \textcolor{keywordtype}{void}\ lookAt(\textcolor{keywordtype}{float}\ xe,\ \textcolor{keywordtype}{float}\ ye,\ \textcolor{keywordtype}{float}\ ze,\ \textcolor{keywordtype}{float}\ xc,\ \textcolor{keywordtype}{float}\ yc,\ \textcolor{keywordtype}{float}\ zc,\ \textcolor{keywordtype}{float}\ xu,\ \textcolor{keywordtype}{float}\ yu,\ \textcolor{keywordtype}{float}\ zu);}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \ \ \textcolor{keywordtype}{void}\ lookAt(\textcolor{keywordtype}{double}\ xe,\ \textcolor{keywordtype}{double}\ ye,\ \textcolor{keywordtype}{double}\ ze,\ \textcolor{keywordtype}{double}\ xc,\ \textcolor{keywordtype}{double}\ yc,\ \textcolor{keywordtype}{double}\ zc,\ \textcolor{keywordtype}{double}\ xu,\ \textcolor{keywordtype}{double}\ yu,\ \textcolor{keywordtype}{double}\ zu);}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordtype}{void}\ lookAt(glm::vec3\ eye,\ glm::vec3\ center,\ glm::vec3\ up);}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordtype}{void}\ lookAt(glm::vec3\ eye,\ glm::vec3\ center);}
+\DoxyCodeLine{00107\ }
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordtype}{void}\ setMatrixMode(MatrixMode\ mode);}
+\DoxyCodeLine{00109\ \ \ \ \ MatrixMode\ matrixMode();}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ \ \ \ \ \textcolor{keywordtype}{void}\ enableModelMatrix();}
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keywordtype}{void}\ enableProjectionMatrix();}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keywordtype}{void}\ enableViewMatrix();}
+\DoxyCodeLine{00114\ \};}
+\DoxyCodeLine{00115\ }
+\DoxyCodeLine{00116\ \textcolor{keyword}{typedef}\ \mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManager}}\ *\mbox{\hyperlink{classivf_1_1_transform_manager}{TransformManagerPtr}};}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \}\ \textcolor{comment}{//\ namespace\ ivf}}
+
+\end{DoxyCode}

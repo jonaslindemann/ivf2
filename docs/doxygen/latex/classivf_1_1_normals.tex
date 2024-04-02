@@ -1,0 +1,89 @@
+\doxysection{ivf\+::Normals Class Reference}
+\hypertarget{classivf_1_1_normals}{}\label{classivf_1_1_normals}\index{ivf::Normals@{ivf::Normals}}
+Inheritance diagram for ivf\+::Normals\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{classivf_1_1_normals}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_normals_ab960c34c810e9c5a8cee93c57f11316f}\label{classivf_1_1_normals_ab960c34c810e9c5a8cee93c57f11316f} 
+{\bfseries Normals} (GLuint n\+Normals)
+\item 
+\Hypertarget{classivf_1_1_normals_af47c88b81152b25063bbb412a0192e95}\label{classivf_1_1_normals_af47c88b81152b25063bbb412a0192e95} 
+void {\bfseries set\+Normal} (GLuint idx, GLfloat nx, GLfloat ny, GLfloat nz)
+\item 
+\Hypertarget{classivf_1_1_normals_a00711d8776f9ec364df688454b394db2}\label{classivf_1_1_normals_a00711d8776f9ec364df688454b394db2} 
+void {\bfseries get\+Normal} (GLuint idx, GLfloat \&nx, GLfloat \&ny, GLfloat \&nz)
+\item 
+\Hypertarget{classivf_1_1_normals_a06608541e5972430c167373513329cc1}\label{classivf_1_1_normals_a06608541e5972430c167373513329cc1} 
+glm\+::vec3 {\bfseries normal} (GLuint idx)
+\item 
+\Hypertarget{classivf_1_1_normals_a9b6fb6171ad51b1e84380e5c39709ce6}\label{classivf_1_1_normals_a9b6fb6171ad51b1e84380e5c39709ce6} 
+void {\bfseries set\+Normal} (GLuint idx, glm\+::vec3 normal)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_float_field}{ivf\+::\+Float\+Field}}}
+\begin{DoxyCompactItemize}
+\item 
+{\bfseries Float\+Field} (GLuint rows, GLuint cols)
+\item 
+{\bfseries Float\+Field} (const \mbox{\hyperlink{classivf_1_1_float_field}{Float\+Field}} \&other)
+\item 
+\mbox{\hyperlink{classivf_1_1_float_field}{Float\+Field}} \& {\bfseries operator=} (const \mbox{\hyperlink{classivf_1_1_float_field}{Float\+Field}} \&other)
+\item 
+{\bfseries Float\+Field} (\mbox{\hyperlink{classivf_1_1_float_field}{Float\+Field}} \&\&other)
+\item 
+\mbox{\hyperlink{classivf_1_1_float_field}{Float\+Field}} \& {\bfseries operator=} (\mbox{\hyperlink{classivf_1_1_float_field}{Float\+Field}} \&\&other)
+\item 
+GLfloat {\bfseries at} (GLuint rows, GLuint cols)
+\item 
+GLfloat {\bfseries at} (GLuint pos)
+\item 
+void {\bfseries set} (GLuint rows, GLuint cols, GLfloat value)
+\item 
+GLfloat {\bfseries get} (GLuint rows, GLuint cols)
+\item 
+virtual size\+\_\+t \mbox{\hyperlink{classivf_1_1_float_field_a6ce55109e9d457ef9515ab58b8020d5b}{mem\+Size}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_float_field_a254daa37816879a6a212b9a1ea5a03d4}{zero}} ()
+\item 
+virtual void \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{classivf_1_1_float_field_a6061280969178c5e933056ac88ea8793}{data}} ()
+\item 
+virtual GLenum \mbox{\hyperlink{classivf_1_1_float_field_a776fc15678423be88e8705f1284087cd}{data\+Type}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_float_field_a10a8966666b3c9a280142633eb490ff5}{print}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_field}{ivf\+::\+Field}}}
+\begin{DoxyCompactItemize}
+\item 
+GLuint {\bfseries rows} () const
+\item 
+GLuint {\bfseries cols} () const
+\item 
+GLuint {\bfseries size} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_normals_a9efae6fcfbdd8503b8f7dcc3994f931d}\label{classivf_1_1_normals_a9efae6fcfbdd8503b8f7dcc3994f931d} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_normals}{Normals}} $>$ {\bfseries create} (GLuint n\+Normals)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_float_field}{ivf\+::\+Float\+Field}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_float_field}{Float\+Field}} $>$ {\bfseries create} (GLuint rows, GLuint cols)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Protected Attributes inherited from \mbox{\hyperlink{classivf_1_1_field}{ivf\+::\+Field}}}
+\begin{DoxyCompactItemize}
+\item 
+GLuint {\bfseries m\+\_\+size} \mbox{[}2\mbox{]} = \{0, 0\}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/normals.\+h\item 
+src/ivf/normals.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,101 @@
+\doxysection{ivf\+::Transform\+Manager Class Reference}
+\hypertarget{classivf_1_1_transform_manager}{}\label{classivf_1_1_transform_manager}\index{ivf::TransformManager@{ivf::TransformManager}}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a7fd469aef637b3e40ba8592f097a1c0a}\label{classivf_1_1_transform_manager_a7fd469aef637b3e40ba8592f097a1c0a} 
+void {\bfseries push\+Matrix} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a4bbee1ec831ebcb78c2ce7f79a23c8d9}\label{classivf_1_1_transform_manager_a4bbee1ec831ebcb78c2ce7f79a23c8d9} 
+void {\bfseries pop\+Matrix} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_ab29238a68d21cb1649fadf572253c317}\label{classivf_1_1_transform_manager_ab29238a68d21cb1649fadf572253c317} 
+void {\bfseries translate3f} (float tx, float ty, float tz)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a86a386b821f89db679a20d74b89acc8e}\label{classivf_1_1_transform_manager_a86a386b821f89db679a20d74b89acc8e} 
+void {\bfseries translate} (glm\+::vec3 pos)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a7d8916f625d038d8f736ff7912ad69a6}\label{classivf_1_1_transform_manager_a7d8916f625d038d8f736ff7912ad69a6} 
+void {\bfseries translate2f} (float tx, float ty)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a9fffe04e80e14ac584e5ac3055178ec1}\label{classivf_1_1_transform_manager_a9fffe04e80e14ac584e5ac3055178ec1} 
+void {\bfseries rotate} (float rx, float ry, float rz, float angle)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a9bdf5f3184d91c8ddc75fd88c2658703}\label{classivf_1_1_transform_manager_a9bdf5f3184d91c8ddc75fd88c2658703} 
+void {\bfseries rotate\+Deg} (float rx, float ry, float rz, float angle)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a3a6eb9b72fa6877bc280c5b470ccb85e}\label{classivf_1_1_transform_manager_a3a6eb9b72fa6877bc280c5b470ccb85e} 
+void {\bfseries rotate\+Deg} (glm\+::vec3 axis, float angle)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a6ed02d033888bf7e8d00df2890effa1f}\label{classivf_1_1_transform_manager_a6ed02d033888bf7e8d00df2890effa1f} 
+void {\bfseries rotate} (float ax, float ay, float az)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_ae7b144052bfc226aa3ed0be7daa070af}\label{classivf_1_1_transform_manager_ae7b144052bfc226aa3ed0be7daa070af} 
+void {\bfseries rotate\+Deg} (float ax, float ay, float az)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a3fc03ca575a450490a29461a757f6a14}\label{classivf_1_1_transform_manager_a3fc03ca575a450490a29461a757f6a14} 
+void {\bfseries rotate\+To\+Vector} (glm\+::vec3 v)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_ac50cd3f1a1f1eddfeaa9e6b610c67cb7}\label{classivf_1_1_transform_manager_ac50cd3f1a1f1eddfeaa9e6b610c67cb7} 
+void {\bfseries scale} (float sx, float sy, float sz)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a19a437e8679b51777b6ec1e4bbde5256}\label{classivf_1_1_transform_manager_a19a437e8679b51777b6ec1e4bbde5256} 
+void {\bfseries mult\+Matrix} (glm\+::mat4 m)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_afacbc8c296a7a70f441a30e25a80ca4f}\label{classivf_1_1_transform_manager_afacbc8c296a7a70f441a30e25a80ca4f} 
+void {\bfseries align\+With\+Axis\+Angle} (glm\+::vec3 axis, float angle)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a3a67f2e9c64bc94b143f7254f39c079c}\label{classivf_1_1_transform_manager_a3a67f2e9c64bc94b143f7254f39c079c} 
+void {\bfseries identity} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a8644a6132dfa20938a32e7a43971df52}\label{classivf_1_1_transform_manager_a8644a6132dfa20938a32e7a43971df52} 
+void {\bfseries ortho2d} (float left, float right, float bottom, float top)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a09badfa1fc2b912564af6c54d13a29a8}\label{classivf_1_1_transform_manager_a09badfa1fc2b912564af6c54d13a29a8} 
+void {\bfseries perspective} (float fovy, float aspect, float z\+Near, float z\+Far)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a82b0143ad9aa9c681ea9dc82c22befa2}\label{classivf_1_1_transform_manager_a82b0143ad9aa9c681ea9dc82c22befa2} 
+void {\bfseries look\+At} (float xe, float ye, float ze, float xc, float yc, float zc, float xu, float yu, float zu)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a2399bfd6017bfca1b0100a76073a8de7}\label{classivf_1_1_transform_manager_a2399bfd6017bfca1b0100a76073a8de7} 
+void {\bfseries look\+At} (double xe, double ye, double ze, double xc, double yc, double zc, double xu, double yu, double zu)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a287254c85fd6a9382ac8a31fb53d61da}\label{classivf_1_1_transform_manager_a287254c85fd6a9382ac8a31fb53d61da} 
+void {\bfseries look\+At} (glm\+::vec3 eye, glm\+::vec3 center, glm\+::vec3 up)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a58a3a9b344b26a0ae4ee61a5ff319f59}\label{classivf_1_1_transform_manager_a58a3a9b344b26a0ae4ee61a5ff319f59} 
+void {\bfseries look\+At} (glm\+::vec3 eye, glm\+::vec3 center)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a7fb5d794da826fa5df7c2a6c4962d941}\label{classivf_1_1_transform_manager_a7fb5d794da826fa5df7c2a6c4962d941} 
+void {\bfseries set\+Matrix\+Mode} (Matrix\+Mode mode)
+\item 
+\Hypertarget{classivf_1_1_transform_manager_ac4f4d1d805232605eb4e4a169a07a841}\label{classivf_1_1_transform_manager_ac4f4d1d805232605eb4e4a169a07a841} 
+Matrix\+Mode {\bfseries matrix\+Mode} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_ab5a57c142fcf04be4a8c39082e8a779b}\label{classivf_1_1_transform_manager_ab5a57c142fcf04be4a8c39082e8a779b} 
+void {\bfseries enable\+Model\+Matrix} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a1f016a438277913b2e23d00064257fc8}\label{classivf_1_1_transform_manager_a1f016a438277913b2e23d00064257fc8} 
+void {\bfseries enable\+Projection\+Matrix} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_ac8f47cd40443d71392357b7fd897e9b7}\label{classivf_1_1_transform_manager_ac8f47cd40443d71392357b7fd897e9b7} 
+void {\bfseries enable\+View\+Matrix} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_transform_manager_acd8ac65a4db600eeaab9f95d1fe58b52}\label{classivf_1_1_transform_manager_acd8ac65a4db600eeaab9f95d1fe58b52} 
+static \mbox{\hyperlink{classivf_1_1_transform_manager}{Transform\+Manager}} \texorpdfstring{$\ast$}{*} {\bfseries instance} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_a3c4d73825954e8ad866832427451a12a}\label{classivf_1_1_transform_manager_a3c4d73825954e8ad866832427451a12a} 
+static \mbox{\hyperlink{classivf_1_1_transform_manager}{Transform\+Manager}} \texorpdfstring{$\ast$}{*} {\bfseries create} ()
+\item 
+\Hypertarget{classivf_1_1_transform_manager_ab9ce99f5c75b6251711bf7df166cf0dd}\label{classivf_1_1_transform_manager_ab9ce99f5c75b6251711bf7df166cf0dd} 
+static void {\bfseries drop} ()
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/transform\+\_\+manager.\+h\item 
+src/ivf/transform\+\_\+manager.\+cpp\end{DoxyCompactItemize}

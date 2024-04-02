@@ -1,0 +1,59 @@
+\doxysection{ivf\+::Shader Class Reference}
+\hypertarget{classivf_1_1_shader}{}\label{classivf_1_1_shader}\index{ivf::Shader@{ivf::Shader}}
+Inheritance diagram for ivf\+::Shader\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{classivf_1_1_shader}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_shader_a13b6d51eeaa569658f3ebb062d7a7865}\label{classivf_1_1_shader_a13b6d51eeaa569658f3ebb062d7a7865} 
+{\bfseries Shader} (const std\+::string filename="{}"{})
+\item 
+\Hypertarget{classivf_1_1_shader_af11ba82423464eb613c9a618eaa4dde6}\label{classivf_1_1_shader_af11ba82423464eb613c9a618eaa4dde6} 
+void {\bfseries set\+Filename} (const std\+::string filename)
+\item 
+\Hypertarget{classivf_1_1_shader_a409adf4b2c079553207692ec5bd3bb6d}\label{classivf_1_1_shader_a409adf4b2c079553207692ec5bd3bb6d} 
+const std\+::string {\bfseries filename} ()
+\item 
+\Hypertarget{classivf_1_1_shader_a96254b3d196d2616d5824f2512c51437}\label{classivf_1_1_shader_a96254b3d196d2616d5824f2512c51437} 
+void {\bfseries set\+Source} (const std\+::string source)
+\item 
+\Hypertarget{classivf_1_1_shader_a0ceeb7c9765124f25963c92097b9dd39}\label{classivf_1_1_shader_a0ceeb7c9765124f25963c92097b9dd39} 
+const std\+::string {\bfseries source} ()
+\item 
+\Hypertarget{classivf_1_1_shader_a79686782ef01556eb8448971112ef7d7}\label{classivf_1_1_shader_a79686782ef01556eb8448971112ef7d7} 
+bool {\bfseries read} ()
+\item 
+\Hypertarget{classivf_1_1_shader_a75512fd8255dc4442d65f1fde2d5feb2}\label{classivf_1_1_shader_a75512fd8255dc4442d65f1fde2d5feb2} 
+virtual bool {\bfseries compile} ()
+\item 
+\Hypertarget{classivf_1_1_shader_ac2dcb19775f8c9f24354de5cf6804ad5}\label{classivf_1_1_shader_ac2dcb19775f8c9f24354de5cf6804ad5} 
+GLuint {\bfseries id} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_shader_a93d8a3899b2c1618f650ec161ecfcbd1}\label{classivf_1_1_shader_a93d8a3899b2c1618f650ec161ecfcbd1} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_shader}{Shader}} $>$ {\bfseries create} (const std\+::string filename="{}"{})
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_shader_acc49132858b42be318cbd0c55d160bca}\label{classivf_1_1_shader_acc49132858b42be318cbd0c55d160bca} 
+std\+::string {\bfseries m\+\_\+filename}
+\item 
+\Hypertarget{classivf_1_1_shader_a7c3521d3162ca9189b7a6dcfa02a60fd}\label{classivf_1_1_shader_a7c3521d3162ca9189b7a6dcfa02a60fd} 
+std\+::string {\bfseries m\+\_\+shader\+Code}
+\item 
+\Hypertarget{classivf_1_1_shader_acd603af094b4a34830e8bff27c5e4afe}\label{classivf_1_1_shader_acd603af094b4a34830e8bff27c5e4afe} 
+GLuint {\bfseries m\+\_\+id}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/shader.\+h\item 
+src/ivf/shader.\+cpp\end{DoxyCompactItemize}

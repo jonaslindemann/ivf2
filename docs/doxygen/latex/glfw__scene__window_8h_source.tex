@@ -1,0 +1,56 @@
+\doxysection{glfw\+\_\+scene\+\_\+window.\+h}
+\hypertarget{glfw__scene__window_8h_source}{}\label{glfw__scene__window_8h_source}\index{include/ivfui/glfw\_scene\_window.h@{include/ivfui/glfw\_scene\_window.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#define\ GLFW\_INCLUDE\_NONE}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#include\ <GLFW/glfw3.h>}}
+\DoxyCodeLine{00005\ }
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#include\ <memory>}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <mutex>}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <ivfui/ui.h>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <ivf/nodes.h>}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{keyword}{namespace\ }ivfui\ \{}
+\DoxyCodeLine{00015\ }
+\DoxyCodeLine{00016\ \textcolor{keyword}{class\ }\mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window}{GLFWSceneWindow}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classivfui_1_1_g_l_f_w_window}{GLFWWindow}}\ \{}
+\DoxyCodeLine{00017\ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00018\ \ \ \ \ ivf::CompositeNodePtr\ m\_scene;}
+\DoxyCodeLine{00019\ \ \ \ \ ivfui::CameraManipulatorPtr\ m\_camManip;}
+\DoxyCodeLine{00020\ \ \ \ \ std::vector<ivfui::UiWindowPtr>\ m\_uiWindows;}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00023\ \ \ \ \ \mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window}{GLFWSceneWindow}}(\textcolor{keywordtype}{int}\ width,\ \textcolor{keywordtype}{int}\ height,\ \textcolor{keyword}{const}\ std::string\ title,\ GLFWmonitor\ *monitor\ =\ \textcolor{keyword}{nullptr},}
+\DoxyCodeLine{00024\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GLFWwindow\ *shared\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00025\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classivfui_1_1_g_l_f_w_scene_window}{\string~GLFWSceneWindow}}();}
+\DoxyCodeLine{00026\ }
+\DoxyCodeLine{00027\ \ \ \ \ \textcolor{keyword}{static}\ std::shared\_ptr<GLFWSceneWindow>\ create(\textcolor{keywordtype}{int}\ width,\ \textcolor{keywordtype}{int}\ height,\ \textcolor{keyword}{const}\ std::string\ title,}
+\DoxyCodeLine{00028\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ GLFWmonitor\ *monitor\ =\ \textcolor{keyword}{nullptr},\ GLFWwindow\ *shared\ =\ \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \ \ \ \ \textcolor{keywordtype}{void}\ add(ivf::NodePtr\ node);}
+\DoxyCodeLine{00031\ \ \ \ \ \textcolor{keywordtype}{void}\ remove(ivf::NodePtr\ node);}
+\DoxyCodeLine{00032\ \ \ \ \ \textcolor{keywordtype}{void}\ clear();}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \textcolor{keywordtype}{void}\ addUiWindow(ivfui::UiWindowPtr\ uiWindow);}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \ \ \ \ ivf::CompositeNodePtr\ scene();}
+\DoxyCodeLine{00037\ }
+\DoxyCodeLine{00038\ \ \ \ \ ivfui::CameraManipulatorPtr\ cameraManipulator();}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ onResize(\textcolor{keywordtype}{int}\ width,\ \textcolor{keywordtype}{int}\ height)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00041\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ onUpdateOtherUi()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00042\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ onDraw()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00043\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ onDrawUi()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ onUpdateUi();}
+\DoxyCodeLine{00046\ \};}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ \textcolor{keyword}{typedef}\ std::shared\_ptr<GLFWSceneWindow>\ GLFWSceneWindowPtr;}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \};\ \textcolor{comment}{//\ namespace\ ivfui}}
+
+\end{DoxyCode}

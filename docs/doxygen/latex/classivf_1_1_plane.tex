@@ -1,0 +1,183 @@
+\doxysection{ivf\+::Plane Class Reference}
+\hypertarget{classivf_1_1_plane}{}\label{classivf_1_1_plane}\index{ivf::Plane@{ivf::Plane}}
+Inheritance diagram for ivf\+::Plane\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classivf_1_1_plane}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_plane_a532aba1fd1d4d0221ad8cdd46a1c7af8}\label{classivf_1_1_plane_a532aba1fd1d4d0221ad8cdd46a1c7af8} 
+{\bfseries Plane} (float a, float b, float c, float d)
+\item 
+\Hypertarget{classivf_1_1_plane_a64684eca19d3d8ef646f2b3254c0e2dd}\label{classivf_1_1_plane_a64684eca19d3d8ef646f2b3254c0e2dd} 
+{\bfseries Plane} (const glm\+::vec3 \&normal, const glm\+::vec3 \&point)
+\item 
+\Hypertarget{classivf_1_1_plane_ac73e95277d2ad3ed86a382b35375a3c8}\label{classivf_1_1_plane_ac73e95277d2ad3ed86a382b35375a3c8} 
+void {\bfseries set} (float a, float b, float c, float d)
+\item 
+\Hypertarget{classivf_1_1_plane_a7cb1f565ec96f36f8ee522321578fe00}\label{classivf_1_1_plane_a7cb1f565ec96f36f8ee522321578fe00} 
+void {\bfseries set} (const glm\+::vec3 \&normal, const glm\+::vec3 \&point)
+\item 
+\Hypertarget{classivf_1_1_plane_a0477da750749bd3ebb97b3c206552e6c}\label{classivf_1_1_plane_a0477da750749bd3ebb97b3c206552e6c} 
+const glm\+::vec3 \& {\bfseries normal} () const
+\item 
+\Hypertarget{classivf_1_1_plane_a84c46b5a8d5a25a85dcced87cc5f60bb}\label{classivf_1_1_plane_a84c46b5a8d5a25a85dcced87cc5f60bb} 
+float {\bfseries d} () const
+\item 
+\Hypertarget{classivf_1_1_plane_a6988ce069ef5fc55aa3ecc0dcf7860f7}\label{classivf_1_1_plane_a6988ce069ef5fc55aa3ecc0dcf7860f7} 
+float {\bfseries normal\+Length} () const
+\item 
+\Hypertarget{classivf_1_1_plane_a7d807c6991ec1c8b6775259f081983da}\label{classivf_1_1_plane_a7d807c6991ec1c8b6775259f081983da} 
+float {\bfseries distance} () const
+\item 
+\Hypertarget{classivf_1_1_plane_ac6c11affe7d248de8ae50ee41d4f2f3a}\label{classivf_1_1_plane_ac6c11affe7d248de8ae50ee41d4f2f3a} 
+float {\bfseries distance} (const glm\+::vec3 \&point)
+\item 
+\Hypertarget{classivf_1_1_plane_a331938ecfe7948dc48a489dd681486ea}\label{classivf_1_1_plane_a331938ecfe7948dc48a489dd681486ea} 
+void {\bfseries normalize} ()
+\item 
+\Hypertarget{classivf_1_1_plane_aa819823ccb9bc53422c5aae83b2a52a8}\label{classivf_1_1_plane_aa819823ccb9bc53422c5aae83b2a52a8} 
+glm\+::vec3 {\bfseries intersect} (const \mbox{\hyperlink{classivf_1_1_line}{Line}} \&line) const
+\item 
+\Hypertarget{classivf_1_1_plane_a270167225e87fe8eb78c42d92f7b0a45}\label{classivf_1_1_plane_a270167225e87fe8eb78c42d92f7b0a45} 
+\mbox{\hyperlink{classivf_1_1_line}{Line}} {\bfseries intersect} (const \mbox{\hyperlink{classivf_1_1_plane}{Plane}} \&plane) const
+\item 
+\Hypertarget{classivf_1_1_plane_a3d4bf67c89446224d32dde6842723af6}\label{classivf_1_1_plane_a3d4bf67c89446224d32dde6842723af6} 
+bool {\bfseries is\+Intersected} (const \mbox{\hyperlink{classivf_1_1_line}{Line}} \&line) const
+\item 
+\Hypertarget{classivf_1_1_plane_aede368e052c65adc4c80a09d813e3e7b}\label{classivf_1_1_plane_aede368e052c65adc4c80a09d813e3e7b} 
+bool {\bfseries is\+Intersected} (const \mbox{\hyperlink{classivf_1_1_plane}{Plane}} \&plane) const
+\item 
+\Hypertarget{classivf_1_1_plane_abb5ed5e07c29df6dcdbc1259b30bcf4b}\label{classivf_1_1_plane_abb5ed5e07c29df6dcdbc1259b30bcf4b} 
+{\bfseries Plane} (double width=1.\+0, double depth=1.\+0, int rows=8, int cols=8)
+\item 
+\Hypertarget{classivf_1_1_plane_a8a28af6ec33b8641e747b96a636bcea2}\label{classivf_1_1_plane_a8a28af6ec33b8641e747b96a636bcea2} 
+void {\bfseries set} (double width=1.\+0, double depth=1.\+0, int rows=8, int cols=8)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries add\+Mesh} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ mesh)
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ $>$ {\bfseries meshes} ()
+\item 
+void {\bfseries new\+Mesh} (int vsize, int isize=0, GLuint prim\+Type=GL\+\_\+\+TRIANGLES)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries mesh} (int idx=0)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries last\+Mesh} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh}{Mesh}} $>$ {\bfseries current\+Mesh} ()
+\item 
+void {\bfseries clear} ()
+\item 
+void {\bfseries create\+From\+Generator} (generator\+::\+Any\+Generator$<$ generator\+::\+Mesh\+Vertex $>$ \&vertices, generator\+::\+Any\+Generator$<$ generator\+::\+Triangle $>$ \&triangles)
+\item 
+void {\bfseries debug\+From\+Generator} (generator\+::\+Any\+Generator$<$ generator\+::\+Mesh\+Vertex $>$ \&vertices, generator\+::\+Any\+Generator$<$ generator\+::\+Triangle $>$ \&triangles)
+\item 
+void {\bfseries refresh} ()
+\item 
+void {\bfseries print} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries set\+Pos} (glm\+::vec3 pos)
+\item 
+glm\+::vec3 {\bfseries pos} ()
+\item 
+void {\bfseries set\+Use\+Transform} (bool flag)
+\item 
+bool {\bfseries use\+Transform} ()
+\item 
+void {\bfseries set\+Rot\+Axis} (glm\+::vec3 axis)
+\item 
+glm\+::vec3 {\bfseries rot\+Axis} () const
+\item 
+void {\bfseries set\+Rot\+Angle} (float angle)
+\item 
+float {\bfseries rot\+Angle} () const
+\item 
+void {\bfseries set\+Euler\+Angles} (float ax, float ay, float az)
+\item 
+void {\bfseries set\+Euler\+Angles} (glm\+::vec3 angles)
+\item 
+void {\bfseries rotate\+Towards} (glm\+::vec3 target)
+\item 
+void {\bfseries align\+With\+Axis\+Angle} (glm\+::vec3 axis, float angle)
+\item 
+void {\bfseries rotate\+To\+Vector} (glm\+::vec3 v)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_node}{ivf\+::\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries draw} ()
+\item 
+void {\bfseries set\+Material} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_material}{Material}} $>$ material)
+\item 
+void {\bfseries set\+Texture} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_texture}{Texture}} $>$ texture)
+\item 
+void {\bfseries set\+Use\+Material} (bool flag)
+\item 
+bool {\bfseries use\+Material} ()
+\item 
+void {\bfseries set\+Use\+Texture} (bool flag)
+\item 
+bool {\bfseries use\+Texture} ()
+\item 
+void {\bfseries set\+Visible} (bool flag)
+\item 
+bool {\bfseries visible} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_plane_a5562cdf5d6e68a8ab44042e409f533c0}\label{classivf_1_1_plane_a5562cdf5d6e68a8ab44042e409f533c0} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_plane}{Plane}} $>$ {\bfseries create} (double width=1.\+0, double depth=1.\+0, int rows=8, int cols=8)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_mesh_node}{Mesh\+Node}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_plane_ab4a61ccbe92625d60a3d71231da0ebc3}{do\+Setup}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_mesh_node_aa91fd06f989967f997f82db12e11c582}{do\+Draw}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_transform_node_a76c460dbfca2a8e2aad4ac6fba484bb6}{do\+Pre\+Draw}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_transform_node_a0eb0a1ef66794b901c49fd5500aa8489}{do\+Post\+Draw}} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classivf_1_1_plane_ab4a61ccbe92625d60a3d71231da0ebc3}\label{classivf_1_1_plane_ab4a61ccbe92625d60a3d71231da0ebc3} 
+\index{ivf::Plane@{ivf::Plane}!doSetup@{doSetup}}
+\index{doSetup@{doSetup}!ivf::Plane@{ivf::Plane}}
+\doxysubsubsection{\texorpdfstring{doSetup()}{doSetup()}}
+{\footnotesize\ttfamily void Plane\+::do\+Setup (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_mesh_node}{ivf\+::\+Mesh\+Node}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/geometry.\+h\item 
+include/ivf/plane.\+h\item 
+src/ivf/geometry.\+cpp\item 
+src/ivf/plane.\+cpp\end{DoxyCompactItemize}

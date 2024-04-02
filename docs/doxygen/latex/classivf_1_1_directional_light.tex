@@ -1,0 +1,80 @@
+\doxysection{ivf\+::Directional\+Light Class Reference}
+\hypertarget{classivf_1_1_directional_light}{}\label{classivf_1_1_directional_light}\index{ivf::DirectionalLight@{ivf::DirectionalLight}}
+Inheritance diagram for ivf\+::Directional\+Light\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=4.000000cm]{classivf_1_1_directional_light}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_directional_light_a4e1e274a22c68f6c552be783de4f4d95}\label{classivf_1_1_directional_light_a4e1e274a22c68f6c552be783de4f4d95} 
+void {\bfseries set\+Direction} (glm\+::vec3 direction)
+\item 
+\Hypertarget{classivf_1_1_directional_light_a9a31a663845875cc0088c72f5ad22f52}\label{classivf_1_1_directional_light_a9a31a663845875cc0088c72f5ad22f52} 
+glm\+::vec3 {\bfseries direction} ()
+\item 
+void \mbox{\hyperlink{classivf_1_1_directional_light_a83c458ce14bbba312402d4516bfcb237}{apply}} () override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_light}{ivf\+::\+Light}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries set\+Position} (glm\+::vec3 pos)
+\item 
+void {\bfseries set\+Diffuse\+Color} (glm\+::vec3 color)
+\item 
+void {\bfseries set\+Specular\+Color} (glm\+::vec3 color)
+\item 
+void {\bfseries set\+Ambient\+Color} (glm\+::vec3 color)
+\item 
+void {\bfseries set\+Index} (int idx)
+\item 
+void {\bfseries set\+Light\+Array\+Name} (std\+::string name)
+\item 
+std\+::string {\bfseries light\+Array\+Name} ()
+\item 
+glm\+::vec3 {\bfseries position} ()
+\item 
+glm\+::vec3 {\bfseries diffuse\+Color} ()
+\item 
+glm\+::vec3 {\bfseries specular\+Color} ()
+\item 
+glm\+::vec3 {\bfseries ambient\+Color} ()
+\item 
+void {\bfseries set\+Enabled} (bool flag)
+\item 
+bool {\bfseries enabled} ()
+\item 
+int {\bfseries index} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_directional_light_a09d963adc7f5fe968ef7c03571ef636c}\label{classivf_1_1_directional_light_a09d963adc7f5fe968ef7c03571ef636c} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_directional_light}{Directional\+Light}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_light}{ivf\+::\+Light}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_light}{Light}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classivf_1_1_directional_light_a83c458ce14bbba312402d4516bfcb237}\label{classivf_1_1_directional_light_a83c458ce14bbba312402d4516bfcb237} 
+\index{ivf::DirectionalLight@{ivf::DirectionalLight}!apply@{apply}}
+\index{apply@{apply}!ivf::DirectionalLight@{ivf::DirectionalLight}}
+\doxysubsubsection{\texorpdfstring{apply()}{apply()}}
+{\footnotesize\ttfamily void ivf\+::\+Directional\+Light\+::apply (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classivf_1_1_light}{ivf\+::\+Light}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/dir\+\_\+light.\+h\item 
+src/ivf/dir\+\_\+light.\+cpp\end{DoxyCompactItemize}

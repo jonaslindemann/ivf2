@@ -1,0 +1,142 @@
+\doxysection{ivf\+::Arrow Class Reference}
+\hypertarget{classivf_1_1_arrow}{}\label{classivf_1_1_arrow}\index{ivf::Arrow@{ivf::Arrow}}
+Inheritance diagram for ivf\+::Arrow\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=6.000000cm]{classivf_1_1_arrow}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_arrow_a830a6416a3f1c4bbab2ecbbd70053239}\label{classivf_1_1_arrow_a830a6416a3f1c4bbab2ecbbd70053239} 
+void {\bfseries set\+Arrow\+Type} (Arrow\+Type arrow\+Type)
+\item 
+\Hypertarget{classivf_1_1_arrow_a51edd064f1a55eb3c8f501a047a09cfc}\label{classivf_1_1_arrow_a51edd064f1a55eb3c8f501a047a09cfc} 
+Arrow\+Type {\bfseries arrow\+Type} () const
+\item 
+\Hypertarget{classivf_1_1_arrow_adbe4a8b28744f5f01674b5ac9221ec9e}\label{classivf_1_1_arrow_adbe4a8b28744f5f01674b5ac9221ec9e} 
+void {\bfseries set\+Length} (GLfloat length)
+\item 
+\Hypertarget{classivf_1_1_arrow_aa5bb23f178ca5d22f418a0fb07978167}\label{classivf_1_1_arrow_aa5bb23f178ca5d22f418a0fb07978167} 
+void {\bfseries set\+Body\+Radius} (GLfloat radius)
+\item 
+\Hypertarget{classivf_1_1_arrow_aee0a25be288f7ade3b3ef9f476945b54}\label{classivf_1_1_arrow_aee0a25be288f7ade3b3ef9f476945b54} 
+void {\bfseries set\+Cone\+Radius} (GLfloat radius)
+\item 
+\Hypertarget{classivf_1_1_arrow_aaacb8e87c6690409e4ea083ba172286d}\label{classivf_1_1_arrow_aaacb8e87c6690409e4ea083ba172286d} 
+void {\bfseries set\+Cone\+Length} (GLfloat length)
+\item 
+\Hypertarget{classivf_1_1_arrow_a2b7e5bbad4b7479485d4130d4e1e3e75}\label{classivf_1_1_arrow_a2b7e5bbad4b7479485d4130d4e1e3e75} 
+GLfloat {\bfseries length} () const
+\item 
+\Hypertarget{classivf_1_1_arrow_a04c77092887a4564caf3f625a4d54d24}\label{classivf_1_1_arrow_a04c77092887a4564caf3f625a4d54d24} 
+GLfloat {\bfseries body\+Radius} () const
+\item 
+\Hypertarget{classivf_1_1_arrow_a349bfe49ef3b42857908242395870629}\label{classivf_1_1_arrow_a349bfe49ef3b42857908242395870629} 
+GLfloat {\bfseries cone\+Radius} () const
+\item 
+\Hypertarget{classivf_1_1_arrow_ad8db4efda371e7a4fb21b10a4dbafd5b}\label{classivf_1_1_arrow_ad8db4efda371e7a4fb21b10a4dbafd5b} 
+GLfloat {\bfseries cone\+Length} () const
+\item 
+\Hypertarget{classivf_1_1_arrow_aeae62045ab8c7f091fc6136f67b0be8c}\label{classivf_1_1_arrow_aeae62045ab8c7f091fc6136f67b0be8c} 
+void {\bfseries refresh} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_composite_node}{ivf\+::\+Composite\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries add} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_node}{Node}} $>$ node)
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_node}{Node}} $>$ $>$ {\bfseries nodes} ()
+\item 
+void {\bfseries clear} ()
+\item 
+void {\bfseries remove} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_node}{Node}} $>$ node)
+\item 
+Node\+Ptr {\bfseries at} (size\+\_\+t index)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries set\+Pos} (glm\+::vec3 pos)
+\item 
+glm\+::vec3 {\bfseries pos} ()
+\item 
+void {\bfseries set\+Use\+Transform} (bool flag)
+\item 
+bool {\bfseries use\+Transform} ()
+\item 
+void {\bfseries set\+Rot\+Axis} (glm\+::vec3 axis)
+\item 
+glm\+::vec3 {\bfseries rot\+Axis} () const
+\item 
+void {\bfseries set\+Rot\+Angle} (float angle)
+\item 
+float {\bfseries rot\+Angle} () const
+\item 
+void {\bfseries set\+Euler\+Angles} (float ax, float ay, float az)
+\item 
+void {\bfseries set\+Euler\+Angles} (glm\+::vec3 angles)
+\item 
+void {\bfseries rotate\+Towards} (glm\+::vec3 target)
+\item 
+void {\bfseries align\+With\+Axis\+Angle} (glm\+::vec3 axis, float angle)
+\item 
+void {\bfseries rotate\+To\+Vector} (glm\+::vec3 v)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_node}{ivf\+::\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries draw} ()
+\item 
+void {\bfseries set\+Material} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_material}{Material}} $>$ material)
+\item 
+void {\bfseries set\+Texture} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_texture}{Texture}} $>$ texture)
+\item 
+void {\bfseries set\+Use\+Material} (bool flag)
+\item 
+bool {\bfseries use\+Material} ()
+\item 
+void {\bfseries set\+Use\+Texture} (bool flag)
+\item 
+bool {\bfseries use\+Texture} ()
+\item 
+void {\bfseries set\+Visible} (bool flag)
+\item 
+bool {\bfseries visible} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_arrow_aba7dfcb16d566b881c987e47747e8c85}\label{classivf_1_1_arrow_aba7dfcb16d566b881c987e47747e8c85} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_arrow}{Arrow}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{classivf_1_1_composite_node}{ivf\+::\+Composite\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classivf_1_1_composite_node}{Composite\+Node}} $>$ {\bfseries create} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classivf_1_1_arrow_a90c262763a802edf57f5027ea8eae758}\label{classivf_1_1_arrow_a90c262763a802edf57f5027ea8eae758} 
+virtual void {\bfseries do\+Setup} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classivf_1_1_composite_node}{ivf\+::\+Composite\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_composite_node_a64204ede882fe6bd244e09d08dc70b22}{do\+Draw}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions inherited from \mbox{\hyperlink{classivf_1_1_transform_node}{ivf\+::\+Transform\+Node}}}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_transform_node_a76c460dbfca2a8e2aad4ac6fba484bb6}{do\+Pre\+Draw}} ()
+\item 
+virtual void \mbox{\hyperlink{classivf_1_1_transform_node_a0eb0a1ef66794b901c49fd5500aa8489}{do\+Post\+Draw}} ()
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+include/ivf/arrow.\+h\item 
+src/ivf/arrow.\+cpp\end{DoxyCompactItemize}

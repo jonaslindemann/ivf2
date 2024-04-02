@@ -2,6 +2,8 @@
 
 Lightweight scene graph library and wrapper over modern OpenGL. 
 
+![alt text](docs/images/ivf-spheres.png "Spheres")
+
 # Cloning the repository
 
 Clone the repository

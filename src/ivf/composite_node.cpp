@@ -1,5 +1,7 @@
 #include <ivf/composite_node.h>
 
+#include <algorithm>
+
 using namespace std;
 using namespace ivf;
 

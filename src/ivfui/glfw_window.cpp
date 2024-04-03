@@ -229,6 +229,8 @@ void GLFWWindow::draw()
         m_runSetup = false;
     }
 
+    this->doUpdate();
+
     m_uiRenderer->beginFrame();
     this->doDrawUi();
     if ((!m_uiRenderer->wantCaptureMouse()) && (!m_uiRenderer->wantCaptureKeyboard()))
@@ -292,10 +294,16 @@ void GLFWWindow::doResize(int width, int height)
     onResize(width, height);
 }
 
-int ivfui::GLFWWindow::lastError()
+void ivfui::GLFWWindow::doUpdate()
+{
+    onUpdate();
+}
+
+int ivfui::GLFWWindow::lastError() const
 {
     return m_lastError;
 }
+
 void GLFWWindow::doDraw()
 {
     int width, height;
@@ -363,6 +371,9 @@ void GLFWWindow::onMouseButton(int button, int action, int mods)
 {}
 
 void GLFWWindow::onResize(int width, int height)
+{}
+
+void ivfui::GLFWWindow::onUpdate()
 {}
 
 void GLFWWindow::onDraw()

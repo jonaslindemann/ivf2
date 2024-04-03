@@ -86,7 +86,7 @@ public:
     bool useEscQuit();
     void setUseEscQuit(bool flag);
 
-    int lastError();
+    int lastError() const;
     void clearError();
     void setError(int error);
 
@@ -99,6 +99,7 @@ public:
     void doMousePosition(double x, double y);
     void doMouseButton(int button, int action, int mods);
     void doResize(int width, int height);
+    void doUpdate();
     void doDraw();
     void doDrawUi();
     void doUpdateOtherUi();
@@ -108,6 +109,7 @@ public:
     virtual void onMousePosition(double x, double y);
     virtual void onMouseButton(int button, int action, int mods);
     virtual void onResize(int width, int height);
+    virtual void onUpdate();
     virtual void onDraw();
     virtual void onDrawUi();
     virtual void onUpdateOtherUi();

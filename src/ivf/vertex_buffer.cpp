@@ -6,7 +6,7 @@ using namespace ivf;
 
 using namespace std;
 
-VertexBuffer::VertexBuffer()
+VertexBuffer::VertexBuffer() : m_usage{GL_STATIC_DRAW}
 {
     glGenBuffers(1, &m_id);
 }
@@ -19,6 +19,16 @@ VertexBuffer::~VertexBuffer()
 std::shared_ptr<VertexBuffer> ivf::VertexBuffer::create()
 {
     return std::make_shared<VertexBuffer>();
+}
+
+void ivf::VertexBuffer::setUsage(GLenum usage)
+{
+    m_usage = usage;
+}
+
+GLenum ivf::VertexBuffer::usage() const
+{
+    return m_usage;
 }
 
 void VertexBuffer::bind()
@@ -34,5 +44,11 @@ void VertexBuffer::unbind()
 void VertexBuffer::setArray(Field *field)
 {
     this->bind();
-    glBufferData(GL_ARRAY_BUFFER, field->memSize(), field->data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, field->memSize(), field->data(), m_usage);
+}
+
+void ivf::VertexBuffer::updateArray(Field *field)
+{
+    this->bind();
+    glBufferSubData(GL_ARRAY_BUFFER, 0, field->memSize(), field->data());
 }

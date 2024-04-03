@@ -41,18 +41,15 @@ public:
     }
 };
 
-class ExampleWindow : public GLFWWindow {
+class ExampleWindow : public GLFWSceneWindow {
 private:
-    CompositeNodePtr m_scene;
-    CameraManipulatorPtr m_camManip;
-
     SpherePtr m_sphere;
     LineTracePtr m_trace;
 
     Lissajous m_lissajous;
 
 public:
-    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -60,36 +57,11 @@ public:
         return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    int onSetup()
+    virtual void onSceneSetup() override
     {
-        glEnable(GL_DEPTH_TEST);
-
-        auto fontMgr = FontManager::create();
-        fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
-
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
-        shaderMgr->loadBasicShader();
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
-
-        auto lightMgr = LightManager::create();
-        lightMgr->enableLighting();
-
-        auto dirLight = lightMgr->addDirectionalLight();
-        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-        dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
-        dirLight->setEnabled(true);
-        lightMgr->apply();
-
-        m_scene = CompositeNode::create();
-
         AxisPtr axis = Axis::create();
 
-        m_scene->add(axis);
+        this->add(axis);
 
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
@@ -100,40 +72,30 @@ public:
         m_sphere->refresh();
         m_sphere->setPos(glm::vec3(0.0, 0.0, 0.0));
 
-        m_scene->add(m_sphere);
+        this->add(m_sphere);
 
         m_trace = LineTrace::create(100);
-        m_trace->setUseColor(true);
-        m_trace->setColor(1.0, 0.0, 0.0, 1.0);
-        m_scene->add(m_trace);
+        // m_trace->setUseColor(true);
+        // m_trace->setColor(1.0, 0.0, 0.0, 1.0);
+        //  m_trace->refresh();
 
-        m_camManip = CameraManipulator::create(this->ref());
+        for (auto i = 0; i < 100; i++)
+        {
+            auto t = i / 100.0;
+            auto pos = m_lissajous(t);
+            m_trace->setVertex(i, pos);
+        }
+
+        this->add(m_trace);
 
         m_lissajous.setParameters(1.0, 2.0, 1.0, 0.0, 3.0, 0.0, 1.0, 2.0, 0.0);
-
-        return 0;
     }
 
-    void onDraw()
+    virtual void onUpdate() override
     {
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         auto pos = m_lissajous(elapsedTime());
         m_sphere->setPos(pos);
-        m_trace->add(pos);
-
-        m_scene->draw();
-    }
-
-    void onUpdateOtherUi()
-    {
-        m_camManip->update();
-    }
-
-    void onResize(int width, int height)
-    {
-        m_camManip->update();
+        // m_trace->add(pos);
     }
 };
 

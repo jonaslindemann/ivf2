@@ -37,12 +37,14 @@ public:
 
     ivfui::CameraManipulatorPtr cameraManipulator();
 
+    virtual int onSetup() override;
     virtual void onResize(int width, int height) override;
     virtual void onUpdateOtherUi() override;
     virtual void onDraw() override;
     virtual void onDrawUi() override;
 
     virtual void onUpdateUi();
+    virtual void onSceneSetup();
 };
 
 typedef std::shared_ptr<GLFWSceneWindow> GLFWSceneWindowPtr;

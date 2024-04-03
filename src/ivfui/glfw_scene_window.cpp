@@ -1,8 +1,10 @@
 #include <ivfui/glfw_scene_window.h>
 
-using namespace ivfui;
 using namespace std;
 using namespace ivfui;
+
+#include <ivf/gl.h>
+#include <ivf/nodes.h>
 
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
@@ -51,6 +53,37 @@ ivfui::CameraManipulatorPtr ivfui::GLFWSceneWindow::cameraManipulator()
     return m_camManip;
 }
 
+int ivfui::GLFWSceneWindow::onSetup()
+{
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glEnable(GL_DEPTH_TEST);
+
+    auto fontMgr = ivf::FontManager::create();
+    fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
+
+    auto shaderMgr = ivf::ShaderManager::create();
+    shaderMgr->loadBasicShader();
+
+    if (shaderMgr->compileLinkErrors())
+    {
+        cout << "Couldn't compile shaders, exiting..." << endl;
+        return -1;
+    }
+
+    auto lightMgr = ivf::LightManager::create();
+    lightMgr->enableLighting();
+
+    auto dirLight = lightMgr->addDirectionalLight();
+    dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+    dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
+    dirLight->setEnabled(true);
+    lightMgr->apply();
+
+    this->onSceneSetup();
+
+    return 0;
+}
+
 void GLFWSceneWindow::onResize(int width, int height)
 {
     GLFWWindow::onResize(width, height);
@@ -79,4 +112,7 @@ void ivfui::GLFWSceneWindow::onDrawUi()
 }
 
 void ivfui::GLFWSceneWindow::onUpdateUi()
+{}
+
+void ivfui::GLFWSceneWindow::onSceneSetup()
 {}

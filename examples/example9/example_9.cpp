@@ -11,17 +11,14 @@ using namespace ivf;
 using namespace ivfui;
 using namespace std;
 
-class ExampleWindow : public GLFWWindow {
+class ExampleWindow : public GLFWSceneWindow {
 private:
-    CompositeNodePtr m_scene;
-    CameraManipulatorPtr m_camManip;
-
     CubePtr m_cube;
     SpherePtr m_sphere;
     TransformPtr m_sphereXfm;
 
 public:
-    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -29,36 +26,11 @@ public:
         return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    int onSetup()
+    virtual void onSceneSetup() override
     {
-        glEnable(GL_DEPTH_TEST);
-
-        auto fontMgr = FontManager::create();
-        fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
-
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
-        shaderMgr->loadBasicShader();
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
-
-        auto lightMgr = LightManager::create();
-        lightMgr->enableLighting();
-
-        auto dirLight = lightMgr->addDirectionalLight();
-        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-        dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
-        dirLight->setEnabled(true);
-        lightMgr->apply();
-
-        m_scene = CompositeNode::create();
-
         AxisPtr axis = Axis::create();
 
-        m_scene->add(axis);
+        this->add(axis);
 
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
@@ -84,36 +56,17 @@ public:
         m_sphereXfm = Transform::create();
         m_sphereXfm->add(m_sphere);
 
-        m_scene->add(m_cube);
-        m_scene->add(m_sphereXfm);
-
-        m_camManip = CameraManipulator::create(this->ref());
-
-        return 0;
+        this->add(m_cube);
+        this->add(m_sphereXfm);
     }
 
-    void onDraw()
+    virtual void onUpdate()
     {
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
         m_cube->setRotAxis(glm::vec3(1.0, 1.0, 1.0));
         m_cube->setRotAngle(20.0 * elapsedTime());
 
         m_sphereXfm->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
         m_sphereXfm->setRotAngle(20.0 * elapsedTime());
-
-        m_scene->draw();
-    }
-
-    void onUpdateOtherUi()
-    {
-        m_camManip->update();
-    }
-
-    void onResize(int width, int height)
-    {
-        m_camManip->update();
     }
 };
 

@@ -311,6 +311,13 @@ void Mesh::end()
     err = checkPrintError("Mesh", __FILE__, __LINE__);
 }
 
+void ivf::Mesh::updateVertices()
+{
+    m_VAO->bind();
+    m_vertexVBO->updateArray(m_verts.get());
+    m_VAO->unbind();
+}
+
 void Mesh::draw()
 {
     m_VAO->bind();

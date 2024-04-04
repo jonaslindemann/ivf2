@@ -9,6 +9,7 @@ private:
     int m_numVertices;
     bool m_useColor;
     GLfloat m_color[4];
+    bool m_firstAdd;
 
 public:
     LineTrace(int numVertices);
@@ -26,8 +27,12 @@ public:
 
     void setVertex(int idx, glm::vec3 &vertex);
 
+    void reset();
+    void start(glm::vec3 &vertex);
     void add(glm::vec3 &vertex);
     void clear();
+
+    void refresh();
 
 protected:
     virtual void doSetup();

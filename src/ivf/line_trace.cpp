@@ -4,9 +4,9 @@
 
 using namespace ivf;
 
-LineTrace::LineTrace(int numVertices) : MeshNode(), m_useColor(true), m_color{1.0, 1.0, 1.0, 1.0}
+LineTrace::LineTrace(int numVertices)
+    : MeshNode(), m_useColor(true), m_color{1.0, 1.0, 1.0, 1.0}, m_numVertices(numVertices), m_firstAdd(true)
 {
-    m_numVertices = numVertices;
     this->doSetup();
 }
 
@@ -63,24 +63,48 @@ void ivf::LineTrace::setVertex(int idx, glm::vec3 &vertex)
         mesh()->vertices()->setVertex(idx, vertex.x, vertex.y, vertex.z);
 }
 
+void ivf::LineTrace::reset()
+{
+    m_firstAdd = true;
+}
+
+void ivf::LineTrace::start(glm::vec3 &vertex)
+{
+    for (auto i = 0; i < m_numVertices; i++)
+        mesh()->vertices()->setVertex(i, vertex.x, vertex.y, vertex.z);
+
+    this->refresh();
+}
+
 void ivf::LineTrace::add(glm::vec3 &vertex)
 {
-    /*
-    m_vertices.push_back(vertex);
-
-    for (auto i = 0; i < m_vertices.size(); i++)
+    if (m_firstAdd)
     {
-        if (i < mesh()->vertices()->size())
-        {
-            auto v = m_vertices[i];
-            mesh()->vertices()->setVertex(i, v.x, v.y, v.z);
-        }
+        this->start(vertex);
+        m_firstAdd = false;
+        return;
     }
-    */
+    //                                                       i
+    //                                                       |
+    // o --- o --- o --- o --- o --- o --- o --- o --- o --- o
+    // 0     1     2     3     4     5     6     7     8     9
+    //       0     1     2     3     4     5     6     7     8     9
+
+    for (auto i = m_numVertices - 1; i > 0; i--)
+    {
+        glm::vec3 v = mesh()->vertices()->vertex(i - 1);
+        mesh()->vertices()->setVertex(i, v.x, v.y, v.z);
+    }
+    mesh()->vertices()->setVertex(0, vertex.x, vertex.y, vertex.z);
 }
 
 void ivf::LineTrace::clear()
 {}
+
+void ivf::LineTrace::refresh()
+{
+    this->mesh()->updateVertices();
+}
 
 void ivf::LineTrace::doSetup()
 {

@@ -68,34 +68,28 @@ public:
 
         m_sphere = Sphere::create();
         m_sphere->setMaterial(yellowMat);
-        m_sphere->setRadius(0.25);
+        m_sphere->setRadius(0.1);
         m_sphere->refresh();
         m_sphere->setPos(glm::vec3(0.0, 0.0, 0.0));
 
         this->add(m_sphere);
 
-        m_trace = LineTrace::create(100);
-        // m_trace->setUseColor(true);
-        // m_trace->setColor(1.0, 0.0, 0.0, 1.0);
-        //  m_trace->refresh();
+        m_trace = LineTrace::create(300);
 
-        for (auto i = 0; i < 100; i++)
-        {
-            auto t = i / 100.0;
-            auto pos = m_lissajous(t);
-            m_trace->setVertex(i, pos);
-        }
+        // (m_a * sin(m_b * t + m_d), m_c * sin(m_e * t + m_f), m_g * sin(m_h * t + m_i)
+
+        m_lissajous.setParameters(1.0, 1.0, 1.0, 0.7, 3.0, 0.4, 1.0, 2.0, 1.0);
+        //                        m_a, m_b, m_c, m_d, m_e, m_f, m_g, m_h, m_i
 
         this->add(m_trace);
-
-        m_lissajous.setParameters(1.0, 2.0, 1.0, 0.0, 3.0, 0.0, 1.0, 2.0, 0.0);
     }
 
     virtual void onUpdate() override
     {
         auto pos = m_lissajous(elapsedTime());
         m_sphere->setPos(pos);
-        // m_trace->add(pos);
+        m_trace->add(pos);
+        m_trace->refresh();
     }
 };
 

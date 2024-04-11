@@ -7,6 +7,8 @@
 #include <ivf/nodes.h>
 #include <ivfui/ui.h>
 
+#include "lissajou_window.h"
+
 using namespace ivf;
 using namespace ivfui;
 using namespace std;
@@ -47,9 +49,12 @@ private:
     LineTracePtr m_trace;
 
     Lissajous m_lissajous;
+    LissajouWindowPtr m_lissajouWindow;
+
+    float m_speed{1.0};
 
 public:
-    ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title), m_speed(1.0)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -82,11 +87,24 @@ public:
         //                        m_a, m_b, m_c, m_d, m_e, m_f, m_g, m_h, m_i
 
         this->add(m_trace);
+
+        m_lissajouWindow = LissajouWindow::create();
+        this->addUiWindow(m_lissajouWindow);
     }
 
     virtual void onUpdate() override
     {
-        auto pos = m_lissajous(elapsedTime());
+        if (m_lissajouWindow->is_dirty())
+        {
+            float a, b, c, d, e, f, g, h, i;
+            m_lissajouWindow->get_params(a, b, c, d, e, f, g, h, i);
+            m_lissajous.setParameters(a, b, c, d, e, f, g, h, i);
+            m_speed = m_lissajouWindow->speed();
+            m_trace->setSize(m_lissajouWindow->size());
+            m_trace->reset();
+        }
+
+        auto pos = m_lissajous(elapsedTime() * m_speed);
         m_sphere->setPos(pos);
         m_trace->add(pos);
         m_trace->refresh();

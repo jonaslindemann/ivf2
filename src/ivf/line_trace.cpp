@@ -96,10 +96,14 @@ void ivf::LineTrace::add(glm::vec3 &vertex)
         mesh()->vertices()->setVertex(i, v.x, v.y, v.z);
     }
     mesh()->vertices()->setVertex(0, vertex.x, vertex.y, vertex.z);
+    this->refresh();
 }
 
-void ivf::LineTrace::clear()
-{}
+void ivf::LineTrace::setSize(size_t size)
+{
+    m_numVertices = size;
+    this->doSetup();
+}
 
 void ivf::LineTrace::refresh()
 {
@@ -114,15 +118,13 @@ void ivf::LineTrace::doSetup()
     mesh()->begin(GL_LINE_STRIP);
     for (auto i = 0; i < m_numVertices; i++)
     {
-        GLfloat x = 0.0;
-        GLfloat y = 0.0;
-        GLfloat z = 0.0;
         if (m_useColor)
             mesh()->color3f(m_color[0], m_color[1], m_color[2]);
         mesh()->normal3d(0.0, 0.0, 1.0);
-        mesh()->vertex3d(x, y, z);
+        mesh()->vertex3d(0.0, 0.0, 0.0);
     }
     mesh()->end();
+    this->refresh();
 }
 
 void LineTrace::doPreDraw()

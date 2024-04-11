@@ -30,7 +30,7 @@ public:
     void reset();
     void start(glm::vec3 &vertex);
     void add(glm::vec3 &vertex);
-    void clear();
+    void setSize(size_t size);
 
     void refresh();
 

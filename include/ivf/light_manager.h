@@ -73,6 +73,11 @@ public:
     size_t dirLightCount();
     size_t spotLightCount();
 
+    void clearPointLights();
+    void clearDirectionalLights();
+    void clearSpotLights();
+    void clearLights();
+
     void setUseLighting(bool flag);
     void setUseVertexColors(bool flag);
     bool useLighting();

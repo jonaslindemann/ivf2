@@ -32,3 +32,4 @@
 #include <ivf/tube.h>
 #include <ivf/utils.h>
 #include <ivf/line_trace.h>
+#include <ivf/trace_node.h>

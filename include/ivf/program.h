@@ -48,6 +48,9 @@ public:
     void uniformInt(const std::string name, int value);
     void uniformInt(GLint id, int value);
 
+    void uniformUInt(const std::string name, int value);
+    void uniformUInt(GLint id, int value);
+
     void uniformFloat(const std::string name, float value);
     void uniformFloat(GLint id, float value);
 

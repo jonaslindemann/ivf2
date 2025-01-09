@@ -89,10 +89,8 @@ void ivf::Material::apply()
 {
     LightManager::instance()->setUseLighting(m_useLighting);
     LightManager::instance()->setUseVertexColors(m_useVertexColor);
-    LightManager::instance()->setUseTexture(m_useTexture);
     LightManager::instance()->setDiffuseColor(m_diffuseColor);
     LightManager::instance()->setAmbientColor(m_ambientColor);
     LightManager::instance()->setSpecularColor(m_specularColor);
-    LightManager::instance()->setUseTexture(m_useTexture);
     LightManager::instance()->setShininess(m_shininess);
 }

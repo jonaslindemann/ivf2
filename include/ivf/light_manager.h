@@ -18,7 +18,6 @@ class LightManager {
 private:
     bool m_useLighting;
     bool m_useVertexColors;
-    bool m_useTexture;
     bool m_savedState;
 
     GLint m_useLightingId;
@@ -83,8 +82,6 @@ public:
     bool useLighting();
     void enableLighting();
     void disableLighting();
-
-    void setUseTexture(bool flag);
 
     void setupDefaultColors();
 

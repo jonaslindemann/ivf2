@@ -12,7 +12,7 @@ else()
     add_library(ivf ${INCLUDE_FILES} ${SOURCE_FILES})
     target_include_directories(ivf PRIVATE glm::glm)
     add_dependencies(ivf glad generator)
-    install_targets(/lib ivf) 
-endif()  
+    install_targets(/lib ivf)  
+endif()   
 
  

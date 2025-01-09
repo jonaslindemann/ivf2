@@ -242,6 +242,8 @@ void GLFWWindow::draw()
 
     m_uiRenderer->draw();
 
+    this->doDrawComplete();
+
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
 
@@ -254,6 +256,11 @@ void GLFWWindow::draw()
     }
 
     this->swapBuffers();
+}
+
+void ivfui::GLFWWindow::drawScene()
+{
+    this->doDraw();
 }
 
 void GLFWWindow::doKey(int key, int scancode, int action, int mods)
@@ -313,6 +320,7 @@ void GLFWWindow::doDraw()
     const float ratio = width / (float)height;
 
     glViewport(0, 0, width, height);
+    glEnable(GL_DEPTH_TEST);
 
     m_t0 = glfwGetTime();
     onDraw();
@@ -324,6 +332,11 @@ void GLFWWindow::doDraw()
 void ivfui::GLFWWindow::doDrawUi()
 {
     onDrawUi();
+}
+
+void ivfui::GLFWWindow::doDrawComplete()
+{
+    onDrawComplete();
 }
 
 void ivfui::GLFWWindow::doUpdateOtherUi()
@@ -382,6 +395,9 @@ void GLFWWindow::onDraw()
 }
 
 void ivfui::GLFWWindow::onDrawUi()
+{}
+
+void ivfui::GLFWWindow::onDrawComplete()
 {}
 
 void ivfui::GLFWWindow::onUpdateOtherUi()

@@ -42,6 +42,14 @@ std::string basic_frag_shader_source = R"(
 // https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/2.lighting/6.multiple_lights/6.multiple_lights.fs
 //
 
+// Blend mode enumeration
+#define BLEND_NORMAL 0
+#define BLEND_MULTIPLY 1
+#define BLEND_ADD 2
+#define BLEND_SCREEN 3
+#define BLEND_OVERLAY 4
+#define BLEND_DECAL 5
+
 out vec4 fragColor;
 
 struct Material 
@@ -104,7 +112,7 @@ uniform vec4 lightColor;
 uniform vec3 textColor;
 
 uniform bool useLighting;
-uniform bool useTexture;
+uniform bool useTexture = false;
 uniform bool useVertexColors;
 uniform bool usePointFalloff = false;
 uniform bool textRendering = false;
@@ -129,6 +137,13 @@ uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 
 uniform Material material;
 
+uniform int blendMode = BLEND_MULTIPLY;
+uniform float blendFactor = 0.5; // Controls the strength of the blend [0,1]
+
+uniform bool selectionRendering = false;
+uniform uint objectId;
+
+vec4 applyBlendMode(vec4 textureColor, vec4 baseColor);
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -163,22 +178,62 @@ void main()
             result += calcSpotLight(spotLights[i], norm, fragPos, viewDir);
     }
 
-    if (useLighting)
-        if (useTexture)
-            if (textRendering)
-                if (useFixedTextColor)
-                    fragColor = vec4(textColor.r, textColor.g, textColor.b, texture(texture0, texCoord).r);
-                else
-                    fragColor = vec4(result.r, result.g, result.b, texture(texture0, texCoord).r);
-            else
-                fragColor = texture(texture0, texCoord) * vec4(result, 1.0);
-        else
-            fragColor = vec4(result, 1.0);
+    if (selectionRendering) 
+    {
+        uint mask = uint(255);  // 0xFF
+        uint r = objectId & mask;
+        uint g = (objectId >> uint(8)) & mask;
+        uint b = (objectId >> uint(16)) & mask;
+    
+        fragColor = vec4(float(r) / 255.0, 
+                         float(g) / 255.0, 
+                         float(b) / 255.0, 
+                         1.0);
+    }
     else
-        if (useVertexColors)
-            fragColor = color;
+    {
+        if (useLighting) 
+        {
+            vec4 baseColor = vec4(result, 1.0);
+    
+            if (useTexture) 
+            {
+                if (textRendering) 
+                {
+                    if (useFixedTextColor) 
+                    {
+                        vec4 texSample = vec4(textColor.rgb, texture(texture0, texCoord).r);
+                        fragColor = applyBlendMode(texSample, baseColor);
+                    }
+                    else 
+                    {
+                        vec4 texSample = vec4(result.rgb, texture(texture0, texCoord).r);
+                        fragColor = applyBlendMode(texSample, baseColor);
+                    }
+                } 
+                else 
+                {
+                    vec4 texSample = texture(texture0, texCoord);
+                    fragColor = applyBlendMode(texSample, baseColor);
+                }
+            } 
+            else 
+            {
+                fragColor = baseColor;
+            }
+        }
         else
-            fragColor = vec4(material.diffuseColor, 1.0);
+        {
+            if (useVertexColors) 
+            {
+                fragColor = color;
+            } 
+            else 
+            {
+                fragColor = vec4(material.diffuseColor, 1.0);
+            }
+        }
+    }
 } 
 
 // -----------------------------------------------------------------------------
@@ -275,6 +330,48 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     specular *= attenuation * intensity;
 
     return (ambient + diffuse + specular);
-})";
+}
+
+vec4 applyBlendMode(vec4 textureColor, vec4 baseColor) {
+    vec4 result;
+    
+    switch(blendMode) {
+        case BLEND_MULTIPLY:
+            result = textureColor * baseColor;
+            break;
+            
+        case BLEND_ADD:
+            result = min(textureColor + baseColor, vec4(1.0));
+            break;
+            
+        case BLEND_SCREEN:
+            result = vec4(1.0) - (vec4(1.0) - textureColor) * (vec4(1.0) - baseColor);
+            break;
+            
+        case BLEND_OVERLAY:
+            result = vec4(
+                baseColor.r < 0.5 ? (2.0 * baseColor.r * textureColor.r) : (1.0 - 2.0 * (1.0 - baseColor.r) * (1.0 - textureColor.r)),
+                baseColor.g < 0.5 ? (2.0 * baseColor.g * textureColor.g) : (1.0 - 2.0 * (1.0 - baseColor.g) * (1.0 - textureColor.g)),
+                baseColor.b < 0.5 ? (2.0 * baseColor.b * textureColor.b) : (1.0 - 2.0 * (1.0 - baseColor.b) * (1.0 - textureColor.b)),
+                baseColor.a
+            );
+            break;
+            
+        case BLEND_DECAL:
+            result = vec4(
+                mix(baseColor.rgb, textureColor.rgb, textureColor.a),
+                baseColor.a
+            );
+            break;
+            
+        case BLEND_NORMAL:
+        default:
+            result = textureColor;
+            break;
+    }
+    
+    return mix(baseColor, result, blendFactor);
+}
+)";
 
 }; // namespace ivf

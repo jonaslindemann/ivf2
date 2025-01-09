@@ -10,10 +10,12 @@
 #include <ivf/program.h>
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
+#include <ivf/texture_manager.h>
 #include <ivf/utils.h>
 #include <ivf/light_manager.h>
 #include <ivf/normal_factory.h>
 #include <ivf/texture.h>
 #include <ivf/material.h>
 #include <ivf/font_manager.h>
-
+#include <ivf/selection_manager.h>
+#include <ivf/buffer_selection.h>

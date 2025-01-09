@@ -46,6 +46,7 @@ bool FragmentShader::compile()
     glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
     if (infoLogLength!=0)
     {
+        cout << "Fragment shader compilation errors:" << endl;
         std::vector<char> fragmentShaderErrorMessage(infoLogLength);
         glGetShaderInfoLog(m_id, infoLogLength, NULL, &fragmentShaderErrorMessage[0]);
         fprintf(stdout, "%s\n", &fragmentShaderErrorMessage[0]);

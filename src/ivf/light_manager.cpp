@@ -9,11 +9,9 @@ using namespace ivf;
 LightManager *LightManager::m_instance = 0;
 
 LightManager::LightManager()
-    : m_useLighting(true), m_useTexture(true), m_useVertexColors(false), m_useLightingId(-1), m_useTextureId(-1),
-      m_useVertexColorsId(-1)
+    : m_useLighting(true), m_useVertexColors(false), m_useLightingId(-1), m_useVertexColorsId(-1)
 {
     m_useLightingId = ShaderManager::instance()->currentProgram()->uniformLoc("useLighting");
-    m_useTextureId = ShaderManager::instance()->currentProgram()->uniformLoc("useTexture");
     m_useVertexColorsId = ShaderManager::instance()->currentProgram()->uniformLoc("useVertexColors");
     m_pointLightCountId = ShaderManager::instance()->currentProgram()->uniformLoc("pointLightCount");
     m_directionalLightCountId = ShaderManager::instance()->currentProgram()->uniformLoc("dirLightCount");
@@ -153,14 +151,6 @@ void LightManager::disableLighting()
 {
     this->setUseLighting(false);
     this->setUseVertexColors(true);
-}
-
-void ivf::LightManager::setUseTexture(bool flag)
-{
-    m_useTexture = flag;
-
-    // ShaderManager::instance()->currentProgram()->use();
-    ShaderManager::instance()->currentProgram()->uniformBool(m_useTextureId, m_useTexture);
 }
 
 void ivf::LightManager::setupDefaultColors()

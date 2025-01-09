@@ -11,6 +11,6 @@ else()
     target_link_libraries(example_10 PRIVATE glad ivf ivfui generator glfw imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL Freetype::Freetype) 
     target_include_directories(example_10 PRIVATE ${Stb_INCLUDE_DIR})
     add_dependencies(example_10 glad generator ivf ivfui)
-endif() 
+endif()  
 
 

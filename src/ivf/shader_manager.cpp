@@ -35,7 +35,8 @@ ShaderManager::~ShaderManager()
 
 ShaderManager *ShaderManager::instance()
 {
-    if (!m_instance) {
+    if (!m_instance)
+    {
         m_instance = new ShaderManager();
     }
     return m_instance;
@@ -96,7 +97,7 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
                                                                const std::string fragmentShaderSource,
                                                                const std::string name)
 {
-    cout << "ShaderManager: Loading shaders." << endl;
+    cout << "ShaderManager: Loading shader " << name << " from string." << endl;
 
     auto vertexShader = std::make_shared<VertexShader>();
     vertexShader->setSource(vertexShaderSource);
@@ -135,12 +136,30 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
 
 std::shared_ptr<Program> ivf::ShaderManager::loadBasicShader()
 {
+    cout << "ShaderManager: Loading basic shader." << endl;
     return loadProgramFromStrings(ivf::basic_vert_shader_source, ivf::basic_frag_shader_source, "basic");
 }
 
 std::shared_ptr<Program> ShaderManager::currentProgram()
 {
     return m_currentProgram;
+}
+
+bool ivf::ShaderManager::setCurrentProgram(const std::string name)
+{
+    auto it = m_programs.find(name);
+    if (it != m_programs.end())
+    {
+        cout << "ShaderManager: Setting current program to " << name << endl;
+        m_currentProgram = it->second;
+        m_currentProgram->use();
+        return true;
+    }
+    else
+    {
+        cout << "ShaderManager: Program " << name << " not found." << endl;
+        return false;
+    }
 }
 
 void ShaderManager::apply()

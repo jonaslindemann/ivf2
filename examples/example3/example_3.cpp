@@ -17,11 +17,16 @@ class ExampleWindow : public GLFWWindow {
 private:
     CompositeNodePtr m_scene;
     CameraManipulatorPtr m_camManip;
+    TextureManagerPtr m_texMgr;
+    LightManagerPtr m_lightMgr;
 
-    bool m_showDemoWindow = false;
+    bool m_showDemoWindow{false};
+    float m_blendFactor{1.0};
 
 public:
-    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title)
+        : GLFWWindow(width, height, title), m_showDemoWindow(false), m_scene(nullptr), m_camManip(nullptr),
+          m_texMgr(nullptr), m_lightMgr(nullptr)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -31,8 +36,6 @@ public:
 
     int onSetup()
     {
-        glEnable(GL_DEPTH_TEST);
-
         ShaderManagerPtr shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
@@ -42,15 +45,19 @@ public:
             return -1;
         }
 
-        auto lightMgr = LightManager::create();
+        m_lightMgr = LightManager::create();
 
-        auto pointLight1 = lightMgr->addPointLight();
+        auto pointLight1 = m_lightMgr->addPointLight();
         pointLight1->setEnabled(true);
         pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
         pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
         pointLight1->setAttenuation(1.0, 0.0, 0.0);
         pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
-        lightMgr->apply();
+        m_lightMgr->apply();
+
+        m_texMgr = TextureManager::create();
+        m_texMgr->setUseTexture(true);
+        m_texMgr->apply();
 
         m_scene = CompositeNode::create();
 
@@ -58,7 +65,7 @@ public:
         auto grid = Grid::create();
 
         auto sphereMaterial = Material::create();
-        sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
         sphereMaterial->setUseTexture(true);
         sphereMaterial->setShininess(100.0);
 
@@ -105,6 +112,53 @@ public:
     void onResize(int width, int height)
     {
         m_camManip->update();
+    }
+
+    void onKey(int key, int scancode, int action, int mods)
+    {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+            this->close();
+        if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
+            m_showDemoWindow = !m_showDemoWindow;
+
+        if (key == '1' && action == GLFW_PRESS)
+            m_texMgr->setTextureBlendMode(TextureBlendMode::Normal);
+        if (key == '2' && action == GLFW_PRESS)
+            m_texMgr->setTextureBlendMode(TextureBlendMode::Multiply);
+        if (key == '3' && action == GLFW_PRESS)
+            m_texMgr->setTextureBlendMode(TextureBlendMode::Add);
+        if (key == '4' && action == GLFW_PRESS)
+            m_texMgr->setTextureBlendMode(TextureBlendMode::Screen);
+        if (key == '5' && action == GLFW_PRESS)
+            m_texMgr->setTextureBlendMode(TextureBlendMode::Overlay);
+        if (key == '6' && action == GLFW_PRESS)
+            m_texMgr->setTextureBlendMode(TextureBlendMode::Decal);
+
+        if (key == GLFW_KEY_T && action == GLFW_PRESS)
+        {
+            if (m_texMgr->useTexture())
+                m_texMgr->setUseTexture(false);
+            else
+                m_texMgr->setUseTexture(true);
+
+            m_lightMgr->apply();
+        }
+
+        if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+        {
+            m_blendFactor += 0.1;
+            if (m_blendFactor > 1.0)
+                m_blendFactor = 1.0;
+            m_texMgr->setBlendFactor(m_blendFactor);
+        }
+
+        if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+        {
+            m_blendFactor -= 0.1;
+            if (m_blendFactor < 0.0)
+                m_blendFactor = 0.0;
+            m_texMgr->setBlendFactor(m_blendFactor);
+        }
     }
 };
 

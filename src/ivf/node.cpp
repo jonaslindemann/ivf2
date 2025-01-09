@@ -1,5 +1,7 @@
 #include <ivf/node.h>
 
+#include <ivf/selection_manager.h>
+
 using namespace ivf;
 
 void Node::draw()
@@ -8,6 +10,12 @@ void Node::draw()
     if (m_visible)
         doDraw();
     doPostDraw();
+}
+
+void ivf::Node::drawSelection()
+{
+    if (m_visible)
+        doDrawSelection();
 }
 
 void ivf::Node::setMaterial(std::shared_ptr<Material> material)
@@ -54,8 +62,30 @@ bool ivf::Node::visible() const
     return m_visible;
 }
 
+void ivf::Node::setObjectId(uint32_t objectId)
+{
+    m_objectId = objectId;
+}
+
+uint32_t ivf::Node::objectId() const
+{
+    return m_objectId;
+}
+
+uint32_t ivf::Node::enumerateIds(uint32_t startId)
+{
+    return this->doEnumerateIds(startId);
+}
+
+void ivf::Node::accept(NodeVisitor *visitor)
+{
+    visitor->visit(this);
+}
+
 void Node::doPreDraw()
 {
+    SelectionManager::instance()->setObjectId(m_objectId);
+
     if ((m_material != nullptr) && (m_useMaterial))
         m_material->apply();
     if ((m_texture != nullptr) && (m_useTexture))
@@ -63,10 +93,18 @@ void Node::doPreDraw()
 }
 
 void ivf::Node::doDraw()
-{
-}
+{}
 
 void ivf::Node::doPostDraw()
 {
     m_texture->unbind();
+}
+
+void ivf::Node::doDrawSelection()
+{}
+
+uint32_t ivf::Node::doEnumerateIds(uint32_t startId)
+{
+    m_objectId = startId;
+    return startId + 1;
 }

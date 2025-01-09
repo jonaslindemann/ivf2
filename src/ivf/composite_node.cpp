@@ -5,7 +5,7 @@
 using namespace std;
 using namespace ivf;
 
-CompositeNode::CompositeNode()
+CompositeNode::CompositeNode() : TransformNode(), m_singleObjectId(false)
 {
     this->setUseMaterial(false);
 }
@@ -42,8 +42,38 @@ NodePtr ivf::CompositeNode::at(size_t index)
     return nodes().at(index);
 }
 
+size_t ivf::CompositeNode::count()
+{
+    return m_nodes.size();
+}
+
+void ivf::CompositeNode::accept(NodeVisitor *visitor)
+{
+    visitor->visit(this);
+
+    for (auto node : m_nodes)
+        node->accept(visitor);
+}
+
 void ivf::CompositeNode::doDraw()
 {
     for (auto node : m_nodes)
         node->draw();
+}
+
+uint32_t ivf::CompositeNode::doEnumerateIds(uint32_t startId)
+{
+    if (m_singleObjectId)
+    {
+        for (auto node : m_nodes)
+            node->setObjectId(startId);
+        return startId + 1;
+    }
+    else
+    {
+        uint32_t nextId = startId;
+        for (auto node : m_nodes)
+            nextId = node->enumerateIds(nextId);
+        return nextId;
+    }
 }

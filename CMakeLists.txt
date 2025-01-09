@@ -33,4 +33,4 @@ endif()
 include_directories( ${PROJECT_SOURCE_DIR}/include ${GLM_DIR} ${GENERATOR_INCLUDE_DIR} ${ZLIB_INCLUDE_DIRS} ${PNG_INCLUDE_DIRS} ${JPEG_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} ${STB_DIR} ${Stb_INCLUDE_DIR} ${IMGUI_INCLUDE_DIRS} ${GLFW_INCLUDE_DIRS})
 
 add_subdirectory(src)
-add_subdirectory(examples)
+add_subdirectory(examples) 

@@ -56,6 +56,8 @@ public:
     ProgramPtr loadBasicShader();
     ProgramPtr currentProgram();
 
+    bool setCurrentProgram(const std::string name);
+
     void apply();
 
     bool compileLinkErrors();

@@ -70,6 +70,8 @@ public:
 
     void draw();
 
+    void drawScene();
+
     GLFWwindow *ref();
 
     int mouseButton();
@@ -102,6 +104,7 @@ public:
     void doUpdate();
     void doDraw();
     void doDrawUi();
+    void doDrawComplete();
     void doUpdateOtherUi();
     int doSetup();
 
@@ -112,6 +115,7 @@ public:
     virtual void onUpdate();
     virtual void onDraw();
     virtual void onDrawUi();
+    virtual void onDrawComplete();
     virtual void onUpdateOtherUi();
     virtual int onSetup();
 };

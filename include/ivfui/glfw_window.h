@@ -97,16 +97,16 @@ public:
     double elapsedTime() const;
 
 public:
-    void doKey(int key, int scancode, int action, int mods);
-    void doMousePosition(double x, double y);
-    void doMouseButton(int button, int action, int mods);
-    void doResize(int width, int height);
-    void doUpdate();
-    void doDraw();
-    void doDrawUi();
-    void doDrawComplete();
-    void doUpdateOtherUi();
-    int doSetup();
+    virtual void doKey(int key, int scancode, int action, int mods);
+    virtual void doMousePosition(double x, double y);
+    virtual void doMouseButton(int button, int action, int mods);
+    virtual void doResize(int width, int height);
+    virtual void doUpdate();
+    virtual void doDraw();
+    virtual void doDrawUi();
+    virtual void doDrawComplete();
+    virtual void doUpdateOtherUi();
+    virtual int doSetup();
 
     virtual void onKey(int key, int scancode, int action, int mods);
     virtual void onMousePosition(double x, double y);

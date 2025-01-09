@@ -8,10 +8,12 @@ using namespace ivfui;
 
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
-    : GLFWWindow(width, height, title, monitor, shared)
+    : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
+      m_currentNode(nullptr)
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());
+    m_bufferSelection = ivf::BufferSelection::create(m_scene);
 }
 
 GLFWSceneWindow::~GLFWSceneWindow()
@@ -38,6 +40,16 @@ void ivfui::GLFWSceneWindow::clear()
     m_scene->clear();
 }
 
+void ivfui::GLFWSceneWindow::setSelectionEnabled(bool enabled)
+{
+    m_selectionEnabled = enabled;
+}
+
+bool ivfui::GLFWSceneWindow::selectionEnabled()
+{
+    return m_selectionEnabled;
+}
+
 void ivfui::GLFWSceneWindow::addUiWindow(ivfui::UiWindowPtr uiWindow)
 {
     m_uiWindows.push_back(uiWindow);
@@ -53,7 +65,7 @@ ivfui::CameraManipulatorPtr ivfui::GLFWSceneWindow::cameraManipulator()
     return m_camManip;
 }
 
-int ivfui::GLFWSceneWindow::onSetup()
+int ivfui::GLFWSceneWindow::doSetup()
 {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_DEPTH_TEST);
@@ -79,40 +91,110 @@ int ivfui::GLFWSceneWindow::onSetup()
     dirLight->setEnabled(true);
     lightMgr->apply();
 
-    this->onSceneSetup();
+    auto retVal = onSetup();
 
-    return 0;
+    if (m_selectionEnabled)
+        m_bufferSelection->initialize(width(), height());
+
+    return retVal;
 }
 
-void GLFWSceneWindow::onResize(int width, int height)
-{
-    GLFWWindow::onResize(width, height);
-    m_camManip->update();
-}
-
-void GLFWSceneWindow::onUpdateOtherUi()
+void GLFWSceneWindow::doResize(int width, int height)
 {
     m_camManip->update();
+    m_bufferSelection->resize(width, height);
+    GLFWWindow::doResize(width, height);
 }
 
-void GLFWSceneWindow::onDraw()
+void GLFWSceneWindow::doUpdateOtherUi()
 {
+    m_camManip->update();
+    GLFWWindow::doUpdateOtherUi();
+}
+
+void GLFWSceneWindow::doDraw()
+{
+    GLFWWindow::doDraw();
+
     glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_scene->draw();
 }
 
-void ivfui::GLFWSceneWindow::onDrawUi()
+void ivfui::GLFWSceneWindow::doDrawUi()
 {
     for (auto uiWindow : m_uiWindows)
         uiWindow->draw();
 
-    this->onUpdateUi();
+    GLFWWindow::doDrawUi();
+    this->doUpdateUi();
+}
+
+void ivfui::GLFWSceneWindow::doDrawComplete()
+{
+    if (m_selectionEnabled)
+    {
+        m_bufferSelection->begin();
+        this->drawScene();
+        auto m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
+
+        if (m_currentNode != nullptr)
+        {
+            if (m_currentNode != m_lastNode)
+            {
+                if (m_lastNode != nullptr)
+                    this->doLeaveNode(m_lastNode);
+                this->doEnterNode(m_currentNode);
+                m_lastNode = m_currentNode;
+            }
+            else
+            {
+                this->doOverNode(m_currentNode);
+            }
+        }
+        else
+        {
+            if (m_lastNode != nullptr)
+            {
+                this->doLeaveNode(m_lastNode);
+                m_lastNode = nullptr;
+            }
+        }
+
+        m_bufferSelection->end();
+    }
+    GLFWWindow::doDrawComplete();
 }
 
 void ivfui::GLFWSceneWindow::onUpdateUi()
 {}
 
-void ivfui::GLFWSceneWindow::onSceneSetup()
+void ivfui::GLFWSceneWindow::onEnterNode(ivf::Node *node)
 {}
+
+void ivfui::GLFWSceneWindow::onOverNode(ivf::Node *node)
+{}
+
+void ivfui::GLFWSceneWindow::onLeaveNode(ivf::Node *node)
+{}
+
+void ivfui::GLFWSceneWindow::doEnterNode(ivf::Node *node)
+{
+    this->onEnterNode(node);
+}
+
+void ivfui::GLFWSceneWindow::doOverNode(ivf::Node *node)
+{
+    this->onOverNode(node);
+}
+
+void ivfui::GLFWSceneWindow::doLeaveNode(ivf::Node *node)
+{
+    this->onLeaveNode(node);
+}
+
+void ivfui::GLFWSceneWindow::doUpdateUi()
+{
+    this->onUpdateUi();
+}

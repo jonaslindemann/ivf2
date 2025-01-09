@@ -62,7 +62,7 @@ public:
         return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    virtual void onSceneSetup() override
+    virtual int onSetup() override
     {
         AxisPtr axis = Axis::create();
 
@@ -90,6 +90,8 @@ public:
 
         m_lissajouWindow = LissajouWindow::create();
         this->addUiWindow(m_lissajouWindow);
+
+        return 0;
     }
 
     virtual void onUpdate() override

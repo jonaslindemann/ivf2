@@ -26,7 +26,7 @@ public:
         return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    virtual void onSceneSetup() override
+    virtual int onSetup() override
     {
         AxisPtr axis = Axis::create();
 
@@ -58,6 +58,8 @@ public:
 
         this->add(m_cube);
         this->add(m_sphereXfm);
+
+        return 0;
     }
 
     virtual void onUpdate()

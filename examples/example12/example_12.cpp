@@ -18,11 +18,8 @@ private:
     CubePtr m_cube;
     SpherePtr m_sphere;
     TransformPtr m_sphereXfm;
-    BufferSelectionPtr m_bufferSelection;
-    MaterialPtr m_selectionMaterial;
     MaterialPtr m_yellowMat;
-    Node *m_lastNode;
-    Node *m_currentNode;
+    MaterialPtr m_selectionMaterial;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -33,11 +30,9 @@ public:
         return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    virtual void onSceneSetup() override
+    virtual int onSetup() override
     {
-        m_bufferSelection = BufferSelection::create(this->scene());
-
-        m_lastNode = nullptr;
+        this->setSelectionEnabled(true);
 
         AxisPtr axis = Axis::create();
 
@@ -68,41 +63,30 @@ public:
             }
         }
 
-        m_bufferSelection->initialize(width(), height());
-
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, 0.0, 20.0));
+
+        return 0;
     }
 
-    virtual void onDrawComplete() override
+    virtual void onEnterNode(Node *node) override
     {
-        m_bufferSelection->begin();
+        std::cout << "Enter node" << std::endl;
+        node->setMaterial(m_selectionMaterial);
+    }
 
-        this->drawScene();
+    virtual void onOverNode(Node *node) override
+    {
+        std::cout << "Over node" << std::endl;
+    }
 
-        auto m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
-
-        if ((m_currentNode != m_lastNode))
-        {
-            if (m_lastNode != nullptr)
-                m_lastNode->setMaterial(m_yellowMat);
-            if (m_currentNode != nullptr)
-            {
-                m_currentNode->setMaterial(m_selectionMaterial);
-                m_lastNode = m_currentNode;
-            }
-        }
-
-        m_bufferSelection->end();
+    virtual void onLeaveNode(Node *node) override
+    {
+        std::cout << "Leave node" << std::endl;
+        node->setMaterial(m_yellowMat);
     }
 
     virtual void onUpdate()
     {}
-
-    virtual void onResize(int width, int height) override
-    {
-        GLFWSceneWindow::onResize(width, height);
-        m_bufferSelection->resize(width, height);
-    }
 };
 
 typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;

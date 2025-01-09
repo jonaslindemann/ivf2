@@ -197,8 +197,6 @@ void CameraManipulator::update()
 
         glm::vec3 posTargetDist = m_cameraNewPos - m_cameraNewTarget;
 
-        cout << glm::length(posTargetDist) << endl;
-
         if (glm::length(posTargetDist) > 1.5f)
             m_cameraNewTarget = m_cameraTarget;
         else

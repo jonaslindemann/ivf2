@@ -19,7 +19,6 @@ private:
     SpherePtr m_sphere;
     TransformPtr m_sphereXfm;
     BufferSelectionPtr m_bufferSelection;
-    SelectionManagerPtr m_selectionMgr;
     MaterialPtr m_selectionMaterial;
     MaterialPtr m_yellowMat;
     Node *m_lastNode;
@@ -36,13 +35,9 @@ public:
 
     virtual void onSceneSetup() override
     {
-        auto shaderMgr = ShaderManager::instance();
-        m_selectionMgr = SelectionManager::instance();
         m_bufferSelection = BufferSelection::create(this->scene());
 
         m_lastNode = nullptr;
-
-        // m_selectionMgr->setSelectionRendering(true);
 
         AxisPtr axis = Axis::create();
 
@@ -81,6 +76,7 @@ public:
     virtual void onDrawComplete() override
     {
         m_bufferSelection->begin();
+
         this->drawScene();
 
         auto m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
@@ -95,6 +91,7 @@ public:
                 m_lastNode = m_currentNode;
             }
         }
+
         m_bufferSelection->end();
     }
 

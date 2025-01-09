@@ -100,6 +100,7 @@ public:
 
     virtual void onResize(int width, int height) override
     {
+        GLFWSceneWindow::onResize(width, height);
         m_bufferSelection->resize(width, height);
     }
 };

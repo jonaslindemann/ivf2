@@ -72,6 +72,7 @@ bool Program::link()
 void Program::use()
 {
     glUseProgram(m_id);
+    this->doParams();
 }
 
 void ivf::Program::bindAttribLoc(GLuint idx, const std::string name)
@@ -222,3 +223,6 @@ void ivf::Program::setName(std::string name)
 {
     m_name = name;
 }
+
+void ivf::Program::doParams()
+{}

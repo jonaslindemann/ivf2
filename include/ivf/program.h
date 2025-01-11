@@ -68,6 +68,9 @@ public:
     GLuint id();
     std::string name();
     void setName(std::string name);
+
+protected:
+    virtual void doParams();
 };
 
 typedef std::shared_ptr<Program> ProgramPtr;

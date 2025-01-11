@@ -15,6 +15,7 @@
 #include <ivf/framebuffer.h>
 #include <ivf/program.h>
 #include <ivf/post_processor.h>
+#include <ivf/effect.h>
 
 namespace ivfui {
 
@@ -33,11 +34,8 @@ private:
 
     bool m_renderToTexture{false};
     bool m_selectionRendering{false};
-    bool m_fxVignette{false};
-    bool m_fxChromatic{false};
-    bool m_fxFilmGrain{false};
-    bool m_fxColorTint{false};
-    bool m_fxBlur{false};
+
+    std::vector<ivf::EffectPtr> m_effects;
 
 public:
     GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor = nullptr,
@@ -59,22 +57,28 @@ public:
 
     void addUiWindow(ivfui::UiWindowPtr uiWindow);
 
+    void addEffect(ivf::EffectPtr effect);
+    void clearEffects();
+
     ivf::CompositeNodePtr scene();
 
     ivfui::CameraManipulatorPtr cameraManipulator();
 
     virtual void onUpdateUi();
+    virtual void onUpdateEffects();
 
     virtual void onEnterNode(ivf::Node *node);
     virtual void onOverNode(ivf::Node *node);
     virtual void onLeaveNode(ivf::Node *node);
 
 protected:
-    virtual void doResize(int width, int height) override;
     virtual void doEnterNode(ivf::Node *node);
     virtual void doOverNode(ivf::Node *node);
     virtual void doLeaveNode(ivf::Node *node);
     virtual void doUpdateUi();
+    virtual void doUpdateEffects();
+
+    virtual void doResize(int width, int height) override;
     virtual int doSetup() override;
     virtual void doDraw() override;
     virtual void doUpdateOtherUi() override;

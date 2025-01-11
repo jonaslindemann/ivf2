@@ -490,12 +490,13 @@ in vec2 TexCoords;
 uniform sampler2D screenTexture;
 uniform float time;
 
+uniform float blurRadius = 2.0;
+
 // Gaussian blur
 vec3 applyBlur(sampler2D tex, vec2 texCoord) {
     vec2 texelSize = 1.0 / textureSize(tex, 0);
     vec3 result = vec3(0.0);
     float total = 0.0;
-    float blurRadius = 2.0;
     
     for(float x = -blurRadius; x <= blurRadius; x++) {
         for(float y = -blurRadius; y <= blurRadius; y++) {

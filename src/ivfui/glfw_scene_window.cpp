@@ -14,8 +14,7 @@ using namespace ivf;
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
     : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
-      m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false), m_fxVignette(false),
-      m_fxChromatic(false), m_fxFilmGrain(false), m_fxColorTint(false), m_fxBlur(false)
+      m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false)
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());
@@ -71,6 +70,18 @@ bool ivfui::GLFWSceneWindow::renderToTexture()
 void ivfui::GLFWSceneWindow::addUiWindow(ivfui::UiWindowPtr uiWindow)
 {
     m_uiWindows.push_back(uiWindow);
+}
+
+void ivfui::GLFWSceneWindow::addEffect(ivf::EffectPtr effect)
+{
+    m_effects.push_back(effect);
+    m_postProcessor->addEffect(effect->program());
+}
+
+void ivfui::GLFWSceneWindow::clearEffects()
+{
+    m_effects.clear();
+    m_postProcessor->clearEffects();
 }
 
 ivf::CompositeNodePtr ivfui::GLFWSceneWindow::scene()
@@ -184,6 +195,11 @@ void GLFWSceneWindow::doDraw()
         // glViewport(0, 0, width(), height());
         m_frameBuffer->draw();
 
+        this->doUpdateEffects();
+
+        for (auto &effect : m_effects)
+            effect->use();
+
         // glViewport(0, 0, width(), height());
         m_postProcessor->setTime(glfwGetTime());
         m_postProcessor->apply(m_frameBuffer->colorTexture());
@@ -253,6 +269,9 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
 void ivfui::GLFWSceneWindow::onUpdateUi()
 {}
 
+void ivfui::GLFWSceneWindow::onUpdateEffects()
+{}
+
 void ivfui::GLFWSceneWindow::onEnterNode(ivf::Node *node)
 {}
 
@@ -280,4 +299,9 @@ void ivfui::GLFWSceneWindow::doLeaveNode(ivf::Node *node)
 void ivfui::GLFWSceneWindow::doUpdateUi()
 {
     this->onUpdateUi();
+}
+
+void ivfui::GLFWSceneWindow::doUpdateEffects()
+{
+    this->onUpdateEffects();
 }

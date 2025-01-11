@@ -15,4 +15,3 @@ target_include_directories(ivfui PRIVATE glm::glm)
 add_dependencies(ivfui ivf)
 INSTALL_TARGETS(/lib ivfui)
 endif() 
-

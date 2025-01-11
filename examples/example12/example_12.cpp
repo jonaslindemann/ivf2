@@ -9,6 +9,7 @@
 
 #include <ivf/node_visitor.h>
 #include <ivf/stock_shaders.h>
+#include <ivf/blur_effect.h>
 
 using namespace ivf;
 using namespace ivfui;
@@ -21,6 +22,8 @@ private:
     TransformPtr m_sphereXfm;
     MaterialPtr m_yellowMat;
     MaterialPtr m_selectionMaterial;
+
+    BlurEffectPtr m_blurEffect;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -65,6 +68,12 @@ public:
             }
         }
 
+        m_blurEffect = BlurEffect::create();
+        m_blurEffect->setBlurRadius(2.0);
+        m_blurEffect->load();
+
+        this->addEffect(m_blurEffect);
+
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, 0.0, 20.0));
 
         return 0;
@@ -89,6 +98,11 @@ public:
 
     virtual void onUpdate()
     {}
+
+    virtual void onUpdateEffects()
+    {
+        m_blurEffect->setBlurRadius(10.0 + 10.0 * sin(glfwGetTime()));
+    }
 };
 
 typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;

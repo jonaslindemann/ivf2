@@ -120,7 +120,8 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
     program->bindAttribLoc(2, "aTex");
     program->bindAttribLoc(3, "aNormal");
 
-    program->use();
+    if (makeCurrent)
+        program->use();
 
     auto it = m_programs.find(name);
 

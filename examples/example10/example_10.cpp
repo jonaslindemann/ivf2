@@ -64,6 +64,8 @@ public:
 
     virtual int onSetup() override
     {
+        this->setRenderToTexture(true);
+
         AxisPtr axis = Axis::create();
 
         this->add(axis);

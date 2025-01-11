@@ -214,7 +214,11 @@ bool GLFWWindow::isEnabled()
 
 void GLFWWindow::draw()
 {
+    // Make sure only a single thread is drawing
+
     const std::lock_guard<std::mutex> lock(m_mutex);
+
+    // Make this window the current context
 
     this->makeCurrent();
 
@@ -222,14 +226,29 @@ void GLFWWindow::draw()
 
     if (m_runSetup)
     {
+        // Run window setup routine
+
         result = this->doSetup();
+
         setError(result);
         if (result != 0)
             this->close(); // close window if setup failed
+
+        // If maximized called we need to do a resize
+
+        glfwGetWindowSize(m_window, &m_width, &m_height);
+        this->doResize(m_width, m_height);
+
+        // Only run setup once.
+
         m_runSetup = false;
     }
 
+    // Update scene graph here
+
     this->doUpdate();
+
+    // Create user interfacee
 
     m_uiRenderer->beginFrame();
     this->doDrawUi();
@@ -237,12 +256,20 @@ void GLFWWindow::draw()
         this->doUpdateOtherUi();
     m_uiRenderer->endFrame();
 
+    // Render scene
+
     if (m_enabled && (result == 0))
         this->doDraw();
 
+    // Render user interfaec
+
     m_uiRenderer->draw();
 
+    // Tell derived class to do any final rendering
+
     this->doDrawComplete();
+
+    // Window/viewport handling
 
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
@@ -254,6 +281,8 @@ void GLFWWindow::draw()
         ImGui::RenderPlatformWindowsDefault();
         glfwMakeContextCurrent(backup_current_context);
     }
+
+    // Swap buffers
 
     this->swapBuffers();
 }

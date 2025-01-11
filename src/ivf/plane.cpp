@@ -6,10 +6,7 @@ using namespace ivf;
 using namespace generator;
 
 Plane::Plane(double width, double depth, int rows, int cols)
-    :m_width(width),
-    m_depth(depth),
-     m_rows(rows),
-     m_cols(cols)
+    : m_width(width), m_depth(depth), m_rows(rows), m_cols(cols)
 {
     this->doSetup();
 }
@@ -37,5 +34,3 @@ void Plane::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
-
-

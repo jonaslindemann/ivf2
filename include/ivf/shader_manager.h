@@ -48,21 +48,46 @@ public:
     static void drop();
 
     ProgramPtr loadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
-                                    const std::string name);
+                                    const std::string name, bool makeCurrent = true);
 
     ProgramPtr loadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
-                                      const std::string name);
+                                      const std::string name, bool makeCurrent = true);
 
     ProgramPtr loadBasicShader();
+
+    ProgramPtr loadRenderToTextureShader();
+
     ProgramPtr currentProgram();
 
     bool setCurrentProgram(const std::string name);
 
     void apply();
 
+    void applyProgram(const std::string name);
+
     bool compileLinkErrors();
 };
 
 typedef ShaderManager *ShaderManagerPtr;
+
+ProgramPtr smLoadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
+                                  const std::string name, bool makeCurrent = true);
+
+ProgramPtr smLoadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
+                                    const std::string name, bool makeCurrent = true);
+
+ProgramPtr smLoadBasicShader();
+
+ProgramPtr smLoadRenderToTextureShader();
+
+ProgramPtr smCurrentProgram();
+
+bool smSetCurrentProgram(const std::string name);
+
+void smApply();
+
+void smApplyProgram(const std::string name);
+
+bool smCompileLinkErrors();
 
 }; // namespace ivf

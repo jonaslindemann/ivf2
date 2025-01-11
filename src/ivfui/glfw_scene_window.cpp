@@ -5,15 +5,23 @@ using namespace ivfui;
 
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
+#include <ivf/shader_manager.h>
+
+#include <ivf/stock_shaders.h>
+
+using namespace ivf;
 
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
     : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
-      m_currentNode(nullptr)
+      m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false), m_fxVignette(false),
+      m_fxChromatic(false), m_fxFilmGrain(false), m_fxColorTint(false), m_fxBlur(false)
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());
     m_bufferSelection = ivf::BufferSelection::create(m_scene);
+    m_frameBuffer = ivf::FrameBuffer::create(width, height);
+    m_postProcessor = ivf::PostProcessor::create(width, height);
 }
 
 GLFWSceneWindow::~GLFWSceneWindow()
@@ -50,6 +58,16 @@ bool ivfui::GLFWSceneWindow::selectionEnabled()
     return m_selectionEnabled;
 }
 
+void ivfui::GLFWSceneWindow::setRenderToTexture(bool renderToTexture)
+{
+    m_renderToTexture = renderToTexture;
+}
+
+bool ivfui::GLFWSceneWindow::renderToTexture()
+{
+    return m_renderToTexture;
+}
+
 void ivfui::GLFWSceneWindow::addUiWindow(ivfui::UiWindowPtr uiWindow)
 {
     m_uiWindows.push_back(uiWindow);
@@ -74,7 +92,9 @@ int ivfui::GLFWSceneWindow::doSetup()
     fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
 
     auto shaderMgr = ivf::ShaderManager::create();
+    shaderMgr->loadRenderToTextureShader();
     shaderMgr->loadBasicShader();
+    shaderMgr->apply();
 
     if (shaderMgr->compileLinkErrors())
     {
@@ -96,6 +116,31 @@ int ivfui::GLFWSceneWindow::doSetup()
     if (m_selectionEnabled)
         m_bufferSelection->initialize(width(), height());
 
+    m_frameBuffer->initialize();
+    m_frameBuffer->setMultisample(true);
+
+    m_postProcessor->initialize();
+
+    /*
+    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
+                                                        ivf::chromatic_frag_shader_source, "chromatic", false));
+
+
+    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
+                                                        ivf::blur_frag_shader_source, "blur", false));
+
+    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
+                                                        ivf::tint_frag_shader_source, "tint", false));
+
+    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
+                                                        ivf::vignette_frag_shader_source, "vignette", false));
+
+    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
+                                                        ivf::filmgrain_frag_shader_source, "filmgrain", false));
+    */
+
+    smSetCurrentProgram("basic");
+
     return retVal;
 }
 
@@ -103,6 +148,8 @@ void GLFWSceneWindow::doResize(int width, int height)
 {
     m_camManip->update();
     m_bufferSelection->resize(width, height);
+    m_frameBuffer->resize(width, height);
+    m_postProcessor->resize(width, height);
     GLFWWindow::doResize(width, height);
 }
 
@@ -114,12 +161,46 @@ void GLFWSceneWindow::doUpdateOtherUi()
 
 void GLFWSceneWindow::doDraw()
 {
-    GLFWWindow::doDraw();
+    if ((m_renderToTexture) && (!m_selectionRendering))
+    {
+        m_frameBuffer->resize(width(), height());
 
-    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // m_frameBuffer->reset();
 
-    m_scene->draw();
+        // Draw scene to texture
+
+        m_frameBuffer->begin();
+        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        GLFWWindow::doDraw();
+        m_scene->draw();
+        m_frameBuffer->end();
+
+        // Draw texture to screen
+
+        smApplyProgram("render_to_texture");
+        smCurrentProgram()->uniformInt("screenTexture", 0);
+
+        // glViewport(0, 0, width(), height());
+        m_frameBuffer->draw();
+
+        // glViewport(0, 0, width(), height());
+        m_postProcessor->setTime(glfwGetTime());
+        m_postProcessor->apply(m_frameBuffer->colorTexture());
+
+        // Reset shader to basic
+
+        smApplyProgram("basic");
+    }
+    else
+    {
+        GLFWWindow::doDraw();
+
+        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        m_scene->draw();
+    }
 }
 
 void ivfui::GLFWSceneWindow::doDrawUi()
@@ -135,6 +216,7 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
 {
     if (m_selectionEnabled)
     {
+        m_selectionRendering = true;
         m_bufferSelection->begin();
         this->drawScene();
         auto m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
@@ -164,6 +246,7 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
 
         m_bufferSelection->end();
     }
+    m_selectionRendering = false;
     GLFWWindow::doDrawComplete();
 }
 

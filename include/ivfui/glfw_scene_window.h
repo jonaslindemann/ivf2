@@ -7,10 +7,14 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <vector>
 
 #include <ivfui/ui.h>
 #include <ivf/nodes.h>
 #include <ivf/gl.h>
+#include <ivf/framebuffer.h>
+#include <ivf/program.h>
+#include <ivf/post_processor.h>
 
 namespace ivfui {
 
@@ -20,10 +24,20 @@ private:
     ivfui::CameraManipulatorPtr m_camManip;
     std::vector<ivfui::UiWindowPtr> m_uiWindows;
     ivf::BufferSelectionPtr m_bufferSelection;
+    ivf::FrameBufferPtr m_frameBuffer;
+    ivf::PostProcessorPtr m_postProcessor;
 
     bool m_selectionEnabled{false};
     ivf::Node *m_lastNode;
     ivf::Node *m_currentNode;
+
+    bool m_renderToTexture{false};
+    bool m_selectionRendering{false};
+    bool m_fxVignette{false};
+    bool m_fxChromatic{false};
+    bool m_fxFilmGrain{false};
+    bool m_fxColorTint{false};
+    bool m_fxBlur{false};
 
 public:
     GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor = nullptr,
@@ -39,6 +53,9 @@ public:
 
     void setSelectionEnabled(bool enabled);
     bool selectionEnabled();
+
+    void setRenderToTexture(bool renderToTexture);
+    bool renderToTexture();
 
     void addUiWindow(ivfui::UiWindowPtr uiWindow);
 

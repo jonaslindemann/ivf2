@@ -8,6 +8,7 @@
 #include <ivfui/ui.h>
 
 #include <ivf/node_visitor.h>
+#include <ivf/stock_shaders.h>
 
 using namespace ivf;
 using namespace ivfui;
@@ -33,6 +34,7 @@ public:
     virtual int onSetup() override
     {
         this->setSelectionEnabled(true);
+        this->setRenderToTexture(true);
 
         AxisPtr axis = Axis::create();
 
@@ -101,7 +103,7 @@ int main()
     app->hint(GLFW_SAMPLES, 4);
 
     auto window = ExampleWindow::create(800, 800, "Example 6");
-    window->maximize();
+    // window->maximize();
 
     app->addWindow(window);
     return app->loop();

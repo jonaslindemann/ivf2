@@ -36,17 +36,7 @@ public:
 
     int onSetup()
     {
-        glEnable(GL_DEPTH_TEST);
-
-        auto shaderMgr = ShaderManager::create();
-        shaderMgr->loadBasicShader();
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
-
+        this->setRenderToTexture(true);
         this->addUiWindow(m_exampleWindow1);
         this->addUiWindow(m_exampleWindow2);
 

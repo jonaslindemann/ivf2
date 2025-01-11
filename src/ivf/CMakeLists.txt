@@ -13,6 +13,6 @@ else()
     target_include_directories(ivf PRIVATE glm::glm)
     add_dependencies(ivf glad generator)
     install_targets(/lib ivf)  
-endif()   
+endif()  
 
  

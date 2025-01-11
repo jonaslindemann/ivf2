@@ -54,7 +54,8 @@ void ShaderManager::drop()
 }
 
 std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string vertexSource,
-                                                             const std::string fragmentSource, const std::string name)
+                                                             const std::string fragmentSource, const std::string name,
+                                                             bool makeCurrent)
 {
     cout << "ShaderManager: Loading shaders." << endl;
     cout << "\tVertex shader = " << vertexSource << endl;
@@ -86,7 +87,8 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
     else
         it->second = program;
 
-    m_currentProgram = program;
+    if (makeCurrent)
+        m_currentProgram = program;
 
     program->printAttribs();
 
@@ -95,7 +97,7 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
 
 std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string vertexShaderSource,
                                                                const std::string fragmentShaderSource,
-                                                               const std::string name)
+                                                               const std::string name, bool makeCurrent)
 {
     cout << "ShaderManager: Loading shader " << name << " from string." << endl;
 
@@ -127,7 +129,8 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
     else
         it->second = program;
 
-    m_currentProgram = program;
+    if (makeCurrent)
+        m_currentProgram = program;
 
     program->printAttribs();
 
@@ -140,6 +143,13 @@ std::shared_ptr<Program> ivf::ShaderManager::loadBasicShader()
     return loadProgramFromStrings(ivf::basic_vert_shader_source, ivf::basic_frag_shader_source, "basic");
 }
 
+ProgramPtr ivf::ShaderManager::loadRenderToTextureShader()
+{
+    cout << "ShaderManager: Loading basic shader." << endl;
+    return loadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
+                                  ivf::render_to_texture_frag_shader_source_330, "render_to_texture");
+}
+
 std::shared_ptr<Program> ShaderManager::currentProgram()
 {
     return m_currentProgram;
@@ -150,14 +160,12 @@ bool ivf::ShaderManager::setCurrentProgram(const std::string name)
     auto it = m_programs.find(name);
     if (it != m_programs.end())
     {
-        cout << "ShaderManager: Setting current program to " << name << endl;
         m_currentProgram = it->second;
         m_currentProgram->use();
         return true;
     }
     else
     {
-        cout << "ShaderManager: Program " << name << " not found." << endl;
         return false;
     }
 }
@@ -167,7 +175,61 @@ void ShaderManager::apply()
     m_currentProgram->use();
 }
 
+void ivf::ShaderManager::applyProgram(const std::string name)
+{
+    this->setCurrentProgram(name);
+    this->apply();
+}
+
 bool ivf::ShaderManager::compileLinkErrors()
 {
     return m_linkErrors || m_vertexCompileErrors || m_fragCompileErrors;
+}
+
+ProgramPtr ivf::smLoadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
+                                       const std::string name, bool makeCurrent)
+{
+    return ShaderManager::instance()->loadProgramFromFiles(vertexShader, fragmentShader, name, makeCurrent);
+}
+
+ProgramPtr ivf::smLoadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
+                                         const std::string name, bool makeCurrent)
+{
+    return ShaderManager::instance()->loadProgramFromStrings(vertexShaderSource, fragmentShaderSource, name,
+                                                             makeCurrent);
+}
+
+ProgramPtr ivf::smLoadBasicShader()
+{
+    return ShaderManager::instance()->loadBasicShader();
+}
+
+ProgramPtr ivf::smLoadRenderToTextureShader()
+{
+    return ShaderManager::instance()->loadRenderToTextureShader();
+}
+
+ProgramPtr ivf::smCurrentProgram()
+{
+    return ShaderManager::instance()->currentProgram();
+}
+
+bool ivf::smSetCurrentProgram(const std::string name)
+{
+    return ShaderManager::instance()->setCurrentProgram(name);
+}
+
+void ivf::smApply()
+{
+    return ShaderManager::instance()->apply();
+}
+
+void ivf::smApplyProgram(const std::string name)
+{
+    return ShaderManager::instance()->applyProgram(name);
+}
+
+bool ivf::smCompileLinkErrors()
+{
+    return ShaderManager::instance()->compileLinkErrors();
 }

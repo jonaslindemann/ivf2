@@ -9,7 +9,7 @@ using namespace ivf;
 
 Grid::Grid()
     : m_tickX(11), m_tickY(11), m_tickZ(11), m_tickSpacingX(1.0e-0), m_tickSpacingY(1.0e-0), m_tickSpacingZ(1.0e-0),
-      m_gridType(GridType::Points), m_tickColor{0.3, 0.3, 0.3, 1.0}, m_lineColor{0.1, 0.1, 0.1, 1.0}, m_markerSize(0.2)
+      m_gridType(GridType::Points), m_tickColor{0.2, 0.2, 0.2, 1.0}, m_lineColor{0.1, 0.1, 0.1, 1.0}, m_markerSize(0.2)
 
 {
     this->doSetup();
@@ -173,6 +173,8 @@ void Grid::doSetup()
     for (auto &mesh : meshes())
         mesh->setEnabled(false);
 
+    mesh(2)->setLineWidth(2.0f);
+
     switch (m_gridType)
     {
     case GridType::Lines:
@@ -187,6 +189,7 @@ void Grid::doSetup()
     case GridType::LinesAndMarkers:
         mesh(1)->setEnabled(true);
         mesh(2)->setEnabled(true);
+        mesh(2)->setDepthFunc(GL_LEQUAL);
         break;
     default:
         mesh(2)->setEnabled(true);
@@ -360,9 +363,6 @@ void Grid::doPreDraw()
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE);
-
-    glEnable(GL_POLYGON_OFFSET_LINE);
-    glPolygonOffset(1.0, 1.0);
 }
 
 void Grid::doPostDraw()

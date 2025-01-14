@@ -17,7 +17,9 @@ glm::vec3 computeNormal(glm::vec3 const &a, glm::vec3 const &b, glm::vec3 const 
     return glm::normalize(glm::cross(c - a, b - a));
 }
 
-Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType) : m_position(0.0f), m_generateNormals(true), m_enabled(true)
+Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType)
+    : m_position(0.0f), m_generateNormals(true), m_enabled(true), m_polygonOffsetFactor(0.0f),
+      m_polygonOffsetUnits(0.0f), m_depthFunc(GL_LESS), m_lineWidth(1.0f)
 {
     m_primType = primType;
     this->setSize(vsize, isize);
@@ -107,6 +109,42 @@ void ivf::Mesh::setGenerateNormals(bool flag)
 bool ivf::Mesh::generateNormals()
 {
     return m_generateNormals;
+}
+
+void ivf::Mesh::setPolygonOffset(float factor, float units)
+{
+    m_polygonOffsetFactor = factor;
+    m_polygonOffsetUnits = units;
+}
+
+float ivf::Mesh::polygonOffsetFactor()
+{
+    return m_polygonOffsetFactor;
+}
+
+float ivf::Mesh::polygonOffsetUnits()
+{
+    return m_polygonOffsetUnits;
+}
+
+void ivf::Mesh::setDepthFunc(GLenum func)
+{
+    m_depthFunc = func;
+}
+
+GLenum ivf::Mesh::depthFunc()
+{
+    return m_depthFunc;
+}
+
+void ivf::Mesh::setLineWidth(GLfloat width)
+{
+    m_lineWidth = width;
+}
+
+GLfloat ivf::Mesh::lineWidth()
+{
+    return m_lineWidth;
 }
 
 void Mesh::setVertexAttrId(GLuint id)
@@ -330,6 +368,22 @@ void ivf::Mesh::updateVertices()
 
 void Mesh::draw()
 {
+    if ((m_polygonOffsetFactor != 0.0f) || (m_polygonOffsetUnits != 0.0f))
+    {
+        glEnable(GL_POLYGON_OFFSET_LINE);
+        glPolygonOffset(m_polygonOffsetFactor, m_polygonOffsetUnits);
+    }
+    else
+    {
+        glDisable(GL_POLYGON_OFFSET_LINE);
+    }
+
+    if (m_depthFunc != GL_LESS)
+        glDepthFunc(m_depthFunc);
+
+    if (m_lineWidth != 1.0f)
+        glLineWidth(m_lineWidth);
+
     m_VAO->bind();
     if (m_indices != nullptr)
     {
@@ -340,6 +394,12 @@ void Mesh::draw()
         GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
     }
     m_VAO->unbind();
+
+    if (m_depthFunc != GL_LESS)
+        glDepthFunc(GL_LESS);
+
+    if (m_lineWidth != 1.0f)
+        glLineWidth(1.0f);
 }
 
 void ivf::Mesh::drawAsPrim(GLuint prim)

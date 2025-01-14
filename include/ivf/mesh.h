@@ -57,8 +57,12 @@ private:
     glm::vec3 m_position;
 
     bool m_generateNormals;
-
     bool m_enabled;
+
+    float m_polygonOffsetFactor;
+    float m_polygonOffsetUnits;
+    GLenum m_depthFunc;
+    GLfloat m_lineWidth;
 
     void setupPrim();
 
@@ -75,6 +79,16 @@ public:
 
     void setGenerateNormals(bool flag);
     bool generateNormals();
+
+    void setPolygonOffset(float factor, float units);
+    float polygonOffsetFactor();
+    float polygonOffsetUnits();
+
+    void setDepthFunc(GLenum func);
+    GLenum depthFunc();
+
+    void setLineWidth(GLfloat width);
+    GLfloat lineWidth();
 
     void setVertexAttrId(GLuint id);
     void setColorAttrId(GLuint id);

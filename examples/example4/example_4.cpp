@@ -13,15 +13,9 @@ using namespace ivf;
 using namespace ivfui;
 using namespace std;
 
-class ExampleWindow : public GLFWWindow {
-private:
-    CompositeNodePtr m_scene;
-    CameraManipulatorPtr m_camManip;
-
-    bool m_showDemoWindow = false;
-
+class ExampleWindow : public GLFWSceneWindow {
 public:
-    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -31,30 +25,9 @@ public:
 
     int onSetup()
     {
-        glEnable(GL_DEPTH_TEST);
-
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
-        shaderMgr->loadBasicShader();
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
-
-        auto lightMgr = LightManager::create();
-
-        auto pointLight1 = lightMgr->addPointLight();
-        pointLight1->setEnabled(true);
-        pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-        pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-        pointLight1->setAttenuation(1.0, 0.0, 0.0);
-        pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
-        lightMgr->apply();
-
-        m_scene = CompositeNode::create();
-
         auto axis = Axis::create();
+        auto grid = Grid::create();
+        grid->setType(GridType::LinesAndMarkers);
 
         auto material = Material::create();
         material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
@@ -114,43 +87,24 @@ public:
         plane->setMaterial(material);
         plane->setPos(glm::vec3(-3.0, 0.0, 9.0));
 
-        m_scene->add(box);
-        m_scene->add(rbox);
-        m_scene->add(sphere);
-        m_scene->add(capCyl);
-        m_scene->add(opCyl);
-        m_scene->add(cone);
-        m_scene->add(capCone);
-        m_scene->add(dodeka);
-        m_scene->add(capsule);
-        m_scene->add(cappedTube);
-        m_scene->add(tube);
-        m_scene->add(disk);
-        m_scene->add(plane);
+        this->add(box);
+        this->add(rbox);
+        this->add(sphere);
+        this->add(capCyl);
+        this->add(opCyl);
+        this->add(cone);
+        this->add(capCone);
+        this->add(dodeka);
+        this->add(capsule);
+        this->add(cappedTube);
+        this->add(tube);
+        this->add(disk);
+        this->add(plane);
 
-        m_scene->add(axis);
-
-        m_camManip = CameraManipulator::create(this->ref());
+        this->add(axis);
+        this->add(grid);
 
         return 0;
-    }
-
-    void onDraw()
-    {
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        m_scene->draw();
-    }
-
-    void onUpdateOtherUi()
-    {
-        m_camManip->update();
-    }
-
-    void onResize(int width, int height)
-    {
-        m_camManip->update();
     }
 };
 

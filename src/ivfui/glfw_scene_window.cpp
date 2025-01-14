@@ -6,6 +6,7 @@ using namespace ivfui;
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
 #include <ivf/shader_manager.h>
+#include <ivf/font_manager.h>
 
 #include <ivf/stock_shaders.h>
 

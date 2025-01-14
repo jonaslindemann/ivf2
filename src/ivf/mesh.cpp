@@ -17,7 +17,7 @@ glm::vec3 computeNormal(glm::vec3 const &a, glm::vec3 const &b, glm::vec3 const 
     return glm::normalize(glm::cross(c - a, b - a));
 }
 
-Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType) : m_position(0.0f), m_generateNormals(true)
+Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType) : m_position(0.0f), m_generateNormals(true), m_enabled(true)
 {
     m_primType = primType;
     this->setSize(vsize, isize);
@@ -87,6 +87,16 @@ void Mesh::setSize(GLuint vsize, GLuint isize)
     this->setColorAttrId(ShaderManager::instance()->currentProgram()->attribId("aColor"));
     this->setNormalAttrId(ShaderManager::instance()->currentProgram()->attribId("aNormal"));
     this->setTexCoordAttrId(ShaderManager::instance()->currentProgram()->attribId("aTex"));
+}
+
+void ivf::Mesh::setEnabled(bool flag)
+{
+    m_enabled = flag;
+}
+
+bool ivf::Mesh::enabled()
+{
+    return m_enabled;
 }
 
 void ivf::Mesh::setGenerateNormals(bool flag)

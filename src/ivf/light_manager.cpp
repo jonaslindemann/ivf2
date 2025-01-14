@@ -9,7 +9,9 @@ using namespace ivf;
 LightManager *LightManager::m_instance = 0;
 
 LightManager::LightManager()
-    : m_useLighting(true), m_useVertexColors(false), m_useLightingId(-1), m_useVertexColorsId(-1)
+    : m_useLighting(true), m_useVertexColors(false), m_useLightingId(-1), m_useVertexColorsId(-1), m_useTextureId(-1),
+      m_pointLightCountId(-1), m_directionalLightCountId(-1), m_spotLightCountId(-1), m_diffuseColorId(-1),
+      m_specularColorId(-1), m_ambientColorId(-1), m_shininessId(-1), m_alphaId(-1), m_savedState(false)
 {
     m_useLightingId = ShaderManager::instance()->currentProgram()->uniformLoc("useLighting");
     m_useVertexColorsId = ShaderManager::instance()->currentProgram()->uniformLoc("useVertexColors");
@@ -21,6 +23,7 @@ LightManager::LightManager()
     m_specularColorId = ShaderManager::instance()->currentProgram()->uniformLoc("material.specularColor");
     m_ambientColorId = ShaderManager::instance()->currentProgram()->uniformLoc("material.ambientColor");
     m_shininessId = ShaderManager::instance()->currentProgram()->uniformLoc("material.shininess");
+    m_alphaId = ShaderManager::instance()->currentProgram()->uniformLoc("material.alpha");
 
     this->setupDefaultColors();
 }
@@ -160,6 +163,7 @@ void ivf::LightManager::setupDefaultColors()
     this->setDiffuseColor(glm::vec3(1.0, 1.0, 0.0));
     this->setAmbientColor(glm::vec3(0.2, 0.2, 0.2));
     this->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+    this->setAlpha(1.0);
 }
 
 void ivf::LightManager::apply()
@@ -239,6 +243,11 @@ void ivf::LightManager::setAmbientColor(GLfloat red, GLfloat green, GLfloat blue
 void ivf::LightManager::setShininess(float shininess)
 {
     ShaderManager::instance()->currentProgram()->uniformFloat(m_shininessId, shininess);
+}
+
+void ivf::LightManager::setAlpha(float alpha)
+{
+    ShaderManager::instance()->currentProgram()->uniformFloat(m_alphaId, alpha);
 }
 
 void LightManager::saveState()

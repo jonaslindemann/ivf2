@@ -58,6 +58,8 @@ private:
 
     bool m_generateNormals;
 
+    bool m_enabled;
+
     void setupPrim();
 
 public:
@@ -67,6 +69,9 @@ public:
     static std::shared_ptr<Mesh> create(GLuint vsize, GLuint isize = 0);
 
     void setSize(GLuint vsize, GLuint isize = 0);
+
+    void setEnabled(bool flag);
+    bool enabled();
 
     void setGenerateNormals(bool flag);
     bool generateNormals();

@@ -14,6 +14,7 @@ private:
     glm::vec4 m_diffuseColor;
     glm::vec4 m_specularColor;
     glm::vec4 m_ambientColor;
+    float m_alpha;
     float m_shininess;
 
 public:
@@ -28,6 +29,7 @@ public:
     void setUseVertexColor(bool flag);
     void setShininess(float shininess);
     void setUseLighting(bool flag);
+    void setAlpha(float alpha);
     bool useLighting() const;
     bool useTexture() const;
     bool useVertexColor() const;
@@ -35,6 +37,7 @@ public:
     glm::vec4 specularColor() const;
     glm::vec4 ambientColor() const;
     float shininess() const;
+    float alpha() const;
 
     void apply();
 };

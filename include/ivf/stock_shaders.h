@@ -43,12 +43,12 @@ inline const std::string basic_frag_shader_source = R"(
 //
 
 // Blend mode enumeration
-#define BLEND_NORMAL 0
-#define BLEND_MULTIPLY 1
-#define BLEND_ADD 2
-#define BLEND_SCREEN 3
-#define BLEND_OVERLAY 4
-#define BLEND_DECAL 5
+#define TEX_BLEND_NORMAL 0
+#define TEX_BLEND_MULTIPLY 1
+#define TEX_BLEND_ADD 2
+#define TEX_BLEND_SCREEN 3
+#define TEX_BLEND_OVERLAY 4
+#define TEX_BLEND_DECAL 5
 
 out vec4 fragColor;
 
@@ -57,6 +57,7 @@ struct Material
     vec3 diffuseColor;
     vec3 specularColor;
     vec3 ambientColor;
+    float alpha;
     float shininess;
 };
 
@@ -137,13 +138,13 @@ uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 
 uniform Material material;
 
-uniform int blendMode = BLEND_MULTIPLY;
+uniform int blendMode = TEX_BLEND_MULTIPLY;
 uniform float blendFactor = 0.5; // Controls the strength of the blend [0,1]
 
 uniform bool selectionRendering = false;
 uniform uint objectId;
 
-vec4 applyBlendMode(vec4 textureColor, vec4 baseColor);
+vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -203,18 +204,18 @@ void main()
                     if (useFixedTextColor) 
                     {
                         vec4 texSample = vec4(textColor.rgb, texture(texture0, texCoord).r);
-                        fragColor = applyBlendMode(texSample, baseColor);
+                        fragColor = applyTexBlendMode(texSample, baseColor);
                     }
                     else 
                     {
                         vec4 texSample = vec4(result.rgb, texture(texture0, texCoord).r);
-                        fragColor = applyBlendMode(texSample, baseColor);
+                        fragColor = applyTexBlendMode(texSample, baseColor);
                     }
                 } 
                 else 
                 {
                     vec4 texSample = texture(texture0, texCoord);
-                    fragColor = applyBlendMode(texSample, baseColor);
+                    fragColor = applyTexBlendMode(texSample, baseColor);
                 }
             } 
             else 
@@ -230,7 +231,7 @@ void main()
             } 
             else 
             {
-                fragColor = vec4(material.diffuseColor, 1.0);
+                fragColor = vec4(material.diffuseColor, material.alpha);
             }
         }
     }
@@ -332,23 +333,23 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     return (ambient + diffuse + specular);
 }
 
-vec4 applyBlendMode(vec4 textureColor, vec4 baseColor) {
+vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor) {
     vec4 result;
     
     switch(blendMode) {
-        case BLEND_MULTIPLY:
+        case TEX_BLEND_MULTIPLY:
             result = textureColor * baseColor;
             break;
             
-        case BLEND_ADD:
+        case TEX_BLEND_ADD:
             result = min(textureColor + baseColor, vec4(1.0));
             break;
             
-        case BLEND_SCREEN:
+        case TEX_BLEND_SCREEN:
             result = vec4(1.0) - (vec4(1.0) - textureColor) * (vec4(1.0) - baseColor);
             break;
             
-        case BLEND_OVERLAY:
+        case TEX_BLEND_OVERLAY:
             result = vec4(
                 baseColor.r < 0.5 ? (2.0 * baseColor.r * textureColor.r) : (1.0 - 2.0 * (1.0 - baseColor.r) * (1.0 - textureColor.r)),
                 baseColor.g < 0.5 ? (2.0 * baseColor.g * textureColor.g) : (1.0 - 2.0 * (1.0 - baseColor.g) * (1.0 - textureColor.g)),
@@ -357,14 +358,14 @@ vec4 applyBlendMode(vec4 textureColor, vec4 baseColor) {
             );
             break;
             
-        case BLEND_DECAL:
+        case TEX_BLEND_DECAL:
             result = vec4(
                 mix(baseColor.rgb, textureColor.rgb, textureColor.a),
                 baseColor.a
             );
             break;
             
-        case BLEND_NORMAL:
+        case TEX_BLEND_NORMAL:
         default:
             result = textureColor;
             break;

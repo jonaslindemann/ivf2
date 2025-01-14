@@ -171,6 +171,15 @@ bool ivf::ShaderManager::setCurrentProgram(const std::string name)
     }
 }
 
+ProgramPtr ivf::ShaderManager::program(const std::string name)
+{
+    auto it = m_programs.find(name);
+    if (it != m_programs.end())
+        return it->second;
+    else
+        return nullptr;
+}
+
 void ShaderManager::apply()
 {
     m_currentProgram->use();

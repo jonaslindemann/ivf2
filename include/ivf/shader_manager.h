@@ -61,6 +61,8 @@ public:
 
     bool setCurrentProgram(const std::string name);
 
+    ProgramPtr program(const std::string name);
+
     void apply();
 
     void applyProgram(const std::string name);

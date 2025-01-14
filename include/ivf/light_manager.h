@@ -32,6 +32,7 @@ private:
     GLint m_specularColorId;
     GLint m_ambientColorId;
     GLint m_shininessId;
+    GLint m_alphaId;
 
     std::vector<PointLightPtr> m_pointLights;
     std::vector<DirectionalLightPtr> m_dirLights;
@@ -100,6 +101,7 @@ public:
     void setAmbientColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha = 1.0f);
 
     void setShininess(float shininess);
+    void setAlpha(float alpha);
 
     void saveState();
     void restoreState();

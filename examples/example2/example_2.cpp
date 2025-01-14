@@ -3,10 +3,6 @@
 #include <string>
 #include <vector>
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
 #include <ivfui/ui.h>
@@ -39,8 +35,6 @@ public:
 
     int onSetup()
     {
-        glEnable(GL_DEPTH_TEST);
-
         auto shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
@@ -114,7 +108,7 @@ public:
         m_scene->draw();
     }
 
-    void onUpdateOtherUi()
+    void onUpdate()
     {
         m_camManip->update();
     }

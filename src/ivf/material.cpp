@@ -7,7 +7,7 @@ using namespace ivf;
 Material::Material()
     : m_diffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0)), m_ambientColor(glm::vec4(0.2, 0.2, 0.2, 1.0)),
       m_specularColor(glm::vec4(1.0, 1.0, 1.0, 1.0)), m_useLighting(true), m_useVertexColor(false), m_useTexture(false),
-      m_shininess(70.0)
+      m_shininess(70.0), m_alpha(1.0)
 {}
 
 std::shared_ptr<Material> ivf::Material::create()
@@ -45,6 +45,11 @@ void ivf::Material::setUseLighting(bool flag)
     m_useLighting = flag;
 }
 
+void ivf::Material::setAlpha(float alpha)
+{
+    m_alpha = alpha;
+}
+
 bool ivf::Material::useLighting() const
 {
     return m_useLighting;
@@ -80,6 +85,11 @@ float ivf::Material::shininess() const
     return m_shininess;
 }
 
+float ivf::Material::alpha() const
+{
+    return m_alpha;
+}
+
 void ivf::Material::setUseVertexColor(bool flag)
 {
     m_useVertexColor = flag;
@@ -93,4 +103,5 @@ void ivf::Material::apply()
     LightManager::instance()->setAmbientColor(m_ambientColor);
     LightManager::instance()->setSpecularColor(m_specularColor);
     LightManager::instance()->setShininess(m_shininess);
+    LightManager::instance()->setAlpha(m_alpha);
 }

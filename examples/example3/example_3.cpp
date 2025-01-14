@@ -63,6 +63,7 @@ public:
 
         auto axis = Axis::create();
         auto grid = Grid::create();
+        grid->setType(GridType::LinesAndMarkers);
 
         auto sphereMaterial = Material::create();
         sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -92,6 +93,7 @@ public:
         m_scene->add(grid);
 
         m_camManip = CameraManipulator::create(this->ref());
+        m_camManip->setCameraPosition(glm::vec3(0.0, 0.0, 10.0));
 
         return 0;
     }

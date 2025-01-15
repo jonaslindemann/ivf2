@@ -16,18 +16,13 @@ using namespace ivf;
 using namespace ivfui;
 using namespace std;
 
-class ExampleWindow : public GLFWWindow {
+class ExampleWindow : public GLFWSceneWindow {
 private:
-    CompositeNodePtr m_scene;
-    CameraManipulatorPtr m_camManip;
-
     FpsWindowPtr m_fpsWindow;
     TextWindowPtr m_textWindow;
 
-    bool m_showDemoWindow = false;
-
 public:
-    ExampleWindow(int width, int height, std::string title) : GLFWWindow(width, height, title)
+    ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
@@ -37,35 +32,13 @@ public:
 
     int onSetup()
     {
-        glEnable(GL_DEPTH_TEST);
-
         auto fontMgr = FontManager::create();
         fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
-
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
-        shaderMgr->loadBasicShader();
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
-
-        auto lightMgr = LightManager::create();
-        lightMgr->enableLighting();
-
-        auto dirLight = lightMgr->addDirectionalLight();
-        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-        dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
-        dirLight->setEnabled(true);
-
-        lightMgr->apply();
 
         auto material = Material::create();
         material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
         material->setShininess(40.0);
 
-        m_scene = CompositeNode::create();
         auto axis = Axis::create();
 
         auto text = TextNode::create();
@@ -78,39 +51,16 @@ public:
 
         text->setMaterial(material);
 
-        m_scene->add(axis);
-        m_scene->add(text);
+        this->add(axis);
+        this->add(text);
 
         m_fpsWindow = FpsWindow::create();
         m_textWindow = TextWindow::create(text);
 
-        m_camManip = CameraManipulator::create(this->ref());
+        this->addUiWindow(m_fpsWindow);
+        this->addUiWindow(m_textWindow);
 
         return 0;
-    }
-
-    void onDraw()
-    {
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        m_scene->draw();
-    }
-
-    void onDrawUi()
-    {
-        m_fpsWindow->draw();
-        m_textWindow->draw();
-    }
-
-    void onUpdateOtherUi()
-    {
-        m_camManip->update();
-    }
-
-    void onResize(int width, int height)
-    {
-        m_camManip->update();
     }
 };
 

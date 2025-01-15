@@ -204,12 +204,14 @@ void main()
                     if (useFixedTextColor) 
                     {
                         vec4 texSample = vec4(textColor.rgb, texture(texture0, texCoord).r);
-                        fragColor = applyTexBlendMode(texSample, baseColor);
+                        // fragColor = applyTexBlendMode(texSample, baseColor);
+                        fragColor = texSample;
                     }
                     else 
                     {
                         vec4 texSample = vec4(result.rgb, texture(texture0, texCoord).r);
-                        fragColor = applyTexBlendMode(texSample, baseColor);
+                        //fragColor = applyTexBlendMode(texSample, baseColor);
+                        fragColor = texSample;
                     }
                 } 
                 else 

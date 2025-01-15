@@ -10,6 +10,6 @@ else()
     add_library(ivfmath ${INCLUDE_FILES} ${SOURCE_FILES})
     target_include_directories(ivfmath PRIVATE glm::glm)
     install_targets(/lib ivfmath)  
-endif()  
+endif()   
 
  

@@ -4,7 +4,8 @@ using namespace ivf;
 using namespace ivfmath;
 
 ivf::SplineAnimation::SplineAnimation(ivfmath::SplinePtr spline)
-    : m_spline(spline), m_time(0.0f), m_speed(1.0f), m_loop(false), m_animatedNode(nullptr)
+    : m_spline(spline), m_time(0.0f), m_speed(1.0f), m_animatedNode(nullptr), m_mode(SplineAnimMode::Once),
+      m_interpolationMode(SplineInterpolationMode::Time)
 {}
 
 std::shared_ptr<SplineAnimation> ivf::SplineAnimation::create(ivfmath::SplinePtr spline)
@@ -42,14 +43,24 @@ double ivf::SplineAnimation::speed()
     return m_speed;
 }
 
-void ivf::SplineAnimation::setLoop(bool loop)
+void ivf::SplineAnimation::setAnimMode(SplineAnimMode mode)
 {
-    m_loop = loop;
+    m_mode = mode;
 }
 
-bool ivf::SplineAnimation::loop()
+SplineAnimMode ivf::SplineAnimation::animMode()
 {
-    return m_loop;
+    return m_mode;
+}
+
+void ivf::SplineAnimation::setInterpolationMode(SplineInterpolationMode mode)
+{
+    m_interpolationMode = mode;
+}
+
+SplineInterpolationMode ivf::SplineAnimation::interpolationMode()
+{
+    return m_interpolationMode;
 }
 
 void ivf::SplineAnimation::setTime(double time)
@@ -67,19 +78,72 @@ void ivf::SplineAnimation::update(double dt)
     if (m_spline == nullptr)
         return;
 
-    m_time += dt * m_speed;
+    if (m_interpolationMode == SplineInterpolationMode::Time)
+    {
+        m_time += dt * m_speed;
 
-    if (m_time > m_spline->size() - 1)
-    {
-        if (m_loop)
-            m_time = 0.0;
+        if (m_time > m_spline->size() - 1)
+        {
+            if (m_mode == SplineAnimMode::Once)
+                m_time = m_spline->size() - 1;
+            else if (m_mode == SplineAnimMode::Loop)
+                m_time = 0.0;
+            else if (m_mode == SplineAnimMode::PingPong)
+            {
+                m_time = m_spline->size() - 1;
+                m_speed = -m_speed;
+            }
+        }
         else
-            m_time = m_spline->size() - 1;
+        {
+            if (m_time < 0.0)
+            {
+                if (m_mode == SplineAnimMode::Once)
+                    m_time = 0.0;
+                else if (m_mode == SplineAnimMode::Loop)
+                    m_time = m_spline->size() - 1;
+                else if (m_mode == SplineAnimMode::PingPong)
+                {
+                    m_time = 0.0;
+                    m_speed = -m_speed;
+                }
+            }
+        }
+
+        if (m_animatedNode != nullptr)
+            m_animatedNode->setPos(m_spline->positionByT(m_time));
     }
-    if (m_animatedNode != nullptr)
+    else
     {
-        auto pos = m_spline->getPointByT(m_time);
-        std::printf("Time: %f, pos: %f %f %f\n", m_time, pos.x, pos.y, pos.z);
-        m_animatedNode->setPos(m_spline->getPointByT(m_time));
+        m_distance += dt * m_speed;
+        if (m_distance > m_spline->totalLength())
+        {
+            if (m_mode == SplineAnimMode::Once)
+                m_distance = m_spline->totalLength();
+            else if (m_mode == SplineAnimMode::Loop)
+                m_distance = 0.0;
+            else if (m_mode == SplineAnimMode::PingPong)
+            {
+                m_distance = m_spline->totalLength();
+                m_speed = -m_speed;
+            }
+        }
+        else
+        {
+            if (m_distance < 0.0)
+            {
+                if (m_mode == SplineAnimMode::Once)
+                    m_distance = 0.0;
+                else if (m_mode == SplineAnimMode::Loop)
+                    m_distance = m_spline->totalLength();
+                else if (m_mode == SplineAnimMode::PingPong)
+                {
+                    m_distance = 0.0;
+                    m_speed = -m_speed;
+                }
+            }
+        }
+        if (m_animatedNode != nullptr)
+            m_animatedNode->setPos(m_spline->positionByDistance(m_distance));
     }
 }

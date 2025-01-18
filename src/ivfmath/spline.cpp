@@ -1,159 +1,115 @@
 #include <ivfmath/spline.h>
 
+#include <algorithm>
+
 using namespace ivfmath;
 
-glm::vec3 Spline::interpolate(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3,
-                              float t) const
-{
-    // Catmull-Rom basis matrix coefficients
-    float t2 = t * t;
-    float t3 = t2 * t;
-
-    // Catmull-Rom spline blending functions
-    float b0 = -0.5f * t3 + t2 - 0.5f * t;
-    float b1 = 1.5f * t3 - 2.5f * t2 + 1.0f;
-    float b2 = -1.5f * t3 + 2.0f * t2 + 0.5f * t;
-    float b3 = 0.5f * t3 - 0.5f * t2;
-
-    return b0 * p0 + b1 * p1 + b2 * p2 + b3 * p3;
-}
-
-void Spline::calculateLengths()
-{
-    m_segmentLengths.clear();
-    m_totalLength = 0.0f;
-
-    if (m_controlPoints.size() < 2)
-        return;
-
-    // Handle cases with less than 4 points
-    if (m_controlPoints.size() == 2)
-    {
-        float length = glm::length(m_controlPoints[1] - m_controlPoints[0]);
-        m_segmentLengths.push_back(length);
-        m_totalLength = length;
-        return;
-    }
-
-    // Calculate length for each segment
-    for (size_t i = 0; i < m_controlPoints.size() - 1; ++i)
-    {
-        float segmentLength = 0.0f;
-        glm::vec3 prevPoint = getPointByT(i);
-
-        // Approximate length using small steps
-        for (int j = 1; j <= LENGTH_SAMPLES; ++j)
-        {
-            float t = static_cast<float>(j) / LENGTH_SAMPLES;
-            glm::vec3 currentPoint = getPointByT(i + t);
-            segmentLength += glm::length(currentPoint - prevPoint);
-            prevPoint = currentPoint;
-        }
-
-        m_segmentLengths.push_back(segmentLength);
-        m_totalLength += segmentLength;
-    }
-}
-
-ivfmath::Spline::Spline() : m_totalLength(0.0f), m_controlPoints(), m_segmentLengths()
+ivfmath::Spline::Spline()
 {}
 
-std::shared_ptr<Spline> Spline::create()
+std::shared_ptr<Spline> ivfmath::Spline::create()
 {
     return std::make_shared<Spline>();
 }
 
 void Spline::addPoint(const glm::vec3 &point)
 {
-    m_controlPoints.push_back(point);
+    m_points.push_back(point);
+    updateDistances();
+}
 
-    // If we have enough points for a complete segment, recalculate lengths
-    if (m_controlPoints.size() >= 4)
+void Spline::updateDistances()
+{
+    m_distances.clear();
+    m_distances.push_back(0.0f);
+
+    for (size_t i = 1; i < m_points.size(); ++i)
     {
-        calculateLengths();
+        float segmentLength = glm::length(m_points[i] - m_points[i - 1]);
+        m_distances.push_back(m_distances.back() + segmentLength);
     }
 }
 
-// Get point by parameter t (0 <= t <= n-1)
-glm::vec3 Spline::getPointByT(float t) const
+float Spline::distanceToT(float distance) const
 {
-    if (m_controlPoints.size() < 2)
+    if (m_points.size() < 2)
+        return 0.0f;
+
+    // Find the segment containing this distance
+    auto it = std::lower_bound(m_distances.begin(), m_distances.end(), distance);
+    if (it == m_distances.begin())
+        return 0.0f;
+    if (it == m_distances.end())
+        return static_cast<float>(m_points.size() - 1);
+
+    // Get segment index and interpolation factor
+    size_t index = std::distance(m_distances.begin(), it) - 1;
+    float segmentStart = m_distances[index];
+    float segmentLength = m_distances[index + 1] - segmentStart;
+    float segmentT = (distance - segmentStart) / segmentLength;
+
+    return static_cast<float>(index) + segmentT;
+}
+
+glm::vec3 Spline::positionByDistance(float distance) const
+{
+    return positionByT(distanceToT(distance));
+}
+
+glm::vec3 Spline::positionByT(float t) const
+{
+    if (m_points.size() < 2)
     {
-        throw std::runtime_error("Not enough control points for interpolation");
+        return m_points.empty() ? glm::vec3(0.0f) : m_points[0];
     }
 
-    // Handle cases with less than 4 points
-    if (m_controlPoints.size() == 2)
+    // Clamp t to valid range
+    t = std::max(0.0f, std::min(t, static_cast<float>(m_points.size() - 1)));
+
+    // Find the segment containing t
+    size_t segment = static_cast<size_t>(t);
+    if (segment >= m_points.size() - 1)
     {
-        float normalizedT = t / (m_controlPoints.size() - 1);
-        normalizedT = std::max(0.0f, std::min(1.0f, normalizedT));
-        return glm::mix(m_controlPoints[0], m_controlPoints[1], normalizedT);
+        return m_points.back();
     }
 
-    // For spline interpolation, we need at least 4 points
-    // Create virtual points for the first and last segments if needed
-    std::vector<glm::vec3> extendedPoints = m_controlPoints;
-    if (m_controlPoints.size() == 3)
-    {
-        // Add virtual end point
-        glm::vec3 virtualEnd = m_controlPoints[2] + (m_controlPoints[2] - m_controlPoints[1]);
-        extendedPoints.push_back(virtualEnd);
-    }
+    // Get surrounding points for interpolation
+    glm::vec3 p0 = segment > 0 ? m_points[segment - 1] : m_points[0];
+    glm::vec3 p1 = m_points[segment];
+    glm::vec3 p2 = m_points[segment + 1];
+    glm::vec3 p3 = segment < m_points.size() - 2 ? m_points[segment + 2] : p2;
 
-    // Normalize t to the range [0, n-1] where n is the number of segments
-    float maxT = static_cast<float>(m_controlPoints.size() - 1);
-    t = std::max(0.0f, std::min(t, maxT));
-
-    // Find the segment and local parameter
-    int segment = std::min(static_cast<int>(t), static_cast<int>(extendedPoints.size()) - 4);
     float localT = t - static_cast<float>(segment);
-
-    return interpolate(m_controlPoints[segment], m_controlPoints[segment + 1], m_controlPoints[segment + 2],
-                       m_controlPoints[segment + 3], localT);
+    return interpolate(p0, p1, p2, p3, localT);
 }
 
-// Get point by distance along the spline (0 <= distance <= totalLength)
-glm::vec3 Spline::getPointByDistance(float distance) const
+glm::vec3 Spline::interpolate(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec3 &p2, const glm::vec3 &p3,
+                              float t) const
 {
-    if (m_controlPoints.size() < 4)
-    {
-        throw std::runtime_error("Not enough control points for interpolation");
-    }
+    // Catmull-Rom spline interpolation
+    float t2 = t * t;
+    float t3 = t2 * t;
 
-    if (distance <= 0.0f)
-        return m_controlPoints[1];
-    if (distance >= m_totalLength)
-        return m_controlPoints[m_controlPoints.size() - 2];
+    glm::vec3 a = p1;
+    glm::vec3 b = 0.5f * (p2 - p0);
+    glm::vec3 c = 0.5f * (2.0f * p0 - 5.0f * p1 + 4.0f * p2 - p3);
+    glm::vec3 d = 0.5f * (-p0 + 3.0f * p1 - 3.0f * p2 + p3);
 
-    // Find the segment containing the distance
-    float accumulatedLength = 0.0f;
-    size_t segment = 0;
-
-    for (size_t i = 0; i < m_segmentLengths.size(); ++i)
-    {
-        if (accumulatedLength + m_segmentLengths[i] >= distance)
-        {
-            segment = i;
-            break;
-        }
-        accumulatedLength += m_segmentLengths[i];
-    }
-
-    // Calculate local parameter t based on distance within segment
-    float segmentDistance = distance - accumulatedLength;
-    float localT = segmentDistance / m_segmentLengths[segment];
-
-    return getPointByT(segment + localT);
+    return a + b * t + c * t2 + d * t3;
 }
 
-// Get total spline length
-float Spline::getLength() const
+float Spline::totalLength() const
 {
-    return m_totalLength;
+    return m_distances.empty() ? 0.0f : m_distances.back();
 }
 
-// Get number of control points
 size_t Spline::size() const
 {
-    return m_controlPoints.size();
+    return m_points.size();
+}
+
+void Spline::clear()
+{
+    m_points.clear();
+    m_distances.clear();
 }

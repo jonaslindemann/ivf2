@@ -23,6 +23,8 @@ using namespace std;
 class ExampleWindow : public GLFWSceneWindow {
 private:
     CubePtr m_cube;
+    SpherePtr m_sphere;
+    LineTracePtr m_trace;
     MaterialPtr m_yellowMat;
     MaterialPtr m_selectionMaterial;
     SplineAnimationPtr m_splineAnim;
@@ -57,20 +59,49 @@ public:
         m_cube = Cube::create();
         m_cube->setMaterial(m_yellowMat);
 
+        m_sphere = Sphere::create();
+        m_sphere->setMaterial(redMat);
+        m_sphere->setRadius(0.1);
+        m_sphere->refresh();
+
         m_splineAnim = SplineAnimation::create();
 
         auto spline = Spline::create();
         spline->addPoint(glm::vec3(0.0f, 0.0f, 0.0f));
-        spline->addPoint(glm::vec3(1.0f, 2.0f, 0.0f));
+        spline->addPoint(glm::vec3(1.0f, 2.0f, 1.0f));
         spline->addPoint(glm::vec3(2.0f, 0.0f, 0.0f));
-        spline->addPoint(glm::vec3(3.0f, 1.0f, 0.0f));
+        spline->addPoint(glm::vec3(3.0f, 1.0f, -1.0f));
+
+        auto p1 = Sphere::create(0.05);
+        p1->setMaterial(m_yellowMat);
+        p1->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+
+        auto p2 = Sphere::create(0.05);
+        p2->setMaterial(m_yellowMat);
+        p2->setPos(glm::vec3(1.0f, 2.0f, 1.0f));
+
+        auto p3 = Sphere::create(0.05);
+        p3->setMaterial(m_yellowMat);
+        p3->setPos(glm::vec3(2.0f, 0.0f, 0.0f));
+
+        auto p4 = Sphere::create(0.05);
+        p4->setMaterial(m_yellowMat);
+        p4->setPos(glm::vec3(3.0f, 1.0f, -1.0f));
 
         m_splineAnim->setSpline(spline);
-        m_splineAnim->setAnimatedNode(m_cube);
-        m_splineAnim->setSpeed(0.1);
-        m_splineAnim->setLoop(true);
+        m_splineAnim->setAnimatedNode(m_sphere);
+        m_splineAnim->setInterpolationMode(SplineInterpolationMode::Distance);
+        m_splineAnim->setSpeed(1.0);
+        m_splineAnim->setAnimMode(SplineAnimMode::PingPong);
 
-        this->add(m_cube);
+        m_trace = LineTrace::create(300);
+
+        this->add(m_sphere);
+        this->add(p1);
+        this->add(p2);
+        this->add(p3);
+        this->add(p4);
+        this->add(m_trace);
 
         return 0;
     }
@@ -78,6 +109,9 @@ public:
     virtual void onUpdate()
     {
         m_splineAnim->update(1.0 / 60.0);
+
+        m_trace->add(m_sphere->pos());
+        m_trace->refresh();
     }
 };
 

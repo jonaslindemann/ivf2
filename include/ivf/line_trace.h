@@ -28,8 +28,8 @@ public:
     void setVertex(int idx, glm::vec3 &vertex);
 
     void reset();
-    void start(glm::vec3 &vertex);
-    void add(glm::vec3 &vertex);
+    void start(glm::vec3 vertex);
+    void add(glm::vec3 vertex);
     void setSize(size_t size);
 
     void refresh();

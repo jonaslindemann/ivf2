@@ -68,7 +68,7 @@ void ivf::LineTrace::reset()
     m_firstAdd = true;
 }
 
-void ivf::LineTrace::start(glm::vec3 &vertex)
+void ivf::LineTrace::start(glm::vec3 vertex)
 {
     for (auto i = 0; i < m_numVertices; i++)
         mesh()->vertices()->setVertex(i, vertex.x, vertex.y, vertex.z);
@@ -76,7 +76,7 @@ void ivf::LineTrace::start(glm::vec3 &vertex)
     this->refresh();
 }
 
-void ivf::LineTrace::add(glm::vec3 &vertex)
+void ivf::LineTrace::add(glm::vec3 vertex)
 {
     if (m_firstAdd)
     {

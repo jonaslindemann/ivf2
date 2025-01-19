@@ -11,6 +11,7 @@
 #include <ivf/stock_shaders.h>
 #include <ivf/blur_effect.h>
 #include <ivf/spline_animation.h>
+#include <ivf/keyframe_animation.h>
 
 #include <ivfmath/spline.h>
 
@@ -24,10 +25,13 @@ class ExampleWindow : public GLFWSceneWindow {
 private:
     CubePtr m_cube;
     SpherePtr m_sphere;
-    LineTracePtr m_trace;
+    LineTracePtr m_trace1;
+    LineTracePtr m_trace2;
     MaterialPtr m_yellowMat;
     MaterialPtr m_selectionMaterial;
     SplineAnimationPtr m_splineAnim;
+    KeyframeAnimationPtr m_keyframeAnim;
+    KeyframeInterpolatorPtr m_keyframeInterpolator;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -57,6 +61,7 @@ public:
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
         m_cube = Cube::create();
+        m_cube->setSize(0.5);
         m_cube->setMaterial(m_yellowMat);
 
         m_sphere = Sphere::create();
@@ -94,14 +99,32 @@ public:
         m_splineAnim->setSpeed(1.0);
         m_splineAnim->setAnimMode(SplineAnimMode::PingPong);
 
-        m_trace = LineTrace::create(300);
+        m_keyframeInterpolator = KeyframeInterpolator::create();
+        m_keyframeInterpolator->addKeyframe(
+            KeyframeData(0.0, glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0)));
+        m_keyframeInterpolator->addKeyframe(
+            KeyframeData(5.0, glm::vec3(0.0, 2.0, 0.0), glm::vec3(45.0, 0.0, 0.0), glm::vec3(1.0, 1.0, 1.0)));
+        m_keyframeInterpolator->addKeyframe(
+            KeyframeData(10.0, glm::vec3(-3.0, 2.0, 0.0), glm::vec3(0.0, 45.0, 0.0), glm::vec3(1.0, 1.0, 1.0)));
+        m_keyframeInterpolator->addKeyframe(
+            KeyframeData(15.0, glm::vec3(-3.0, 0.0, -3.0), glm::vec3(0.0, 0.0, 45.0), glm::vec3(1.0, 1.0, 1.0)));
+        m_keyframeInterpolator->setInterpolationType(InterpolationType::CatmullRom);
+
+        m_keyframeAnim = KeyframeAnimation::create(m_cube);
+        m_keyframeAnim->setInterpolator(m_keyframeInterpolator);
+        m_keyframeAnim->play();
+
+        m_trace1 = LineTrace::create(300);
+        m_trace2 = LineTrace::create(300);
 
         this->add(m_sphere);
         this->add(p1);
         this->add(p2);
         this->add(p3);
         this->add(p4);
-        this->add(m_trace);
+        this->add(m_cube);
+        this->add(m_trace1);
+        this->add(m_trace2);
 
         return 0;
     }
@@ -110,8 +133,13 @@ public:
     {
         m_splineAnim->update(1.0 / 60.0);
 
-        m_trace->add(m_sphere->pos());
-        m_trace->refresh();
+        m_trace1->add(m_sphere->pos());
+        m_trace1->refresh();
+
+        m_trace2->add(m_cube->pos());
+        m_trace2->refresh();
+
+        m_keyframeAnim->update(1.0 / 60.0);
     }
 };
 

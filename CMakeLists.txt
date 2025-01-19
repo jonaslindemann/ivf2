@@ -19,6 +19,7 @@ find_package(glfw3 CONFIG REQUIRED)
 #find_package(glm CONFIG REQUIRED)
 find_package(Stb REQUIRED) 
 find_package(Freetype REQUIRED) 
+find_package(Assimp CONFIG REQUIRED)
 
 #if(WIN32)
 #    set(CMAKE_DEBUG_POSTFIX d)

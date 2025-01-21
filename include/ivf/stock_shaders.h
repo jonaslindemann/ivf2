@@ -64,6 +64,8 @@ struct Material
 struct DirLight 
 {
     bool enabled;
+    bool useViewSpace;
+
     vec3 direction;	
 
     vec3 ambientColor;
@@ -74,6 +76,8 @@ struct DirLight
 struct PointLight 
 {
     bool enabled;
+    bool useViewSpace;
+
     vec3 position;    
 
     float constant;
@@ -88,8 +92,11 @@ struct PointLight
 struct SpotLight 
 {
     bool enabled;
+    bool useViewSpace;
+
     vec3 position;
     vec3 direction;
+
     float cutOff;
     float outerCutOff;
   
@@ -106,6 +113,7 @@ in vec3 normal;
 in vec3 fragPos;  
 in vec4 color;
 in vec2 texCoord;
+in vec3 viewFragPos;  // View space position
 
 uniform vec3 lightPos; 
 uniform vec3 viewPos; 
@@ -244,7 +252,22 @@ void main()
 // calculates the color when using a directional light.
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
-    vec3 lightDir = normalize(-light.direction);
+    // vec3 lightDir = normalize(-light.direction);
+
+    // --> UPDATED
+
+    vec3 viewDirMod;
+    vec3 lightDir;
+    
+    if (light.useViewSpace) {
+        lightDir = normalize(-light.direction);  // Direction already in view space
+        viewDirMod = normalize(-viewFragPos);
+    } else {
+        lightDir = normalize(-light.direction);  // Direction in world space
+        viewDirMod = normalize(viewPos - fragPos);
+    }
+
+    // <--
 
     // diffuse shading
 
@@ -253,7 +276,7 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     // specular shading
 
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(viewDirMod, reflectDir), 0.0), material.shininess);
 
     // combine results
 
@@ -266,7 +289,27 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 // calculates the color when using a point light.
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-    vec3 lightDir = normalize(light.position - fragPos);
+    //vec3 lightDir = normalize(light.position - fragPos);
+
+    // --> UPDATED
+
+    vec3 lightDir;
+    vec3 viewDirMod;
+    float distance;
+    
+    if (light.useViewSpace) {
+        // View space calculations
+        lightDir = normalize(light.position - viewFragPos);
+        viewDirMod = normalize(-viewFragPos);
+        distance = length(light.position - viewFragPos);
+    } else {
+        // World space calculations
+        lightDir = normalize(light.position - fragPos);
+        viewDirMod = normalize(viewPos - fragPos);
+        distance = length(light.position - fragPos);
+    }
+
+    // <--
  
     // diffuse shading
 
@@ -275,11 +318,11 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // specular shading
 
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(viewDirMod, reflectDir), 0.0), material.shininess);
 
     // attenuation
 
-    float distance = length(light.position - fragPos);
+    // float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
     // combine results
@@ -298,8 +341,27 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 // calculates the color when using a spot light.
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-    vec3 lightDir = normalize(light.position - fragPos);
+    // vec3 lightDir = normalize(light.position - fragPos);
     
+    // --> UPDATED
+
+    vec3 lightDir;
+    vec3 viewDirMod;
+    float distance;
+    
+    if (light.useViewSpace) {
+        // View space calculations
+        lightDir = normalize(light.position - viewFragPos);
+        viewDirMod = normalize(-viewFragPos);
+        distance = length(light.position - viewFragPos);
+    } else {
+        // World space calculations
+        lightDir = normalize(light.position - fragPos);
+        viewDirMod = normalize(viewPos - fragPos);
+        distance = length(light.position - fragPos);
+    }
+
+    // <--
     // diffuse shading
 
     float diff = max(dot(normal, lightDir), 0.0);
@@ -307,11 +369,11 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     // specular shading
 
     vec3 reflectDir = reflect(-lightDir, normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float spec = pow(max(dot(viewDirMod, reflectDir), 0.0), material.shininess);
 
     // attenuation
 
-    float distance = length(light.position - fragPos);
+    // float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
 
     // spotlight intensity

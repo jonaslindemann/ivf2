@@ -4,27 +4,26 @@
 
 namespace ivf {
 
-	class PointLight : public Light {
-	private:
-		float m_constAttenuation;
-		float m_linearAttenuation;
-		float m_quadraticAttenuation;
-	public:
-		PointLight();
+class PointLight : public Light {
+private:
+    float m_constAttenuation;
+    float m_linearAttenuation;
+    float m_quadraticAttenuation;
 
-		static std::shared_ptr<PointLight> create();
+public:
+    PointLight();
 
-		void setAttenuation(float cnst, float linear, float quadratic);
+    static std::shared_ptr<PointLight> create();
 
-		float constAttenuation();
-		float linearAttenutation();
-		float quadraticAttenuation();
+    void setAttenuation(float cnst, float linear, float quadratic);
 
-		void apply() override;
-	};
+    float constAttenuation();
+    float linearAttenutation();
+    float quadraticAttenuation();
 
-	typedef std::shared_ptr<PointLight> PointLightPtr;
+    void apply() override;
+};
 
-}
+typedef std::shared_ptr<PointLight> PointLightPtr;
 
-
+} // namespace ivf

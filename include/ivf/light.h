@@ -8,47 +8,50 @@
 
 namespace ivf {
 
-	class Light : public GLBase {
-	private:
-		glm::vec3 m_position;
-		glm::vec3 m_diffuseColor;
-		glm::vec3 m_specularColor;
-		glm::vec3 m_ambientColor;
-		bool m_enabled;
-		int m_index;
-		std::string m_lightArrayName;
-	public:
-		Light();
+class Light : public GLBase {
+private:
+    glm::vec3 m_position;
+    glm::vec3 m_diffuseColor;
+    glm::vec3 m_specularColor;
+    glm::vec3 m_ambientColor;
+    bool m_enabled;
+    bool m_useViewSpace;
+    int m_index;
+    std::string m_lightArrayName;
 
-		static std::shared_ptr<Light> create();
+public:
+    Light();
 
-		void setPosition(glm::vec3 pos);
+    static std::shared_ptr<Light> create();
 
-		void setDiffuseColor(glm::vec3 color);
-		void setSpecularColor(glm::vec3 color);
-		void setAmbientColor(glm::vec3 color);
+    void setPosition(glm::vec3 pos);
 
-		void setIndex(int idx);
+    void setDiffuseColor(glm::vec3 color);
+    void setSpecularColor(glm::vec3 color);
+    void setAmbientColor(glm::vec3 color);
 
-		void setLightArrayName(std::string name);
-		std::string lightArrayName();
+    void setIndex(int idx);
 
-		glm::vec3 position();
+    void setLightArrayName(std::string name);
+    std::string lightArrayName();
 
-		glm::vec3 diffuseColor();
-		glm::vec3 specularColor();
-		glm::vec3 ambientColor();
+    glm::vec3 position();
 
-		void setEnabled(bool flag);
-		bool enabled();
+    glm::vec3 diffuseColor();
+    glm::vec3 specularColor();
+    glm::vec3 ambientColor();
 
-		int index();
+    void setEnabled(bool flag);
+    bool enabled();
 
-		virtual void apply();
-	};
+    void setUseViewSpace(bool flag);
+    bool useViewSpace();
 
-	typedef std::shared_ptr<Light> LightPtr;
+    int index();
 
-}
+    virtual void apply();
+};
 
+typedef std::shared_ptr<Light> LightPtr;
 
+} // namespace ivf

@@ -42,16 +42,24 @@ public:
         auto grid = Grid::create();
         grid->setType(GridType::Markers);
 
-        auto model = ModelLoader::loadModel("assets/tie3.ac");
+        auto box = Box::create();
+        box->setSize(0.5, 0.5, 0.5);
+        box->refresh();
+
+        auto model = ModelLoader::loadModel("assets/city.ac");
 
         auto material = Material::create();
-        material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.8, 1.0));
-        material->setAmbientColor(glm::vec4(0.2, 0.2, 0.2, 1.0));
+        material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
+        material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
+        material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
         model->setMaterial(material);
+
+        box->setMaterial(material);
 
         this->add(axis);
         this->add(grid);
         this->add(model);
+        this->add(box);
 
         return 0;
     }

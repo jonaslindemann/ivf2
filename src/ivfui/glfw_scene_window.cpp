@@ -118,10 +118,23 @@ int ivfui::GLFWSceneWindow::doSetup()
     lightMgr->enableLighting();
 
     auto dirLight = lightMgr->addDirectionalLight();
+    dirLight->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
     dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
+    dirLight->setDirection(glm::vec3(-1.0, -2.0, -3.0));
     dirLight->setEnabled(true);
     lightMgr->apply();
+
+    /*
+    auto pointLight = lightMgr->addPointLight();
+    pointLight->setAmbientColor(glm::vec3(0.1, 0.1, 0.1));
+    pointLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+    pointLight->setPosition(glm::vec3(0.0, 0.0, 0.0));
+
+    pointLight->setPosition(glm::vec3(10.0, 10.0, 5.0));
+    pointLight->setEnabled(true);
+
+    lightMgr->apply();
+*/
 
     auto retVal = onSetup();
 

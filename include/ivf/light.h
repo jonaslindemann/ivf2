@@ -15,7 +15,6 @@ private:
     glm::vec3 m_specularColor;
     glm::vec3 m_ambientColor;
     bool m_enabled;
-    bool m_useViewSpace;
     int m_index;
     std::string m_lightArrayName;
 
@@ -43,9 +42,6 @@ public:
 
     void setEnabled(bool flag);
     bool enabled();
-
-    void setUseViewSpace(bool flag);
-    bool useViewSpace();
 
     int index();
 

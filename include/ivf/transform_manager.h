@@ -47,7 +47,8 @@ private:
 public:
     static TransformManager *instance()
     {
-        if (!m_instance) {
+        if (!m_instance)
+        {
             if (!m_instance)
                 m_instance = new TransformManager();
         }
@@ -56,7 +57,8 @@ public:
 
     static TransformManager *create()
     {
-        if (!m_instance) {
+        if (!m_instance)
+        {
             if (!m_instance)
                 m_instance = new TransformManager();
         }
@@ -111,6 +113,8 @@ public:
     void enableModelMatrix();
     void enableProjectionMatrix();
     void enableViewMatrix();
+
+    glm::mat4 &viewMatrix();
 };
 
 typedef TransformManager *TransformManagerPtr;

@@ -7,6 +7,8 @@
 
 #include <glm/glm.hpp>
 
+#include <ivf/light_manager.h>
+
 namespace ivfui {
 
 class CameraManipulator {
@@ -33,6 +35,8 @@ private:
     glm::vec3 m_cameraPosition;
     glm::vec3 m_cameraNewPos;
     glm::vec3 m_cameraNewTarget;
+
+    ivf::DirectionalLightPtr m_headlight;
 
     double m_fov;
     double m_nearZ;
@@ -64,6 +68,9 @@ public:
     double farZ();
 
     void setMouseScaling(double sx, double sy);
+
+    void setHeadlight(ivf::DirectionalLightPtr dirLight);
+    ivf::DirectionalLightPtr headlight();
 };
 
 typedef std::shared_ptr<CameraManipulator> CameraManipulatorPtr;

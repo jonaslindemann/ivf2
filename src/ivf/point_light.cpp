@@ -2,6 +2,7 @@
 
 #include <ivf/light_manager.h>
 #include <ivf/shader_manager.h>
+#include <ivf/transform_manager.h>
 
 #include <sstream>
 #include <iostream>
@@ -58,5 +59,4 @@ void ivf::PointLight::apply()
     ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "constant", constAttenuation());
     ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "linear", linearAttenutation());
     ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "quadratic", quadraticAttenuation());
-    ShaderManager::instance()->currentProgram()->uniformBool(prefix + "useViewSpace", useViewSpace());
 }

@@ -85,6 +85,34 @@ void ivfui::GLFWSceneWindow::clearEffects()
     m_postProcessor->clearEffects();
 }
 
+void ivfui::GLFWSceneWindow::enableHeadlight()
+{
+    auto lightMgr = ivf::LightManager::instance();
+
+    if (lightMgr->dirLightCount() == 0)
+    {
+        auto dirLight = lightMgr->addDirectionalLight();
+        dirLight->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
+        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight->setDirection(glm::vec3(-1.0, -2.0, -3.0));
+        dirLight->setEnabled(true);
+        lightMgr->apply();
+
+        m_camManip->setHeadlight(dirLight);
+    }
+    else
+    {
+        auto dirLight = lightMgr->getDirectionalLight(0);
+        m_camManip->setHeadlight(dirLight);
+    }
+}
+
+void ivfui::GLFWSceneWindow::disableHeadlight()
+{
+    m_camManip->setHeadlight(nullptr);
+}
+
 ivf::CompositeNodePtr ivfui::GLFWSceneWindow::scene()
 {
     return m_scene;
@@ -120,6 +148,7 @@ int ivfui::GLFWSceneWindow::doSetup()
     auto dirLight = lightMgr->addDirectionalLight();
     dirLight->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
     dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+    dirLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
     dirLight->setDirection(glm::vec3(-1.0, -2.0, -3.0));
     dirLight->setEnabled(true);
     lightMgr->apply();

@@ -44,5 +44,4 @@ void ivf::DirectionalLight::apply()
     ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "position", position());
     ShaderManager::instance()->currentProgram()->uniformBool(prefix + "enabled", enabled());
     ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "direction", direction());
-    ShaderManager::instance()->currentProgram()->uniformBool(prefix + "useViewSpace", useViewSpace());
 }

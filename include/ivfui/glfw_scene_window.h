@@ -60,6 +60,9 @@ public:
     void addEffect(ivf::EffectPtr effect);
     void clearEffects();
 
+    void enableHeadlight();
+    void disableHeadlight();
+
     ivf::CompositeNodePtr scene();
 
     ivfui::CameraManipulatorPtr cameraManipulator();

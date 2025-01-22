@@ -16,7 +16,7 @@ CameraManipulator::CameraManipulator(GLFWwindow *window)
       m_cameraPosition(glm::vec3(0.0, 0.0, 5.0)), m_cameraNewPos(m_cameraPosition), m_cameraNewTarget(m_cameraTarget),
       m_leftMouseButton(false), m_middleMouseButton(false), m_rightMouseButton(false), m_anyMouseButton(false),
       m_shiftKey(false), m_ctrlKey(false), m_altKey(false), m_fov(45.0), m_nearZ(1.0), m_farZ(100.0),
-      m_mouseScaleX(0.01), m_mouseScaleY(0.01)
+      m_mouseScaleX(0.01), m_mouseScaleY(0.01), m_headlight(nullptr)
 {}
 
 std::shared_ptr<CameraManipulator> ivfui::CameraManipulator::create(GLFWwindow *window)
@@ -54,45 +54,8 @@ void CameraManipulator::update()
 {
     TransformManager *xfmMgr = TransformManager::instance();
 
-    /*
-    // Handles key inputs
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-    {
-        m_position += m_speed * m_orientation;
-    }
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-    {
-        m_position += m_speed * -glm::normalize(glm::cross(m_orientation, m_up));
-    }
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-    {
-        m_position += m_speed * -m_orientation;
-    }
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-    {
-        m_position += m_speed * glm::normalize(glm::cross(m_orientation, m_up));
-    }
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-    {
-        m_position += m_speed * m_up;
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS)
-    {
-        m_position += m_speed * -m_up;
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-    {
-        m_speed = 0.1f;
-    }
-    else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
-    {
-        m_speed = 0.025f;
-    }
-
-    */
-
-    // glfwGetWindowSize(m_window, &m_width, &m_height);
     int width, height;
+
     glfwGetFramebufferSize(m_window, &width, &height);
 
     if ((width != m_width) || (height != m_height))
@@ -162,6 +125,12 @@ void CameraManipulator::update()
         xfmMgr->identity();
         xfmMgr->lookAt(m_cameraNewPos, m_cameraNewTarget);
 
+        if (m_headlight)
+        {
+            m_headlight->setDirection(glm::normalize(m_cameraTarget - m_cameraNewPos));
+            LightManager::instance()->apply();
+        }
+
         xfmMgr->enableModelMatrix();
     }
     else if ((m_rightMouseButton) && (!m_shiftKey))
@@ -180,6 +149,12 @@ void CameraManipulator::update()
         xfmMgr->enableViewMatrix();
         xfmMgr->identity();
         xfmMgr->lookAt(m_cameraNewPos, m_cameraNewTarget);
+
+        if (m_headlight)
+        {
+            m_headlight->setDirection(glm::normalize(m_cameraTarget - m_cameraNewPos));
+            LightManager::instance()->apply();
+        }
 
         xfmMgr->enableModelMatrix();
     }
@@ -208,6 +183,12 @@ void CameraManipulator::update()
         xfmMgr->enableViewMatrix();
         xfmMgr->identity();
         xfmMgr->lookAt(m_cameraNewPos, m_cameraNewTarget);
+
+        if (m_headlight)
+        {
+            m_headlight->setDirection(glm::normalize(m_cameraTarget - m_cameraNewPos));
+            LightManager::instance()->apply();
+        }
 
         xfmMgr->enableModelMatrix();
     }
@@ -285,4 +266,14 @@ void ivfui::CameraManipulator::setMouseScaling(double sx, double sy)
 {
     m_mouseScaleX = sx;
     m_mouseScaleY = sy;
+}
+
+void ivfui::CameraManipulator::setHeadlight(ivf::DirectionalLightPtr dirLight)
+{
+    m_headlight = dirLight;
+}
+
+ivf::DirectionalLightPtr ivfui::CameraManipulator::headlight()
+{
+    return m_headlight;
 }

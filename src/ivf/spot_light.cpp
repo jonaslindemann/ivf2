@@ -90,5 +90,4 @@ void ivf::SpotLight::apply()
     ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "cutOff", glm::cos(glm::radians(innerCutoff())));
     ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "outerCutOff",
                                                               glm::cos(glm::radians(outerCutoff())));
-    ShaderManager::instance()->currentProgram()->uniformBool(prefix + "useViewSpace", useViewSpace());
 }

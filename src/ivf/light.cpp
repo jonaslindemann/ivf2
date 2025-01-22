@@ -87,13 +87,3 @@ bool ivf::Light::enabled()
 {
     return m_enabled;
 }
-
-void ivf::Light::setUseViewSpace(bool flag)
-{
-    m_useViewSpace = flag;
-}
-
-bool ivf::Light::useViewSpace()
-{
-    return m_useViewSpace;
-}

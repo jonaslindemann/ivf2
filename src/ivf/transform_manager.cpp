@@ -39,13 +39,20 @@ void TransformManager::enableViewMatrix()
     m_matrixMode = MatrixMode::VIEW;
 }
 
+glm::mat4 &ivf::TransformManager::viewMatrix()
+{
+    return m_viewMatrix;
+}
+
 // function to display 4x4 matrix
 void display_4x4(string tag, glm::mat4 m4)
 {
     cout << tag << '\n';
-    for (int col = 0; col < 4; ++col) {
+    for (int col = 0; col < 4; ++col)
+    {
         cout << "| ";
-        for (int row = 0; row < 4; ++row) {
+        for (int row = 0; row < 4; ++row)
+        {
             cout << m4[row][col] << '\t';
         }
         cout << '\n';
@@ -73,22 +80,28 @@ void TransformManager::pushMatrix()
 
 void TransformManager::popMatrix()
 {
-    if (m_matrixMode == MatrixMode::MODEL) {
-        if (m_modelStack.size() != 0) {
+    if (m_matrixMode == MatrixMode::MODEL)
+    {
+        if (m_modelStack.size() != 0)
+        {
             m_modelMatrix = m_modelStack.back();
             m_modelStack.pop_back();
             ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
         }
     }
-    else if (m_matrixMode == MatrixMode::PROJECTION) {
-        if (m_projectionStack.size() != 0) {
+    else if (m_matrixMode == MatrixMode::PROJECTION)
+    {
+        if (m_projectionStack.size() != 0)
+        {
             m_projectionMatrix = m_projectionStack.back();
             m_projectionStack.pop_back();
             ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_modelMatrix);
         }
     }
-    else {
-        if (m_viewStack.size() != 0) {
+    else
+    {
+        if (m_viewStack.size() != 0)
+        {
             m_viewMatrix = m_viewStack.back();
             m_viewStack.pop_back();
             ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_modelMatrix);
@@ -125,33 +138,33 @@ void TransformManager::rotate(float rx, float ry, float rz, float angle)
 void ivf::TransformManager::rotateDeg(float rx, float ry, float rz, float angle)
 {
     glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(angle), glm::vec3(rx, ry, rz));
-	m_modelMatrix = m_modelMatrix * m;
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+    m_modelMatrix = m_modelMatrix * m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void ivf::TransformManager::rotateDeg(glm::vec3 axis, float angle)
 {
     glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(angle), axis);
-	m_modelMatrix = m_modelMatrix * m;
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+    m_modelMatrix = m_modelMatrix * m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void ivf::TransformManager::rotate(float ax, float ay, float az)
 {
     glm::mat4 m = glm::rotate(glm::mat4(1.0), ax, glm::vec3(1.0, 0.0, 0.0));
-	m = m * glm::rotate(glm::mat4(1.0), ay, glm::vec3(0.0, 1.0, 0.0));
-	m = m * glm::rotate(glm::mat4(1.0), az, glm::vec3(0.0, 0.0, 1.0));
-	m_modelMatrix = m_modelMatrix * m;
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+    m = m * glm::rotate(glm::mat4(1.0), ay, glm::vec3(0.0, 1.0, 0.0));
+    m = m * glm::rotate(glm::mat4(1.0), az, glm::vec3(0.0, 0.0, 1.0));
+    m_modelMatrix = m_modelMatrix * m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void ivf::TransformManager::rotateDeg(float ax, float ay, float az)
 {
     glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(ax), glm::vec3(1.0, 0.0, 0.0));
-	m = m * glm::rotate(glm::mat4(1.0), glm::radians(ay), glm::vec3(0.0, 1.0, 0.0));
-	m = m * glm::rotate(glm::mat4(1.0), glm::radians(az), glm::vec3(0.0, 0.0, 1.0));
-	m_modelMatrix = m_modelMatrix * m;
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+    m = m * glm::rotate(glm::mat4(1.0), glm::radians(ay), glm::vec3(0.0, 1.0, 0.0));
+    m = m * glm::rotate(glm::mat4(1.0), glm::radians(az), glm::vec3(0.0, 0.0, 1.0));
+    m_modelMatrix = m_modelMatrix * m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void ivf::TransformManager::rotateToVector(glm::vec3 v)
@@ -186,8 +199,8 @@ void ivf::TransformManager::multMatrix(glm::mat4 m)
 void ivf::TransformManager::alignWithAxisAngle(glm::vec3 axis, float angle)
 {
     glm::mat4 m = glm::rotate(glm::mat4(1.0), angle, axis);
-	m_modelMatrix = m_modelMatrix * m;
-	ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+    m_modelMatrix = m_modelMatrix * m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void TransformManager::lookAt(float xe, float ye, float ze, float xc, float yc, float zc, float xu, float yu, float zu)
@@ -250,15 +263,18 @@ void TransformManager::identity()
 {
     glm::mat4 m(1.0);
 
-    if (m_matrixMode == MatrixMode::MODEL) {
+    if (m_matrixMode == MatrixMode::MODEL)
+    {
         m_modelMatrix = m;
         ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
     }
-    else if (m_matrixMode == MatrixMode::PROJECTION) {
+    else if (m_matrixMode == MatrixMode::PROJECTION)
+    {
         m_projectionMatrix = m;
         ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_projectionMatrix);
     }
-    else {
+    else
+    {
         m_viewMatrix = m;
         ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
     }

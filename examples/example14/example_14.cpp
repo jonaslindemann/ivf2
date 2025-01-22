@@ -38,6 +38,8 @@ public:
         // this->setSelectionEnabled(true);
         // this->setRenderToTexture(true);
 
+        this->enableHeadlight();
+
         auto axis = Axis::create();
         auto grid = Grid::create();
         grid->setType(GridType::Markers);

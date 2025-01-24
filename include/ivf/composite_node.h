@@ -24,6 +24,9 @@ public:
     NodePtr at(size_t index);
     size_t count();
 
+    void storeChildrenPos();
+    void restoreChildrenPos();
+
     virtual void accept(NodeVisitor *visitor) override;
 
     // Iterator type aliases

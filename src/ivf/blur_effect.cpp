@@ -1,6 +1,6 @@
 #include <ivf/blur_effect.h>
 
-#include <ivf/stock_shaders.h>
+#include <ivf/post_shaders.h>
 
 using namespace ivf;
 

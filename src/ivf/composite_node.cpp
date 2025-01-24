@@ -47,6 +47,26 @@ size_t ivf::CompositeNode::count()
     return m_nodes.size();
 }
 
+void ivf::CompositeNode::storeChildrenPos()
+{
+    for (auto node : m_nodes)
+    {
+        auto transformNode = std::dynamic_pointer_cast<TransformNode>(node);
+        if (transformNode)
+            transformNode->storePos();
+    }
+}
+
+void ivf::CompositeNode::restoreChildrenPos()
+{
+    for (auto node : m_nodes)
+    {
+        auto transformNode = std::dynamic_pointer_cast<TransformNode>(node);
+        if (transformNode)
+            transformNode->restorePos();
+    }
+}
+
 void ivf::CompositeNode::accept(NodeVisitor *visitor)
 {
     visitor->visit(this);

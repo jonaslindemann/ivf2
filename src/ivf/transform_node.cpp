@@ -5,7 +5,9 @@
 
 using namespace ivf;
 
-TransformNode::TransformNode() : m_pos(0.0f), m_rotAxis(0.0f), m_rotAngle(0.0f), m_scale(1.0f), m_useTransform(true), m_vecRot(0.0f), m_eulerAngles(0.0f)
+TransformNode::TransformNode()
+    : m_pos(0.0f), m_rotAxis(0.0f), m_rotAngle(0.0f), m_scale(1.0f), m_useTransform(true), m_vecRot(0.0f),
+      m_eulerAngles(0.0f), m_storedPos(0.0f)
 {
     m_rotAxis.y = 1.0f;
 }
@@ -70,8 +72,8 @@ void ivf::TransformNode::rotateTowards(glm::vec3 target)
 
 void ivf::TransformNode::alignWithAxisAngle(glm::vec3 axis, float angle)
 {
-	m_rotAxis = axis;
-	m_rotAngle = angle;
+    m_rotAxis = axis;
+    m_rotAngle = angle;
 }
 
 void ivf::TransformNode::rotateToVector(glm::vec3 v)
@@ -79,11 +81,37 @@ void ivf::TransformNode::rotateToVector(glm::vec3 v)
     m_vecRot = v;
 }
 
+void ivf::TransformNode::storePos()
+{
+    m_storedPos = m_pos;
+}
+
+void ivf::TransformNode::restorePos()
+{
+    m_pos = m_storedPos;
+}
+
+glm::vec3 ivf::TransformNode::storedPos()
+{
+    return m_storedPos;
+}
+
+void ivf::TransformNode::setScale(glm::vec3 scale)
+{
+    m_scale = scale;
+}
+
+glm::vec3 ivf::TransformNode::scale()
+{
+    return m_scale;
+}
+
 void TransformNode::doPreDraw()
 {
     Node::doPreDraw();
 
-    if (m_useTransform) {
+    if (m_useTransform)
+    {
         xfmMgr()->enableModelMatrix();
         xfmMgr()->pushMatrix();
         xfmMgr()->translate(m_pos);

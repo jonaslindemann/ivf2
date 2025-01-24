@@ -23,6 +23,11 @@ void ivf::Node::setMaterial(std::shared_ptr<Material> material)
     m_material = material;
 }
 
+std::shared_ptr<Material> ivf::Node::material()
+{
+    return m_material;
+}
+
 void ivf::Node::setUseMaterial(bool flag)
 {
     m_useMaterial = flag;
@@ -35,6 +40,11 @@ void Node::setTexture(std::shared_ptr<Texture> texture)
         m_material->setUseTexture(true);
 
     m_useTexture = true;
+}
+
+std::shared_ptr<Texture> ivf::Node::texture()
+{
+    return m_texture;
 }
 
 bool ivf::Node::useMaterial()

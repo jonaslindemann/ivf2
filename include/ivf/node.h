@@ -21,7 +21,10 @@ public:
     void drawSelection();
 
     void setMaterial(std::shared_ptr<Material> material);
+    std::shared_ptr<Material> material();
+
     void setTexture(std::shared_ptr<Texture> texture);
+    std::shared_ptr<Texture> texture();
 
     void setUseMaterial(bool flag);
     bool useMaterial();

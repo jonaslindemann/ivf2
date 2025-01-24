@@ -15,6 +15,7 @@ private:
     bool m_useTransform;
     glm::vec3 m_vecRot;
     glm::vec3 m_eulerAngles;
+    glm::vec3 m_storedPos;
 
 public:
     TransformNode();
@@ -37,6 +38,14 @@ public:
     void rotateTowards(glm::vec3 target);
     void alignWithAxisAngle(glm::vec3 axis, float angle);
     void rotateToVector(glm::vec3 v);
+
+    void storePos();
+    void restorePos();
+
+    glm::vec3 storedPos();
+
+    void setScale(glm::vec3 scale);
+    glm::vec3 scale();
 
 protected:
     virtual void doPreDraw();

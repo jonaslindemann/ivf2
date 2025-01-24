@@ -224,9 +224,12 @@ void GLFWSceneWindow::doDraw()
         // Draw scene to texture
 
         m_frameBuffer->begin();
+
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         GLFWWindow::doDraw();
+
         m_scene->draw();
         m_frameBuffer->end();
 
@@ -235,7 +238,6 @@ void GLFWSceneWindow::doDraw()
         smApplyProgram("render_to_texture");
         smCurrentProgram()->uniformInt("screenTexture", 0);
 
-        // glViewport(0, 0, width(), height());
         m_frameBuffer->draw();
 
         this->doUpdateEffects();
@@ -243,7 +245,6 @@ void GLFWSceneWindow::doDraw()
         for (auto &effect : m_effects)
             effect->use();
 
-        // glViewport(0, 0, width(), height());
         m_postProcessor->setTime(glfwGetTime());
         m_postProcessor->apply(m_frameBuffer->colorTexture());
 
@@ -276,7 +277,9 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
     if (m_selectionEnabled)
     {
         m_selectionRendering = true;
+
         m_bufferSelection->begin();
+        
         this->drawScene();
         auto m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
 

@@ -13,7 +13,11 @@
 #include <ivf/spline_animation.h>
 #include <ivf/keyframe_animation.h>
 #include <ivf/model_loader.h>
-#include <ivf/node_visitor.h>
+
+#include <ivf/tint_effect.h>
+#include <ivf/filmgrain_effect.h>
+#include <ivf/chromatic_effect.h>
+#include <ivf/vignette_effect.h>
 
 #include <ivfmath/spline.h>
 
@@ -39,9 +43,28 @@ public:
         auto xfm = dynamic_cast<Transform *>(node);
         if (xfm == nullptr)
             return;
+
+        auto storedPos = xfm->storedPos();
         auto pos = xfm->pos();
-        auto rep = repeller(pos.x, pos.y, pos.z);
-        xfm->setPos(pos - rep * 0.05f);
+
+        auto center = glm::vec3(0.0, 0.0, 0.0);
+
+        auto l = glm::length(pos - center);
+
+        pos.y = storedPos.y + 0.5 * sin(l + glfwGetTime());
+
+        xfm->setPos(pos);
+
+        auto material = xfm->material();
+
+        if (material)
+        {
+            auto color = material->diffuseColor();
+            color.r = 0.5 + 0.5 * sin(l + glfwGetTime());
+            color.g = 0.5 + 0.5 * sin(l + glfwGetTime() + 2.0);
+            color.b = 0.5 + 0.5 * sin(l + glfwGetTime() + 4.0);
+            material->setDiffuseColor(color);
+        }
     }
 };
 
@@ -49,6 +72,7 @@ class ExampleWindow : public GLFWSceneWindow {
 private:
     FunctionVisitor m_visitor;
     CompositeNodePtr m_nodes;
+    MaterialPtr m_material;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -62,38 +86,68 @@ public:
     virtual int onSetup() override
     {
         // this->setSelectionEnabled(true);
-        // this->setRenderToTexture(true);
-
+        this->setRenderToTexture(true);
         this->enableHeadlight();
 
         auto axis = Axis::create();
-        auto grid = Grid::create();
-        grid->setType(GridType::Markers);
 
-        auto material = Material::create();
-        material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
-        material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
-        material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
+        m_material = Material::create();
+        m_material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
+        m_material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
+        m_material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
 
-        GridLayout layout(10, 10, 10, 1.0, 1.0, 1.0);
+        GridLayout layout(30, 2, 30, 0.6, 3.0, 0.6);
 
-        auto sphere = Sphere::create(0.1);
-        sphere->setMaterial(material);
+        auto box = RoundedBox::create(glm::vec3(0.26, 0.26, 0.26), glm::vec3(8, 8, 8), 0.04);
 
         m_nodes = CompositeNode::create();
 
         for (auto i = 0; i < layout.size(); i++)
         {
+            auto material = Material::create();
+            material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
+            material->setDiffuseColor(glm::vec4(random(0.2, 1.0), random(0.2, 1.0), random(0.2, 1.0), 1.0));
+            material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
+
             auto xfm = Transform::create();
-            xfm->add(sphere);
+            xfm->setUseMaterial(true);
+            xfm->add(box);
+
+            xfm->setMaterial(material);
+
             m_nodes->add(xfm);
         }
 
         layout.apply(m_nodes);
 
-        this->add(axis);
-        this->add(grid);
+        m_nodes->storeChildrenPos();
+
         this->add(m_nodes);
+        // this->add(axis);
+
+        auto blurEffect = BlurEffect::create();
+        blurEffect->setBlurRadius(2.0);
+        blurEffect->load();
+
+        auto tintEffect = TintEffect::create();
+        tintEffect->load();
+
+        auto filmgrainEffect = FilmgrainEffect::create();
+        filmgrainEffect->load();
+
+        auto chromaticEffect = ChromaticEffect::create();
+        chromaticEffect->load();
+
+        auto vignetteEffect = VignetteEffect::create();
+        vignetteEffect->setSize(1.0);
+        vignetteEffect->setSmoothness(0.7);
+        vignetteEffect->load();
+
+        // this->addEffect(blurEffect);
+        // this->addEffect(tintEffect);
+        // this->addEffect(filmgrainEffect);
+        this->addEffect(chromaticEffect);
+        this->addEffect(vignetteEffect);
 
         return 0;
     }

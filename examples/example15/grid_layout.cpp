@@ -1,6 +1,6 @@
 #include "grid_layout.h"
 
-GridLayout::GridLayout(size_t rows = 10, size_t cols = 10, size_t layers = 10, float xSpacing = 1.0,
+GridLayout::GridLayout(size_t rows = 10, size_t layers = 10, size_t cols = 10, float xSpacing = 1.0,
                        float ySpacing = 1.0, float zSpacing = 1.0)
     : m_rows(rows), m_cols(cols), m_layers(layers), m_xSpacing(xSpacing), m_ySpacing(ySpacing), m_zSpacing(zSpacing)
 {}
@@ -65,13 +65,13 @@ void GridLayout::apply(ivf::CompositeNode *composite)
 {
     size_t index = 0;
 
-    float xOffset = m_xSpacing * m_cols / 2.0f;
-    float yOffset = m_ySpacing * m_rows / 2.0f;
-    float zOffset = m_zSpacing * m_layers / 2.0f;
+    float xOffset = m_xSpacing * (m_cols - 1) / 2.0f;
+    float yOffset = m_ySpacing * (m_layers - 1) / 2.0f;
+    float zOffset = m_zSpacing * (m_rows - 1) / 2.0f;
 
-    for (size_t i = 0; i < m_rows; i++)
+    for (size_t i = 0; i < m_cols; i++)
     {
-        for (size_t j = 0; j < m_cols; j++)
+        for (size_t j = 0; j < m_rows; j++)
         {
             for (size_t k = 0; k < m_layers; k++)
             {
@@ -80,7 +80,7 @@ void GridLayout::apply(ivf::CompositeNode *composite)
 
                 if (transformNode)
                     transformNode->setPos(
-                        glm::vec3(i * m_xSpacing - xOffset, j * m_ySpacing - yOffset, k * m_zSpacing - zOffset));
+                        glm::vec3(i * m_xSpacing - xOffset, k * m_ySpacing - yOffset, j * m_zSpacing - zOffset));
 
                 index++;
             }

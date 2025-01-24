@@ -3,6 +3,7 @@
 #include <ivf/fragment_shader.h>
 #include <ivf/program.h>
 #include <ivf/stock_shaders.h>
+#include <ivf/post_shaders.h>
 #include <ivf/vertex_shader.h>
 
 #include <glm/glm.hpp>

@@ -111,6 +111,7 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
     m_fragCompileErrors = !fragmentShader->compile();
 
     auto program = std::make_shared<Program>();
+    program->setName(name);
     program->addShader(vertexShader);
     program->addShader(fragmentShader);
 

@@ -18,6 +18,9 @@
 #include <ivf/filmgrain_effect.h>
 #include <ivf/chromatic_effect.h>
 #include <ivf/vignette_effect.h>
+#include <ivf/bloom_effect.h>
+#include <ivf/dithering_effect.h>
+#include <ivf/pixelation_effect.h>
 
 #include <ivfmath/spline.h>
 
@@ -51,7 +54,7 @@ public:
 
         auto l = glm::length(pos - center);
 
-        pos.y = storedPos.y + 0.5 * sin(l + glfwGetTime());
+        pos.y = storedPos.y + 0.5 * sin(0.5 * l + glfwGetTime());
 
         xfm->setPos(pos);
 
@@ -96,9 +99,9 @@ public:
         m_material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
         m_material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
 
-        GridLayout layout(30, 2, 30, 0.6, 3.0, 0.6);
+        GridLayout layout(30, 2, 30, 1.2, 10.0, 1.2);
 
-        auto box = RoundedBox::create(glm::vec3(0.26, 0.26, 0.26), glm::vec3(8, 8, 8), 0.04);
+        auto box = RoundedBox::create(glm::vec3(0.52, 0.52, 0.52), glm::vec3(8, 8, 8), 0.16);
 
         m_nodes = CompositeNode::create();
 
@@ -130,12 +133,18 @@ public:
         blurEffect->load();
 
         auto tintEffect = TintEffect::create();
+        tintEffect->setTintColor(glm::vec3(1.2, 0.9, 0.7));
+        tintEffect->setTintStrength(0.5);
+        tintEffect->setGrayScaleWeights(glm::vec3(0.299, 0.587, 0.114));
         tintEffect->load();
 
         auto filmgrainEffect = FilmgrainEffect::create();
+        filmgrainEffect->setNoiseIntensity(0.5);
+        filmgrainEffect->setGrainBlending(0.1);
         filmgrainEffect->load();
 
         auto chromaticEffect = ChromaticEffect::create();
+        chromaticEffect->setOffset(0.01);
         chromaticEffect->load();
 
         auto vignetteEffect = VignetteEffect::create();
@@ -143,10 +152,25 @@ public:
         vignetteEffect->setSmoothness(0.7);
         vignetteEffect->load();
 
-        // this->addEffect(blurEffect);
-        // this->addEffect(tintEffect);
-        // this->addEffect(filmgrainEffect);
-        this->addEffect(chromaticEffect);
+        auto bloomEffect = BloomEffect::create();
+        bloomEffect->setThreshold(1.0);
+        bloomEffect->setIntensity(1.0);
+        bloomEffect->load();
+
+        auto ditheringEffect = DitheringEffect::create();
+        ditheringEffect->load();
+
+        auto pixelationEffect = PixelationEffect::create();
+        pixelationEffect->setPixelSize(4.0);
+        pixelationEffect->load();
+
+        this->addEffect(blurEffect); // OK
+        this->addEffect(tintEffect);
+        this->addEffect(chromaticEffect); // OK
+        this->addEffect(filmgrainEffect); // OK
+        this->addEffect(ditheringEffect); // OK
+        this->addEffect(bloomEffect);     // OK
+        // this->addEffect(pixelationEffect);
         this->addEffect(vignetteEffect);
 
         return 0;

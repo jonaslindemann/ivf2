@@ -46,14 +46,13 @@ void ivf::Effect::load()
 
 void ivf::Effect::use()
 {
-    m_program->use();
 
     if (m_program != nullptr)
     {
+        m_program->use();
         m_program->uniformFloat("time", m_time);
         m_program->uniformInt("width", m_width);
         m_program->uniformInt("height", m_height);
-
         doUpdateParams();
     }
 }

@@ -4,12 +4,32 @@
 
 using namespace ivf;
 
-ivf::FilmgrainEffect::FilmgrainEffect()
+ivf::FilmgrainEffect::FilmgrainEffect() : m_noiseIntensity(0.1), m_grainBlending(0.1)
 {}
 
 std::shared_ptr<FilmgrainEffect> ivf::FilmgrainEffect::create()
 {
     return std::make_shared<FilmgrainEffect>();
+}
+
+void ivf::FilmgrainEffect::setNoiseIntensity(float noiseIntensity)
+{
+    m_noiseIntensity = noiseIntensity;
+}
+
+float ivf::FilmgrainEffect::noiseIntensity() const
+{
+    return m_noiseIntensity;
+}
+
+void ivf::FilmgrainEffect::setGrainBlending(float grainBlending)
+{
+    m_grainBlending = grainBlending;
+}
+
+float ivf::FilmgrainEffect::grainBlending() const
+{
+    return m_noiseIntensity;
 }
 
 void ivf::FilmgrainEffect::doLoad()
@@ -20,5 +40,6 @@ void ivf::FilmgrainEffect::doLoad()
 
 void ivf::FilmgrainEffect::doUpdateParams()
 {
-    // m_program->uniformFloat("blurRadius", m_blurRadius);
+    m_program->uniformFloat("noiseIntensity", m_noiseIntensity);
+    m_program->uniformFloat("grainBlending", m_grainBlending);
 }

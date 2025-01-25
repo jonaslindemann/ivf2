@@ -229,8 +229,8 @@ void GLFWSceneWindow::doDraw()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         GLFWWindow::doDraw();
-
         m_scene->draw();
+
         m_frameBuffer->end();
 
         // Draw texture to screen
@@ -279,7 +279,7 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
         m_selectionRendering = true;
 
         m_bufferSelection->begin();
-        
+
         this->drawScene();
         auto m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
 

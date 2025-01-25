@@ -88,7 +88,7 @@ GLint Program::attribId(const std::string name)
 
 GLint Program::uniformLoc(const std::string name)
 {
-#ifdef _DEBUG
+#ifdef IVF_DEBUG
     std::cout << "Getting uniform location for " << name << " in " << this->name() << std::endl;
 #endif
 

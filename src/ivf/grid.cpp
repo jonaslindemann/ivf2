@@ -9,7 +9,7 @@ using namespace ivf;
 
 Grid::Grid()
     : m_tickX(11), m_tickY(11), m_tickZ(11), m_tickSpacingX(1.0e-0), m_tickSpacingY(1.0e-0), m_tickSpacingZ(1.0e-0),
-      m_gridType(GridType::Points), m_tickColor{0.2, 0.2, 0.2, 1.0}, m_lineColor{0.1, 0.1, 0.1, 1.0}, m_markerSize(0.1)
+      m_gridType(GridType::Markers), m_tickColor{0.2, 0.2, 0.2, 1.0}, m_lineColor{0.1, 0.1, 0.1, 1.0}, m_markerSize(0.1)
 
 {
     this->doSetup();

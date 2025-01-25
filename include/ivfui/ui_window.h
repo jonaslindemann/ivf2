@@ -7,29 +7,30 @@
 
 namespace ivfui {
 
-	class UiWindow {
-	private:
-		std::string m_name;
-		bool m_visible;
-	public:
-		UiWindow(const std::string name);
-		virtual ~UiWindow();
+class UiWindow {
+private:
+    std::string m_name;
+    bool m_visible;
 
-		static std::shared_ptr<UiWindow> create(const std::string name);
+public:
+    UiWindow(const std::string name);
+    virtual ~UiWindow();
 
-		void draw();
+    static std::shared_ptr<UiWindow> create(const std::string name);
 
-		void setVisible(bool flag);
-		bool visible();
-		void show();
-		void hide();
+    void draw();
 
-	protected:
-		virtual void doDraw();
-	};
+    void setVisible(bool flag);
+    bool visible();
+    void show();
+    void hide();
+    void update();
 
-	typedef std::shared_ptr<UiWindow> UiWindowPtr;
+protected:
+    virtual void doDraw();
+    virtual void doUpdate();
+};
 
-}
+typedef std::shared_ptr<UiWindow> UiWindowPtr;
 
-
+} // namespace ivfui

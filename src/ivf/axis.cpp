@@ -4,17 +4,13 @@
 
 using namespace ivf;
 
-Axis::Axis(GLfloat size)
-	:m_size(size)
+Axis::Axis(GLfloat size) : m_size(size)
 {
-    this->newMesh(6);
     this->doSetup();
 }
 
 Axis::~Axis()
-{
-    
-}
+{}
 
 std::shared_ptr<Axis> ivf::Axis::create(GLfloat size)
 {
@@ -34,6 +30,9 @@ GLfloat Axis::size()
 
 void ivf::Axis::doSetup()
 {
+    this->clear();
+    this->newMesh(6);
+
     mesh()->begin(GL_LINES);
 
     mesh()->vertex3d(0.0, 0.0, 0.0);
@@ -56,12 +55,11 @@ void ivf::Axis::doSetup()
 
 void Axis::doPreDraw()
 {
-	LightManager::instance()->saveState();
-	LightManager::instance()->disableLighting();
+    LightManager::instance()->saveState();
+    LightManager::instance()->disableLighting();
 }
 
 void Axis::doPostDraw()
 {
-	LightManager::instance()->restoreState();
+    LightManager::instance()->restoreState();
 }
-

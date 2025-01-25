@@ -113,6 +113,82 @@ void ivfui::GLFWSceneWindow::disableHeadlight()
     m_camManip->setHeadlight(nullptr);
 }
 
+void ivfui::GLFWSceneWindow::enableAxis()
+{
+    m_showAxis = true;
+    m_axis->setVisible(true);
+}
+
+void ivfui::GLFWSceneWindow::disableAxis()
+{
+    m_showAxis = false;
+    m_axis->setVisible(false);
+}
+
+bool ivfui::GLFWSceneWindow::axisEnabled()
+{
+    return m_showAxis;
+}
+
+void ivfui::GLFWSceneWindow::setAxisVisible(bool visible)
+{
+    m_showAxis = visible;
+    m_axis->setVisible(visible);
+}
+
+bool ivfui::GLFWSceneWindow::axisVisible()
+{
+    return m_showAxis;
+}
+
+void ivfui::GLFWSceneWindow::enableGrid()
+{
+    m_showGrid = true;
+    m_grid->setVisible(true);
+}
+
+void ivfui::GLFWSceneWindow::disableGrid()
+{
+    m_showGrid = false;
+    m_grid->setVisible(false);
+}
+
+bool ivfui::GLFWSceneWindow::gridEnabled()
+{
+    return m_showGrid;
+}
+
+void ivfui::GLFWSceneWindow::setGridVisible(bool visible)
+{
+    m_showGrid = visible;
+    m_grid->setVisible(visible);
+}
+
+bool ivfui::GLFWSceneWindow::gridVisible()
+{
+    return m_showGrid;
+}
+
+void ivfui::GLFWSceneWindow::setAxisLength(float length)
+{
+    m_axis->setSize(length);
+}
+
+void ivfui::GLFWSceneWindow::setGridTicks(int x, int y, int z)
+{
+    m_grid->setTicks(x, y, z);
+}
+
+void ivfui::GLFWSceneWindow::setGridSpacing(float x, float y, float z)
+{
+    m_grid->setSpacing(x, y, z);
+}
+
+void ivfui::GLFWSceneWindow::showControlPanel()
+{
+    m_sceneControlPanel->show();
+}
+
 ivf::CompositeNodePtr ivfui::GLFWSceneWindow::scene()
 {
     return m_scene;
@@ -153,17 +229,14 @@ int ivfui::GLFWSceneWindow::doSetup()
     dirLight->setEnabled(true);
     lightMgr->apply();
 
-    /*
-    auto pointLight = lightMgr->addPointLight();
-    pointLight->setAmbientColor(glm::vec3(0.1, 0.1, 0.1));
-    pointLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    pointLight->setPosition(glm::vec3(0.0, 0.0, 0.0));
+    m_axis = ivf::Axis::create();
+    m_grid = ivf::Grid::create();
 
-    pointLight->setPosition(glm::vec3(10.0, 10.0, 5.0));
-    pointLight->setEnabled(true);
+    this->add(m_axis);
+    this->add(m_grid);
 
-    lightMgr->apply();
-*/
+    m_axis->setVisible(m_showAxis);
+    m_grid->setVisible(m_showGrid);
 
     auto retVal = onSetup();
 
@@ -175,25 +248,12 @@ int ivfui::GLFWSceneWindow::doSetup()
 
     m_postProcessor->initialize();
 
-    /*
-    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                                        ivf::chromatic_frag_shader_source, "chromatic", false));
-
-
-    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                                        ivf::blur_frag_shader_source, "blur", false));
-
-    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                                        ivf::tint_frag_shader_source, "tint", false));
-
-    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                                        ivf::vignette_frag_shader_source, "vignette", false));
-
-    m_postProcessor->addEffect(smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                                        ivf::filmgrain_frag_shader_source, "filmgrain", false));
-    */
-
     smSetCurrentProgram("basic");
+
+    m_sceneControlPanel = ivfui::SceneControlPanel::create("Control panel", this);
+    m_sceneControlPanel->hide();
+
+    this->addUiWindow(m_sceneControlPanel);
 
     return retVal;
 }
@@ -261,6 +321,9 @@ void GLFWSceneWindow::doDraw()
 
         m_scene->draw();
     }
+
+    for (auto &uiWindow : m_uiWindows)
+        uiWindow->update();
 }
 
 void ivfui::GLFWSceneWindow::doDrawUi()
@@ -309,7 +372,21 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
         m_bufferSelection->end();
     }
     m_selectionRendering = false;
+
     GLFWWindow::doDrawComplete();
+}
+
+void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
+{
+#ifdef IVF_DEBUG
+    std::cout << "Key: " << key << " Scancode: " << scancode << " Action: " << action << " Mods: " << mods << std::endl;
+#endif
+
+    if (key == GLFW_KEY_KP_DIVIDE)
+    {
+        this->showControlPanel();
+    }
+    GLFWWindow::doKey(key, scancode, action, mods);
 }
 
 void ivfui::GLFWSceneWindow::onUpdateUi()

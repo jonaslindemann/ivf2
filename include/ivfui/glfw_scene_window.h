@@ -17,6 +17,8 @@
 #include <ivf/post_processor.h>
 #include <ivf/effect.h>
 
+#include <ivfui/scene_control_panel.h>
+
 namespace ivfui {
 
 class GLFWSceneWindow : public GLFWWindow {
@@ -28,12 +30,19 @@ private:
     ivf::FrameBufferPtr m_frameBuffer;
     ivf::PostProcessorPtr m_postProcessor;
 
+    SceneControlPanelPtr m_sceneControlPanel;
+
     bool m_selectionEnabled{false};
     ivf::Node *m_lastNode;
     ivf::Node *m_currentNode;
 
     bool m_renderToTexture{false};
     bool m_selectionRendering{false};
+    bool m_showAxis{false};
+    bool m_showGrid{false};
+
+    ivf::AxisPtr m_axis;
+    ivf::GridPtr m_grid;
 
     std::vector<ivf::EffectPtr> m_effects;
 
@@ -63,6 +72,26 @@ public:
     void enableHeadlight();
     void disableHeadlight();
 
+    void enableAxis();
+    void disableAxis();
+    bool axisEnabled();
+    void setAxisVisible(bool visible);
+    bool axisVisible();
+
+    void enableGrid();
+    void disableGrid();
+    bool gridEnabled();
+
+    void setGridVisible(bool visible);
+    bool gridVisible();
+
+    void setAxisLength(float length);
+
+    void setGridTicks(int x, int y, int z);
+    void setGridSpacing(float x, float y, float z);
+
+    void showControlPanel();
+
     ivf::CompositeNodePtr scene();
 
     ivfui::CameraManipulatorPtr cameraManipulator();
@@ -87,6 +116,7 @@ protected:
     virtual void doUpdateOtherUi() override;
     virtual void doDrawUi() override;
     virtual void doDrawComplete() override;
+    virtual void doKey(int key, int scancode, int action, int mods) override;
 };
 
 typedef std::shared_ptr<GLFWSceneWindow> GLFWSceneWindowPtr;

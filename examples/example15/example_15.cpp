@@ -140,7 +140,7 @@ public:
 
         auto filmgrainEffect = FilmgrainEffect::create();
         filmgrainEffect->setNoiseIntensity(0.5);
-        filmgrainEffect->setGrainBlending(0.1);
+        filmgrainEffect->setGrainBlending(0.5);
         filmgrainEffect->load();
 
         auto chromaticEffect = ChromaticEffect::create();
@@ -164,14 +164,14 @@ public:
         pixelationEffect->setPixelSize(4.0);
         pixelationEffect->load();
 
-        this->addEffect(blurEffect); // OK
-        this->addEffect(tintEffect);
+        // this->addEffect(blurEffect); // OK
+        // this->addEffect(tintEffect);
         this->addEffect(chromaticEffect); // OK
-        this->addEffect(filmgrainEffect); // OK
-        this->addEffect(ditheringEffect); // OK
-        this->addEffect(bloomEffect);     // OK
+        // this->addEffect(ditheringEffect); // OK
+        this->addEffect(bloomEffect); // OK
         // this->addEffect(pixelationEffect);
-        this->addEffect(vignetteEffect);
+        // this->addEffect(vignetteEffect);
+        this->addEffect(filmgrainEffect); // OK
 
         return 0;
     }

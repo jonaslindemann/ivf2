@@ -18,6 +18,7 @@
 #include <ivf/effect.h>
 
 #include <ivfui/scene_control_panel.h>
+#include <ivfui/camera_window.h>
 
 namespace ivfui {
 
@@ -31,6 +32,7 @@ private:
     ivf::PostProcessorPtr m_postProcessor;
 
     SceneControlPanelPtr m_sceneControlPanel;
+    CameraWindowPtr m_cameraWindow;
 
     bool m_selectionEnabled{false};
     ivf::Node *m_lastNode;
@@ -90,7 +92,11 @@ public:
     void setGridTicks(int x, int y, int z);
     void setGridSpacing(float x, float y, float z);
 
+    void resetView();
+    void saveView();
+
     void showControlPanel();
+    void showCameraWindow();
 
     ivf::CompositeNodePtr scene();
 

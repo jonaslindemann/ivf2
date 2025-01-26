@@ -89,7 +89,7 @@ public:
     virtual int onSetup() override
     {
         // this->setSelectionEnabled(true);
-        this->setRenderToTexture(true);
+        this->setRenderToTexture(false);
         this->enableHeadlight();
 
         auto axis = Axis::create();
@@ -99,7 +99,7 @@ public:
         m_material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
         m_material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
 
-        GridLayout layout(30, 2, 30, 1.2, 10.0, 1.2);
+        GridLayout layout(30, 1, 30, 1.2, 0.0, 1.2);
 
         auto box = RoundedBox::create(glm::vec3(0.52, 0.52, 0.52), glm::vec3(8, 8, 8), 0.16);
 
@@ -166,12 +166,12 @@ public:
 
         // this->addEffect(blurEffect); // OK
         // this->addEffect(tintEffect);
-        this->addEffect(chromaticEffect); // OK
+        // this->addEffect(chromaticEffect); // OK
         // this->addEffect(ditheringEffect); // OK
-        this->addEffect(bloomEffect); // OK
+        // this->addEffect(bloomEffect); // OK
         // this->addEffect(pixelationEffect);
         // this->addEffect(vignetteEffect);
-        this->addEffect(filmgrainEffect); // OK
+        // this->addEffect(filmgrainEffect); // OK
 
         return 0;
     }

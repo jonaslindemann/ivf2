@@ -2,6 +2,8 @@
 
 #include <ivfui/glfw_scene_window.h>
 
+#include <ivf/version.h>
+
 using namespace ivfui;
 
 ivfui::SceneControlPanel::SceneControlPanel(std::string caption, GLFWSceneWindow *sceneWindow)
@@ -24,7 +26,31 @@ void SceneControlPanel::doDraw()
 
     ImGui::Dummy(ImVec2(200.0f, 0.0f));
 
-    ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+    if (ImGui::Button("Reset View"))
+    {
+        m_sceneWindow->resetView();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Save View"))
+    {
+        m_sceneWindow->saveView();
+    }
+
+    if (ImGui::Button("Edit View"))
+    {
+        m_sceneWindow->showCameraWindow();
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Zoom Extent"))
+    {
+        m_sceneWindow->saveView();
+    }
+
+    ImGui::Separator();
 
     if (ImGui::Checkbox("Show Axis", &m_showAxis))
         m_isDirty = true;
@@ -53,6 +79,12 @@ void SceneControlPanel::doDraw()
         if (ImGui::SliderFloat("Grid Spacing Z", &m_tickSpacingZ, 0.1f, 10.0f))
             m_isDirty = true;
     }
+
+    ImGui::Separator();
+
+    ImGui::Text("Ivf2 Version %s", ivf::version_string);
+    ImGui::Text("Build date - %s", ivf::version_date);
+    ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
 }
 
 bool ivfui::SceneControlPanel::isDirty()

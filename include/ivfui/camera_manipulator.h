@@ -36,6 +36,9 @@ private:
     glm::vec3 m_cameraNewPos;
     glm::vec3 m_cameraNewTarget;
 
+    glm::vec3 m_savedCameraTarget;
+    glm::vec3 m_savedCameraPosition;
+
     ivf::DirectionalLightPtr m_headlight;
 
     double m_fov;
@@ -66,6 +69,11 @@ public:
     double fov();
     double nearZ();
     double farZ();
+
+    void reset();
+
+    void saveState();
+    void restoreState();
 
     void setMouseScaling(double sx, double sy);
 

@@ -16,7 +16,8 @@ CameraManipulator::CameraManipulator(GLFWwindow *window)
       m_cameraPosition(glm::vec3(0.0, 0.0, 5.0)), m_cameraNewPos(m_cameraPosition), m_cameraNewTarget(m_cameraTarget),
       m_leftMouseButton(false), m_middleMouseButton(false), m_rightMouseButton(false), m_anyMouseButton(false),
       m_shiftKey(false), m_ctrlKey(false), m_altKey(false), m_fov(45.0), m_nearZ(1.0), m_farZ(100.0),
-      m_mouseScaleX(0.01), m_mouseScaleY(0.01), m_headlight(nullptr)
+      m_mouseScaleX(0.01), m_mouseScaleY(0.01), m_headlight(nullptr), m_savedCameraTarget(m_cameraTarget),
+      m_savedCameraPosition(m_cameraPosition)
 {}
 
 std::shared_ptr<CameraManipulator> ivfui::CameraManipulator::create(GLFWwindow *window)
@@ -260,6 +261,28 @@ double ivfui::CameraManipulator::nearZ()
 double ivfui::CameraManipulator::farZ()
 {
     return m_farZ;
+}
+
+void ivfui::CameraManipulator::reset()
+{
+    restoreState();
+    updateLookAt();
+    update();
+}
+
+void ivfui::CameraManipulator::saveState()
+{
+    m_savedCameraPosition = m_cameraPosition;
+    m_savedCameraTarget = m_cameraTarget;
+}
+
+void ivfui::CameraManipulator::restoreState()
+{
+    m_cameraPosition = m_savedCameraPosition;
+    m_cameraNewPos = m_savedCameraPosition;
+    m_cameraTarget = m_savedCameraTarget;
+    m_cameraNewTarget = m_savedCameraTarget;
+    updateLookAt();
 }
 
 void ivfui::CameraManipulator::setMouseScaling(double sx, double sy)

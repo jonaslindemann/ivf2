@@ -184,9 +184,24 @@ void ivfui::GLFWSceneWindow::setGridSpacing(float x, float y, float z)
     m_grid->setSpacing(x, y, z);
 }
 
+void ivfui::GLFWSceneWindow::resetView()
+{
+    m_camManip->reset();
+}
+
+void ivfui::GLFWSceneWindow::saveView()
+{
+    m_camManip->saveState();
+}
+
 void ivfui::GLFWSceneWindow::showControlPanel()
 {
     m_sceneControlPanel->show();
+}
+
+void ivfui::GLFWSceneWindow::showCameraWindow()
+{
+    m_cameraWindow->show();
 }
 
 ivf::CompositeNodePtr ivfui::GLFWSceneWindow::scene()
@@ -254,6 +269,11 @@ int ivfui::GLFWSceneWindow::doSetup()
     m_sceneControlPanel->hide();
 
     this->addUiWindow(m_sceneControlPanel);
+
+    m_cameraWindow = ivfui::CameraWindow::create(m_camManip, "Camera");
+    m_cameraWindow->hide();
+
+    this->addUiWindow(m_cameraWindow);
 
     return retVal;
 }

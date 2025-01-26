@@ -254,7 +254,7 @@ void TransformManager::ortho2d(float left, float right, float bottom, float top)
 
 void TransformManager::perspective(float fovy, float aspect, float zNear, float zFar)
 {
-    glm::mat4 m = glm::perspective(fovy, aspect, zNear, zFar);
+    glm::mat4 m = glm::perspective(glm::radians(fovy), aspect, zNear, zFar);
     m_projectionMatrix = m_projectionMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_projectionMatrix);
 }

@@ -1,4 +1,6 @@
-#include "grid_layout.h"
+#include <ivf/grid_layout.h>
+
+using namespace ivf;
 
 GridLayout::GridLayout(size_t rows = 10, size_t layers = 10, size_t cols = 10, float xSpacing = 1.0,
                        float ySpacing = 1.0, float zSpacing = 1.0)

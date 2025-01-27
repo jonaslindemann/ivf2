@@ -2,6 +2,8 @@
 
 #include <ivf/nodes.h>
 
+namespace ivf {
+
 class GridLayout {
 private:
     size_t m_rows;
@@ -32,3 +34,5 @@ public:
     void apply(ivf::CompositeNode *composite);
     void apply(ivf::CompositeNodePtr &composite);
 };
+
+} // namespace ivf

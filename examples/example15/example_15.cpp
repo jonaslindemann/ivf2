@@ -24,19 +24,14 @@
 
 #include <ivfmath/spline.h>
 
-#include "grid_layout.h"
+#include <ivf/grid_layout.h>
+#include <ivf/extent_visitor.h>
 
 using namespace ivf;
 using namespace ivfui;
 using namespace ivfmath;
 
 using namespace std;
-
-glm::vec3 repeller(float x, float y, float z)
-{
-    float r = sqrt(x * x + y * y + z * z);
-    return glm::vec3(-x / (r * r), -y / (r * r), -z / (r * r));
-}
 
 class FunctionVisitor : public NodeVisitor {
 private:
@@ -74,6 +69,7 @@ public:
 class ExampleWindow : public GLFWSceneWindow {
 private:
     FunctionVisitor m_visitor;
+    ExtentVisitor m_extentVisitor;
     CompositeNodePtr m_nodes;
     MaterialPtr m_material;
 
@@ -121,12 +117,21 @@ public:
             m_nodes->add(xfm);
         }
 
+        m_nodes->setPos(glm::vec3(0.0, -4.0, 0.0));
+
         layout.apply(m_nodes);
 
         m_nodes->storeChildrenPos();
 
         this->add(m_nodes);
         // this->add(axis);
+
+        this->scene()->accept(&m_extentVisitor);
+
+        auto bbox = m_extentVisitor.bbox();
+
+        this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, bbox.size().y / 2.0, 2 * bbox.min().z));
+        this->cameraManipulator()->setCameraTarget(bbox.center());
 
         auto blurEffect = BlurEffect::create();
         blurEffect->setBlurRadius(2.0);

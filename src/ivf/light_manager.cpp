@@ -209,12 +209,14 @@ void ivf::LightManager::apply()
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, m_dirLights[i]->shadowMap()->depthTexture());
 
+        ShaderManager::instance()->currentProgram()->uniformBool("useShadows", true);
+
         // Tell shader which texture unit the shadow map is on
         ShaderManager::instance()->currentProgram()->uniformInt("shadowMap", textureUnit);
 
         // Pass light space matrix
-        ShaderManager::instance()->currentProgram()->uniformMatrix4(prefix + "lightSpaceMatrix",
-                                                                    m_dirLights[i]->shadowMap()->lightSpaceMatrix());
+        ShaderManager::instance()->currentProgram()->uniformMatrix4(
+            "lightSpaceMatrix", m_dirLights[i]->calculateLightSpaceMatrix(m_sceneBBox));
 
         // Only using one shadow map for now, but you could use multiple
         textureUnit++;
@@ -226,6 +228,8 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
 {
     if (!m_useShadows)
         return;
+
+    this->apply();
 
     // Save current OpenGL state
     GLboolean depthTest;
@@ -260,34 +264,34 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     GLint previousViewport[4];
     glGetIntegerv(GL_VIEWPORT, previousViewport);
 
-    shader->uniformBool("shadowPass", false); // Make sure it's initialized
-
-    // Directional lights
+    // For each shadow-casting light:
     for (auto &light : m_dirLights)
     {
         if (!light->enabled() || !light->castsShadows() || !light->shadowMap())
             continue;
 
-        // Calculate light space matrix
+        // Calculate the light space matrix with the current scene bbox
         glm::mat4 lightSpaceMatrix = light->calculateLightSpaceMatrix(sceneBBox);
-        light->shadowMap()->setLightSpaceMatrix(lightSpaceMatrix);
+        // light->shadowMap()->setLightSpaceMatrix(lightSpaceMatrix);
 
-        // Render to shadow map
+        // Bind the shadow map's framebuffer
         light->shadowMap()->bind();
+
+        // Clear the depth buffer
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        // Use shadow depth shader
+        // Set shader to shadow pass mode
         shader->use();
         shader->uniformBool("shadowPass", true);
         shader->uniformMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
-        // Render scene with shadow shader
-        // We need a special rendering path that only uses vertices
+        // Render the scene
         scene->draw();
 
         // Reset shader mode
         shader->uniformBool("shadowPass", false);
 
+        // Unbind the shadow map's framebuffer
         light->shadowMap()->unbind();
     }
 
@@ -392,13 +396,13 @@ bool ivf::LightManager::autoCalcBBox() const
     return m_autoCalcBBox;
 }
 
-void ivf::LightManager::setDebugShadow(bool flag)
+void ivf::LightManager::setDebugShadow(int value)
 {
-    m_debugShadow = flag;
-    ShaderManager::instance()->currentProgram()->uniformBool("debugShadow", flag);
+    m_debugShadow = value;
+    ShaderManager::instance()->currentProgram()->uniformInt("debugShadow", value);
 }
 
-bool ivf::LightManager::debugShadow() const
+int ivf::LightManager::debugShadow() const
 {
     return m_debugShadow;
 }

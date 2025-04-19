@@ -39,10 +39,10 @@ glm::mat4 ivf::DirectionalLight::calculateLightSpaceMatrix(BoundingBox &sceneBBo
     // Ensure the light direction is normalized
     glm::vec3 lightDir = glm::normalize(m_direction);
 
-    // Try to position the light at a considerable distance
+    // Position the light at a considerable distance
     glm::vec3 lightPos = center - lightDir * (radius * 3.0f);
 
-    // Use a stable up vector - if light is pointing straight down, use a different up
+    // Use a stable up vector
     glm::vec3 up(0.0f, 1.0f, 0.0f);
     if (std::abs(glm::dot(lightDir, up)) > 0.99f)
         up = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -50,11 +50,10 @@ glm::mat4 ivf::DirectionalLight::calculateLightSpaceMatrix(BoundingBox &sceneBBo
     // Light view matrix
     glm::mat4 lightView = glm::lookAt(lightPos, center, up);
 
-    // Orthographic projection - use a more generous size to ensure coverage
-    float nearPlane = 0.1f;
-    float farPlane = radius * 10.0f;
-    float orthoSize = radius * 1.5f;
-    glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, nearPlane, farPlane);
+    // IMPORTANT: Use more generous values for the orthographic projection
+    float orthoSize = radius * 2.0f; // <-- Try a larger multiplier
+    glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, 0.1f,
+                                           radius * 10.0f); // <-- Use a smaller near plane and larger far plane
 
     return lightProjection * lightView;
 }
@@ -75,6 +74,6 @@ void ivf::DirectionalLight::apply()
     ShaderManager::instance()->currentProgram()->uniformBool(prefix + "enabled", enabled());
     ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "direction", direction());
     ShaderManager::instance()->currentProgram()->uniformBool(prefix + "castShadows", castsShadows());
-    ShaderManager::instance()->currentProgram()->uniformMat4(
-        prefix + "lightSpaceMatrix", calculateLightSpaceMatrix(LightManager::instance()->sceneBoundingBox()));
+    // ShaderManager::instance()->currentProgram()->uniformMat4(
+    //     "lightSpaceMatrix", calculateLightSpaceMatrix(LightManager::instance()->sceneBoundingBox()));
 }

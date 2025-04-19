@@ -47,7 +47,7 @@ private:
     GLint m_lightSpaceMatrixId;
     bool m_autoCalcBBox{true};
     BoundingBox m_sceneBBox;
-    bool m_debugShadow{false};
+    int m_debugShadow{0};
 
     LightManager();
     static LightManager *m_instance;
@@ -122,8 +122,8 @@ public:
     void setAutoCalcBBox(bool flag);
     bool autoCalcBBox() const;
 
-    void setDebugShadow(bool flag);
-    bool debugShadow() const;
+    void setDebugShadow(int flag);
+    int debugShadow() const;
 
     void setSceneBoundingBox(BoundingBox &bbox);
     void setSceneBoundingBox(glm::vec3 min, glm::vec3 max);

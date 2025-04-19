@@ -41,6 +41,8 @@ private:
     MaterialPtr m_material;
     RoundedBoxPtr m_box;
 
+    int m_debugShadow{0};
+
     float m_a1{0.0f}, m_a2{0.0f}, m_a3{0.0f};
 
 public:
@@ -128,7 +130,11 @@ public:
         }
         else if (key == GLFW_KEY_D && action == GLFW_PRESS)
         {
-            LightManager::instance()->setDebugShadow(!LightManager::instance()->debugShadow());
+            m_debugShadow++;
+            LightManager::instance()->setDebugShadow(m_debugShadow);
+
+            if (m_debugShadow > 4)
+                m_debugShadow = 0;
         }
     }
 };

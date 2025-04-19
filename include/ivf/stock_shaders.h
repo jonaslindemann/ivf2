@@ -165,7 +165,7 @@ uniform bool shadowPass = false;
 uniform sampler2D shadowMap;
 uniform mat4 lightSpaceMatrix;
 uniform bool useShadows = false;
-uniform bool debugShadow = false;
+uniform int debugShadow = 0;
 
 vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir);
@@ -187,15 +187,13 @@ float calculateShadow(vec4 fragPosLightSpace)
     // Get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     
-    // Check whether current fragment is in shadow
-    float bias = 0.005; // Adjust based on your scene
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    // Try an even larger bias for testing
+    float bias = 0.05; // Increased bias
     
-    // Keep in bounds
-    projCoords = clamp(projCoords, 0.0, 1.0);
-     
-        
-    return shadow;
+    // REVERSE the comparison direction
+    return currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    // Try this if it still doesn't work:
+    //return (currentDepth > closestDepth + bias) ? 1.0 : 0.0;
 }
 
 float rand(vec2 co){
@@ -210,18 +208,38 @@ void main()
         return;
     }
 
-    if (debugShadow) {
-        // Get shadow map coordinates
-        vec3 projCoords = (lightSpaceMatrix * vec4(fragPos, 1.0)).xyz / (lightSpaceMatrix * vec4(fragPos, 1.0)).w;
+    if (debugShadow > 0) {
+        vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
+        vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         projCoords = projCoords * 0.5 + 0.5;
     
-        // Sample shadow map
-        float depth = texture(shadowMap, projCoords.xy).r;
+        float closestDepth = texture(shadowMap, projCoords.xy).r;
+        float currentDepth = projCoords.z;
     
-        // Show depth as grayscale
-        fragColor = vec4(vec3(depth), 1.0);
-        //fragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        return;
+        // Different debug visualizations
+        if (debugShadow == 1) {
+            // Raw depth map
+            fragColor = vec4(vec3(closestDepth), 1.0);
+            return;
+        } else if (debugShadow == 2) {
+            // Raw shadow test result (red = in shadow, green = not in shadow)
+            float shadow = currentDepth - 0.05 > closestDepth ? 1.0 : 0.0;
+            fragColor = vec4(shadow, 1.0-shadow, 0.0, 1.0);
+            return;
+        } else if (debugShadow == 3) {
+            // Show projection coordinates
+            fragColor = vec4(projCoords, 1.0);
+            return;
+        }
+        else if (debugShadow == 4) {
+            // Show both depth values for comparison
+            float closestDepth = texture(shadowMap, projCoords.xy).r;
+            float currentDepth = projCoords.z;
+    
+            // Show current depth in red channel, shadow map depth in green channel
+            fragColor = vec4(currentDepth, closestDepth, 0.0, 1.0);
+            return;
+        }
     }
 
     vec3 norm = normalize(normal);
@@ -347,8 +365,6 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     // Final color with shadows
 
     return (ambient + (1.0 - shadow) * (diffuse + specular));
-
-    //return (ambient + diffuse + specular);
 }
 
 // calculates the color when using a point light.

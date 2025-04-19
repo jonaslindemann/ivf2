@@ -37,3 +37,19 @@ glm::vec3 BoundingBox::size()
 {
     return m_max - m_min;
 }
+
+void BoundingBox::clear()
+{
+    m_min = glm::vec3(1.0e6, 1.0e6, 1.0e6);
+    m_max = glm::vec3(-1.0e6, -1.0e6, -1.0e6);
+}
+
+void BoundingBox::setMin(glm::vec3 min)
+{
+    m_min = min;
+}
+
+void BoundingBox::setMax(glm::vec3 max)
+{
+    m_max = max;
+}

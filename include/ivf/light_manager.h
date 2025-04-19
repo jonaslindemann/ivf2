@@ -6,6 +6,7 @@
 #include <ivf/dir_light.h>
 #include <ivf/point_light.h>
 #include <ivf/spot_light.h>
+#include <ivf/composite_node.h>
 
 #include <string>
 #include <vector>
@@ -37,6 +38,16 @@ private:
     std::vector<PointLightPtr> m_pointLights;
     std::vector<DirectionalLightPtr> m_dirLights;
     std::vector<SpotLightPtr> m_spotLights;
+
+    // Shadow mapping
+
+    bool m_useShadows{false};
+    GLint m_useShadowsId;
+    GLint m_shadowMapId;
+    GLint m_lightSpaceMatrixId;
+    bool m_autoCalcBBox{true};
+    BoundingBox m_sceneBBox;
+    bool m_debugShadow{false};
 
     LightManager();
     static LightManager *m_instance;
@@ -88,6 +99,8 @@ public:
 
     void apply();
 
+    void renderShadowMaps(CompositeNodePtr scene);
+
     void setDiffuseColor(glm::vec3 color);
     void setDiffuseColor(glm::vec4 color);
     void setDiffuseColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha = 1.0f);
@@ -102,6 +115,20 @@ public:
 
     void setShininess(float shininess);
     void setAlpha(float alpha);
+
+    void setUseShadows(bool flag);
+    bool useShadows() const;
+
+    void setAutoCalcBBox(bool flag);
+    bool autoCalcBBox() const;
+
+    void setDebugShadow(bool flag);
+    bool debugShadow() const;
+
+    void setSceneBoundingBox(BoundingBox &bbox);
+    void setSceneBoundingBox(glm::vec3 min, glm::vec3 max);
+    BoundingBox sceneBoundingBox() const;
+    BoundingBox &sceneBoundingBox();
 
     void saveState();
     void restoreState();

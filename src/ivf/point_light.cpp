@@ -1,6 +1,6 @@
 #include <ivf/point_light.h>
 
-#include <ivf/light_manager.h>
+// #include <ivf/light_manager.h>
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
 

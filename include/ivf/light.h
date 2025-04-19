@@ -1,6 +1,8 @@
 #pragma once
 
 #include <ivf/glbase.h>
+#include <ivf/shadow_map.h>
+#include <ivf/bounding_box.h>
 
 #include <glm/glm.hpp>
 
@@ -17,6 +19,9 @@ private:
     bool m_enabled;
     int m_index;
     std::string m_lightArrayName;
+
+    bool m_castsShadows{false};
+    ShadowMapPtr m_shadowMap;
 
 public:
     Light();
@@ -44,6 +49,14 @@ public:
     bool enabled();
 
     int index();
+
+    void setCastShadows(bool flag);
+    bool castsShadows() const;
+
+    void setShadowMap(ShadowMapPtr shadowMap);
+    ShadowMapPtr shadowMap();
+
+    virtual glm::mat4 calculateLightSpaceMatrix(BoundingBox &sceneBBox);
 
     virtual void apply();
 };

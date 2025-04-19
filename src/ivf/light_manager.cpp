@@ -1,6 +1,8 @@
 #include <ivf/light_manager.h>
 
 #include <ivf/shader_manager.h>
+#include <ivf/extent_visitor.h>
+#include <ivf/shadow_shaders.h>
 
 #include <strstream>
 
@@ -31,6 +33,7 @@ LightManager::LightManager()
 PointLightPtr ivf::LightManager::addPointLight()
 {
     auto pointLight = PointLight::create();
+    pointLight->setEnabled(true);
     m_pointLights.push_back(pointLight);
     return pointLight;
 }
@@ -38,6 +41,7 @@ PointLightPtr ivf::LightManager::addPointLight()
 DirectionalLightPtr ivf::LightManager::addDirectionalLight()
 {
     auto dirLight = DirectionalLight::create();
+    dirLight->setEnabled(true);
     m_dirLights.push_back(dirLight);
     return dirLight;
 }
@@ -45,6 +49,7 @@ DirectionalLightPtr ivf::LightManager::addDirectionalLight()
 SpotLightPtr ivf::LightManager::addSpotLight()
 {
     auto spotLight = SpotLight::create();
+    spotLight->setEnabled(true);
     m_spotLights.push_back(spotLight);
     return spotLight;
 }
@@ -102,7 +107,7 @@ void ivf::LightManager::clearDirectionalLights()
 {
     for (auto i = 0; i < m_dirLights.size(); i++)
     {
-        m_dirLights[i]->setEnabled(i);
+        m_dirLights[i]->setEnabled(false);
         m_dirLights[i]->apply();
     }
     m_dirLights.clear();
@@ -112,7 +117,7 @@ void ivf::LightManager::clearSpotLights()
 {
     for (auto i = 0; i < m_spotLights.size(); i++)
     {
-        m_spotLights[i]->setEnabled(i);
+        m_spotLights[i]->setEnabled(false);
         m_spotLights[i]->apply();
     }
     m_spotLights.clear();
@@ -189,6 +194,122 @@ void ivf::LightManager::apply()
         m_spotLights[i]->setIndex(i);
         m_spotLights[i]->apply();
     }
+
+    // Set shadow map textures
+    GLuint textureUnit = 1; // Assuming 0 is used for regular textures
+
+    for (auto i = 0; i < m_dirLights.size(); i++)
+    {
+        if (!m_dirLights[i]->enabled() || !m_dirLights[i]->castsShadows() || !m_dirLights[i]->shadowMap())
+            continue;
+
+        std::string prefix = "dirLights[" + std::to_string(i) + "].";
+
+        // Activate texture unit and bind shadow map
+        glActiveTexture(GL_TEXTURE0 + textureUnit);
+        glBindTexture(GL_TEXTURE_2D, m_dirLights[i]->shadowMap()->depthTexture());
+
+        // Tell shader which texture unit the shadow map is on
+        ShaderManager::instance()->currentProgram()->uniformInt("shadowMap", textureUnit);
+
+        // Pass light space matrix
+        ShaderManager::instance()->currentProgram()->uniformMatrix4(prefix + "lightSpaceMatrix",
+                                                                    m_dirLights[i]->shadowMap()->lightSpaceMatrix());
+
+        // Only using one shadow map for now, but you could use multiple
+        textureUnit++;
+        break;
+    }
+}
+
+void LightManager::renderShadowMaps(CompositeNodePtr scene)
+{
+    if (!m_useShadows)
+        return;
+
+    // Save current OpenGL state
+    GLboolean depthTest;
+    glGetBooleanv(GL_DEPTH_TEST, &depthTest);
+    GLint polygonMode[2];
+    glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+    GLboolean cullFace;
+    glGetBooleanv(GL_CULL_FACE, &cullFace);
+
+    // Set shadow rendering state
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS); // Use default depth function
+    glCullFace(GL_FRONT); // Can help with shadow acne (or try GL_BACK)
+
+    BoundingBox sceneBBox;
+
+    // Create an extent visitor to calculate scene bounds
+    if (m_autoCalcBBox)
+    {
+        ExtentVisitor extentVisitor;
+        scene->accept(&extentVisitor);
+    }
+    else
+    {
+        sceneBBox = m_sceneBBox;
+    }
+
+    // Use the current shader (stock shader)
+    ProgramPtr shader = ShaderManager::instance()->currentProgram();
+
+    // Save current OpenGL state
+    GLint previousViewport[4];
+    glGetIntegerv(GL_VIEWPORT, previousViewport);
+
+    shader->uniformBool("shadowPass", false); // Make sure it's initialized
+
+    // Directional lights
+    for (auto &light : m_dirLights)
+    {
+        if (!light->enabled() || !light->castsShadows() || !light->shadowMap())
+            continue;
+
+        // Calculate light space matrix
+        glm::mat4 lightSpaceMatrix = light->calculateLightSpaceMatrix(sceneBBox);
+        light->shadowMap()->setLightSpaceMatrix(lightSpaceMatrix);
+
+        // Render to shadow map
+        light->shadowMap()->bind();
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        // Use shadow depth shader
+        shader->use();
+        shader->uniformBool("shadowPass", true);
+        shader->uniformMatrix4("lightSpaceMatrix", lightSpaceMatrix);
+
+        // Render scene with shadow shader
+        // We need a special rendering path that only uses vertices
+        scene->draw();
+
+        // Reset shader mode
+        shader->uniformBool("shadowPass", false);
+
+        light->shadowMap()->unbind();
+    }
+
+    // Restore viewport
+    glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
+
+    // Restore regular shader
+    shader->use();
+    shader->uniformBool("shadowPass", false);
+
+    // Restore OpenGL state
+    if (depthTest)
+        glEnable(GL_DEPTH_TEST);
+    else
+        glDisable(GL_DEPTH_TEST);
+
+    glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+
+    if (cullFace)
+        glEnable(GL_CULL_FACE);
+    else
+        glDisable(GL_CULL_FACE);
 }
 
 void ivf::LightManager::setDiffuseColor(glm::vec3 color)
@@ -248,6 +369,59 @@ void ivf::LightManager::setShininess(float shininess)
 void ivf::LightManager::setAlpha(float alpha)
 {
     ShaderManager::instance()->currentProgram()->uniformFloat(m_alphaId, alpha);
+}
+
+void ivf::LightManager::setUseShadows(bool flag)
+{
+    m_useShadows = flag;
+    ShaderManager::instance()->currentProgram()->uniformBool("useShadows", flag);
+}
+
+bool ivf::LightManager::useShadows() const
+{
+    return m_useShadows;
+}
+
+void ivf::LightManager::setAutoCalcBBox(bool flag)
+{
+    m_autoCalcBBox = flag;
+}
+
+bool ivf::LightManager::autoCalcBBox() const
+{
+    return m_autoCalcBBox;
+}
+
+void ivf::LightManager::setDebugShadow(bool flag)
+{
+    m_debugShadow = flag;
+    ShaderManager::instance()->currentProgram()->uniformBool("debugShadow", flag);
+}
+
+bool ivf::LightManager::debugShadow() const
+{
+    return m_debugShadow;
+}
+
+void ivf::LightManager::setSceneBoundingBox(BoundingBox &bbox)
+{
+    m_sceneBBox = bbox;
+}
+
+void ivf::LightManager::setSceneBoundingBox(glm::vec3 min, glm::vec3 max)
+{
+    m_sceneBBox.setMin(min);
+    m_sceneBBox.setMax(max);
+}
+
+BoundingBox ivf::LightManager::sceneBoundingBox() const
+{
+    return m_sceneBBox;
+}
+
+BoundingBox &ivf::LightManager::sceneBoundingBox()
+{
+    return m_sceneBBox;
 }
 
 void LightManager::saveState()

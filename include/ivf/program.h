@@ -63,6 +63,9 @@ public:
     void uniformVec4(const std::string name, const glm::vec4 v);
     void uniformVec4(GLint id, const glm::vec4 v);
 
+    void uniformMat4(const std::string name, const glm::mat4 matrix);
+    void uniformMat4(GLint id, const glm::mat4 matrix);
+
     void printAttribs();
 
     GLuint id();

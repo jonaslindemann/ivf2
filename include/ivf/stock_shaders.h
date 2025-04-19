@@ -20,6 +20,9 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform bool shadowPass = false;
+uniform mat4 lightSpaceMatrix;
+
 void main()
 {
     fragPos = vec3(model * vec4(aPos, 1.0));
@@ -29,7 +32,13 @@ void main()
     color = aColor;
     texCoord = aTex;
     
-    gl_Position = projection * view * vec4(fragPos, 1.0);
+    if (shadowPass) {
+        // When rendering shadow map, just output position in light space
+        gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
+    } else {
+        // Normal rendering path
+        gl_Position = projection * view * vec4(fragPos, 1.0);
+    }
 }
 )";
 
@@ -70,6 +79,8 @@ struct DirLight
     vec3 ambientColor;
     vec3 diffuseColor;
     vec3 specularColor;
+    bool castShadows;
+    mat4 lightSpaceMatrix;
 };
 
 struct PointLight 
@@ -148,10 +159,44 @@ uniform float blendFactor = 0.5; // Controls the strength of the blend [0,1]
 uniform bool selectionRendering = false;
 uniform uint objectId;
 
+// Shadow mapping
+
+uniform bool shadowPass = false;
+uniform sampler2D shadowMap;
+uniform mat4 lightSpaceMatrix;
+uniform bool useShadows = false;
+uniform bool debugShadow = false;
+
 vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
+
+// Add this function before the main function
+float calculateShadow(vec4 fragPosLightSpace)
+{
+    // Perform perspective divide
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    
+    // Transform to [0,1] range
+    projCoords = projCoords * 0.5 + 0.5;
+    
+    // Get closest depth value from light's perspective
+    float closestDepth = texture(shadowMap, projCoords.xy).r; 
+    
+    // Get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+    
+    // Check whether current fragment is in shadow
+    float bias = 0.005; // Adjust based on your scene
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    
+    // Keep in bounds
+    projCoords = clamp(projCoords, 0.0, 1.0);
+     
+        
+    return shadow;
+}
 
 float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -159,6 +204,26 @@ float rand(vec2 co){
 
 void main()
 {	
+    if (shadowPass) {
+        // For shadow pass, we don't need to output a color
+        // The depth is automatically written to the depth buffer
+        return;
+    }
+
+    if (debugShadow) {
+        // Get shadow map coordinates
+        vec3 projCoords = (lightSpaceMatrix * vec4(fragPos, 1.0)).xyz / (lightSpaceMatrix * vec4(fragPos, 1.0)).w;
+        projCoords = projCoords * 0.5 + 0.5;
+    
+        // Sample shadow map
+        float depth = texture(shadowMap, projCoords.xy).r;
+    
+        // Show depth as grayscale
+        fragColor = vec4(vec3(depth), 1.0);
+        //fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        return;
+    }
+
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(lightPos - fragPos);   
     vec3 viewDir = normalize(viewPos - fragPos);
@@ -264,7 +329,26 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 ambient = light.ambientColor * material.ambientColor;
     vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
-    return (ambient + diffuse + specular);
+
+    // If shadows are enabled and this light casts shadows
+
+    float shadow = 0.0;
+    if(useShadows && light.castShadows)
+    {
+        // Test pattern - create a striped shadow pattern
+        //if (mod(fragPos.x + fragPos.z, 1.0) > 0.5)
+        //    shadow = 0.5; // 50% shadow
+
+
+        vec4 fragPosLightSpace = lightSpaceMatrix * vec4(fragPos, 1.0);
+        shadow = calculateShadow(fragPosLightSpace);
+    }
+    
+    // Final color with shadows
+
+    return (ambient + (1.0 - shadow) * (diffuse + specular));
+
+    //return (ambient + diffuse + specular);
 }
 
 // calculates the color when using a point light.

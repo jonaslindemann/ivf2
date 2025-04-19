@@ -1,25 +1,29 @@
 #pragma once
 
 #include <ivf/light.h>
+#include <ivf/bounding_box.h>
+
+#include <glm/glm.hpp>
 
 namespace ivf {
 
-	class DirectionalLight : public Light {
-	private:
-		glm::vec3 m_direction;
-	public:
-		DirectionalLight();
+class DirectionalLight : public Light {
+private:
+    glm::vec3 m_direction;
 
-		static std::shared_ptr<DirectionalLight> create();
+public:
+    DirectionalLight();
 
-		void setDirection(glm::vec3 direction);
-		glm::vec3 direction();
+    static std::shared_ptr<DirectionalLight> create();
 
-		void apply() override;
-	};
+    void setDirection(glm::vec3 direction);
+    glm::vec3 direction();
 
-	typedef std::shared_ptr<DirectionalLight> DirectionalLightPtr;
+    virtual glm::mat4 calculateLightSpaceMatrix(BoundingBox &sceneBBox) override;
 
-}
+    void apply() override;
+};
 
+typedef std::shared_ptr<DirectionalLight> DirectionalLightPtr;
 
+} // namespace ivf

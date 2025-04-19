@@ -1,10 +1,9 @@
 #include <ivf/light.h>
-
-#include <ivf/light_manager.h>
+#include <glm/glm.hpp>
 
 using namespace ivf;
 
-Light::Light()
+ivf::Light::Light()
     : m_position(glm::vec3(0.0, 0.0, 0.0)), m_diffuseColor(glm::vec3(1.0, 1.0, 1.0)),
       m_ambientColor(glm::vec3(0.2, 0.2, 0.2)), m_specularColor(glm::vec3(1.0, 1.0, 1.0)), m_enabled(true), m_index(-1),
       m_lightArrayName("Lights")
@@ -53,6 +52,31 @@ std::string ivf::Light::lightArrayName()
 int ivf::Light::index()
 {
     return m_index;
+}
+
+void ivf::Light::setCastShadows(bool flag)
+{
+    m_castsShadows = flag;
+}
+
+bool ivf::Light::castsShadows() const
+{
+    return m_castsShadows;
+}
+
+void ivf::Light::setShadowMap(ShadowMapPtr shadowMap)
+{
+    m_shadowMap = shadowMap;
+}
+
+ShadowMapPtr ivf::Light::shadowMap()
+{
+    return m_shadowMap;
+}
+
+glm::mat4 ivf::Light::calculateLightSpaceMatrix(BoundingBox &sceneBBox)
+{
+    return glm::mat4();
 }
 
 void ivf::Light::apply()

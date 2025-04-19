@@ -4,38 +4,36 @@
 
 namespace ivf {
 
-	class SpotLight : public Light {
-	private:
-		glm::vec3 m_direction;
-		float m_cutoff;
-		float m_outerCutoff;
-		float m_constAttenuation;
-		float m_linearAttenuation;
-		float m_quadraticAttenuation;
-	public:
-		SpotLight();
+class SpotLight : public Light {
+private:
+    glm::vec3 m_direction;
+    float m_cutoff;
+    float m_outerCutoff;
+    float m_constAttenuation;
+    float m_linearAttenuation;
+    float m_quadraticAttenuation;
 
-		static std::shared_ptr<SpotLight> create();
+public:
+    SpotLight();
 
-		void setDirection(glm::vec3 direction);
-		void setAttenuation(float cnst, float linear, float quadratic);
-		void setCutoff(float inner, float outer);
+    static std::shared_ptr<SpotLight> create();
 
-		glm::vec3 direction();
+    void setDirection(glm::vec3 direction);
+    void setAttenuation(float cnst, float linear, float quadratic);
+    void setCutoff(float inner, float outer);
 
-		float constAttenuation();
-		float linearAttenutation();
-		float quadraticAttenuation();
+    glm::vec3 direction();
 
-		float innerCutoff();
-		float outerCutoff();
+    float constAttenuation();
+    float linearAttenutation();
+    float quadraticAttenuation();
 
-		void apply();
+    float innerCutoff();
+    float outerCutoff();
 
-	};
+    void apply();
+};
 
-	typedef std::shared_ptr<SpotLight> SpotLightPtr;
+typedef std::shared_ptr<SpotLight> SpotLightPtr;
 
-}
-
-
+} // namespace ivf

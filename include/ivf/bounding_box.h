@@ -18,6 +18,10 @@ public:
     glm::vec3 max();
     glm::vec3 center();
     glm::vec3 size();
+
+    void clear();
+    void setMin(glm::vec3 min);
+    void setMax(glm::vec3 max);
 };
 
 } // namespace ivf

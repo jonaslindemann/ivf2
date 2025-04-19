@@ -85,7 +85,7 @@ public:
     virtual int onSetup() override
     {
         // this->setSelectionEnabled(true);
-        this->setRenderToTexture(false);
+        // this->setRenderToTexture(true);
         this->enableHeadlight();
 
         auto axis = Axis::create();
@@ -171,12 +171,12 @@ public:
 
         // this->addEffect(blurEffect); // OK
         // this->addEffect(tintEffect);
-        // this->addEffect(chromaticEffect); // OK
-        // this->addEffect(ditheringEffect); // OK
-        // this->addEffect(bloomEffect); // OK
-        // this->addEffect(pixelationEffect);
-        // this->addEffect(vignetteEffect);
-        // this->addEffect(filmgrainEffect); // OK
+        //  this->addEffect(chromaticEffect); // OK
+        //  this->addEffect(ditheringEffect); // OK
+        //  this->addEffect(bloomEffect); // OK
+        //  this->addEffect(pixelationEffect);
+        //  this->addEffect(vignetteEffect);
+        //  this->addEffect(filmgrainEffect); // OK
 
         return 0;
     }

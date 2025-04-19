@@ -186,6 +186,16 @@ void ivf::Program::uniformVec4(GLint id, const glm::vec4 v)
     GL_ERR(glUniform4f(id, v.x, v.y, v.z, v.w));
 }
 
+void ivf::Program::uniformMat4(const std::string name, const glm::mat4 matrix)
+{
+    GL_ERR(glUniformMatrix4fv(uniformLoc(name), 1, GL_FALSE, glm::value_ptr(matrix)));
+}
+
+void ivf::Program::uniformMat4(GLint id, const glm::mat4 matrix)
+{
+    GL_ERR(glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix)));
+}
+
 void ivf::Program::printAttribs()
 {
     int nrAttributes;

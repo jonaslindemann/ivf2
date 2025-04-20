@@ -196,6 +196,23 @@ void ivf::Program::uniformMat4(GLint id, const glm::mat4 matrix)
     GL_ERR(glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix)));
 }
 
+void ivf::Program::uniformIntArray(const std::string name, int count, const int *values)
+{
+    GLint location = glGetUniformLocation(m_id, name.c_str());
+    if (location != -1)
+    {
+        glUniform1iv(location, count, values);
+    }
+}
+
+void ivf::Program::uniformMatrix4Array(const std::string name, int count, const glm::mat4 *matrices)
+{
+    for (int i = 0; i < count; i++)
+    {
+        uniformMatrix4(name + "[" + std::to_string(i) + "]", matrices[i]);
+    }
+}
+
 void ivf::Program::printAttribs()
 {
     int nrAttributes;

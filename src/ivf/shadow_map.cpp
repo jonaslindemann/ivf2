@@ -58,8 +58,15 @@ void ShadowMap::resize(int width, int height)
     m_width = width;
     m_height = height;
 
-    glBindTexture(GL_TEXTURE_2D, m_depthTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    this->unbind();
+
+    glDeleteFramebuffers(1, &m_fbo);
+    glDeleteTextures(1, &m_depthTexture);
+
+    // glBindTexture(GL_TEXTURE_2D, m_depthTexture);
+    // glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+
+    this->initialize();
 }
 
 void ShadowMap::bind()

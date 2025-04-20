@@ -23,6 +23,9 @@ private:
     bool m_castsShadows{false};
     ShadowMapPtr m_shadowMap;
 
+    size_t m_shadowMapWidth{2048};
+    size_t m_shadowMapHeight{2048};
+
 public:
     Light();
 
@@ -53,8 +56,12 @@ public:
     void setCastShadows(bool flag);
     bool castsShadows() const;
 
+    void setShadowMapSize(size_t width, size_t height);
+
     void setShadowMap(ShadowMapPtr shadowMap);
     ShadowMapPtr shadowMap();
+
+    void clearShadowMap();
 
     virtual glm::mat4 calculateLightSpaceMatrix(BoundingBox &sceneBBox);
 

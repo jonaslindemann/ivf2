@@ -1,48 +1,3 @@
-#pragma once
-
-#include <string>
-
-namespace ivf {
-
-inline const std::string basic_vert_shader_source = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec4 aColor;
-layout (location = 2) in vec2 aTex;
-layout (location = 3) in vec3 aNormal;
-
-out vec3 fragPos;
-out vec3 normal;
-out vec4 color;
-out vec2 texCoord;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-uniform bool shadowPass = false;
-uniform mat4 lightSpaceMatrix;
-
-void main()
-{
-    fragPos = vec3(model * vec4(aPos, 1.0));
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-    normal = normalMatrix * aNormal;
-
-    color = aColor;
-    texCoord = aTex;
-    
-    if (shadowPass) {
-        // When rendering shadow map, just output position in light space
-        gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
-    } else {
-        // Normal rendering path
-        gl_Position = projection * view * vec4(fragPos, 1.0);
-    }
-}
-)";
-
-inline const std::string basic_frag_shader_source = R"(
 #version 330 core
 
 //
@@ -184,36 +139,17 @@ float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap)
     // Transform to [0,1] range
     projCoords = projCoords * 0.5 + 0.5;
     
-    // Check if fragment is outside shadow map
-    if(projCoords.x < 0.0 || projCoords.x > 1.0 || 
-       projCoords.y < 0.0 || projCoords.y > 1.0 ||
-       projCoords.z < 0.0 || projCoords.z > 1.0) {
-        return 0.0; // Not in shadow if outside shadow map
-    }
-    
     // Get closest depth value from light's perspective
     float closestDepth = texture(sMap, projCoords.xy).r; 
     
     // Get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     
-    // Calculate bias based on depth slope
-    vec3 norm = normalize(normal);
-    vec3 lightDir = normalize(-dirLights[0].direction);
-    float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
+    // Try an even larger bias for testing
+    float bias = 0.05; // Increased bias
     
-    // PCF (Percentage Closer Filtering) for softer shadows
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(sMap, 0);
-    for(int x = -1; x <= 1; ++x) {
-        for(int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(sMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-        }    
-    }
-    shadow /= 9.0;
-    
-    return shadow;
+    // REVERSE the comparison direction
+    return currentDepth - bias > closestDepth ? 1.0 : 0.0;
 }
 
 float rand(vec2 co){
@@ -497,6 +433,3 @@ vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor) {
     
     return mix(baseColor, result, blendFactor);
 }
-)";
-
-}; // namespace ivf

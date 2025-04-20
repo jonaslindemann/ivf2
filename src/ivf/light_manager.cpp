@@ -198,6 +198,10 @@ void ivf::LightManager::apply()
     // Set shadow map textures
     GLuint textureUnit = 1; // Assuming 0 is used for regular textures
 
+    // Create arrays to pass to shader
+    std::vector<int> shadowMapTextureUnits;
+    std::vector<glm::mat4> lightSpaceMatrices;
+
     for (auto i = 0; i < m_dirLights.size(); i++)
     {
         if (!m_dirLights[i]->enabled() || !m_dirLights[i]->castsShadows() || !m_dirLights[i]->shadowMap())
@@ -206,21 +210,39 @@ void ivf::LightManager::apply()
         std::string prefix = "dirLights[" + std::to_string(i) + "].";
 
         // Activate texture unit and bind shadow map
+
         glActiveTexture(GL_TEXTURE0 + textureUnit);
         glBindTexture(GL_TEXTURE_2D, m_dirLights[i]->shadowMap()->depthTexture());
 
-        ShaderManager::instance()->currentProgram()->uniformBool("useShadows", true);
+        // Store texture unit and light space matrix
 
-        // Tell shader which texture unit the shadow map is on
+        shadowMapTextureUnits.push_back(textureUnit);
+        lightSpaceMatrices.push_back(m_dirLights[i]->shadowMap()->lightSpaceMatrix());
+
+        ShaderManager::instance()->currentProgram()->uniformBool(prefix + "castsShadows", true);
+        ShaderManager::instance()->currentProgram()->uniformBool("useShadows", true);
         ShaderManager::instance()->currentProgram()->uniformInt("shadowMap", textureUnit);
 
         // Pass light space matrix
+
         ShaderManager::instance()->currentProgram()->uniformMatrix4(
             "lightSpaceMatrix", m_dirLights[i]->calculateLightSpaceMatrix(m_sceneBBox));
 
         // Only using one shadow map for now, but you could use multiple
+
         textureUnit++;
-        break;
+        // break;
+    }
+
+    // Set shadow map arrays to shader
+    if (!shadowMapTextureUnits.empty())
+    {
+        // Set the array of shadow map samplers
+        ShaderManager::instance()->currentProgram()->uniformIntArray("shadowMaps", shadowMapTextureUnits.size(),
+                                                                     shadowMapTextureUnits.data());
+
+        ShaderManager::instance()->currentProgram()->uniformMatrix4Array(
+            "lightSpaceMatrices", lightSpaceMatrices.size(), lightSpaceMatrices.data());
     }
 }
 
@@ -232,6 +254,7 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     this->apply();
 
     // Save current OpenGL state
+
     GLboolean depthTest;
     glGetBooleanv(GL_DEPTH_TEST, &depthTest);
     GLint polygonMode[2];
@@ -240,6 +263,7 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     glGetBooleanv(GL_CULL_FACE, &cullFace);
 
     // Set shadow rendering state
+
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS); // Use default depth function
     glCullFace(GL_FRONT); // Can help with shadow acne (or try GL_BACK)
@@ -247,6 +271,7 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     BoundingBox sceneBBox;
 
     // Create an extent visitor to calculate scene bounds
+
     if (m_autoCalcBBox)
     {
         ExtentVisitor extentVisitor;
@@ -258,47 +283,59 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     }
 
     // Use the current shader (stock shader)
+
     ProgramPtr shader = ShaderManager::instance()->currentProgram();
 
     // Save current OpenGL state
+
     GLint previousViewport[4];
     glGetIntegerv(GL_VIEWPORT, previousViewport);
 
     // For each shadow-casting light:
+
     for (auto &light : m_dirLights)
     {
         if (!light->enabled() || !light->castsShadows() || !light->shadowMap())
             continue;
 
         // Calculate the light space matrix with the current scene bbox
+
         glm::mat4 lightSpaceMatrix = light->calculateLightSpaceMatrix(sceneBBox);
-        // light->shadowMap()->setLightSpaceMatrix(lightSpaceMatrix);
+        light->shadowMap()->setLightSpaceMatrix(lightSpaceMatrix);
 
         // Bind the shadow map's framebuffer
+
         light->shadowMap()->bind();
 
         // Clear the depth buffer
+
         glClear(GL_DEPTH_BUFFER_BIT);
 
         // Set shader to shadow pass mode
+
         shader->use();
         shader->uniformBool("shadowPass", true);
         shader->uniformMatrix4("lightSpaceMatrix", lightSpaceMatrix);
 
         // Render the scene
+
         scene->draw();
 
         // Reset shader mode
+
         shader->uniformBool("shadowPass", false);
 
         // Unbind the shadow map's framebuffer
+
         light->shadowMap()->unbind();
     }
 
     // Restore viewport
+
     glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
 
     // Restore regular shader
+
     shader->use();
     shader->uniformBool("shadowPass", false);
 

@@ -57,11 +57,27 @@ int ivf::Light::index()
 void ivf::Light::setCastShadows(bool flag)
 {
     m_castsShadows = flag;
+
+    if (m_castsShadows)
+    {
+        // Create shadow map if it doesn't exist
+
+        if (m_shadowMap == nullptr)
+            m_shadowMap = ShadowMap::create(2048, 2048);
+    }
 }
 
 bool ivf::Light::castsShadows() const
 {
     return m_castsShadows;
+}
+
+void ivf::Light::setShadowMapSize(size_t width, size_t height)
+{
+    m_shadowMapWidth = width;
+    m_shadowMapHeight = height;
+    if (m_shadowMap)
+        m_shadowMap->resize(m_shadowMapWidth, m_shadowMapHeight);
 }
 
 void ivf::Light::setShadowMap(ShadowMapPtr shadowMap)
@@ -72,6 +88,12 @@ void ivf::Light::setShadowMap(ShadowMapPtr shadowMap)
 ShadowMapPtr ivf::Light::shadowMap()
 {
     return m_shadowMap;
+}
+
+void ivf::Light::clearShadowMap()
+{
+    if (m_shadowMap)
+        m_shadowMap = nullptr;
 }
 
 glm::mat4 ivf::Light::calculateLightSpaceMatrix(BoundingBox &sceneBBox)

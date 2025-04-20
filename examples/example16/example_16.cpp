@@ -40,6 +40,7 @@ private:
     CompositeNodePtr m_nodes;
     MaterialPtr m_material;
     RoundedBoxPtr m_box;
+    DirectionalLightPtr m_dirLight0;
 
     int m_debugShadow{0};
 
@@ -56,26 +57,30 @@ public:
 
     virtual int onSetup() override
     {
-        // this->setSelectionEnabled(true);
-        // this->setRenderToTexture(true);
-        // this->enableHeadlight();
-
-        auto shadowMap = ShadowMap::create(2048, 2048);
-
         auto lightManager = LightManager::instance();
         lightManager->clearLights();
         lightManager->setUseShadows(true);
         lightManager->setAutoCalcBBox(false);
         lightManager->setSceneBoundingBox(glm::vec3(-10.0, -10.0, -10.0), glm::vec3(10.0, 10.0, 10.0));
 
-        auto dirLight = lightManager->addDirectionalLight();
-        dirLight->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
-        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-        dirLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-        dirLight->setDirection(glm::vec3(-1.0, -2.0, -3.0));
-        dirLight->setEnabled(true);
-        dirLight->setCastShadows(true);
-        dirLight->setShadowMap(shadowMap);
+        m_dirLight0 = lightManager->addDirectionalLight();
+        m_dirLight0->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
+        m_dirLight0->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        m_dirLight0->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        m_dirLight0->setDirection(glm::vec3(0.5, -1.0, 0.5));
+        m_dirLight0->setEnabled(true);
+        m_dirLight0->setCastShadows(true);
+
+        /*
+        auto dirLight1 = lightManager->addDirectionalLight();
+        dirLight1->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
+        dirLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight1->setDirection(glm::vec3(0.0, -1.0, 0.0));
+        dirLight1->setEnabled(true);
+        dirLight1->setCastShadows(true);
+        */
+
         lightManager->apply();
 
         auto axis = Axis::create();
@@ -91,31 +96,36 @@ public:
         auto boxMaterial = Material::create();
         boxMaterial->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
 
-        m_box = RoundedBox::create();
-        m_box->setPos(glm::vec3(0.0, 4.0, 0.0));
-        m_box->setSize(2.0, 2.0, 2.0);
-        m_box->setSegments(10, 10, 10);
-        m_box->setRadius(0.5);
-        m_box->setSlices(10);
-        m_box->refresh();
-        m_box->setMaterial(boxMaterial);
+        for (auto row = -5; row <= 5; row++)
+        {
+            for (auto col = -5; col <= 5; col++)
+            {
+                auto box = RoundedBox::create();
+                box->setPos(glm::vec3(row * 2.0, 5.0, col * 2.0));
+                box->setSize(0.3, 0.3, 0.3);
+                box->setSegments(10, 10, 10);
+                box->setRadius(0.05);
+                box->setSlices(10);
+                box->refresh();
+                box->setMaterial(boxMaterial);
+                this->add(box);
+            }
+        }
 
         this->add(plane);
-        this->add(m_box);
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, 8.0, 40.0));
-        // this->cameraManipulator()->setCameraTarget(bbox.center());
 
         return 0;
     }
 
     virtual void onUpdate()
     {
-        m_a1 += 0.1;
-        m_a2 += 0.1;
-        m_a3 += 0.1;
+        m_a1 += 0.01;
+        m_a2 += 0.01;
+        m_a3 += 0.01;
 
-        m_box->setEulerAngles(m_a1, m_a2, m_a3);
+        m_dirLight0->setDirection(glm::vec3(cos(m_a1) * 0.1, -1.0, sin(m_a3) * 0.1));
     }
 
     virtual void onKey(int key, int scancode, int action, int mods)

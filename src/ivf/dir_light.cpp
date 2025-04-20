@@ -21,7 +21,11 @@ std::shared_ptr<DirectionalLight> ivf::DirectionalLight::create()
 
 void ivf::DirectionalLight::setDirection(glm::vec3 direction)
 {
-    m_direction = direction;
+    // Ensure the direction is normalized
+    if (glm::length(direction) > 0.0f)
+        m_direction = glm::normalize(direction);
+    else
+        std::cerr << "Warning: Directional light direction cannot be zero." << std::endl;
 }
 
 glm::vec3 ivf::DirectionalLight::direction()
@@ -31,7 +35,7 @@ glm::vec3 ivf::DirectionalLight::direction()
 
 glm::mat4 ivf::DirectionalLight::calculateLightSpaceMatrix(BoundingBox &sceneBBox)
 {
-    // Create orthographic projection for directional light
+    // Get scene properties
     glm::vec3 center = sceneBBox.center();
     glm::vec3 size = sceneBBox.size();
     float radius = glm::length(size) * 0.5f;
@@ -39,21 +43,33 @@ glm::mat4 ivf::DirectionalLight::calculateLightSpaceMatrix(BoundingBox &sceneBBo
     // Ensure the light direction is normalized
     glm::vec3 lightDir = glm::normalize(m_direction);
 
-    // Position the light at a considerable distance
-    glm::vec3 lightPos = center - lightDir * (radius * 3.0f);
+    // Position the light at a distance from the scene center
+    glm::vec3 lightPos = center - lightDir * (radius * 4.0f);
 
-    // Use a stable up vector
-    glm::vec3 up(0.0f, 1.0f, 0.0f);
-    if (std::abs(glm::dot(lightDir, up)) > 0.99f)
-        up = glm::vec3(0.0f, 0.0f, 1.0f);
+    // Create a stable view basis that works for any light direction
+    glm::vec3 right, up;
 
-    // Light view matrix
+    // Find the smallest component of the light direction
+    float absX = std::abs(lightDir.x);
+    float absY = std::abs(lightDir.y);
+    float absZ = std::abs(lightDir.z);
+
+    if (absX <= absY && absX <= absZ)
+        right = glm::normalize(glm::cross(glm::vec3(0.0f, 0.0f, 1.0f), lightDir));
+    else if (absY <= absX && absY <= absZ)
+        right = glm::normalize(glm::cross(glm::vec3(1.0f, 0.0f, 0.0f), lightDir));
+    else
+        right = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), lightDir));
+
+    up = glm::normalize(glm::cross(lightDir, right));
+
+    // Create view matrix
     glm::mat4 lightView = glm::lookAt(lightPos, center, up);
 
-    // IMPORTANT: Use more generous values for the orthographic projection
-    float orthoSize = radius * 2.0f; // <-- Try a larger multiplier
-    glm::mat4 lightProjection = glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, 0.1f,
-                                           radius * 10.0f); // <-- Use a smaller near plane and larger far plane
+    // Create orthographic projection with a bit more space
+    float orthoSize = radius * 2.5f;
+    glm::mat4 lightProjection =
+        glm::ortho(-orthoSize, orthoSize, -orthoSize, orthoSize, 0.1f, radius * 12.0f); // Use a larger depth range
 
     return lightProjection * lightView;
 }

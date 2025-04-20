@@ -66,6 +66,9 @@ public:
     void uniformMat4(const std::string name, const glm::mat4 matrix);
     void uniformMat4(GLint id, const glm::mat4 matrix);
 
+    void uniformIntArray(const std::string name, int count, const int *values);
+    void uniformMatrix4Array(const std::string name, int count, const glm::mat4 *matrices);
+
     void printAttribs();
 
     GLuint id();

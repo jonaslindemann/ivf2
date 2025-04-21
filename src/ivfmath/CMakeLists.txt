@@ -6,10 +6,12 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_library(ivfmathd ${INCLUDE_FILES} ${SOURCE_FILES})
     target_include_directories(ivfmathd PRIVATE ${GLM_INCLUDE_DIRS})
     install_targets(/lib ivfmathd)
+    set_target_properties(ivfmathd PROPERTIES FOLDER "ivf")
 else()
     add_library(ivfmath ${INCLUDE_FILES} ${SOURCE_FILES})
     target_include_directories(ivfmath PRIVATE glm::glm)
     install_targets(/lib ivfmath)  
+    set_target_properties(ivfmath PROPERTIES FOLDER "ivf")
 endif()    
 
  

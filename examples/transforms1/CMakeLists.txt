@@ -12,7 +12,7 @@ else()
     target_link_libraries(transforms1 PRIVATE glad ivf ivfui generator glfw imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL Freetype::Freetype) 
     target_include_directories(transforms1 PRIVATE ${Stb_INCLUDE_DIR})
     add_dependencies(transforms1 glad generator ivf ivfui)
-    set_target_properties(transforms1d PROPERTIES FOLDER "examples")
+    set_target_properties(transforms1 PROPERTIES FOLDER "examples")
 endif()
 
 

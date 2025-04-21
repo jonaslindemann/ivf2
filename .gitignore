@@ -46,3 +46,4 @@ vcpkg_installed/
 docs/doxygen/
 docs/doxygen/html/
 docs/doxygen/latex/
+/.VSCodeCounter

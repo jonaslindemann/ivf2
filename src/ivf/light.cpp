@@ -101,6 +101,16 @@ glm::mat4 ivf::Light::calculateLightSpaceMatrix(BoundingBox &sceneBBox)
     return glm::mat4();
 }
 
+void ivf::Light::setShadowStrength(float strength)
+{
+    m_shadowStrength = strength;
+}
+
+float ivf::Light::shadowStrength() const
+{
+    return m_shadowStrength;
+}
+
 void ivf::Light::apply()
 {}
 

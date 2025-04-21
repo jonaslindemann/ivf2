@@ -80,6 +80,7 @@ struct DirLight
     vec3 diffuseColor;
     vec3 specularColor;
     bool castShadows;
+    float shadowStrength;
     mat4 lightSpaceMatrix;
 };
 
@@ -96,6 +97,7 @@ struct PointLight
     vec3 ambientColor;
     vec3 diffuseColor;
     vec3 specularColor;
+    float shadowStrength;
 };
 
 struct SpotLight 
@@ -115,6 +117,7 @@ struct SpotLight
     vec3 ambientColor;
     vec3 diffuseColor;
     vec3 specularColor;       
+    float shadowStrength;
 };
 
 in vec3 normal;  
@@ -174,47 +177,7 @@ vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-
-// Add this function before the main function
-float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap)
-{
-    // Perform perspective divide
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    
-    // Transform to [0,1] range
-    projCoords = projCoords * 0.5 + 0.5;
-    
-    // Check if fragment is outside shadow map
-    if(projCoords.x < 0.0 || projCoords.x > 1.0 || 
-       projCoords.y < 0.0 || projCoords.y > 1.0 ||
-       projCoords.z < 0.0 || projCoords.z > 1.0) {
-        return 0.0; // Not in shadow if outside shadow map
-    }
-    
-    // Get closest depth value from light's perspective
-    float closestDepth = texture(sMap, projCoords.xy).r; 
-    
-    // Get depth of current fragment from light's perspective
-    float currentDepth = projCoords.z;
-    
-    // Calculate bias based on depth slope
-    vec3 norm = normalize(normal);
-    vec3 lightDir = normalize(-dirLights[0].direction);
-    float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
-    
-    // PCF (Percentage Closer Filtering) for softer shadows
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(sMap, 0);
-    for(int x = -1; x <= 1; ++x) {
-        for(int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(sMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-        }    
-    }
-    shadow /= 9.0;
-    
-    return shadow;
-}
+float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap);
 
 float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -239,26 +202,38 @@ void main()
         float currentDepth = projCoords.z;
     
         // Different debug visualizations
-        if (debugShadow == 1) {
+
+        if (debugShadow == 1) 
+        {
             // Raw depth map
+
             fragColor = vec4(vec3(closestDepth), 1.0);
             return;
-        } else if (debugShadow == 2) {
+        } 
+        else if (debugShadow == 2) 
+        {
             // Raw shadow test result (red = in shadow, green = not in shadow)
+
             float shadow = currentDepth - 0.05 > closestDepth ? 1.0 : 0.0;
             fragColor = vec4(shadow, 1.0-shadow, 0.0, 1.0);
             return;
-        } else if (debugShadow == 3) {
+        } 
+        else if (debugShadow == 3) 
+        {
             // Show projection coordinates
+        
             fragColor = vec4(projCoords, 1.0);
             return;
         }
-        else if (debugShadow == 4) {
+        else if (debugShadow == 4) 
+        {
             // Show both depth values for comparison
+        
             float closestDepth = texture(shadowMap, projCoords.xy).r;
             float currentDepth = projCoords.z;
     
             // Show current depth in red channel, shadow map depth in green channel
+        
             fragColor = vec4(currentDepth, closestDepth, 0.0, 1.0);
             return;
         }
@@ -351,6 +326,7 @@ void main()
 // -----------------------------------------------------------------------------
 
 // calculates the color when using a directional light.
+
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap)
 {
     vec3 lightDir = normalize(-light.direction);
@@ -373,6 +349,7 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, samp
     // If shadows are enabled and this light casts shadows
 
     float shadow = 0.0;
+
     if(useShadows && light.castShadows)
     {
         vec4 fragPosLightSpace = lightMat * vec4(fragPos, 1.0);
@@ -381,7 +358,7 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, samp
     
     // Final color with shadows
 
-    return (ambient + (1.0 - shadow) * (diffuse + specular));
+    return (ambient + (1.0 - shadow * light.shadowStrength) * (diffuse + specular));
 }
 
 // calculates the color when using a point light.
@@ -457,7 +434,8 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     return (ambient + diffuse + specular);
 }
 
-vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor) {
+vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor) 
+{
     vec4 result;
     
     switch(blendMode) {
@@ -497,6 +475,56 @@ vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor) {
     
     return mix(baseColor, result, blendFactor);
 }
+
+float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap)
+{
+    // Perform perspective divide
+
+    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
+    
+    // Transform to [0,1] range
+
+    projCoords = projCoords * 0.5 + 0.5;
+    
+    // Check if fragment is outside shadow map
+
+    if(projCoords.x < 0.0 || projCoords.x > 1.0 || 
+       projCoords.y < 0.0 || projCoords.y > 1.0 ||
+       projCoords.z < 0.0 || projCoords.z > 1.0) {
+        return 0.0; // Not in shadow if outside shadow map
+    }
+    
+    // Get closest depth value from light's perspective
+
+    float closestDepth = texture(sMap, projCoords.xy).r; 
+    
+    // Get depth of current fragment from light's perspective
+
+    float currentDepth = projCoords.z;
+    
+    // Calculate bias based on depth slope
+
+    vec3 norm = normalize(normal);
+    vec3 lightDir = normalize(-dirLights[0].direction);
+
+    float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
+    
+    // PCF (Percentage Closer Filtering) for softer shadows
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(sMap, 0);
+    for(int x = -1; x <= 1; ++x) {
+        for(int y = -1; y <= 1; ++y) {
+            float pcfDepth = texture(sMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+        }    
+    }
+
+    shadow /= 9.0;
+    
+    return shadow;
+}
+
 )";
 
 }; // namespace ivf

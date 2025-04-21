@@ -20,6 +20,8 @@ private:
     int m_index;
     std::string m_lightArrayName;
 
+    float m_shadowStrength{1.0f}; // Shadow strength (0.0 to 1.0)
+
     bool m_castsShadows{false};
     ShadowMapPtr m_shadowMap;
 
@@ -64,6 +66,9 @@ public:
     void clearShadowMap();
 
     virtual glm::mat4 calculateLightSpaceMatrix(BoundingBox &sceneBBox);
+
+    void setShadowStrength(float strength);
+    float shadowStrength() const;
 
     virtual void apply();
 };

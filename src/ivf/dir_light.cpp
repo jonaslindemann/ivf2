@@ -90,6 +90,7 @@ void ivf::DirectionalLight::apply()
     ShaderManager::instance()->currentProgram()->uniformBool(prefix + "enabled", enabled());
     ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "direction", direction());
     ShaderManager::instance()->currentProgram()->uniformBool(prefix + "castShadows", castsShadows());
+    ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "shadowStrength", shadowStrength());
     // ShaderManager::instance()->currentProgram()->uniformMat4(
     //     "lightSpaceMatrix", calculateLightSpaceMatrix(LightManager::instance()->sceneBoundingBox()));
 }

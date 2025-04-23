@@ -6,6 +6,12 @@
 
 namespace ivf {
 
+/**
+ * TransformNode class 
+ * 
+ * This class is used to define a node that can be transformed in 3D space. It can be translated,
+ * rotated, and scaled. The transformation can be applied to the node before or after drawing it.
+ */
 class TransformNode : public Node {
 private:
     glm::vec3 m_pos;

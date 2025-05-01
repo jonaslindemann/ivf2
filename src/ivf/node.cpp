@@ -4,6 +4,15 @@
 
 using namespace ivf;
 
+std::shared_ptr<Node> Node::parent() const
+{
+    return m_parent.lock();
+}
+void Node::setParent(std::shared_ptr<Node> parent)
+{
+    m_parent = parent;
+}
+
 void Node::draw()
 {
     doPreDraw();

@@ -10,6 +10,11 @@ CompositeNode::CompositeNode() : TransformNode(), m_singleObjectId(false)
     this->setUseMaterial(false);
 }
 
+ivf::CompositeNode::~CompositeNode()
+{
+    clear();
+}
+
 std::shared_ptr<CompositeNode> ivf::CompositeNode::create()
 {
     return std::make_shared<CompositeNode>();
@@ -18,6 +23,7 @@ std::shared_ptr<CompositeNode> ivf::CompositeNode::create()
 void CompositeNode::add(std::shared_ptr<Node> node)
 {
     m_nodes.push_back(node);
+    node->setParent(shared_from_this());
 }
 
 std::vector<std::shared_ptr<Node>> ivf::CompositeNode::nodes()
@@ -27,6 +33,12 @@ std::vector<std::shared_ptr<Node>> ivf::CompositeNode::nodes()
 
 void ivf::CompositeNode::clear()
 {
+    for (auto node : m_nodes)
+    {
+        // If the node has a parent, remove this composite node from its parent
+        if (node->parent())
+            node->setParent(nullptr);
+    }
     m_nodes.clear();
 }
 
@@ -34,7 +46,13 @@ void ivf::CompositeNode::remove(std::shared_ptr<Node> node)
 {
     auto it = std::find(m_nodes.begin(), m_nodes.end(), node);
     if (it != m_nodes.end())
+    {
+        // If the node has a parent, remove this composite node from its parent
+        if (node->parent())
+            node->setParent(nullptr);
+
         m_nodes.erase(it);
+    }
 }
 
 NodePtr ivf::CompositeNode::at(size_t index)

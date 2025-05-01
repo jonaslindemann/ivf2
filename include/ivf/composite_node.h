@@ -14,6 +14,7 @@ private:
 public:
     // Existing methods...
     CompositeNode();
+    virtual ~CompositeNode() override;
 
     static std::shared_ptr<CompositeNode> create();
 

@@ -10,18 +10,20 @@
 #include <ivf/texture.h>
 #include <ivf/node_visitor.h>
 
+#include <memory>
+
 namespace ivf {
 
 /**
  * Node class for the ivf library.
- * 
+ *
  * This class is used to define a common interface for all nodes in the ivf library. A node is
- * an object that can be drawn to the screen. It can have a material and a texture associated with 
- * it. It can also be visible or invisible. The node can be drawn using the draw() method, and it 
- * also has a special method drawSelection() for drawing it in a selected state. The node also 
+ * an object that can be drawn to the screen. It can have a material and a texture associated with
+ * it. It can also be visible or invisible. The node can be drawn using the draw() method, and it
+ * also has a special method drawSelection() for drawing it in a selected state. The node also
  * provides a special object ID which is used for selection.
  */
-class Node : public GLBase {
+class Node : public GLBase, public std::enable_shared_from_this<Node> {
 private:
     std::shared_ptr<Material> m_material{nullptr};
     std::shared_ptr<Texture> m_texture{nullptr};
@@ -29,8 +31,11 @@ private:
     bool m_useTexture{false};
     bool m_visible{true};
     uint32_t m_objectId{0};
+    std::weak_ptr<Node> m_parent{};
 
 public:
+    std::shared_ptr<Node> parent() const;
+    void setParent(std::shared_ptr<Node> parent);
     /**
      * Draws the node to the screen.
      */
@@ -53,7 +58,7 @@ public:
 
     /**
      * Set the texture for the node.
-     */    
+     */
     void setTexture(std::shared_ptr<Texture> texture);
 
     /**
@@ -62,7 +67,8 @@ public:
     std::shared_ptr<Texture> texture();
 
     /**
-     * If set to true, the node will use the material for rendering. If set to false, the node will * not use the material. Default is true.
+     * If set to true, the node will use the material for rendering. If set to false, the node will * not use the
+     * material. Default is true.
      */
     void setUseMaterial(bool flag);
 
@@ -72,7 +78,8 @@ public:
     bool useMaterial();
 
     /**
-     * If set to true, the node will use the texture for rendering. If set to false, the node will * not use the texture. Default is false.
+     * If set to true, the node will use the texture for rendering. If set to false, the node will * not use the
+     * texture. Default is false.
      */
     void setUseTexture(bool flag);
 
@@ -82,7 +89,7 @@ public:
     bool useTexture();
 
     /**
-     * Set the visibility of the node. If set to true, the node will be visible. If set to false, 
+     * Set the visibility of the node. If set to true, the node will be visible. If set to false,
      * the node will be invisible. Default is true.
      */
     void setVisible(bool flag);
@@ -104,7 +111,7 @@ public:
     uint32_t enumerateIds(uint32_t startId);
 
     /**
-     * Accept a visitor. This method is used for the visitor pattern. The visitor will be able to 
+     * Accept a visitor. This method is used for the visitor pattern. The visitor will be able to
      * visit the node and perform some action on it.
      */
     virtual void accept(NodeVisitor *visitor);
@@ -119,7 +126,7 @@ protected:
 
     /**
      * Protected virtual method for implementing the actual drawing of the node. The default
-     * implementation does nothing. 
+     * implementation does nothing.
      */
     virtual void doDraw();
 

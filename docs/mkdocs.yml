@@ -1,0 +1,58 @@
+site_name: Ivf2 - Object-oriented Scene Graph for OpenGL
+site_url: https://ivf2.github.io
+site_description: A modern C++ framework for OpenGL rendering and scene graph management.
+repo_url: https://github.com/jonaslindemann/ivf2
+
+nav:
+- Home: index.md
+- About: about.md
+- Download: download.md
+- Use: use.md
+- Contact: contact.md
+- Privacy: privacy.md
+
+theme: 
+  name: material
+  palette:
+    scheme: youtube
+    #primary: LU
+    #accent: LU
+  font:
+    text: Roboto
+    code: Roboto Mono
+  features:
+    - navigation.instant    
+    - navigation.tracking
+    - navigation.section
+    - navigation.tabs
+    - navigation.top
+    - header.autohide
+
+extra_css:
+  - stylesheets/extra.css   
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true 
+  - admonition
+  - pymdownx.details
+  - meta
+  - md_in_html
+
+extra:
+  blog:
+    dir: blog
+    author: Jonas Lindemann
+    author_image: https://avatars.githubusercontent.com/u/9675453
+    words_read_per_minute: 300
+    list_length: 25
+    extended_preview: true
+
+
+

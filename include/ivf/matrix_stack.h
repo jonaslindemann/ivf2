@@ -26,6 +26,8 @@ public:
     void clear();
     size_t size();
     glm::mat4 top();
+
+    glm::mat4 globalTransform();
 };
 
 } // namespace ivf

@@ -57,3 +57,12 @@ glm::mat4 MatrixStack::top()
 {
     return m_stack.back();
 }
+
+glm::mat4 ivf::MatrixStack::globalTransform()
+{
+    glm::mat4 result(1.0f);
+    for (const auto &matrix : m_stack)
+        result = result * matrix;
+
+    return result;
+}

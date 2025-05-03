@@ -1,4 +1,6 @@
-# Interactive Visualisation Framework 2 (Ivf2) Library
+# Interactive Visualisation Framework 2 
+
+![ivf2](images/logo.png)
 
 Welcome to the ivf2 documentation. ivf2 is a modern C++ graphics and visualization library built on top of OpenGL.
 

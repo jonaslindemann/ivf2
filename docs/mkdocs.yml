@@ -6,20 +6,17 @@ theme:
   name: material
   palette: 
     # Palette toggle for light mode
-    - scheme: default
-      accent: yellow
-      primary: yellow
-      toggle:
-        icon: material/brightness-4
-        name: Switch to dark mode
+    #- scheme: default
+    #  accent: yellow
+    #  primary: yellow
+    #  toggle:
+    #    icon: material/brightness-2
+    #    name: Switch to dark mode
 
     # Palette toggle for dark mode
     - scheme: slate
       accent: yellow
       primary: yellow
-      toggle:
-        icon: material/brightness-7
-        name: Switch to light mode
   features:
     - navigation.tabs
     - navigation.expand

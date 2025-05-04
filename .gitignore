@@ -47,3 +47,4 @@ docs/doxygen/
 docs/doxygen/html/
 docs/doxygen/latex/
 /.VSCodeCounter
+_CMakePresets.json

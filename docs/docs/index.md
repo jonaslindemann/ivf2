@@ -2,7 +2,9 @@
 
 ![ivf2](images/logo.png)
 
-Welcome to the ivf2 documentation. ivf2 is a modern C++ graphics and visualization library built on top of OpenGL.
+Welcome to the ivf2 documentation. ivf2 is a modern C++ graphics and visualization library built on top of OpenGL. This is also a complete rewrite of the original [ivfplusplus library](https://github.com/jonaslindemann/ivfplusplus), which also was a C++ wrapper around OpenGL used in the [ObjectiveFrame application](https://jonaslindemann.github.io/objectiveframe/). 
+
+The goal of Ivf2 is to provide a more modern and flexible framework for graphics and visualization applications that is based on modern OpenGL and C++ standards. The library is designed to be easy to use and extend, making it a great choice for both beginners and experienced developers. 
 
 ## Features
 

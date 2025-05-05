@@ -301,3 +301,5 @@ When creating references to classes in the library in most cases you can also us
 ```cpp
 auto node = Cube::create();
 ```
+
+This will automatically deduce the type of the variable to be `CubePtr`, which is a shared pointer to the `Cube` class. This makes it easier to write code and avoids having to type the full type of the variable.

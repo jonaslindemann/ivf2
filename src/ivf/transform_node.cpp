@@ -17,7 +17,7 @@ void TransformNode::setPos(glm::vec3 pos)
     m_pos = pos;
 }
 
-glm::vec3 TransformNode::pos()
+glm::vec3 TransformNode::pos() const
 {
     return m_pos;
 }
@@ -27,7 +27,7 @@ void ivf::TransformNode::setUseTransform(bool flag)
     m_useTransform = flag;
 }
 
-bool ivf::TransformNode::useTransform()
+bool ivf::TransformNode::useTransform() const
 {
     return m_useTransform;
 }
@@ -91,7 +91,7 @@ void ivf::TransformNode::restorePos()
     m_pos = m_storedPos;
 }
 
-glm::vec3 ivf::TransformNode::storedPos()
+glm::vec3 ivf::TransformNode::storedPos() const
 {
     return m_storedPos;
 }
@@ -101,9 +101,69 @@ void ivf::TransformNode::setScale(glm::vec3 scale)
     m_scale = scale;
 }
 
-glm::vec3 ivf::TransformNode::scale()
+glm::vec3 ivf::TransformNode::scale() const
 {
     return m_scale;
+}
+
+glm::mat4 ivf::TransformNode::localTransform() const
+{
+    // Create matrix for this node's transform
+    glm::mat4 localTransform = glm::mat4(1.0f);
+
+    // Apply translation
+    localTransform = glm::translate(localTransform, m_pos);
+
+    // Apply rotation and scale similar to how it's done in doPreDraw()
+    if ((abs(m_eulerAngles.x) > 0.0) || (abs(m_eulerAngles.y) > 0.0) || (abs(m_eulerAngles.z) > 0.0))
+    {
+        localTransform = glm::rotate(localTransform, glm::radians(m_eulerAngles.x), glm::vec3(1.0f, 0.0f, 0.0f));
+        localTransform = glm::rotate(localTransform, glm::radians(m_eulerAngles.y), glm::vec3(0.0f, 1.0f, 0.0f));
+        localTransform = glm::rotate(localTransform, glm::radians(m_eulerAngles.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    }
+
+    // Apply other rotations similarly...
+
+    if (m_rotAngle != 0.0)
+        localTransform = glm::rotate(localTransform, glm::radians(m_rotAngle), m_rotAxis);
+
+    localTransform = glm::scale(localTransform, m_scale);
+
+    return localTransform;
+}
+
+glm::mat4 ivf::TransformNode::globalTransform() const
+{
+    glm::mat4 globalTransform = localTransform();
+
+    // Traverse up the hierarchy using shared_ptr
+    std::shared_ptr<Node> p = parent();
+    if (p)
+    {
+        auto parentTransform = std::dynamic_pointer_cast<TransformNode>(p);
+        if (parentTransform)
+            globalTransform = parentTransform->globalTransform() * globalTransform;
+    }
+
+    return globalTransform;
+}
+
+glm::vec3 TransformNode::worldPos() const
+{
+    glm::mat4 globalTransform = localTransform();
+
+    // Traverse up the hierarchy using shared_ptr
+    std::shared_ptr<Node> p = parent();
+    while (p)
+    {
+        auto parentTransform = std::dynamic_pointer_cast<TransformNode>(p);
+        if (parentTransform)
+            globalTransform = parentTransform->localTransform() * globalTransform;
+        p = p->parent();
+    }
+
+    // Extract and return the position component
+    return glm::vec3(globalTransform[3]);
 }
 
 void TransformNode::doPreDraw()

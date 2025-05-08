@@ -1,0 +1,98 @@
+site_name: Interactive Visual Framework 2 
+site_description: Documentation for the Ivf2 C++ graphics library
+site_author: Jonas Lindemann
+
+theme:
+  name: material
+  palette: 
+    # Palette toggle for light mode
+    #- scheme: default
+    #  accent: yellow
+    #  primary: yellow
+    #  toggle:
+    #    icon: material/brightness-2
+    #    name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      accent: yellow
+      primary: yellow
+  features:
+    - navigation.tabs
+    - navigation.expand
+    - navigation.instant
+    - navigation.tracking
+    - content.code.copy
+    - content.code.annotate
+
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed
+  - pymdownx.arithmatex
+  - admonition
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting_started/installation.md
+    - Basic Concepts: getting_started/basic_concepts.md
+    - Your first Application: getting_started/your_first_app.md
+  - Core:
+    - Nodes: core/nodes.md
+    - Transforms: core/transforms.md
+    - Materials: core/materials.md
+    - Lighting: core/lighting.md
+    - Textures: core/textures.md
+    - Shaders: core/shaders.md
+  - Primitives:
+    - Basic Primitives: primitives/basic_primitives.md
+    - Complex Primitives: primitives/complex_primitives.md
+    - Text: primitives/text.md
+  - Effects:
+    - Blur: effects/blur.md
+    - Color Effects: effects/color_effects.md
+    - Film Effects: effects/film_effects.md
+    - Custom Effects: effects/custom_effects.md
+  - Animation:
+    - Basic Animation: animation/basic_animation.md
+    - Spline Animation: animation/spline_animation.md
+    - Keyframe Animation: animation/keyframe_animation.md
+    - Lissajous: animation/lissajous.md
+  - UI:
+    - UI Windows: ui/ui_windows.md
+    - Widgets: ui/widgets.md
+    - Scene UI Integration: ui/scene_ui_integration.md
+    - Custom UI: ui/custom_ui.md
+  - Advanced:
+    - Shadows: advanced/shadows.md
+    - Model Loading: advanced/model_loading.md
+    - Selection: advanced/selection.md
+    - Visitor Pattern: advanced/visitor_pattern.md
+  - API Reference:
+    - ivf Namespace: api/ivf.md
+    - ivfui Namespace: api/ivfui.md
+    - ivfmath Namespace: api/ivfmath.md
+  - Examples:
+    - Animation Examples: examples/animation_examples.md
+    - Lighting Examples: examples/lighting_examples.md
+    - Effects Examples: examples/effects_examples.md
+    - UI Examples: examples/ui_examples.md
+    - Advanced Examples: examples/advanced_examples.md
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+  # - mkdoxy:
+  #     projects:
+  #       Ivf2:  # alphanumeric name (no spaces)
+  #         src-dirs: ../..  # path to your source code
+  #         full-doc: True  # generate full documentation
+  #         doxy-cfg:  # standard doxygen configuration options
+  #           FILE_PATTERNS: "*.cpp *.h*"
+  #           RECURSIVE: False      

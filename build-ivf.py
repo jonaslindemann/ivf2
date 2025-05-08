@@ -19,7 +19,7 @@ def setup_cmake_preset():
 
             print("\n--- Setting up toolchain file...\n")
 
-            new_toolchain_file = None
+            new_toolchain_file = "c:/vcpkg/scripts/buildsystems/vcpkg.cmake"
 
             while os.path.exists(new_toolchain_file) == False:
 

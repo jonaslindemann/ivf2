@@ -19,3 +19,4 @@
 #include <ivf/font_manager.h>
 #include <ivf/selection_manager.h>
 #include <ivf/buffer_selection.h>
+#include <ivf/camera.h>

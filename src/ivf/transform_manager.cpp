@@ -222,8 +222,9 @@ void ivf::TransformManager::lookAt(glm::vec3 eye, glm::vec3 center, glm::vec3 up
 {
     glm::mat4 m = glm::lookAt(eye, center, up);
     m_viewMatrix = m_viewMatrix * m;
+    m_viewPos = eye;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
-    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewPosId, m_projectionMatrix);
+    ShaderManager::instance()->currentProgram()->uniformVec3(m_viewPosId, m_viewPos);
 }
 
 void ivf::TransformManager::lookAt(glm::vec3 eye, glm::vec3 center)

@@ -1,21 +1,9 @@
 {
-    "version": 3,
-    "configurePresets": [
-      {
-        "name": "default_c",
-        "toolchainFile": "c:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      },
-      {
-        "name": "default_e",
-        "toolchainFile": "e:/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      },
-      {
-        "name": "linux",
-        "toolchainFile": "/home/bmjl/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      },
-      {
-        "name": "macos",
-        "toolchainFile": "/Users/lindemann/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      }
-    ]
-  }
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "default",
+      "toolchainFile": "e:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    }
+  ]
+}

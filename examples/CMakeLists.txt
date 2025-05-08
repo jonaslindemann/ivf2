@@ -1,4 +1,5 @@
 add_subdirectory(hello_ivf)
+add_subdirectory(hello_pipeline)
 add_subdirectory(ui1)
 add_subdirectory(textures1)
 add_subdirectory(primitives1)

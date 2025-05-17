@@ -44,11 +44,9 @@ nav:
     - Your first Application: getting_started/your_first_app.md
   - Core:
     - Nodes: core/nodes.md
-    - Transforms: core/transforms.md
     - Materials: core/materials.md
-    - Lighting: core/lighting.md
     - Textures: core/textures.md
-    - Shaders: core/shaders.md
+    - Lighting: core/lighting.md
   - Primitives:
     - Basic Primitives: primitives/basic_primitives.md
     - Complex Primitives: primitives/complex_primitives.md

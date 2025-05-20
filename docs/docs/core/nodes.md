@@ -254,29 +254,27 @@ void Cube::doSetup()
 
 ## InstanceNode Class
 
-The `InstanceNode` class is a specialized node for rendering instances of a mesh. It allows you to create multiple instances of a mesh with different transformations and properties.
-
-
-## Working with Nodes
-
-### Creating Nodes
-
-Most node classes in ivf2 follow the factory pattern with static `create()` methods:
+The `InstanceNode` class is a specialized node for rendering instances of a mesh. It allows you to create multiple instances of a mesh with different transformations and properties. In the following example we create a grid of spheres using an instance of a single sphere node:
 
 ```cpp
-auto cube = Cube::create();
-auto sphere = Sphere::create(1.0f); // radius
+auto sphere = Sphere::create(0.15);
+
+for (auto i = 0; i < 11; i++)
+    for (auto j = 0; j < 11; j++)
+        for (auto k = 0; k < 11; k++)
+        {
+            auto instSphere = InstanceNode::create();
+            instSphere->setNode(sphere);
+            instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+
+            auto material = Material::create();
+            material->setDiffuseColor(
+                glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+            material->setShininess(40.0);
+
+            instSphere->setMaterial(material);
+            this->add(instSphere);
+        }
 ```
 
-### Node Hierarchy
-
-Building a scene graph hierarchy:
-
-```cpp
-auto scene = CompositeNode::create();
-auto transform = Transform::create();
-auto cube = Cube::create();
-
-transform->add(cube);
-scene->add(transform);
-```
+You can see in the above example that the `instSphere` node can be used just like any other node except that it reuses the same mesh data as the `sphere` node. This allows you to create multiple instances of a mesh with different transformations and properties without having to create a new mesh for each instance. 

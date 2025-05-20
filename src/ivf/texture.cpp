@@ -117,6 +117,26 @@ void ivf::Texture::setBlendFactor(float blendFactor)
     m_blendFactor = blendFactor;
 }
 
+void ivf::Texture::setWrapT(GLint wrapT)
+{
+    m_wrapT = wrapT;
+}
+
+void ivf::Texture::setWrapS(GLint wrapS)
+{
+    m_wrapS = wrapS;
+}
+
+void ivf::Texture::setMinFilter(GLint minFilter)
+{
+    m_minFilter = minFilter;
+}
+
+void ivf::Texture::setMagFilter(GLint magFilter)
+{
+    m_magFilter = magFilter;
+}
+
 GLint ivf::Texture::useLocalBlendMode()
 {
     return m_useLocalBlendMode;

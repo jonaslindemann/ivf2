@@ -45,6 +45,11 @@ public:
     void setUseLocalBlendMode(bool flag);
     void setBlendMode(TextureBlendMode blendMode);
     void setBlendFactor(float blendFactor);
+    void setWrapT(GLint wrapT);
+    void setWrapS(GLint wrapS);
+    void setMinFilter(GLint minFilter);
+    void setMagFilter(GLint magFilter);
+
 
     GLint useLocalBlendMode();
     TextureBlendMode blendMode();

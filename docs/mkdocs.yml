@@ -44,8 +44,7 @@ nav:
     - Your first Application: getting_started/your_first_app.md
   - Core:
     - Nodes: core/nodes.md
-    - Materials: core/materials.md
-    - Textures: core/textures.md
+    - Materials and Textures: core/materials_and_textures.md
     - Lighting: core/lighting.md
   - Primitives:
     - Basic Primitives: primitives/basic_primitives.md

@@ -1,29 +1,34 @@
+# The Scene Window
+
+To make it easier to create 3D applications ivf2 provides a specialised version of the `GLFWWindow` class called `GLFWSceneWindow`. This class manages the scene graph and provides a number of convenience functions for rendering and updating the scene. The `GLFWSceneWindow` class is a subclass of `GLFWWindow` and inherits all of its functionality. 
+
+Instead of maintaining your own scene instance nodes can be added in the `onSetup()` method using the `add(...)` method. There is also no need to implement the `onRender()` method as this is handled by the `GLFWSceneWindow` class. The `onUpdate()` method is still available for you to implement your own logic.
+
+The class also supports rendering to a texture. This is useful for creating effects such as shadow mapping or post-processing, which is also supported by the class. 
+
+The class also automates the creation of UiWindow derived ImGui windows. 
+
+## Creating a Scene Window
+
+To create a scene window you need to create a subclass of `GLFWSceneWindow` and implement the `onSetup()` and `onUpdate()` methods. The `onSetup()` method is called once when the window is created and is used to set up the scene. The `onUpdate()` method is called every frame and is used to update the scene.
+
+The example below shows how to create a simple scene window with a few shapes and a light source. 
+
+```cpp
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_opengl3.h>
-
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
 #include <ivfui/ui.h>
 
-#include "example_window_1.h"
-#include "example_window_2.h"
-
 using namespace ivf;
-using namespace ivfui;
 using namespace std;
 
 class ExampleWindow : public GLFWSceneWindow {
 private:
-    ExampleWindow1Ptr m_exampleWindow1 = ExampleWindow1::create();
-    ExampleWindow2Ptr m_exampleWindow2 = ExampleWindow2::create();
-
-    bool m_showDemoWindow = false;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -36,9 +41,15 @@ public:
 
     int onSetup()
     {
-        this->setRenderToTexture(true);
-        this->addUiWindow(m_exampleWindow1);
-        this->addUiWindow(m_exampleWindow2);
+        auto lightMgr = LightManager::create();
+
+        auto pointLight1 = lightMgr->addPointLight();
+        pointLight1->setEnabled(true);
+        pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        pointLight1->setAttenuation(1.0, 0.0, 0.0);
+        pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
+        lightMgr->apply();
 
         auto axis = Axis::create();
 
@@ -81,66 +92,6 @@ public:
 
         return 0;
     }
-
-    void onDrawUi()
-    {
-        if (ImGui::BeginMainMenuBar())
-        {
-            if (ImGui::BeginMenu("File"))
-            {
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Edit"))
-            {
-                if (ImGui::MenuItem("Undo", "CTRL+Z"))
-                {
-                }
-                if (ImGui::MenuItem("Redo", "CTRL+Y", false, false))
-                {
-                } // Disabled item
-                ImGui::Separator();
-                if (ImGui::MenuItem("Cut", "CTRL+X"))
-                {
-                }
-                if (ImGui::MenuItem("Copy", "CTRL+C"))
-                {
-                }
-                if (ImGui::MenuItem("Paste", "CTRL+V"))
-                {
-                }
-                ImGui::EndMenu();
-            }
-            ImGui::EndMainMenuBar();
-        }
-    }
-
-    void onUpdateUi()
-    {
-        if (m_showDemoWindow)
-            ImGui::ShowDemoWindow(&m_showDemoWindow);
-
-        if (m_exampleWindow1->demoWindowButton())
-            m_showDemoWindow = true;
-
-        if (m_exampleWindow1->anotherWindowButton())
-            m_exampleWindow2->show();
-
-        if (m_exampleWindow2->closeMeButton())
-            m_exampleWindow2->hide();
-    }
-
-    void onKey(int key, int scancode, int action, int mods)
-    {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        {
-            this->close();
-        }
-
-        if (key == GLFW_KEY_F1 && action == GLFW_PRESS)
-        {
-            m_showDemoWindow = !m_showDemoWindow;
-        }
-    }
 };
 
 typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;
@@ -160,3 +111,4 @@ int main()
     app->addWindow(window);
     return app->loop();
 }
+```

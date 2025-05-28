@@ -1,3 +1,6 @@
 {
-    "iis.configDir": ""
+    "iis.configDir": "",
+    "files.associations": {
+        "memory": "cpp"
+    }
 }

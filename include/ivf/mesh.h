@@ -47,6 +47,8 @@ private:
     GLint m_normalAttrId;
     GLint m_texCoordAttrId;
 
+    bool m_wireframe{false};
+
     std::unique_ptr<VertexArray> m_VAO;
     std::unique_ptr<VertexBuffer> m_vertexVBO;
     std::unique_ptr<VertexBuffer> m_colorVBO;
@@ -63,11 +65,12 @@ private:
     float m_polygonOffsetUnits;
     GLenum m_depthFunc;
     GLfloat m_lineWidth;
+    GLenum m_usage{GL_STATIC_DRAW};
 
     void setupPrim();
 
 public:
-    Mesh(GLuint vsize, GLuint isize = 0, GLuint primType = GL_TRIANGLES);
+    Mesh(GLuint vsize, GLuint isize = 0, GLuint primType = GL_TRIANGLES, GLenum usage = GL_STATIC_DRAW);
     virtual ~Mesh();
 
     static std::shared_ptr<Mesh> create(GLuint vsize, GLuint isize = 0);
@@ -89,6 +92,9 @@ public:
 
     void setLineWidth(GLfloat width);
     GLfloat lineWidth();
+
+    void setWireframe(bool flag);
+    bool wireframe();
 
     void setVertexAttrId(GLuint id);
     void setColorAttrId(GLuint id);
@@ -118,6 +124,7 @@ public:
     void end();
 
     void updateVertices();
+    void updateNormals();
 
     void draw();
     void drawAsPrim(GLuint prim);

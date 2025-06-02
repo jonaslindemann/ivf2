@@ -20,3 +20,4 @@
 #include <ivf/selection_manager.h>
 #include <ivf/buffer_selection.h>
 #include <ivf/camera.h>
+#include <ivf/mesh_manager.h>

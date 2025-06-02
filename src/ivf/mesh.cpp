@@ -17,11 +17,11 @@ glm::vec3 computeNormal(glm::vec3 const &a, glm::vec3 const &b, glm::vec3 const 
     return glm::normalize(glm::cross(c - a, b - a));
 }
 
-Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType)
+Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType, GLenum usage)
     : m_position(0.0f), m_generateNormals(true), m_enabled(true), m_polygonOffsetFactor(0.0f),
-      m_polygonOffsetUnits(0.0f), m_depthFunc(GL_LESS), m_lineWidth(1.0f)
+      m_polygonOffsetUnits(0.0f), m_depthFunc(GL_LESS), m_lineWidth(1.0f), m_usage(usage), m_primType(primType),
+      m_wireframe(false)
 {
-    m_primType = primType;
     this->setSize(vsize, isize);
 }
 
@@ -145,6 +145,16 @@ void ivf::Mesh::setLineWidth(GLfloat width)
 GLfloat ivf::Mesh::lineWidth()
 {
     return m_lineWidth;
+}
+
+void ivf::Mesh::setWireframe(bool flag)
+{
+    m_wireframe = flag;
+}
+
+bool ivf::Mesh::wireframe()
+{
+    return m_wireframe;
 }
 
 void Mesh::setVertexAttrId(GLuint id)
@@ -317,7 +327,7 @@ void Mesh::end()
     m_VAO = std::make_unique<VertexArray>();
     m_VAO->bind();
 
-    m_vertexVBO = std::make_unique<VertexBuffer>();
+    m_vertexVBO = std::make_unique<VertexBuffer>(m_usage);
     m_vertexVBO->setArray(m_verts.get());
 
     glEnableVertexAttribArray(m_vertexAttrId);
@@ -331,7 +341,7 @@ void Mesh::end()
 
     if (m_colorAttrId != -1)
     {
-        m_colorVBO = std::make_unique<VertexBuffer>();
+        m_colorVBO = std::make_unique<VertexBuffer>(m_usage);
         // m_colorVBO->setArray(m_glColors.get());
         m_colorVBO->setArray(m_colors.get());
         glEnableVertexAttribArray(m_colorAttrId);
@@ -340,7 +350,7 @@ void Mesh::end()
 
     if (m_normalAttrId != -1)
     {
-        m_normalVBO = std::make_unique<VertexBuffer>();
+        m_normalVBO = std::make_unique<VertexBuffer>(m_usage);
         // m_normalVBO->setArray(m_glNormals.get());
         m_normalVBO->setArray(m_normals.get());
         glEnableVertexAttribArray(m_normalAttrId);
@@ -349,7 +359,7 @@ void Mesh::end()
 
     if (m_texCoordAttrId != -1)
     {
-        m_texCoordVBO = std::make_unique<VertexBuffer>();
+        m_texCoordVBO = std::make_unique<VertexBuffer>(m_usage);
         m_texCoordVBO->setArray(m_texCoords.get());
         glEnableVertexAttribArray(m_texCoordAttrId);
         glVertexAttribPointer(m_texCoordAttrId, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
@@ -361,9 +371,34 @@ void Mesh::end()
 
 void ivf::Mesh::updateVertices()
 {
-    m_VAO->bind();
+    // m_VAO->bind();
     m_vertexVBO->updateArray(m_verts.get());
-    m_VAO->unbind();
+    // m_VAO->unbind();
+}
+
+void ivf::Mesh::updateNormals()
+{
+    int pos = 0;
+
+    glm::vec3 points[3];
+    glm::vec3 norm;
+
+    if (m_indices != nullptr)
+    {
+        for (GLuint i = 0; i < m_indices->rows(); i++)
+        {
+            points[0] = m_verts->vertex(m_indices->at(i, 0));
+            points[1] = m_verts->vertex(m_indices->at(i, 1));
+            points[2] = m_verts->vertex(m_indices->at(i, 2));
+            norm = computeNormal(points[0], points[1], points[2]);
+            m_normals->setNormal(m_indices->at(i, 0), norm);
+            m_normals->setNormal(m_indices->at(i, 1), norm);
+            m_normals->setNormal(m_indices->at(i, 2), norm);
+        }
+        // m_VAO->bind();
+        m_normalVBO->updateArray(m_normals.get());
+        // m_VAO->unbind();
+    }
 }
 
 void Mesh::draw()
@@ -387,10 +422,26 @@ void Mesh::draw()
     m_VAO->bind();
     if (m_indices != nullptr)
     {
+        if (m_wireframe)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
         GL_ERR(glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0));
     }
     else
     {
+        if (m_wireframe)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
         GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
     }
     m_VAO->unbind();
@@ -405,10 +456,8 @@ void Mesh::draw()
 void ivf::Mesh::drawAsPrim(GLuint prim)
 {
     m_VAO->bind();
-    // err = checkPrintError("__FILE__, __LINE__");
     glDrawArrays(prim, 0, m_glVerts->size());
     m_VAO->unbind();
-    // err = checkPrintError("__FILE__, __LINE__");
 }
 
 void ivf::Mesh::setPos(glm::vec3 pos)

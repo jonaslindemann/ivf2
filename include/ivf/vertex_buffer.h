@@ -11,7 +11,7 @@ private:
     GLenum m_usage{GL_STATIC_DRAW};
 
 public:
-    VertexBuffer();
+    VertexBuffer(GLenum usage = GL_STATIC_DRAW);
     virtual ~VertexBuffer();
 
     static std::shared_ptr<VertexBuffer> create();

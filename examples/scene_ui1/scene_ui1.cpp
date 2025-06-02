@@ -23,6 +23,8 @@ private:
     ExampleWindow1Ptr m_exampleWindow1 = ExampleWindow1::create();
     ExampleWindow2Ptr m_exampleWindow2 = ExampleWindow2::create();
 
+    UiMainMenuPtr m_mainMenu;
+
     bool m_showDemoWindow = false;
 
 public:
@@ -36,6 +38,13 @@ public:
 
     int onSetup()
     {
+        // Add main menu
+
+        auto fileMenu = UiMenu::create("File");
+        fileMenu->addItem(UiMenuItem::create("Exit", "ALT+F4", [this]() { this->onExit(); }));
+
+        this->mainMenu()->addMenu(fileMenu);
+
         this->setRenderToTexture(true);
         this->addUiWindow(m_exampleWindow1);
         this->addUiWindow(m_exampleWindow2);
@@ -82,36 +91,9 @@ public:
         return 0;
     }
 
-    void onDrawUi()
+    void onExit()
     {
-        if (ImGui::BeginMainMenuBar())
-        {
-            if (ImGui::BeginMenu("File"))
-            {
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Edit"))
-            {
-                if (ImGui::MenuItem("Undo", "CTRL+Z"))
-                {
-                }
-                if (ImGui::MenuItem("Redo", "CTRL+Y", false, false))
-                {
-                } // Disabled item
-                ImGui::Separator();
-                if (ImGui::MenuItem("Cut", "CTRL+X"))
-                {
-                }
-                if (ImGui::MenuItem("Copy", "CTRL+C"))
-                {
-                }
-                if (ImGui::MenuItem("Paste", "CTRL+V"))
-                {
-                }
-                ImGui::EndMenu();
-            }
-            ImGui::EndMainMenuBar();
-        }
+        this->close();
     }
 
     void onUpdateUi()

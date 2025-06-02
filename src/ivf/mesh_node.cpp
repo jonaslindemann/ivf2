@@ -1,5 +1,7 @@
 #include <ivf/mesh_node.h>
 
+#include <ivf/mesh_manager.h>
+
 #include <generator/generator.hpp>
 #include <generator/utils.hpp>
 
@@ -9,7 +11,7 @@ using namespace std;
 using namespace ivf;
 using namespace generator;
 
-MeshNode::MeshNode()
+MeshNode::MeshNode() : TransformNode() // Initialize the base class TransformNode
 {}
 
 std::shared_ptr<MeshNode> ivf::MeshNode::create()
@@ -27,9 +29,9 @@ std::vector<std::shared_ptr<Mesh>> ivf::MeshNode::meshes()
     return m_meshes;
 }
 
-void MeshNode::newMesh(int vsize, int isize, GLuint primType)
+void MeshNode::newMesh(int vsize, int isize, GLuint primType, GLenum usage)
 {
-    this->addMesh(std::make_shared<Mesh>(vsize, isize, primType));
+    this->addMesh(std::make_shared<Mesh>(vsize, isize, primType, usage));
 }
 
 std::shared_ptr<Mesh> ivf::MeshNode::mesh(int idx)
@@ -58,6 +60,14 @@ void ivf::MeshNode::clear()
     m_meshes.clear();
 }
 
+void ivf::MeshNode::setWireframe(bool flag)
+{
+    for (auto &mesh : m_meshes)
+    {
+        mesh->setWireframe(flag);
+    }
+}
+
 void ivf::MeshNode::createFromGenerator(generator::AnyGenerator<generator::MeshVertex> &vertices,
                                         generator::AnyGenerator<generator::Triangle> &triangles)
 {
@@ -65,7 +75,7 @@ void ivf::MeshNode::createFromGenerator(generator::AnyGenerator<generator::MeshV
     GLuint nTriangles = count(triangles);
 
     this->clear();
-    this->newMesh(nVertices, nTriangles);
+    this->newMesh(nVertices, nTriangles, GL_TRIANGLES, ivf::mmDefaultMeshUsage());
 
     mesh()->setGenerateNormals(false);
 
@@ -124,6 +134,22 @@ void ivf::MeshNode::debugFromGenerator(generator::AnyGenerator<generator::MeshVe
 void MeshNode::refresh()
 {
     this->doSetup();
+}
+
+void ivf::MeshNode::updateVertices()
+{
+    for (auto &mesh : m_meshes)
+    {
+        mesh->updateVertices();
+    }
+}
+
+void ivf::MeshNode::updateNormals()
+{
+    for (auto &mesh : m_meshes)
+    {
+        mesh->updateNormals();
+    }
 }
 
 void ivf::MeshNode::print()

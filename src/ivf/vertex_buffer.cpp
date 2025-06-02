@@ -6,7 +6,7 @@ using namespace ivf;
 
 using namespace std;
 
-VertexBuffer::VertexBuffer() : m_usage{GL_STATIC_DRAW}
+VertexBuffer::VertexBuffer(GLenum usage) : m_usage{usage}
 {
     glGenBuffers(1, &m_id);
 }

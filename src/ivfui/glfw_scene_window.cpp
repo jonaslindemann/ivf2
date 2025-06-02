@@ -15,13 +15,15 @@ using namespace ivf;
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
     : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
-      m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false)
+      m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false), m_showAxis(false),
+      m_showGrid(false)
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());
     m_bufferSelection = ivf::BufferSelection::create(m_scene);
     m_frameBuffer = ivf::FrameBuffer::create(width, height);
     m_postProcessor = ivf::PostProcessor::create(width, height);
+    m_mainMenu = ivfui::UiMainMenu::create();
 }
 
 GLFWSceneWindow::~GLFWSceneWindow()
@@ -214,6 +216,11 @@ ivfui::CameraManipulatorPtr ivfui::GLFWSceneWindow::cameraManipulator()
     return m_camManip;
 }
 
+ivfui::UiMainMenu *ivfui::GLFWSceneWindow::mainMenu()
+{
+    return m_mainMenu.get();
+}
+
 int ivfui::GLFWSceneWindow::doSetup()
 {
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -351,6 +358,8 @@ void GLFWSceneWindow::doDraw()
 
 void ivfui::GLFWSceneWindow::doDrawUi()
 {
+    m_mainMenu->draw();
+
     for (auto uiWindow : m_uiWindows)
         uiWindow->draw();
 

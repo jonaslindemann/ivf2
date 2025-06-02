@@ -1,26 +1,25 @@
 {
-    "name": "ivf2",
-    "version": "0",
-    "dependencies":
-    [
-        "zlib",
-        "glfw3",
-        "libjpeg-turbo",
-        "libpng",
-        "glew",
-        "opengl",
-        {
-            "name": "imgui",
-            "features":
-            [
-                "glfw-binding",
-                "docking-experimental",
-                "opengl2-binding",
-                "opengl3-binding"
-            ]
-        },
-        "stb",
-        "freetype",
-        "assimp"
-    ]
+  "name": "ivf2",
+  "version": "0",
+  "dependencies": [
+    "assimp",
+    "freetype",
+    "glew",
+    "glfw3",
+    {
+      "name": "imgui",
+      "features": [
+        "docking-experimental",
+        "glfw-binding",
+        "opengl2-binding",
+        "opengl3-binding"
+      ]
+    },
+    "libjpeg-turbo",
+    "libpng",
+    "opengl",
+    "stb",
+    "zlib",
+    "nlohmann-json"
+  ]
 }

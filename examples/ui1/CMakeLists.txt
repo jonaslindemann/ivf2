@@ -12,7 +12,7 @@ else()
     target_link_libraries(ui1 PRIVATE ivf ivfui generator glad glfw imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL)
     target_include_directories(ui1 PRIVATE ${Stb_INCLUDE_DIR})
     add_dependencies(ui1 glad generator ivf ivfui)
-    set_target_properties(ui1 PROPERTIES FOLDER "examples")
+    set_target_properties(ui1 PROPERTIES FOLDER "examples") 
 endif()
 
 

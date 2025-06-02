@@ -19,6 +19,7 @@
 
 #include <ivfui/scene_control_panel.h>
 #include <ivfui/camera_window.h>
+#include <ivfui/ui_menu.h>
 
 namespace ivfui {
 
@@ -30,6 +31,8 @@ private:
     ivf::BufferSelectionPtr m_bufferSelection;
     ivf::FrameBufferPtr m_frameBuffer;
     ivf::PostProcessorPtr m_postProcessor;
+
+    ivfui::UiMainMenuPtr m_mainMenu;
 
     SceneControlPanelPtr m_sceneControlPanel;
     CameraWindowPtr m_cameraWindow;
@@ -101,6 +104,8 @@ public:
     ivf::CompositeNodePtr scene();
 
     ivfui::CameraManipulatorPtr cameraManipulator();
+
+    ivfui::UiMainMenu *mainMenu();
 
     virtual void onUpdateUi();
     virtual void onUpdateEffects();

@@ -11,38 +11,44 @@
 
 namespace ivf {
 
-    class MeshNode : public TransformNode {
-    private:
-        std::vector<std::shared_ptr<Mesh>> m_meshes;
-    public:
-        MeshNode();
+class MeshNode : public TransformNode {
+private:
+    std::vector<std::shared_ptr<Mesh>> m_meshes;
 
-        static std::shared_ptr<MeshNode> create();
+public:
+    MeshNode();
 
-        void addMesh(std::shared_ptr<Mesh> mesh);
-        std::vector<std::shared_ptr<Mesh>> meshes();
+    static std::shared_ptr<MeshNode> create();
 
-        void newMesh(int vsize, int isize = 0, GLuint primType=GL_TRIANGLES);
-        std::shared_ptr<Mesh> mesh(int idx = 0);
-        std::shared_ptr<Mesh> lastMesh();
-        std::shared_ptr<Mesh> currentMesh();
-        void clear();
+    void addMesh(std::shared_ptr<Mesh> mesh);
+    std::vector<std::shared_ptr<Mesh>> meshes();
 
-        void createFromGenerator(generator::AnyGenerator<generator::MeshVertex>& vertices, generator::AnyGenerator<generator::Triangle>& triangles);
-        void debugFromGenerator(generator::AnyGenerator<generator::MeshVertex>& vertices, generator::AnyGenerator<generator::Triangle>& triangles);
+    void newMesh(int vsize, int isize = 0, GLuint primType = GL_TRIANGLES, GLenum usage = GL_STATIC_DRAW);
+    std::shared_ptr<Mesh> mesh(int idx = 0);
+    std::shared_ptr<Mesh> lastMesh();
+    std::shared_ptr<Mesh> currentMesh();
+    void clear();
 
-        void refresh();
+    void setWireframe(bool flag);
 
-        void print();
+    void createFromGenerator(generator::AnyGenerator<generator::MeshVertex> &vertices,
+                             generator::AnyGenerator<generator::Triangle> &triangles);
+    void debugFromGenerator(generator::AnyGenerator<generator::MeshVertex> &vertices,
+                            generator::AnyGenerator<generator::Triangle> &triangles);
 
-    protected:
-        virtual void doDraw();
+    void refresh();
 
-        virtual void doSetup();
-    };
+    void updateVertices();
+    void updateNormals();
 
-    typedef std::shared_ptr<MeshNode> MeshNodePtr;
+    void print();
 
+protected:
+    virtual void doDraw();
+
+    virtual void doSetup();
 };
 
+typedef std::shared_ptr<MeshNode> MeshNodePtr;
 
+}; // namespace ivf

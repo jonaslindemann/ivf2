@@ -8,6 +8,10 @@
     {
       "name": "default_e",
       "toolchainFile": "e:/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    },
+    {
+      "name": "default_l",
+      "toolchainFile": "/home/admin/Development/vcpkg/scripts/buildsystems/vcpkg.cmake"
     }
   ]
 }

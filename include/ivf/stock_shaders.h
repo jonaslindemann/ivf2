@@ -43,7 +43,7 @@ void main()
 )";
 
 inline const std::string basic_frag_shader_source = R"(
-#version 330 core
+#version 400 core
 
 //
 // A lot of information from:

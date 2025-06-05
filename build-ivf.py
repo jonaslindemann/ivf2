@@ -1,3 +1,5 @@
+#!/bin/env python3
+
 import os, shutil, argparse, platform
 
 cmake_preset_template = '''{
@@ -24,6 +26,28 @@ def setup_cmake_preset():
             while os.path.exists(new_toolchain_file) == False:
 
                 new_toolchain_file = input('Enter the path to the toolchain file (default: c:/vcpkg/scripts/buildsystems/vcpkg.cmake): ') or 'c:/vcpkg/scripts/buildsystems/vcpkg.cmake'
+
+                if not os.path.exists(new_toolchain_file):
+                    print(f'Error: Toolchain file not found at {new_toolchain_file}')
+                    return
+
+            with open('CMakePresets.json', 'w') as f:
+                f.write(cmake_preset_template % (new_toolchain_file))
+
+        else:
+            print('CMakePresets.json already exists. Skipping...')
+
+    elif platform.system() == "Linux":
+
+        if not os.path.exists("CMakePresets.json"):
+
+            print("\n--- Setting up toolchain file...\n")
+
+            new_toolchain_file = "../vcpkg/scripts/buildsystems/vcpkg.cmake"
+
+            while os.path.exists('CMakePresets.json') == False:
+
+                new_toolchain_file = input('Enter the path to the toolchain file (default: /usr/share/cmake-3.16/Modules/Platform/Linux-GNU.cmake): ') or '/usr/share/cmake-3.16/Modules/Platform/Linux-GNU.cmake'
 
                 if not os.path.exists(new_toolchain_file):
                     print(f'Error: Toolchain file not found at {new_toolchain_file}')
@@ -63,7 +87,7 @@ class CMakeRunner:
         if platform.system() == 'Windows':
             os.system(f'cmake -S . -B {self.build_dir} -DCMAKE_BUILD_TYPE={self.build_type} -G"Visual Studio 17 2022" --preset={self.preset}')
         else:
-            os.system(f'cmake -S . -B {self.build_dir} -DCMAKE_BUILD_TYPE={self.build_type}')
+            os.system(f'cmake -S . -B {self.build_dir} -DCMAKE_BUILD_TYPE={self.build_type} --preset={self.preset}')
 
     def build(self, build_type='Release'):
         print("\n--- Building project...\n")

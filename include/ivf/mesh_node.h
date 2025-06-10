@@ -13,6 +13,7 @@ namespace ivf {
 
 class MeshNode : public TransformNode {
 private:
+protected:
     std::vector<std::shared_ptr<Mesh>> m_meshes;
 
 public:

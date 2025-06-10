@@ -13,6 +13,28 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+float ivf::smoothStep(float edge0, float edge1, float x)
+{
+    float t = glm::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
+    return t * t * (3.0f - 2.0f * t);
+}
+
+glm::mat4 ivf::rotationMatrix(const glm::vec3 &axis, float angle)
+{
+    return glm::rotate(glm::mat4(1.0f), angle, axis);
+}
+
+float ivf::calculateWeight(float distance, float start, float end, float falloff)
+{
+    if (distance < start)
+        return 1.0f;
+    if (distance > end)
+        return 0.0f;
+
+    float t = (distance - start) / (end - start);
+    return std::pow(1.0f - t, falloff);
+}
+
 glm::mat4 ivf::createRotationMatrixTowards(glm::vec3 currentDirection, glm::vec3 targetDirection)
 {
     // Normalize the vectors
@@ -28,7 +50,6 @@ glm::mat4 ivf::createRotationMatrixTowards(glm::vec3 currentDirection, glm::vec3
 
     return rotationMatrix;
 }
-
 
 void ivf::vectorToEuler(const glm::vec3 &unitVector, float &ax, float &ay)
 {
@@ -55,8 +76,7 @@ float LinearInterpolFunc::tri(float t)
 }
 
 LinearInterpolFunc::LinearInterpolFunc()
-{
-}
+{}
 
 void LinearInterpolFunc::addPoint(glm::vec3 p)
 {
@@ -99,7 +119,8 @@ GLenum ivf::checkPrintError(const std::string context, const std::string file, c
 {
     GLenum err = glGetError();
 
-    switch (err) {
+    switch (err)
+    {
     case GL_NO_ERROR:
         break;
     case GL_INVALID_ENUM:

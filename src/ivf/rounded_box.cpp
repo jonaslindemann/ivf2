@@ -6,10 +6,7 @@ using namespace ivf;
 using namespace generator;
 
 RoundedBox::RoundedBox(glm::vec3 size, glm::vec3 segments, double radius, int slices)
-    :m_size(size),
-     m_segments(segments),
-     m_radius(radius),
-     m_slices(slices)
+    : m_size(size), m_segments(segments), m_radius(radius), m_slices(slices)
 {
     this->doSetup();
 }
@@ -88,12 +85,12 @@ void RoundedBox::doSetup()
     gml::ivec3 sg;
 
     si[0] = m_size.x;
-    si[1] = m_size.y;
-    si[2] = m_size.z;
+    si[1] = m_size.z;
+    si[2] = m_size.y;
 
     sg[0] = m_segments.x;
-    sg[1] = m_segments.y;
-    sg[2] = m_segments.z;
+    sg[1] = m_segments.z;
+    sg[2] = m_segments.y;
 
     RoundedBoxMesh rbox(m_radius, si, m_slices, sg);
 
@@ -102,5 +99,3 @@ void RoundedBox::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
-
-

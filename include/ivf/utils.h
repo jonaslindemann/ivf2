@@ -8,6 +8,21 @@
 
 namespace ivf {
 
+// Smooth step function for falloff
+float smoothStep(float edge0, float edge1, float x);
+
+// Linear interpolation for animation
+template<typename T>
+T lerp(const T& a, const T& b, float t) {
+    return a + t * (b - a);
+}
+
+// Rotation matrix around arbitrary axis
+glm::mat4 rotationMatrix(const glm::vec3& axis, float angle);
+
+// Distance-based weight calculation
+float calculateWeight(float distance, float start, float end, float falloff = 1.0f);    
+
 class LinearInterpolFunc {
 private:
     std::vector<glm::vec3> m_points;

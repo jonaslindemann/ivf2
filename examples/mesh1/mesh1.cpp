@@ -15,6 +15,7 @@
 #include <ivfui/ui.h>
 
 #include "twist_window.h"
+#include "bend_window.h"
 
 using namespace ivf;
 using namespace ivfui;
@@ -28,14 +29,11 @@ private:
     IndicesPtr m_indices;
     std::shared_ptr<DeformablePrimitive<RoundedBox>> m_deformableCube;
     TwistDeformerPtr m_twistDeformer;
-    TwistWindowPtr m_twistWindow;
+    BendDeformerPtr m_bendDeformer;
 
-    float m_angle{0.0f};          // Twist angle in radians
-    float m_falloff{1.0};         // Distance falloff factor
-    float m_startDistance{0.0};   // Distance where twist starts
-    float m_endDistance{1.0};     // Distance where twist ends
-    bool m_wireframe{true};       // Wireframe mode
-    float m_angleIncrement{0.5f}; // Angle increment for animation
+    TwistWindowPtr m_twistWindow;
+    BendWindowPtr m_bendWindow;
+
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
     {}
@@ -77,11 +75,15 @@ public:
 
         // Add deformers
         m_twistDeformer = TwistDeformer::create(glm::vec3(0, 1, 0));
-        m_twistDeformer->setAngle(glm::radians(m_angle));
-        m_twistDeformer->setFalloff(m_falloff);
-        m_twistDeformer->setDistanceRange(m_startDistance, m_endDistance);
+
+        m_bendDeformer = BendDeformer::create(glm::vec3(0, 1, 0), glm::vec3(0, 0, 0));
+        m_bendDeformer->setCurvature(2.5f);
+        m_bendDeformer->setDistanceRange(-4.0f, 4.0f);
+        m_bendDeformer->setAxis(glm::vec3(0, 1, 0));
+        m_bendDeformer->setCenter(glm::vec3(0, 0, 0));
 
         m_deformableCube->addDeformer(m_twistDeformer);
+        m_deformableCube->addDeformer(m_bendDeformer);
 
         // Use like any other MeshNode
         m_deformableCube->applyDeformers();
@@ -91,7 +93,12 @@ public:
         this->cameraManipulator()->setCameraPosition(glm::vec3(0, 5, 20));
 
         m_twistWindow = TwistWindow::create();
+        m_twistWindow->setVisible(true);
         this->addUiWindow(m_twistWindow);
+
+        m_bendWindow = BendWindow::create();
+        m_bendWindow->setVisible(true);
+        this->addUiWindow(m_bendWindow);
 
         return 0;
     }
@@ -100,36 +107,39 @@ public:
     {
         // Update twist parameters from the UI window
 
-        m_angle = m_twistWindow->angle();
-        m_falloff = m_twistWindow->falloff();
-        m_startDistance = m_twistWindow->startDistance();
-        m_endDistance = m_twistWindow->endDistance();
-        m_wireframe = m_twistWindow->wireframe();
-        m_deformableCube->setWireframe(m_wireframe);
+        m_deformableCube->setWireframe(m_twistWindow->wireframe());
 
-        m_twistDeformer->setAngle(glm::radians(m_angle));
-        m_twistDeformer->setFalloff(m_falloff);
-        m_twistDeformer->setDistanceRange(m_startDistance, m_endDistance);
+        m_twistDeformer->setAngle(glm::radians(m_twistWindow->angle()));
+        m_twistDeformer->setFalloff(m_twistWindow->falloff());
+        m_twistDeformer->setDistanceRange(m_twistWindow->startDistance(), m_twistWindow->endDistance());
         m_twistDeformer->setCenter(
             glm::vec3(m_twistWindow->center()[0], m_twistWindow->center()[1], m_twistWindow->center()[2]));
 
         m_twistDeformer->setAxis(
             glm::vec3(m_twistWindow->axis()[0], m_twistWindow->axis()[1], m_twistWindow->axis()[2]));
 
-        m_deformableCube->applyDeformers();
+        m_bendDeformer->setCurvature(m_bendWindow->curvature());
+        m_bendDeformer->setDistanceRange(m_bendWindow->startDistance(), m_bendWindow->endDistance());
+        m_bendDeformer->setCenter(
+            glm::vec3(m_bendWindow->center()[0], m_bendWindow->center()[1], m_bendWindow->center()[2]));
+        m_bendDeformer->setAxis(glm::vec3(m_bendWindow->axis()[0], m_bendWindow->axis()[1], m_bendWindow->axis()[2]));
 
-        if (std::abs(m_angle) >= 45.0f)
-        {
-            m_angleIncrement = -m_angleIncrement; // Reverse direction after a full twist
-        }
+        m_deformableCube->applyDeformers();
     }
 
     virtual void onKey(int key, int scancode, int action, int mods) override
     {
         if (key == GLFW_KEY_W && action == GLFW_PRESS)
         {
-            m_wireframe = !m_wireframe;
-            m_deformableCube->setWireframe(m_wireframe);
+            if (m_twistWindow->wireframe())
+            {
+                m_twistWindow->setWireframe(false);
+            }
+            else
+            {
+                m_twistWindow->setWireframe(true);
+            }
+            m_deformableCube->setWireframe(m_twistWindow->wireframe());
         }
         else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         {

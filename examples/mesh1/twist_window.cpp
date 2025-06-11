@@ -3,7 +3,7 @@
 using namespace ivfui;
 
 TwistWindow::TwistWindow()
-    : UiWindow("Twist Example"), m_angle(0.0f), m_falloff(1.0f), m_startDistance(0.0f), m_endDistance(1.0f),
+    : UiWindow("Twist properties"), m_angle(0.0f), m_falloff(1.0f), m_startDistance(0.0f), m_endDistance(1.0f),
       m_wireframe(false), m_angleIncrement(0.5f)
 {}
 

@@ -17,9 +17,10 @@
     },
     "libjpeg-turbo",
     "libpng",
+    "nlohmann-json",
     "opengl",
     "stb",
     "zlib",
-    "nlohmann-json"
+    "bullet3"
   ]
 }

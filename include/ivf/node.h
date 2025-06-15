@@ -9,6 +9,7 @@
 #include <ivf/material.h>
 #include <ivf/texture.h>
 #include <ivf/node_visitor.h>
+#include <ivf/property_inspectable.h>
 
 #include <memory>
 
@@ -23,7 +24,7 @@ namespace ivf {
  * also has a special method drawSelection() for drawing it in a selected state. The node also
  * provides a special object ID which is used for selection.
  */
-class Node : public GLBase, public std::enable_shared_from_this<Node> {
+class Node : public GLBase, public std::enable_shared_from_this<Node>, public PropertyInspectable {
 private:
     std::shared_ptr<Material> m_material{nullptr};
     std::shared_ptr<Texture> m_texture{nullptr};
@@ -149,6 +150,8 @@ protected:
      * to the object ID and returns the next ID.
      */
     virtual uint32_t doEnumerateIds(uint32_t startId);
+
+    virtual void setupProperties() override;
 };
 
 typedef std::shared_ptr<Node> NodePtr;

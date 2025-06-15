@@ -191,3 +191,15 @@ void TransformNode::doPostDraw()
     if (m_useTransform)
         xfmMgr()->popMatrix();
 }
+
+void ivf::TransformNode::setupProperties()
+{
+    Node::setupProperties();
+    addProperty("Position", &m_pos, "Transform");
+    addProperty("Use Transform", &m_useTransform, "Transform");
+    addProperty("Rotation Axis", &m_rotAxis, "Transform");
+    addProperty("Rotation Angle", &m_rotAngle, "Transform");
+    addProperty("Euler Angles", &m_eulerAngles, "Transform");
+    addProperty("Stored Position", &m_storedPos, "Transform");
+    addProperty("Scale", &m_scale, "Transform");
+}

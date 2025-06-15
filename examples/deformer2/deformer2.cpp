@@ -85,8 +85,8 @@ public:
         }
 
         // Add surface turbulence
-        m_surfaceTurbulence = TurbulenceDeformer::create(3.0f, 0.05f, 4, 0.7f, 0.01f);
-        // m_deformable->addDeformer(m_surfaceTurbulence);
+        m_surfaceTurbulence = TurbulenceDeformer::create(10.0f, 0.01f, 4, 0.5f, 0.001f);
+        m_deformable->addDeformer(m_surfaceTurbulence);
 
         this->add(m_deformable);
 

@@ -61,6 +61,8 @@ public:
 protected:
     virtual void doPreDraw();
     virtual void doPostDraw();
+
+    virtual void setupProperties() override;
 };
 
 typedef std::shared_ptr<TransformNode> TransformNodePtr;

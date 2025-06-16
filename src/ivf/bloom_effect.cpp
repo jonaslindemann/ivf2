@@ -43,3 +43,9 @@ void ivf::BloomEffect::doUpdateParams()
     m_program->uniformFloat("threshold", m_threshold);
     m_program->uniformFloat("intensity", m_intensity);
 }
+
+void ivf::BloomEffect::setupProperties()
+{
+    addProperty("threshold", &m_threshold, "Bloom");
+    addProperty("intensity", &m_intensity, "Bloom");
+}

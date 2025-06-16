@@ -78,3 +78,13 @@ std::unique_ptr<Deformer> BendDeformer::clone() const
     cloned->setEnabled(m_enabled);
     return cloned;
 }
+
+void ivf::BendDeformer::setupProperties()
+{
+    Deformer::setupProperties();
+    addProperty("Axis", &m_axis, "Bend");
+    addProperty("Center", &m_center, "Bend");
+    addProperty("Curvature", &m_curvature, "Bend");
+    addProperty("Start distance", &m_startDistance, "Bend");
+    addProperty("End distance", &m_endDistance, "Bend");
+}

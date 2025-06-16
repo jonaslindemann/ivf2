@@ -14,151 +14,220 @@ namespace ivf {
 class Base;
 
 /**
- * Represents different property types that can be exposed
+ * @brief Represents different property types that can be exposed for inspection.
  */
 using PropertyValue = std::variant<double *, int *, bool *, std::string *, float *, glm::vec3 *, glm::vec4 *>;
 
 /**
- * Property metadata and access structure
+ * @struct Property
+ * @brief Property metadata and access structure for property inspection.
+ *
+ * The Property struct holds metadata and access information for a property that can be
+ * inspected or edited at runtime. It supports value pointers, category, range, and read-only flags.
  */
 struct Property {
-    std::string name;
-    std::string category;
-    PropertyValue value;
-    double minValue = 0.0;
-    double maxValue = 100.0;
-    bool hasRange = false;
-    bool readOnly = false;
+    std::string name;        ///< Name of the property.
+    std::string category;    ///< Category for grouping in UI.
+    PropertyValue value;     ///< Pointer to the property value.
+    double minValue = 0.0;   ///< Minimum value (if range is specified).
+    double maxValue = 100.0; ///< Maximum value (if range is specified).
+    bool hasRange = false;   ///< True if the property has a range.
+    bool readOnly = false;   ///< True if the property is read-only.
 
     Property(const std::string &n, PropertyValue v, const std::string &cat = "General");
     Property(const std::string &n, PropertyValue v, double min, double max, const std::string &cat = "General");
 };
 
 /**
- * Mixin class to add property inspection capabilities
+ * @class PropertyInspectable
+ * @brief Mixin class to add property inspection capabilities to objects.
+ *
+ * PropertyInspectable provides a mechanism for objects to expose their properties for
+ * inspection and editing, typically for UI editors or debugging tools. Properties can
+ * be registered, categorized, and have value ranges or read-only status.
  */
 class PropertyInspectable {
 private:
-    std::vector<Property> m_properties;
+    std::vector<Property> m_properties; ///< List of registered properties.
 
 public:
     /**
-     * Get all properties for this object
+     * @brief Get all properties for this object (const).
+     * @return const std::vector<Property>& List of properties.
      */
     const std::vector<Property> &getProperties() const;
 
     /**
-     * Get all properties, ensuring they are initialized
+     * @brief Get all properties, ensuring they are initialized.
+     * @return const std::vector<Property>& List of properties.
      */
     const std::vector<Property> &getProperties();
 
     /**
-     * Get properties by category
+     * @brief Get properties by category.
+     * @param category Category name.
+     * @return std::vector<Property> Properties in the given category.
      */
     std::vector<Property> getPropertiesByCategory(const std::string &category) const;
 
     /**
-     * Get all unique categories
+     * @brief Get all unique property categories.
+     * @return std::vector<std::string> List of category names.
      */
     std::vector<std::string> getCategories() const;
 
     /**
-     * Initialize properties for inspection
-     * This is a public wrapper around the protected setupProperties()
+     * @brief Initialize properties for inspection (public wrapper).
      */
     void initializeProperties();
 
     /**
-     * Force re-initialization of properties
+     * @brief Force re-initialization of properties.
      */
     void refreshProperties();
 
     /**
-     * Notify that a property has changed (public wrapper)
+     * @brief Notify that a property has changed (public wrapper).
+     * @param propertyName Name of the property that changed.
      */
     void notifyPropertyChanged(const std::string &propertyName);
 
 protected:
     /**
-     * Register properties for inspection
+     * @brief Register a double property for inspection.
      */
     void addProperty(const std::string &name, double *value, const std::string &category = "General");
     void addProperty(const std::string &name, double *value, double min, double max,
                      const std::string &category = "General");
+
+    /**
+     * @brief Register an int property for inspection.
+     */
     void addProperty(const std::string &name, int *value, const std::string &category = "General");
     void addProperty(const std::string &name, int *value, double min, double max,
                      const std::string &category = "General");
+
+    /**
+     * @brief Register a bool property for inspection.
+     */
     void addProperty(const std::string &name, bool *value, const std::string &category = "General");
+
+    /**
+     * @brief Register a string property for inspection.
+     */
     void addProperty(const std::string &name, std::string *value, const std::string &category = "General");
+
+    /**
+     * @brief Register a float property for inspection.
+     */
     void addProperty(const std::string &name, float *value, const std::string &category = "General");
     void addProperty(const std::string &name, float *value, double min, double max,
                      const std::string &category = "General");
+
+    /**
+     * @brief Register a glm::vec3 property for inspection.
+     */
     void addProperty(const std::string &name, glm::vec3 *value, const std::string &category = "General");
     void addPropertyWithRange(const std::string &name, glm::vec3 *value, double minVal, double maxVal,
                               const std::string &category = "General");
+
+    /**
+     * @brief Register a glm::vec4 property for inspection.
+     */
     void addProperty(const std::string &name, glm::vec4 *value, const std::string &category = "General");
     void addPropertyWithRange(const std::string &name, glm::vec4 *value, double minVal, double maxVal,
                               const std::string &category = "General");
 
     /**
-     * Add read-only property
+     * @brief Add a read-only property for inspection.
+     * @param name Property name.
+     * @param value Property value pointer.
+     * @param category Category name.
      */
     void addReadOnlyProperty(const std::string &name, PropertyValue value, const std::string &category = "General");
 
     /**
-     * Called when properties are first requested - override to register properties
+     * @brief Called when properties are first requested - override to register properties.
      */
     virtual void setupProperties();
 
     /**
-     * Called when a property value changes - override to handle updates
+     * @brief Called when a property value changes - override to handle updates.
+     * @param propertyName Name of the property that changed.
      */
     virtual void onPropertyChanged(const std::string &propertyName);
 };
 
 /**
- * Helper class for UI integration
+ * @class PropertyEditor
+ * @brief Helper class for UI integration and property editing.
+ *
+ * PropertyEditor provides static utility functions for converting property values to and from
+ * strings, determining property types, and editing individual vector components.
  */
 class PropertyEditor {
 public:
     /**
-     * Get string representation of property value
+     * @brief Get string representation of a property value.
+     * @param prop Property to convert.
+     * @return std::string String representation.
      */
     static std::string getValueAsString(const Property &prop);
 
     /**
-     * Set property value from string
+     * @brief Set property value from a string.
+     * @param prop Property to set.
+     * @param value String value to parse.
+     * @return bool True if successful.
      */
     static bool setValueFromString(const Property &prop, const std::string &value);
 
     /**
-     * Get property type as string
+     * @brief Get the property type as a string.
+     * @param prop Property to query.
+     * @return std::string Type name.
      */
     static std::string getPropertyType(const Property &prop);
 
     /**
-     * Get individual component of vector properties
+     * @brief Get the name of a vector component.
+     * @param prop Property to query.
+     * @param component Component index.
+     * @return std::string Component name.
      */
     static std::string getComponentName(const Property &prop, int component);
 
     /**
-     * Get component value as float
+     * @brief Get the value of a vector component as a float.
+     * @param prop Property to query.
+     * @param component Component index.
+     * @return float Component value.
      */
     static float getComponentValue(const Property &prop, int component);
 
     /**
-     * Set component value
+     * @brief Set the value of a vector component.
+     * @param prop Property to modify.
+     * @param component Component index.
+     * @param value New value.
+     * @return bool True if successful.
      */
     static bool setComponentValue(const Property &prop, int component, float value);
 
 private:
     /**
-     * Parse vec3 from string format: "(x, y, z)" or "x y z" or "x,y,z"
+     * @brief Parse a glm::vec3 from a string.
+     * @param str String to parse.
+     * @param vec Output vector.
+     * @return bool True if successful.
      */
     static bool parseVec3(const std::string &str, glm::vec3 &vec);
 
     /**
-     * Parse vec4 from string format: "(x, y, z, w)" or "x y z w" or "x,y,z,w"
+     * @brief Parse a glm::vec4 from a string.
+     * @param str String to parse.
+     * @param vec Output vector.
+     * @return bool True if successful.
      */
     static bool parseVec4(const std::string &str, glm::vec4 &vec);
 };

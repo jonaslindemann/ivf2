@@ -9,7 +9,7 @@ using namespace ivf;
 
 using namespace std;
 
-Program::Program() : m_id(-1), m_name("generic")
+Program::Program() : m_id(-1), m_name("generic"), m_enabled(true)
 {}
 
 Program::~Program()
@@ -71,8 +71,27 @@ bool Program::link()
 
 void Program::use()
 {
-    glUseProgram(m_id);
-    this->doParams();
+    if (m_id == -1)
+    {
+        fprintf(stderr, "Program not linked yet, cannot use it.\n");
+        return;
+    }
+
+    if (m_enabled)
+    {
+        glUseProgram(m_id);
+        this->doParams();
+    }
+}
+
+bool ivf::Program::enabled() const
+{
+    return m_enabled;
+}
+
+void ivf::Program::setEnabled(bool enabled)
+{
+    m_enabled = enabled;
 }
 
 void ivf::Program::bindAttribLoc(GLuint idx, const std::string name)

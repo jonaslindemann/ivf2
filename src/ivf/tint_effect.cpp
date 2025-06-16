@@ -55,3 +55,10 @@ void ivf::TintEffect::doUpdateParams()
     m_program->uniformFloat("tintStrength", m_tintStrength);
     m_program->uniformVec3("grayScaleWeights", m_grayScaleWeights);
 }
+
+void ivf::TintEffect::setupProperties()
+{
+    addProperty("Tint color", &m_tintColor, "Tint");
+    addProperty("Tint strength", &m_tintStrength, "Tint");
+    addProperty("Gray scale weights", &m_grayScaleWeights, "Tint");
+}

@@ -43,3 +43,9 @@ void ivf::VignetteEffect::doUpdateParams()
     m_program->uniformFloat("vignetteSize", m_vignetteSize);
     m_program->uniformFloat("vignetteSmoothness", m_vignetteSmoothness);
 }
+
+void ivf::VignetteEffect::setupProperties()
+{
+    addProperty("Size", &m_vignetteSize, "Vignette");
+    addProperty("Smoothness", &m_vignetteSmoothness, "Vignette");
+}

@@ -35,3 +35,8 @@ void ivf::PixelationEffect::doUpdateParams()
 {
     m_program->uniformFloat("pixelSize", m_pixelSize);
 }
+
+void ivf::PixelationEffect::setupProperties()
+{
+    addProperty("pixelSize", &m_pixelSize, "Pixelation");
+}

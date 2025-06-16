@@ -4,22 +4,52 @@
 
 namespace ivf {
 
-	class InstanceNode : public TransformNode {
-	private:
-		std::shared_ptr<TransformNode> m_node;
-	public:
-		InstanceNode();
+/**
+ * @class InstanceNode
+ * @brief Node that instances another TransformNode, sharing its geometry and properties.
+ *
+ * The InstanceNode class allows instancing of a TransformNode, enabling multiple nodes to share
+ * the same geometry and properties while having independent transformations. This is useful for
+ * efficient rendering of repeated objects in a scene.
+ */
+class InstanceNode : public TransformNode {
+private:
+    std::shared_ptr<TransformNode> m_node; ///< The instanced node.
 
-		static std::shared_ptr<InstanceNode> create();
+public:
+    /**
+     * @brief Default constructor.
+     */
+    InstanceNode();
 
-		void setNode(std::shared_ptr<TransformNode> node);
-		std::shared_ptr<TransformNode> node();
+    /**
+     * @brief Factory method to create a shared pointer to an InstanceNode instance.
+     * @return std::shared_ptr<InstanceNode> New InstanceNode instance.
+     */
+    static std::shared_ptr<InstanceNode> create();
 
-	protected:
-		virtual void doDraw();
-	};
+    /**
+     * @brief Set the node to be instanced.
+     * @param node Shared pointer to the TransformNode to instance.
+     */
+    void setNode(std::shared_ptr<TransformNode> node);
 
-	typedef std::shared_ptr<InstanceNode> InstanceNodePtr;
+    /**
+     * @brief Get the currently instanced node.
+     * @return std::shared_ptr<TransformNode> The instanced node.
+     */
+    std::shared_ptr<TransformNode> node();
+
+protected:
+    /**
+     * @brief Draw the instanced node with this node's transformation.
+     */
+    virtual void doDraw();
 };
 
-
+/**
+ * @typedef InstanceNodePtr
+ * @brief Shared pointer type for InstanceNode.
+ */
+typedef std::shared_ptr<InstanceNode> InstanceNodePtr;
+};

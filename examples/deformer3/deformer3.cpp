@@ -116,7 +116,7 @@ public:
         this->add(plane);
         this->add(cylinder);
 
-        m_objectInspector = ObjectInspector::create();
+        m_objectInspector = ObjectInspector::create("Sphere");
         m_objectInspector->setObject(sphere);
 
         this->addUiWindow(m_objectInspector);

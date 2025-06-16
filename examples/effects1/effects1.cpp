@@ -27,6 +27,8 @@
 #include <ivf/grid_layout.h>
 #include <ivf/extent_visitor.h>
 
+#include <ivfui/object_inspector.h>
+
 using namespace ivf;
 using namespace ivfui;
 using namespace ivfmath;
@@ -72,6 +74,8 @@ private:
     ExtentVisitor m_extentVisitor;
     CompositeNodePtr m_nodes;
     MaterialPtr m_material;
+
+    ObjectInspectorPtr m_inspector;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -168,14 +172,19 @@ public:
         pixelationEffect->setPixelSize(4.0);
         pixelationEffect->load();
 
-        // this->addEffect(blurEffect); // OK
-        // this->addEffect(tintEffect);
-        // this->addEffect(chromaticEffect); // OK
-        // this->addEffect(ditheringEffect); // OK
-        // this->addEffect(bloomEffect); // OK
-        // this->addEffect(pixelationEffect);
-        // this->addEffect(vignetteEffect);
+        this->addEffect(blurEffect); // OK
+        this->addEffect(tintEffect);
+        this->addEffect(chromaticEffect); // OK
+        this->addEffect(ditheringEffect); // OK
+        this->addEffect(bloomEffect);     // OK
+        this->addEffect(pixelationEffect);
+        this->addEffect(vignetteEffect);
         this->addEffect(filmgrainEffect); // OK
+
+        this->disableAllEffects();
+
+        m_inspector = ObjectInspector::create("Inspector");
+        this->addUiWindow(m_inspector);
 
         return 0;
     }
@@ -183,6 +192,137 @@ public:
     virtual void onUpdate()
     {
         m_nodes->accept(&m_visitor);
+    }
+
+    virtual void onKey(int key, int scancode, int action, int mods) override
+    {
+        if (action == GLFW_PRESS)
+        {
+            if (key == GLFW_KEY_0)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(0));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(0))
+                        this->disableEffect(0);
+                    else
+                        this->enableEffect(0);
+                }
+            }
+            else if (key == GLFW_KEY_1)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(1));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(1))
+                        this->disableEffect(1);
+                    else
+                        this->enableEffect(1);
+                }
+            }
+            else if (key == GLFW_KEY_2)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(2));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(2))
+                        this->disableEffect(2);
+                    else
+                        this->enableEffect(2);
+                }
+            }
+            else if (key == GLFW_KEY_3)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(3));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(3))
+                        this->disableEffect(3);
+                    else
+                        this->enableEffect(3);
+                }
+            }
+            else if (key == GLFW_KEY_4)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(4));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(4))
+                        this->disableEffect(4);
+                    else
+                        this->enableEffect(4);
+                }
+            }
+            else if (key == GLFW_KEY_5)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(5));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(5))
+                        this->disableEffect(5);
+                    else
+                        this->enableEffect(5);
+                }
+            }
+            else if (key == GLFW_KEY_6)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(6));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(6))
+                        this->disableEffect(6);
+                    else
+                        this->enableEffect(6);
+                }
+            }
+            else if (key == GLFW_KEY_7)
+            {
+                if (mods & GLFW_MOD_SHIFT)
+                {
+                    m_inspector->setObject(this->effect(7));
+                }
+                else
+                {
+                    if (this->isEffectEnabled(7))
+                        this->disableEffect(7);
+                    else
+                        this->enableEffect(7);
+                }
+            }
+            if (key == GLFW_KEY_ESCAPE)
+            {
+                this->close();
+            }
+            else if (key == GLFW_KEY_F1)
+            {
+                this->showControlPanel();
+            }
+            else if (key == GLFW_KEY_F2)
+            {
+                this->showCameraWindow();
+            }
+        }
     }
 };
 

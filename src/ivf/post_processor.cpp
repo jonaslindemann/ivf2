@@ -137,10 +137,12 @@ void PostProcessor::apply(GLuint inputTexture)
         // Bind source texture and set uniforms
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sourceTexture);
-        m_fxPrograms[i]->uniformInt("screenTexture", 0);
-        // m_fxPrograms[i]->uniformInt("screenWidth", m_width);
-        // m_fxPrograms[i]->uniformInt("screenHeight", m_height);
-        m_fxPrograms[i]->uniformFloat("time", m_time);
+
+        if (m_fxPrograms[i]->enabled())
+        {
+            m_fxPrograms[i]->uniformInt("screenTexture", 0);
+            m_fxPrograms[i]->uniformFloat("time", m_time);
+        }
 
         glDisable(GL_DEPTH_TEST);
 

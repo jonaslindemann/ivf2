@@ -87,6 +87,88 @@ void ivfui::GLFWSceneWindow::clearEffects()
     m_postProcessor->clearEffects();
 }
 
+void ivfui::GLFWSceneWindow::enableEffect(int index)
+{
+    if (index < 0 || index >= m_effects.size())
+    {
+        cout << "Invalid effect index: " << index << endl;
+        return;
+    }
+
+    auto effect = m_effects[index];
+
+    if (effect)
+    {
+        effect->program()->setEnabled(true);
+    }
+    else
+    {
+        cout << "Effect at index " << index << " is null." << endl;
+    }
+}
+
+void ivfui::GLFWSceneWindow::disableEffect(int index)
+{
+    if (index < 0 || index >= m_effects.size())
+    {
+        cout << "Invalid effect index: " << index << endl;
+        return;
+    }
+
+    auto effect = m_effects[index];
+
+    if (effect)
+    {
+        effect->program()->setEnabled(false);
+    }
+    else
+    {
+        cout << "Effect at index " << index << " is null." << endl;
+    }
+}
+
+bool ivfui::GLFWSceneWindow::isEffectEnabled(int index)
+{
+    if (index < 0 || index >= m_effects.size())
+    {
+        cout << "Invalid effect index: " << index << endl;
+        return false;
+    }
+    auto effect = m_effects[index];
+    if (effect)
+    {
+        return effect->program()->enabled();
+    }
+    else
+    {
+        cout << "Effect at index " << index << " is null." << endl;
+        return false;
+    }
+}
+
+void ivfui::GLFWSceneWindow::disableAllEffects()
+{
+    for (auto &effect : m_effects)
+    {
+        if (effect)
+            effect->program()->setEnabled(false);
+        else
+        {
+            cout << "Effect is null." << endl;
+        }
+    }
+}
+
+ivf::EffectPtr ivfui::GLFWSceneWindow::effect(int index)
+{
+    if (index < 0 || index >= m_effects.size())
+    {
+        cout << "Invalid effect index: " << index << endl;
+        return nullptr;
+    }
+    return m_effects[index];
+}
+
 void ivfui::GLFWSceneWindow::enableHeadlight()
 {
     auto lightMgr = ivf::LightManager::instance();

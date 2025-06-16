@@ -1,5 +1,4 @@
 #pragma once
-
 /**
  * @file node.h
  * @brief Node class for the ivf library.
@@ -16,144 +15,171 @@
 namespace ivf {
 
 /**
- * Node class for the ivf library.
+ * @class Node
+ * @brief Base class for all drawable scene nodes in the ivf library.
  *
- * This class is used to define a common interface for all nodes in the ivf library. A node is
- * an object that can be drawn to the screen. It can have a material and a texture associated with
- * it. It can also be visible or invisible. The node can be drawn using the draw() method, and it
- * also has a special method drawSelection() for drawing it in a selected state. The node also
- * provides a special object ID which is used for selection.
+ * The Node class defines a common interface for all drawable objects in the ivf library.
+ * A node can have a material and a texture, be visible or invisible, and be drawn in
+ * normal or selected state. Nodes support hierarchical relationships (parent/child),
+ * object IDs for selection, and property inspection for editor integration.
  */
 class Node : public GLBase, public std::enable_shared_from_this<Node>, public PropertyInspectable {
 private:
-    std::shared_ptr<Material> m_material{nullptr};
-    std::shared_ptr<Texture> m_texture{nullptr};
-    bool m_useMaterial{true};
-    bool m_useTexture{false};
-    bool m_visible{true};
-    uint32_t m_objectId{0};
-    std::weak_ptr<Node> m_parent{};
+    std::shared_ptr<Material> m_material{nullptr}; ///< Material associated with the node.
+    std::shared_ptr<Texture> m_texture{nullptr};   ///< Texture associated with the node.
+    bool m_useMaterial{true};                      ///< Whether to use the material for rendering.
+    bool m_useTexture{false};                      ///< Whether to use the texture for rendering.
+    bool m_visible{true};                          ///< Whether the node is visible.
+    uint32_t m_objectId{0};                        ///< Object ID for selection.
+    std::weak_ptr<Node> m_parent{};                ///< Parent node (for hierarchy).
 
 public:
-    std::shared_ptr<Node> parent() const;
-    void setParent(std::shared_ptr<Node> parent);
     /**
-     * Draws the node to the screen.
+     * @brief Get the parent node.
+     * @return std::shared_ptr<Node> Parent node pointer.
+     */
+    std::shared_ptr<Node> parent() const;
+
+    /**
+     * @brief Set the parent node.
+     * @param parent Parent node pointer.
+     */
+    void setParent(std::shared_ptr<Node> parent);
+
+    /**
+     * @brief Draw the node to the screen.
      */
     void draw();
 
     /**
-     * Draws the node in a selected state.
+     * @brief Draw the node in a selected state.
      */
     void drawSelection();
 
     /**
-     * Set the material for the node.
+     * @brief Set the material for the node.
+     * @param material Shared pointer to the material.
      */
     void setMaterial(std::shared_ptr<Material> material);
 
     /**
-     * Return the current material for the node.
+     * @brief Get the current material for the node.
+     * @return std::shared_ptr<Material> Material pointer.
      */
     std::shared_ptr<Material> material();
 
     /**
-     * Set the texture for the node.
+     * @brief Set the texture for the node.
+     * @param texture Shared pointer to the texture.
      */
     void setTexture(std::shared_ptr<Texture> texture);
 
     /**
-     * Return the current texture for the node.
+     * @brief Get the current texture for the node.
+     * @return std::shared_ptr<Texture> Texture pointer.
      */
     std::shared_ptr<Texture> texture();
 
     /**
-     * If set to true, the node will use the material for rendering. If set to false, the node will * not use the
-     * material. Default is true.
+     * @brief Enable or disable the use of the material for rendering.
+     * @param flag True to use the material, false otherwise.
      */
     void setUseMaterial(bool flag);
 
     /**
-     * Return the current state of the useMaterial flag.
+     * @brief Check if the material is used for rendering.
+     * @return bool True if the material is used.
      */
     bool useMaterial();
 
     /**
-     * If set to true, the node will use the texture for rendering. If set to false, the node will * not use the
-     * texture. Default is false.
+     * @brief Enable or disable the use of the texture for rendering.
+     * @param flag True to use the texture, false otherwise.
      */
     void setUseTexture(bool flag);
 
     /**
-     * Return the current state of the useTexture flag.
+     * @brief Check if the texture is used for rendering.
+     * @return bool True if the texture is used.
      */
     bool useTexture();
 
     /**
-     * Set the visibility of the node. If set to true, the node will be visible. If set to false,
-     * the node will be invisible. Default is true.
+     * @brief Set the visibility of the node.
+     * @param flag True to make visible, false to hide.
      */
     void setVisible(bool flag);
+
+    /**
+     * @brief Check if the node is visible.
+     * @return bool True if visible.
+     */
     bool visible() const;
 
     /**
-     * Set the object ID for the node. The object ID is used for selection. The default value is 0.
+     * @brief Set the object ID for the node (used for selection).
+     * @param objectId Object ID value.
      */
     void setObjectId(uint32_t objectId);
 
     /**
-     * Return the current object ID for the node.
+     * @brief Get the current object ID for the node.
+     * @return uint32_t Object ID value.
      */
     uint32_t objectId() const;
 
     /**
-     * Return the next object ID for the node. This method is used for selection. The default value is 0.
+     * @brief Enumerate and assign the next object ID for the node (used for selection).
+     * @param startId Starting object ID.
+     * @return uint32_t Next available object ID.
      */
     uint32_t enumerateIds(uint32_t startId);
 
     /**
-     * Accept a visitor. This method is used for the visitor pattern. The visitor will be able to
-     * visit the node and perform some action on it.
+     * @brief Accept a visitor for traversal or processing (visitor pattern).
+     * @param visitor Pointer to the NodeVisitor.
      */
     virtual void accept(NodeVisitor *visitor);
 
 protected:
     /**
-     * Protected virtual method called before drawing the node. This method can be overridden by
-     * subclasses to perform some action before drawing the node. The default implementation does
-     * nothing.
+     * @brief Called before drawing the node. Override to perform actions before drawing.
      */
     virtual void doPreDraw();
 
     /**
-     * Protected virtual method for implementing the actual drawing of the node. The default
-     * implementation does nothing.
+     * @brief Called to perform the actual drawing of the node. Override to implement custom drawing.
      */
     virtual void doDraw();
 
     /**
-     * Protected virtual method called after drawing the node. This method can be overridden by
-     * subclasses to perform some action after drawing the node. The default implementation does
-     * nothing.
+     * @brief Called after drawing the node. Override to perform actions after drawing.
      */
     virtual void doPostDraw();
 
     /**
-     * Protected virtual method for implementing the actual drawing of the node in a selected
-     * state. The default implementation does nothing.
+     * @brief Called to perform the actual drawing of the node in a selected state.
      */
     virtual void doDrawSelection();
 
     /**
-     * Protected virtual method for enumerating the object IDs. This method can be overridden by
-     * subclasses to implement custom ID enumeration. The default implementation assigns the startId
-     * to the object ID and returns the next ID.
+     * @brief Called to enumerate object IDs. Override to implement custom ID enumeration.
+     * The default implementation assigns the startId to the object ID and returns the next ID.
+     * @param startId Starting object ID.
+     * @return uint32_t Next available object ID.
      */
     virtual uint32_t doEnumerateIds(uint32_t startId);
 
+    /**
+     * @brief Register properties for inspection (editor integration).
+     */
     virtual void setupProperties() override;
 };
 
+/**
+ * @typedef NodePtr
+ * @brief Shared pointer type for Node.
+ */
 typedef std::shared_ptr<Node> NodePtr;
 
 } // namespace ivf

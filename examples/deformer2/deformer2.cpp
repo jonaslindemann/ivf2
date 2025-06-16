@@ -7,14 +7,13 @@
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
 
-#include <ivf/twist_deformer.h>
-#include <ivf/bend_deformer.h>
 #include <ivf/deformable_mesh_node.h>
 #include <ivf/deformable_primitive.h>
 #include <ivf/wave_deformer.h>
 #include <ivf/turbulence_deformer.h>
 
 #include <ivfui/ui.h>
+#include <ivfui/object_inspector.h>
 
 using namespace ivf;
 using namespace ivfui;
@@ -27,6 +26,13 @@ private:
 
     std::vector<std::shared_ptr<WaveDeformer>> m_waves;
     std::shared_ptr<TurbulenceDeformer> m_surfaceTurbulence;
+
+    ObjectInspectorPtr m_wave1Inspector;
+    ObjectInspectorPtr m_wave2Inspector;
+    ObjectInspectorPtr m_wave3Inspector;
+    ObjectInspectorPtr m_wave4Inspector;
+    ObjectInspectorPtr m_wave5Inspector;
+    ObjectInspectorPtr m_surfaceTurbulenceInspector;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -89,6 +95,39 @@ public:
         m_deformable->addDeformer(m_surfaceTurbulence);
 
         this->add(m_deformable);
+
+        // Create object inspectors for each wave and turbulence
+
+        m_wave1Inspector = ObjectInspector::create("Wave 1");
+        m_wave1Inspector->setObject(wave1);
+        m_wave1Inspector->setVisible(true);
+
+        m_wave2Inspector = ObjectInspector::create("Wave 2");
+        m_wave2Inspector->setObject(wave2);
+        m_wave2Inspector->setVisible(true);
+
+        m_wave3Inspector = ObjectInspector::create("Wave 3");
+        m_wave3Inspector->setObject(wave3);
+        m_wave3Inspector->setVisible(true);
+
+        m_wave4Inspector = ObjectInspector::create("Wave 4");
+        m_wave4Inspector->setObject(wave4);
+        m_wave4Inspector->setVisible(true);
+
+        m_wave5Inspector = ObjectInspector::create("Wave 5");
+        m_wave5Inspector->setObject(wave5);
+        m_wave5Inspector->setVisible(true);
+
+        m_surfaceTurbulenceInspector = ObjectInspector::create("Surface Turbulence");
+        m_surfaceTurbulenceInspector->setObject(m_surfaceTurbulence);
+        m_surfaceTurbulenceInspector->setVisible(true);
+
+        this->addUiWindow(m_wave1Inspector);
+        this->addUiWindow(m_wave2Inspector);
+        this->addUiWindow(m_wave3Inspector);
+        this->addUiWindow(m_wave4Inspector);
+        this->addUiWindow(m_wave5Inspector);
+        this->addUiWindow(m_surfaceTurbulenceInspector);
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(0, 5, 20));
 

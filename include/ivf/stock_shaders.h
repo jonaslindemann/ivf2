@@ -2,8 +2,23 @@
 
 #include <string>
 
+#pragma once
+
+#include <string>
+
 namespace ivf {
 
+/**
+ * @file stock_shaders.h
+ * @brief Contains GLSL shader source code strings for basic rendering and lighting.
+ *
+ * This header provides inline string constants for vertex and fragment shaders used in
+ * basic rendering, including support for lighting, shadow mapping, and texture blending.
+ * These shaders are intended for use with OpenGL 3.3+ and can be loaded at runtime for
+ * custom rendering pipelines.
+ */
+
+/// Vertex shader for basic rendering with lighting and shadow mapping (OpenGL 3.3+).
 inline const std::string basic_vert_shader_source = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
@@ -42,6 +57,7 @@ void main()
 }
 )";
 
+/// Fragment shader for basic rendering with lighting, shadow mapping, and texture blending (OpenGL 4.0+).
 inline const std::string basic_frag_shader_source = R"(
 #version 400 core
 

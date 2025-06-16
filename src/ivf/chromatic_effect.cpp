@@ -35,3 +35,8 @@ void ivf::ChromaticEffect::doUpdateParams()
 {
     m_program->uniformFloat("offset", m_offset);
 }
+
+void ivf::ChromaticEffect::setupProperties()
+{
+    addProperty("offset", &m_offset, "Chromatic");
+}

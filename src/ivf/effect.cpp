@@ -46,9 +46,11 @@ void ivf::Effect::load()
 
 void ivf::Effect::use()
 {
-
     if (m_program != nullptr)
     {
+        if (!m_program->enabled())
+            return; // Already in use
+
         m_program->use();
         m_program->uniformFloat("time", m_time);
         m_program->uniformInt("width", m_width);

@@ -5,16 +5,16 @@
 
 using namespace ivfui;
 
-ObjectInspector::ObjectInspector()
-    : UiWindow("Object Inspector"), m_currentObject(nullptr), m_showAdvanced(false), m_dragSpeed(0.1f)
+ObjectInspector::ObjectInspector(const std::string &name)
+    : UiWindow(name), m_currentObject(nullptr), m_showAdvanced(false), m_dragSpeed(0.1f)
 {}
 
 ObjectInspector::~ObjectInspector()
 {}
 
-std::shared_ptr<ObjectInspector> ObjectInspector::create()
+std::shared_ptr<ObjectInspector> ObjectInspector::create(const std::string &name)
 {
-    return std::make_shared<ObjectInspector>();
+    return std::make_shared<ObjectInspector>(name);
 }
 
 void ObjectInspector::setObject(std::shared_ptr<ivf::PropertyInspectable> object, const std::string &objectName)
@@ -64,8 +64,11 @@ void ObjectInspector::doDraw()
     }
 
     // Object header
-    ImGui::Text("Object: %s", m_objectName.c_str());
-    ImGui::Separator();
+    if (m_objectName != "Object")
+    {
+        ImGui::Text("Object: %s", m_objectName.c_str());
+        ImGui::Separator();
+    }
 
     // Settings
     if (ImGui::CollapsingHeader("Inspector Settings"))

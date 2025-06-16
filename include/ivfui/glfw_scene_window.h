@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @file glfw_scene_window.h
+ * @brief Declares the GLFWSceneWindow class for interactive 3D scene rendering and UI in the ivfui library.
+ */
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -23,113 +28,389 @@
 
 namespace ivfui {
 
+/**
+ * @class GLFWSceneWindow
+ * @brief Main window for 3D scene rendering, UI integration, and post-processing effects.
+ *
+ * The GLFWSceneWindow class provides a comprehensive window for rendering a 3D scene using
+ * a scene graph (CompositeNode), camera manipulation, UI overlays, and post-processing effects.
+ * It supports node selection, render-to-texture, axis/grid overlays, and integration with
+ * custom UI windows and control panels. Inherits from GLFWWindow.
+ */
 class GLFWSceneWindow : public GLFWWindow {
 private:
-    ivf::CompositeNodePtr m_scene;
-    ivfui::CameraManipulatorPtr m_camManip;
-    std::vector<ivfui::UiWindowPtr> m_uiWindows;
-    ivf::BufferSelectionPtr m_bufferSelection;
-    ivf::FrameBufferPtr m_frameBuffer;
-    ivf::PostProcessorPtr m_postProcessor;
+    ivf::CompositeNodePtr m_scene;               ///< Root scene node.
+    ivfui::CameraManipulatorPtr m_camManip;      ///< Camera manipulator for navigation.
+    std::vector<ivfui::UiWindowPtr> m_uiWindows; ///< List of additional UI windows.
+    ivf::BufferSelectionPtr m_bufferSelection;   ///< Buffer for selection rendering.
+    ivf::FrameBufferPtr m_frameBuffer;           ///< Framebuffer for offscreen rendering.
+    ivf::PostProcessorPtr m_postProcessor;       ///< Post-processing pipeline.
+    ivfui::UiMainMenuPtr m_mainMenu;             ///< Main menu UI.
+    SceneControlPanelPtr m_sceneControlPanel;    ///< Scene control panel UI.
+    CameraWindowPtr m_cameraWindow;              ///< Camera control window UI.
 
-    ivfui::UiMainMenuPtr m_mainMenu;
+    bool m_selectionEnabled{false}; ///< Selection mode enabled.
+    ivf::Node *m_lastNode;          ///< Last node under the cursor.
+    ivf::Node *m_currentNode;       ///< Current node under the cursor.
 
-    SceneControlPanelPtr m_sceneControlPanel;
-    CameraWindowPtr m_cameraWindow;
+    bool m_renderToTexture{false};    ///< Render to texture enabled.
+    bool m_selectionRendering{false}; ///< Selection rendering in progress.
+    bool m_showAxis{false};           ///< Show axis overlay.
+    bool m_showGrid{false};           ///< Show grid overlay.
 
-    bool m_selectionEnabled{false};
-    ivf::Node *m_lastNode;
-    ivf::Node *m_currentNode;
+    ivf::AxisPtr m_axis; ///< Axis overlay object.
+    ivf::GridPtr m_grid; ///< Grid overlay object.
 
-    bool m_renderToTexture{false};
-    bool m_selectionRendering{false};
-    bool m_showAxis{false};
-    bool m_showGrid{false};
-
-    ivf::AxisPtr m_axis;
-    ivf::GridPtr m_grid;
-
-    std::vector<ivf::EffectPtr> m_effects;
+    std::vector<ivf::EffectPtr> m_effects; ///< List of post-processing effects.
 
 public:
+    /**
+     * @brief Construct a GLFWSceneWindow with the given size and title.
+     * @param width Window width in pixels.
+     * @param height Window height in pixels.
+     * @param title Window title.
+     * @param monitor Optional monitor for fullscreen mode.
+     * @param shared Optional shared OpenGL context.
+     */
     GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor = nullptr,
                     GLFWwindow *shared = nullptr);
+
+    /**
+     * @brief Destructor. Cleans up resources.
+     */
     virtual ~GLFWSceneWindow();
 
+    /**
+     * @brief Factory method to create a shared pointer to a GLFWSceneWindow instance.
+     * @param width Window width in pixels.
+     * @param height Window height in pixels.
+     * @param title Window title.
+     * @param monitor Optional monitor for fullscreen mode.
+     * @param shared Optional shared OpenGL context.
+     * @return std::shared_ptr<GLFWSceneWindow> New GLFWSceneWindow instance.
+     */
     static std::shared_ptr<GLFWSceneWindow> create(int width, int height, const std::string title,
                                                    GLFWmonitor *monitor = nullptr, GLFWwindow *shared = nullptr);
 
+    /**
+     * @brief Add a node to the scene.
+     * @param node Shared pointer to the node to add.
+     */
     void add(ivf::NodePtr node);
+
+    /**
+     * @brief Remove a node from the scene.
+     * @param node Shared pointer to the node to remove.
+     */
     void remove(ivf::NodePtr node);
+
+    /**
+     * @brief Remove all nodes from the scene.
+     */
     void clear();
 
+    /**
+     * @brief Enable or disable selection mode.
+     * @param enabled True to enable selection, false to disable.
+     */
     void setSelectionEnabled(bool enabled);
+
+    /**
+     * @brief Check if selection mode is enabled.
+     * @return bool True if selection is enabled.
+     */
     bool selectionEnabled();
 
+    /**
+     * @brief Enable or disable render-to-texture mode.
+     * @param renderToTexture True to enable, false to disable.
+     */
     void setRenderToTexture(bool renderToTexture);
+
+    /**
+     * @brief Check if render-to-texture mode is enabled.
+     * @return bool True if enabled.
+     */
     bool renderToTexture();
 
+    /**
+     * @brief Add a custom UI window to the scene window.
+     * @param uiWindow Shared pointer to the UI window.
+     */
     void addUiWindow(ivfui::UiWindowPtr uiWindow);
 
+    /**
+     * @brief Add a post-processing effect to the scene.
+     * @param effect Shared pointer to the effect.
+     */
     void addEffect(ivf::EffectPtr effect);
+
+    /**
+     * @brief Remove all post-processing effects.
+     */
     void clearEffects();
 
+    /**
+     * @brief Enable a specific post-processing effect by index.
+     * @param index Effect index.
+     */
+    void enableEffect(int index);
+
+    /**
+     * @brief Disable a specific post-processing effect by index.
+     * @param index Effect index.
+     */
+    void disableEffect(int index);
+
+    /**
+     * @brief Check if a specific effect is enabled.
+     * @param index Effect index.
+     * @return bool True if enabled.
+     */
+    bool isEffectEnabled(int index);
+
+    /**
+     * @brief Disable all post-processing effects.
+     */
+    void disableAllEffects();
+
+    /**
+     * @brief Get a specific effect by index.
+     * @param index Effect index.
+     * @return ivf::EffectPtr Shared pointer to the effect.
+     */
+    ivf::EffectPtr effect(int index);
+
+    /**
+     * @brief Enable the headlight (camera-attached directional light).
+     */
     void enableHeadlight();
+
+    /**
+     * @brief Disable the headlight.
+     */
     void disableHeadlight();
 
+    /**
+     * @brief Enable the axis overlay.
+     */
     void enableAxis();
+
+    /**
+     * @brief Disable the axis overlay.
+     */
     void disableAxis();
+
+    /**
+     * @brief Check if the axis overlay is enabled.
+     * @return bool True if enabled.
+     */
     bool axisEnabled();
+
+    /**
+     * @brief Set the axis overlay visibility.
+     * @param visible True to show, false to hide.
+     */
     void setAxisVisible(bool visible);
+
+    /**
+     * @brief Check if the axis overlay is visible.
+     * @return bool True if visible.
+     */
     bool axisVisible();
 
+    /**
+     * @brief Enable the grid overlay.
+     */
     void enableGrid();
+
+    /**
+     * @brief Disable the grid overlay.
+     */
     void disableGrid();
+
+    /**
+     * @brief Check if the grid overlay is enabled.
+     * @return bool True if enabled.
+     */
     bool gridEnabled();
 
+    /**
+     * @brief Set the grid overlay visibility.
+     * @param visible True to show, false to hide.
+     */
     void setGridVisible(bool visible);
+
+    /**
+     * @brief Check if the grid overlay is visible.
+     * @return bool True if visible.
+     */
     bool gridVisible();
 
+    /**
+     * @brief Set the length of the axis overlay.
+     * @param length Axis length.
+     */
     void setAxisLength(float length);
 
+    /**
+     * @brief Set the number of grid ticks along each axis.
+     * @param x Number of ticks along X.
+     * @param y Number of ticks along Y.
+     * @param z Number of ticks along Z.
+     */
     void setGridTicks(int x, int y, int z);
+
+    /**
+     * @brief Set the grid spacing along each axis.
+     * @param x Spacing along X.
+     * @param y Spacing along Y.
+     * @param z Spacing along Z.
+     */
     void setGridSpacing(float x, float y, float z);
 
+    /**
+     * @brief Reset the camera view to the default state.
+     */
     void resetView();
+
+    /**
+     * @brief Save the current camera view state.
+     */
     void saveView();
 
+    /**
+     * @brief Show the scene control panel UI.
+     */
     void showControlPanel();
+
+    /**
+     * @brief Show the camera control window UI.
+     */
     void showCameraWindow();
 
+    /**
+     * @brief Get the root scene node.
+     * @return ivf::CompositeNodePtr Shared pointer to the scene.
+     */
     ivf::CompositeNodePtr scene();
 
+    /**
+     * @brief Get the camera manipulator.
+     * @return ivfui::CameraManipulatorPtr Shared pointer to the camera manipulator.
+     */
     ivfui::CameraManipulatorPtr cameraManipulator();
 
+    /**
+     * @brief Get the main menu UI.
+     * @return ivfui::UiMainMenu* Pointer to the main menu.
+     */
     ivfui::UiMainMenu *mainMenu();
 
+    /**
+     * @brief Called when the UI should be updated (override for custom behavior).
+     */
     virtual void onUpdateUi();
+
+    /**
+     * @brief Called when effects should be updated (override for custom behavior).
+     */
     virtual void onUpdateEffects();
 
+    /**
+     * @brief Called when the mouse enters a node (override for custom behavior).
+     * @param node Pointer to the node entered.
+     */
     virtual void onEnterNode(ivf::Node *node);
+
+    /**
+     * @brief Called when the mouse is over a node (override for custom behavior).
+     * @param node Pointer to the node.
+     */
     virtual void onOverNode(ivf::Node *node);
+
+    /**
+     * @brief Called when the mouse leaves a node (override for custom behavior).
+     * @param node Pointer to the node left.
+     */
     virtual void onLeaveNode(ivf::Node *node);
 
 protected:
+    /**
+     * @brief Internal handler for mouse entering a node.
+     * @param node Pointer to the node entered.
+     */
     virtual void doEnterNode(ivf::Node *node);
+
+    /**
+     * @brief Internal handler for mouse over a node.
+     * @param node Pointer to the node.
+     */
     virtual void doOverNode(ivf::Node *node);
+
+    /**
+     * @brief Internal handler for mouse leaving a node.
+     * @param node Pointer to the node left.
+     */
     virtual void doLeaveNode(ivf::Node *node);
+
+    /**
+     * @brief Internal handler for UI updates.
+     */
     virtual void doUpdateUi();
+
+    /**
+     * @brief Internal handler for effect updates.
+     */
     virtual void doUpdateEffects();
 
+    /**
+     * @brief Handle window resize events.
+     * @param width New window width.
+     * @param height New window height.
+     */
     virtual void doResize(int width, int height) override;
+
+    /**
+     * @brief Perform setup operations for the window.
+     * @return int Status code.
+     */
     virtual int doSetup() override;
+
+    /**
+     * @brief Draw the scene (called per frame).
+     */
     virtual void doDraw() override;
+
+    /**
+     * @brief Draw additional UI elements (called per frame).
+     */
     virtual void doUpdateOtherUi() override;
+
+    /**
+     * @brief Draw UI overlays (called per frame).
+     */
     virtual void doDrawUi() override;
+
+    /**
+     * @brief Called after drawing is complete (called per frame).
+     */
     virtual void doDrawComplete() override;
+
+    /**
+     * @brief Handle key events.
+     * @param key Key code.
+     * @param scancode Scan code.
+     * @param action Key action.
+     * @param mods Modifier flags.
+     */
     virtual void doKey(int key, int scancode, int action, int mods) override;
 };
 
+/**
+ * @typedef GLFWSceneWindowPtr
+ * @brief Shared pointer type for GLFWSceneWindow.
+ */
 typedef std::shared_ptr<GLFWSceneWindow> GLFWSceneWindowPtr;
 
 }; // namespace ivfui

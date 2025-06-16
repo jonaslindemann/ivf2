@@ -13,9 +13,7 @@
 #include <ivf/deformable_primitive.h>
 
 #include <ivfui/ui.h>
-
-#include "twist_window.h"
-#include "bend_window.h"
+#include <ivfui/object_inspector.h>
 
 using namespace ivf;
 using namespace ivfui;
@@ -31,8 +29,8 @@ private:
     TwistDeformerPtr m_twistDeformer;
     BendDeformerPtr m_bendDeformer;
 
-    TwistWindowPtr m_twistWindow;
-    BendWindowPtr m_bendWindow;
+    ObjectInspectorPtr m_twistInspector;
+    ObjectInspectorPtr m_bendInspector;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -92,13 +90,17 @@ public:
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(0, 5, 20));
 
-        m_twistWindow = TwistWindow::create();
-        m_twistWindow->setVisible(true);
-        this->addUiWindow(m_twistWindow);
+        m_twistInspector = ObjectInspector::create("Twist");
+        m_twistInspector->setObject(m_twistDeformer);
+        m_twistInspector->setVisible(true);
 
-        m_bendWindow = BendWindow::create();
-        m_bendWindow->setVisible(true);
-        this->addUiWindow(m_bendWindow);
+        this->addUiWindow(m_twistInspector);
+
+        m_bendInspector = ObjectInspector::create("Bend");
+        m_bendInspector->setObject(m_bendDeformer);
+        m_bendInspector->setVisible(true);
+
+        this->addUiWindow(m_bendInspector);
 
         return 0;
     }
@@ -107,23 +109,6 @@ public:
     {
         // Update twist parameters from the UI window
 
-        m_deformableCube->setWireframe(m_twistWindow->wireframe());
-
-        m_twistDeformer->setAngle(glm::radians(m_twistWindow->angle()));
-        m_twistDeformer->setFalloff(m_twistWindow->falloff());
-        m_twistDeformer->setDistanceRange(m_twistWindow->startDistance(), m_twistWindow->endDistance());
-        m_twistDeformer->setCenter(
-            glm::vec3(m_twistWindow->center()[0], m_twistWindow->center()[1], m_twistWindow->center()[2]));
-
-        m_twistDeformer->setAxis(
-            glm::vec3(m_twistWindow->axis()[0], m_twistWindow->axis()[1], m_twistWindow->axis()[2]));
-
-        m_bendDeformer->setCurvature(m_bendWindow->curvature());
-        m_bendDeformer->setDistanceRange(m_bendWindow->startDistance(), m_bendWindow->endDistance());
-        m_bendDeformer->setCenter(
-            glm::vec3(m_bendWindow->center()[0], m_bendWindow->center()[1], m_bendWindow->center()[2]));
-        m_bendDeformer->setAxis(glm::vec3(m_bendWindow->axis()[0], m_bendWindow->axis()[1], m_bendWindow->axis()[2]));
-
         m_deformableCube->applyDeformers();
     }
 
@@ -131,15 +116,7 @@ public:
     {
         if (key == GLFW_KEY_W && action == GLFW_PRESS)
         {
-            if (m_twistWindow->wireframe())
-            {
-                m_twistWindow->setWireframe(false);
-            }
-            else
-            {
-                m_twistWindow->setWireframe(true);
-            }
-            m_deformableCube->setWireframe(m_twistWindow->wireframe());
+            m_deformableCube->primitive()->mesh()->setWireframe(!m_deformableCube->primitive()->mesh()->wireframe());
         }
         else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         {

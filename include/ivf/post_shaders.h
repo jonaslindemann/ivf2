@@ -2,7 +2,21 @@
 
 #include <string>
 
+#pragma once
+
+#include <string>
+
 namespace ivf {
+
+/**
+ * @file post_shaders.h
+ * @brief Contains GLSL shader source code strings for various post-processing effects.
+ *
+ * This header provides inline string constants for vertex and fragment shaders used in
+ * post-processing effects such as vignette, chromatic aberration, film grain, blur, tint,
+ * bloom, dithering, pixelation, and edge detection. These shaders are intended for use
+ * with OpenGL 3.3+ and can be loaded at runtime for custom rendering pipelines.
+ */
 
 inline const std::string render_to_texture_vert_shader_source_330 = R"(
 #version 330 core

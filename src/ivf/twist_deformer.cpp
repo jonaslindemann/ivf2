@@ -117,3 +117,13 @@ std::unique_ptr<Deformer> TwistDeformer::clone() const
     cloned->setEnabled(m_enabled);
     return cloned;
 }
+
+void TwistDeformer::setupProperties()
+{
+    Deformer::setupProperties();
+    addProperty("Axis", &m_axis, "Twist");
+    addProperty("Angle", &m_angle, "Twist");
+    addProperty("Falloff", &m_falloff, "Twist");
+    addProperty("Start distance", &m_startDistance, "Twist");
+    addProperty("End distance", &m_endDistance, "Twist");
+}

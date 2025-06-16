@@ -11,27 +11,56 @@
 
 namespace ivf {
 
-	class PointPath {
-	private:
+/**
+ * @class PointPath
+ * @brief Utility class for representing a parametric path defined by control points.
+ *
+ * The PointPath class wraps a generator::ParametricPath and provides access to its
+ * edges and vertices. It is useful for creating and manipulating paths defined by
+ * a set of control points, supporting parametric evaluation and traversal.
+ */
+class PointPath {
+private:
+    int m_segments; ///< Number of segments in the path.
 
-		int m_segments;
+    using Impl = generator::ParametricPath;
+    Impl parametricPath_; ///< Underlying parametric path implementation.
 
-		using Impl = generator::ParametricPath;
-		Impl parametricPath_;
+public:
+    /**
+     * @brief Constructor.
+     * @param segments Number of segments in the path.
+     * @param points Control points defining the path.
+     */
+    PointPath(int segments, std::vector<glm::vec3> points);
 
+    /**
+     * @brief Type alias for the edges generator.
+     */
+    using Edges = typename Impl::Edges;
 
-	public:
-		PointPath(int segments, std::vector<glm::vec3> points);
+    /**
+     * @brief Get an edge generator for the path.
+     * @return Edges Generator for path edges.
+     */
+    Edges edges() const noexcept
+    {
+        return parametricPath_.edges();
+    }
 
-		using Edges = typename Impl::Edges;
+    /**
+     * @brief Type alias for the vertices generator.
+     */
+    using Vertices = typename Impl::Vertices;
 
-		Edges edges() const noexcept { return parametricPath_.edges(); }
+    /**
+     * @brief Get a vertex generator for the path.
+     * @return Vertices Generator for path vertices.
+     */
+    Vertices vertices() const noexcept
+    {
+        return parametricPath_.vertices();
+    }
+};
 
-		using Vertices = typename Impl::Vertices;
-
-		Vertices vertices() const noexcept { return parametricPath_.vertices(); }
-	};
-
-}
-
-
+} // namespace ivf

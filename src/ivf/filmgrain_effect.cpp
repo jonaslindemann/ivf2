@@ -43,3 +43,9 @@ void ivf::FilmgrainEffect::doUpdateParams()
     m_program->uniformFloat("noiseIntensity", m_noiseIntensity);
     m_program->uniformFloat("grainBlending", m_grainBlending);
 }
+
+void ivf::FilmgrainEffect::setupProperties()
+{
+    addProperty("noiseIntensity", &m_noiseIntensity, "Film Grain");
+    addProperty("grainBlending", &m_grainBlending, "Film Grain");
+}

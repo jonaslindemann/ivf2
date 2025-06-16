@@ -35,3 +35,8 @@ void ivf::BlurEffect::doUpdateParams()
 {
     m_program->uniformFloat("blurRadius", m_blurRadius);
 }
+
+void ivf::BlurEffect::setupProperties()
+{
+    addProperty("blurRadius", &m_blurRadius, "Blur");
+}

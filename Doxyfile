@@ -61,7 +61,7 @@ PROJECT_BRIEF          = "A Modern C++ Visualization library built on top of Mod
 # pixels and the maximum width should not exceed 200 pixels. Doxygen will copy
 # the logo to the output directory.
 
-PROJECT_LOGO           = E:/Users/Jonas/Development/ivf2/docs/docs/images/logo_200px.png
+PROJECT_LOGO           = docs/docs/images/logo_200px.png
 
 # With the PROJECT_ICON tag one can specify an icon that is included in the tabs
 # when the HTML document is shown. Doxygen will copy the logo to the output

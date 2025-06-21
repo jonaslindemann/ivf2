@@ -43,7 +43,6 @@ build/
 lib/
 vcpkg_installed/
 *.lastcodeanalysissucceeded
-docs/doxygen/
 docs/doxygen/html/
 docs/doxygen/latex/
 /.VSCodeCounter

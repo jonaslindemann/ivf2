@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Gidole:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space Mono:wght@300;400;600&display=swap');
+
+/* Universal font override */
+* {
+    font-family: "Gidole", Arial, sans-serif !important;
+}
+
+/* Specific code font override */
+code, pre, .fragment, .line, .lineno, .keyword, .comment, 
+.preprocessor, .string, .charliteral, .stringliteral,
+span[class*="keyword"], span[class*="comment"] {
+    font-family: "Space Mono", Consolas, monospace !important;
+}
+
+/* Headers */
+h1, h2, h3, h4, h5, h6, .title, .summary {
+    font-family: "Gidole", Georgia, serif !important;
+}

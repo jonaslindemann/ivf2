@@ -12,8 +12,6 @@ build:
     python: "3.11"
   jobs:
     pre_build:
-      # Install Doxygen
-      - apt-get update && apt-get install -y doxygen graphviz git
       # Generate Doxygen documentation
       - doxygen Doxyfile
 

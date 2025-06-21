@@ -4,6 +4,10 @@ Lightweight scene graph library and wrapper over modern OpenGL.
 
 ![alt text](docs/docs/images/logo.png "Logo")
 
+# Documentation
+
+Documentation for Ivf++ can be found at https://interactive-visualisation-framework-2.readthedocs.io/en/latest/. The documentation is generated from the source code and is available in the **docs** folder.
+
 # Cloning the repository
 
 Clone the repository

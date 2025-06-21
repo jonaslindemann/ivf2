@@ -1,3 +1,14 @@
+/**
+ * @file deformer3.cpp
+ * @brief Deformer example
+ * @author Jonas Lindemann
+ * @example deformer3.cpp
+ * @ingroup deformer_examples
+ *
+ * This example demonstrates the use of various random deformers
+ * to manipulate a 3D mesh, including uniform noise, Gaussian noise,
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -43,9 +54,12 @@ public:
 
     virtual int onSetup() override
     {
-        auto axis = Axis::create();
+        // Create and add axis for orientation
 
+        auto axis = Axis::create();
         this->add(axis);
+
+        // Create some materials with different colors
 
         auto redMaterial = Material::create();
         redMaterial->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
@@ -62,7 +76,11 @@ public:
         auto whiteMaterial = Material::create();
         whiteMaterial->setDiffuseColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
 
+        // Set mesh usage for dynamic drawing
+
         mmDefaultMeshUsage(GL_DYNAMIC_DRAW);
+
+        // Create a deformable sphere and set its properties
 
         auto sphere = DeformablePrimitive<Sphere>::create();
         sphere->primitive()->set(3.0);
@@ -71,7 +89,8 @@ public:
         sphere->setWireframe(false);
         sphere->setPos(glm::vec3(0, 0, 0));
 
-        // 1. Uniform random jitter
+        // 1. Apply uniform random jitter to the sphere
+
         auto uniformNoise =
             RandomDeformer::create(RandomDeformer::NoiseType::UNIFORM, RandomDeformer::DeformationMode::ADDITIVE);
         uniformNoise->setIntensity(0.1f);
@@ -82,7 +101,8 @@ public:
 
         std::cout << "Applied uniform random jitter to sphere" << std::endl;
 
-        // 2. Gaussian noise on a plane
+        // 2. Apply Gaussian noise to a plane
+
         auto plane = DeformablePrimitive<Plane>::create(4.0f, 4.0f, 100, 100);
 
         auto gaussianNoise =
@@ -93,12 +113,13 @@ public:
 
         plane->addDeformer(gaussianNoise);
         plane->setMaterial(greenMaterial);
-        plane->setPos(glm::vec3(-10, 0, 0)); // Position left the sphere
+        plane->setPos(glm::vec3(-10, 0, 0)); // Position left of the sphere
         plane->applyDeformers();
 
         std::cout << "Applied Gaussian noise to plane" << std::endl;
 
-        // 3. Perlin noise for organic deformation
+        // 3. Apply Perlin noise for organic deformation to a cylinder
+
         auto cylinder = DeformablePrimitive<CappedCylinder>::create(1.0f, 3.0f, 24);
 
         auto perlinNoise =
@@ -112,14 +133,20 @@ public:
         cylinder->setPos(glm::vec3(10, 0, 0)); // Position to the right of the sphere
         cylinder->applyDeformers();
 
+        // Add all primitives to the scene
+
         this->add(sphere);
         this->add(plane);
         this->add(cylinder);
+
+        // Create an object inspector UI for the sphere
 
         m_objectInspector = ObjectInspector::create("Sphere");
         m_objectInspector->setObject(sphere);
 
         this->addUiWindow(m_objectInspector);
+
+        // Set initial camera position
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(0, 5, 20));
 
@@ -128,6 +155,8 @@ public:
 
     virtual void onUpdate()
     {
+        // Update the object inspector with the current object
+        
         float time = this->elapsedTime();
     }
 

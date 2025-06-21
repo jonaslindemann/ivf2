@@ -1,3 +1,15 @@
+/**
+ * @file animation2.cpp
+ * @brief Simple animation example
+ * @author Jonas Lindemann
+ * @example animation2.cpp
+ * @ingroup animation_examples
+ * 
+ * This example demonstrates a more complex animation technique using the library.
+ * 
+ * It creates a Lissajous curve animation with a sphere tracing the curve.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -12,6 +24,8 @@
 using namespace ivf;
 using namespace ivfui;
 using namespace std;
+
+// Lissajous class to generate points on a Lissajous curve
 
 class Lissajous {
 private:
@@ -43,6 +57,8 @@ public:
     }
 };
 
+// 
+
 class ExampleWindow : public GLFWSceneWindow {
 private:
     SpherePtr m_sphere;
@@ -62,13 +78,17 @@ public:
         return std::make_shared<ExampleWindow>(width, height, title);
     }
 
+
     virtual int onSetup() override
     {
         this->setRenderToTexture(true);
 
-        AxisPtr axis = Axis::create();
+        // Add axis for reference
 
+        AxisPtr axis = Axis::create();
         this->add(axis);
+
+        // Create and configure the animated sphere
 
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
@@ -78,17 +98,19 @@ public:
         m_sphere->setRadius(0.1);
         m_sphere->refresh();
         m_sphere->setPos(glm::vec3(0.0, 0.0, 0.0));
-
         this->add(m_sphere);
+
+        // Create the line trace for the Lissajous curve
 
         m_trace = LineTrace::create(300);
 
-        // (m_a * sin(m_b * t + m_d), m_c * sin(m_e * t + m_f), m_g * sin(m_h * t + m_i)
+        // Set initial Lissajous parameters for the animation
 
         m_lissajous.setParameters(1.0, 1.0, 1.0, 0.7, 3.0, 0.4, 1.0, 2.0, 1.0);
-        //                        m_a, m_b, m_c, m_d, m_e, m_f, m_g, m_h, m_i
 
         this->add(m_trace);
+
+        // Create and add the Lissajous parameter UI window
 
         m_lissajouWindow = LissajouWindow::create();
         this->addUiWindow(m_lissajouWindow);
@@ -98,6 +120,8 @@ public:
 
     virtual void onUpdate() override
     {
+        // Update the Lissajous parameters and speed if the UI window is dirty
+
         if (m_lissajouWindow->is_dirty())
         {
             float a, b, c, d, e, f, g, h, i;
@@ -107,6 +131,8 @@ public:
             m_trace->setSize(m_lissajouWindow->size());
             m_trace->reset();
         }
+
+        // Calculate the current position on the Lissajous curve and update the sphere's position
 
         auto pos = m_lissajous(elapsedTime() * m_speed);
         m_sphere->setPos(pos);

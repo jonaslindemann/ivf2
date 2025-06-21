@@ -5,15 +5,7 @@ site_author: Jonas Lindemann
 theme:
   name: material
   palette: 
-    # Palette toggle for light mode
-    #- scheme: default
-    #  accent: yellow
-    #  primary: yellow
-    #  toggle:
-    #    icon: material/brightness-2
-    #    name: Switch to dark mode
 
-    # Palette toggle for dark mode
     - scheme: slate
       accent: yellow
       primary: yellow
@@ -35,6 +27,7 @@ markdown_extensions:
   - admonition
   - toc:
       permalink: true
+  - attr_list
 
 nav:
   - Home: index.md
@@ -62,6 +55,7 @@ nav:
     - Lissajous: animation/lissajous.md
   - UI:
     - UI Windows: ui/ui_windows.md
+    - Scene Window: ui/scene_window.md
     - Widgets: ui/widgets.md
     - Scene UI Integration: ui/scene_ui_integration.md
     - Custom UI: ui/custom_ui.md
@@ -71,9 +65,7 @@ nav:
     - Selection: advanced/selection.md
     - Visitor Pattern: advanced/visitor_pattern.md
   - API Reference:
-    - ivf Namespace: api/ivf.md
-    - ivfui Namespace: api/ivfui.md
-    - ivfmath Namespace: api/ivfmath.md
+    - Overview: api/index.md
   - Examples:
     - Animation Examples: examples/animation_examples.md
     - Lighting Examples: examples/lighting_examples.md
@@ -85,11 +77,3 @@ plugins:
   - search
   - minify:
       minify_html: true
-  # - mkdoxy:
-  #     projects:
-  #       Ivf2:  # alphanumeric name (no spaces)
-  #         src-dirs: ../..  # path to your source code
-  #         full-doc: True  # generate full documentation
-  #         doxy-cfg:  # standard doxygen configuration options
-  #           FILE_PATTERNS: "*.cpp *.h*"
-  #           RECURSIVE: False      

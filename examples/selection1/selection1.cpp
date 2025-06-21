@@ -1,3 +1,13 @@
+/**
+ * @file selection1.cpp
+ * @brief Hello IVF example
+ * @author Jonas Lindemann
+ * @example selection1.cpp
+ * @ingroup ui_examples
+ *
+ * Example demonstrating how to use selection in IVF.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -36,20 +46,32 @@ public:
 
     virtual int onSetup() override
     {
+        // Enable selection functionality for the scene.
+
         this->setSelectionEnabled(true);
+
+        // Create an axis node and add it to the scene.
 
         AxisPtr axis = Axis::create();
 
         this->add(axis);
 
+        // Create a yellow material and set its diffuse color.
+
         m_yellowMat = Material::create();
         m_yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
+
+        // Create a red material and set its diffuse color.
 
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
+        // Create a selection material and set its diffuse color.
+
         m_selectionMaterial = Material::create();
         m_selectionMaterial->setDiffuseColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
+
+        // Generate a grid of spheres with yellow material.
 
         for (auto row = -3; row < 4; row++)
         {
@@ -57,6 +79,8 @@ public:
             {
                 for (auto layer = -3; layer < 4; layer++)
                 {
+                    // Create a sphere, set its material and position, and add it to the scene.
+
                     auto sph1 = Sphere::create();
                     sph1->setMaterial(m_yellowMat);
                     sph1->setRadius(0.5);
@@ -67,6 +91,8 @@ public:
             }
         }
 
+        // Set the initial camera position for the scene.
+
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, 0.0, 20.0));
 
         return 0;
@@ -74,23 +100,26 @@ public:
 
     virtual void onEnterNode(Node *node) override
     {
+        // Selection event when a mouse enters a node.
+
         std::cout << "Enter node" << std::endl;
         node->setMaterial(m_selectionMaterial);
     }
 
     virtual void onOverNode(Node *node) override
     {
+        // Selection event when the mouse is over a node.
+
         std::cout << "Over node" << std::endl;
     }
 
     virtual void onLeaveNode(Node *node) override
     {
+        // Selection event when the mouse leaves a node.
+
         std::cout << "Leave node" << std::endl;
         node->setMaterial(m_yellowMat);
     }
-
-    virtual void onUpdate()
-    {}
 };
 
 typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;

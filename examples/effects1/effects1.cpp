@@ -1,3 +1,15 @@
+/**
+ * @file effects1.cpp
+ * @brief Deformer example
+ * @author Jonas Lindemann
+ * @example effects1.cpp
+ * @ingroup effect_examples
+ *
+ * This example demonstrates the use of various post-processing effects
+ * including blur, tint, film grain, chromatic aberration, vignette,
+ * bloom, dithering, and pixelation.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -35,6 +47,8 @@ using namespace ivfmath;
 
 using namespace std;
 
+// Visitor to apply transformations and effects to nodes
+
 class FunctionVisitor : public NodeVisitor {
 private:
 public:
@@ -68,6 +82,8 @@ public:
     }
 };
 
+// Main example window class
+
 class ExampleWindow : public GLFWSceneWindow {
 private:
     FunctionVisitor m_visitor;
@@ -88,28 +104,49 @@ public:
 
     virtual int onSetup() override
     {
+        // Enable rendering to texture for post-processing effects
+
         this->setRenderToTexture(true);
+
+        // Enable a headlight for the scene
+
         this->enableHeadlight();
 
+        // Create an axis (not added to the scene by default)
+
         auto axis = Axis::create();
+
+        // Create a base material for the objects
 
         m_material = Material::create();
         m_material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
         m_material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
         m_material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
 
+        // Set up a grid layout for the objects (30x30 grid, spacing 1.2)
+
         GridLayout layout(30, 1, 30, 1.2, 0.0, 1.2);
+
+        // Create a rounded box geometry
 
         auto box = RoundedBox::create(glm::vec3(0.52, 0.52, 0.52), glm::vec3(8, 8, 8), 0.16);
 
+        // Create a composite node to hold all objects
+
         m_nodes = CompositeNode::create();
+
+        // Populate the grid with transform nodes, each with a random colored material
 
         for (auto i = 0; i < layout.size(); i++)
         {
+            // Create a new material with random diffuse color
+
             auto material = Material::create();
             material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
             material->setDiffuseColor(glm::vec4(random(0.2, 1.0), random(0.2, 1.0), random(0.2, 1.0), 1.0));
             material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
+
+            // Create a transform node and assign the material
 
             auto xfm = Transform::create();
             xfm->setUseMaterial(true);
@@ -117,28 +154,48 @@ public:
 
             xfm->setMaterial(material);
 
+            // Add the transform node to the composite node
+
             m_nodes->add(xfm);
         }
 
+        // Position the grid of nodes
+
         m_nodes->setPos(glm::vec3(0.0, -4.0, 0.0));
+
+        // Apply the grid layout to the composite node
 
         layout.apply(m_nodes);
 
+        // Store the initial positions of the children for animation
+
         m_nodes->storeChildrenPos();
 
+        // Add the composite node to the scene
+
         this->add(m_nodes);
-        // this->add(axis);
+        // this->add(axis); // Uncomment to add axis to the scene
+
+        // Compute the bounding box of the scene
 
         this->scene()->accept(&m_extentVisitor);
 
         auto bbox = m_extentVisitor.bbox();
 
+        // Set up the camera to view the scene
+
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, bbox.size().y / 2.0, 2 * bbox.min().z));
         this->cameraManipulator()->setCameraTarget(bbox.center());
+
+        // Create and configure post-processing effects
+
+        // Blur effect
 
         auto blurEffect = BlurEffect::create();
         blurEffect->setBlurRadius(2.0);
         blurEffect->load();
+
+        // Tint effect
 
         auto tintEffect = TintEffect::create();
         tintEffect->setTintColor(glm::vec3(1.2, 0.9, 0.7));
@@ -146,42 +203,67 @@ public:
         tintEffect->setGrayScaleWeights(glm::vec3(0.299, 0.587, 0.114));
         tintEffect->load();
 
+        // Film grain effect
+
         auto filmgrainEffect = FilmgrainEffect::create();
         filmgrainEffect->setNoiseIntensity(0.5);
         filmgrainEffect->setGrainBlending(0.5);
         filmgrainEffect->load();
 
+        // Chromatic aberration effect
+
         auto chromaticEffect = ChromaticEffect::create();
         chromaticEffect->setOffset(0.01);
         chromaticEffect->load();
+
+        // Vignette effect
 
         auto vignetteEffect = VignetteEffect::create();
         vignetteEffect->setSize(1.0);
         vignetteEffect->setSmoothness(0.7);
         vignetteEffect->load();
 
+        // Bloom effect
+
         auto bloomEffect = BloomEffect::create();
         bloomEffect->setThreshold(1.0);
         bloomEffect->setIntensity(1.0);
         bloomEffect->load();
 
+        // Dithering effect
+
         auto ditheringEffect = DitheringEffect::create();
         ditheringEffect->load();
+
+        // Pixelation effect
 
         auto pixelationEffect = PixelationEffect::create();
         pixelationEffect->setPixelSize(4.0);
         pixelationEffect->load();
 
-        this->addEffect(blurEffect); // OK
-        this->addEffect(tintEffect);
-        this->addEffect(chromaticEffect); // OK
-        this->addEffect(ditheringEffect); // OK
-        this->addEffect(bloomEffect);     // OK
-        this->addEffect(pixelationEffect);
-        this->addEffect(vignetteEffect);
-        this->addEffect(filmgrainEffect); // OK
+        // Add effects to the window (order matters for compositing)
+
+        this->addEffect(blurEffect); // 0
+
+        this->addEffect(tintEffect); // 1
+
+        this->addEffect(chromaticEffect); // 2
+
+        this->addEffect(ditheringEffect); // 3
+
+        this->addEffect(bloomEffect);     // 4
+
+        this->addEffect(pixelationEffect); // 5
+
+        this->addEffect(vignetteEffect);   // 6
+
+        this->addEffect(filmgrainEffect);  // 7
+
+        // Disable all effects by default
 
         this->disableAllEffects();
+
+        // Create and add the object inspector UI window
 
         m_inspector = ObjectInspector::create("Inspector");
         this->addUiWindow(m_inspector);
@@ -191,11 +273,15 @@ public:
 
     virtual void onUpdate()
     {
+        // Update the function visitor to animate the nodes
+
         m_nodes->accept(&m_visitor);
     }
 
     virtual void onKey(int key, int scancode, int action, int mods) override
     {
+        // Handle key events for toggling effects and showing UI
+
         if (action == GLFW_PRESS)
         {
             if (key == GLFW_KEY_0)

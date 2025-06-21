@@ -1,3 +1,17 @@
+/**
+ * @file transforms1.cpp
+ * @brief Texture example
+ * @author Jonas Lindemann
+ * @example transforms1.cpp
+ * @ingroup general_examples
+ *
+ * This example demonstrates the use of various transformations
+ * (translation, rotation, scaling) on a set of arrow objects
+ * in a 3D scene using the IVF library.
+ * It creates a grid of arrows with random orientations
+ * and positions, showcasing the use of the TransformNode class.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -28,16 +42,24 @@ public:
 
     int onSetup()
     {
+        // Create and add an axis to the scene for reference.
+        
         AxisPtr axis = Axis::create();
 
         this->add(axis);
 
+        // Create a yellow material for potential use.
+        
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
 
+        // Create a red material for the arrows.
+        
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
+        // Create an arrow object and set its properties.
+        
         auto arrow = Arrow::create();
         arrow->setArrowType(ArrowType::RightSided);
         arrow->setLength(0.5);
@@ -45,17 +67,23 @@ public:
         arrow->setConeRadius(0.1);
         arrow->setMaterial(redMat);
 
+        // Create a 5x5x5 grid of arrows, each with a random orientation and position.
+        
         for (auto i = 0; i < 5; i++)
             for (auto j = 0; j < 5; j++)
-                for (auto k = 0; k < 5; k++)
-                {
-                    auto xfm = Transform::create();
-                    xfm->add(arrow);
-                    xfm->setPos(glm::vec3(-2.0 + i, -2.0 + j, -2.0 + k));
-                    xfm->rotateToVector(glm::vec3(random(-1.0, 1.0), random(-1.0, 1.0), random(-1.0, 1.0)));
-                    this->add(xfm);
-                }
+            for (auto k = 0; k < 5; k++)
+            {
+                // Create a transform node for each arrow.
+                
+                auto xfm = Transform::create();
+                xfm->add(arrow);
+                xfm->setPos(glm::vec3(-2.0 + i, -2.0 + j, -2.0 + k));
+                xfm->rotateToVector(glm::vec3(random(-1.0, 1.0), random(-1.0, 1.0), random(-1.0, 1.0)));
+                this->add(xfm);
+            }
 
+        // Return 0 to indicate successful setup.
+        
         return 0;
     }
 };

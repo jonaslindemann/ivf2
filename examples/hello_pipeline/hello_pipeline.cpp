@@ -1,3 +1,16 @@
+/**
+ * @file hello_pipeline.cpp
+ * @brief Basic Ivf pipeline
+ * @author Jonas Lindemann
+ * @example hello_pipeline.cpp
+ * @ingroup general_examples
+ *
+ * This example demonstrates the basic usage of the IVF library to create a
+ * simple 3D scene with a red cube, lighting, and camera manipulation.
+ * It initializes a GLFW application, sets up a window, and renders the scene
+ * with a camera. The scene includes a red cube with basic material properties.
+ */
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -83,14 +96,20 @@ public:
 
     void onDraw()
     {
+        // Clear the screen and depth buffer
+
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Draw the scene graph
 
         m_scene->draw();
     }
 
     void onResize(int width, int height)
     {
+        // Update the camera viewport when the window is resized
+        
         m_camera->setViewport(width, height);
     }
 };

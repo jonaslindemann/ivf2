@@ -1,3 +1,19 @@
+/**
+ * @file lighting1.cpp
+ * @brief Lighting example
+ * @author Jonas Lindemann
+ * @example lighting1.cpp
+ * @ingroup lighting_examples
+ *
+ * This example demonstrates the use of various light types in a 3D scene,
+ * including point lights, directional lights, and spotlights.
+ * It provides a user interface to control the properties of these lights
+ * and visualize their effects on a simple scene with multiple spheres.
+ * The scene includes a grid of spheres with random colors,
+ * and allows toggling the visibility of different light controls.
+ * The example also includes FPS display and an option to show the ImGui demo window.
+ */
+
 #include <iostream>
 #include <map>
 #include <memory>
@@ -36,9 +52,15 @@ public:
 
     int onSetup()
     {
+        // Get the singleton instance of the LightManager
+
         auto lightMgr = LightManager::instance();
 
+        // Remove any existing lights from the scene
+
         lightMgr->clearLights();
+
+        // Add and configure the first point light
 
         auto pointLight1 = lightMgr->addPointLight();
         pointLight1->setEnabled(false);
@@ -47,6 +69,8 @@ public:
         pointLight1->setAttenuation(1.0, 0.14, 0.07);
         pointLight1->setPosition(glm::vec3(2.0, 2.0, 2.0));
 
+        // Add and configure the second point light
+
         auto pointLight2 = lightMgr->addPointLight();
         pointLight2->setEnabled(false);
         pointLight2->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
@@ -54,10 +78,14 @@ public:
         pointLight2->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
         pointLight2->setPosition(glm::vec3(-2.0, -2.0, -2.0));
 
+        // Add and configure a directional light
+
         auto dirLight = lightMgr->addDirectionalLight();
         dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
         dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
         dirLight->setEnabled(false);
+
+        // Add and configure a spotlight
 
         auto spotLight = lightMgr->addSpotLight();
         spotLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
@@ -67,63 +95,89 @@ public:
         spotLight->setCutoff(12.0f, 13.0f);
         spotLight->setEnabled(true);
 
+        // Apply the light settings to the scene
+
         lightMgr->apply();
 
+        // Create an axis node for scene orientation
+
         auto axis = Axis::create();
+
+        // Load a texture for use in the scene
 
         auto texture = Texture::create();
         texture->load("assets/planks.png");
 
+        // Create a base sphere node to be instanced
+
         auto sphere = Sphere::create(0.15);
+
+        // Create a 3D grid of spheres with random colors
 
         for (auto i = 0; i < 11; i++)
             for (auto j = 0; j < 11; j++)
-                for (auto k = 0; k < 11; k++)
+            for (auto k = 0; k < 11; k++)
+            {
+                if (true)
                 {
-                    if (true)
-                    {
-                        auto instSphere = InstanceNode::create();
-                        instSphere->setNode(sphere);
-                        instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+                // Use instancing for efficiency
 
-                        auto material = Material::create();
-                        material->setDiffuseColor(
-                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                        material->setShininess(40.0);
+                auto instSphere = InstanceNode::create();
+                instSphere->setNode(sphere);
+                instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
 
-                        instSphere->setMaterial(material);
-                        this->add(instSphere);
-                    }
-                    else
-                    {
-                        auto sphere = Sphere::create(0.15);
-                        sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+                // Assign a random colored material to the instance
 
-                        auto material = Material::create();
-                        material->setDiffuseColor(
-                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                        material->setShininess(40.0);
+                auto material = Material::create();
+                material->setDiffuseColor(
+                    glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+                material->setShininess(40.0);
 
-                        sphere->setMaterial(material);
-                        this->add(sphere);
-                    }
+                instSphere->setMaterial(material);
+                this->add(instSphere);
                 }
+                else
+                {
+                // (Unused branch) Create individual spheres instead of instances
+
+                auto sphere = Sphere::create(0.15);
+                sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+
+                auto material = Material::create();
+                material->setDiffuseColor(
+                    glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+                material->setShininess(40.0);
+
+                sphere->setMaterial(material);
+                this->add(sphere);
+                }
+            }
+
+        // Add the axis to the scene
 
         this->add(axis);
+
+        // Create UI controls for each light
 
         m_pointLightControl1 = PointLightWindow::create(pointLight1, "pointLight1");
         m_pointLightControl2 = PointLightWindow::create(pointLight2, "pointLight2");
         m_dirLightControl = DirectionalLightWindow::create(dirLight, "dirLight");
         m_spotLightControl = SpotLightWindow::create(spotLight, "spotLight");
 
+        // Add the light control windows to the UI
+
         this->addUiWindow(m_pointLightControl1);
         this->addUiWindow(m_pointLightControl2);
         this->addUiWindow(m_dirLightControl);
         this->addUiWindow(m_spotLightControl);
 
+        // Create and add an FPS display window
+
         m_fpsWindow = FpsWindow::create();
 
         this->addUiWindow(m_fpsWindow);
+
+        // Return success
 
         return 0;
     }

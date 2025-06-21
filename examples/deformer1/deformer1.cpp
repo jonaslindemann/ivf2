@@ -1,3 +1,13 @@
+/**
+ * @file deformer1.cpp
+ * @brief Deformer example
+ * @author Jonas Lindemann
+ * @example deformer1.cpp
+ * @ingroup deformer_examples
+ *
+ * This example demonstrates the use of deformers to manipulate a 3D mesh.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -43,9 +53,12 @@ public:
 
     virtual int onSetup() override
     {
-        auto axis = Axis::create();
+        // Create and add an axis to the scene for orientation
 
+        auto axis = Axis::create();
         this->add(axis);
+
+        // Create some materials with different colors
 
         auto redMaterial = Material::create();
         redMaterial->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
@@ -62,7 +75,11 @@ public:
         auto whiteMaterial = Material::create();
         whiteMaterial->setDiffuseColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
 
+        // Set default mesh usage to dynamic draw for deformable geometry
+
         mmDefaultMeshUsage(GL_DYNAMIC_DRAW);
+
+        // Create a deformable rounded box primitive
 
         m_deformableCube = DeformablePrimitive<RoundedBox>::create();
         m_deformableCube->primitive()->setSize(glm::vec3(1.0f, 4.0f, 1.0f));
@@ -71,8 +88,11 @@ public:
         m_deformableCube->setMaterial(whiteMaterial);
         m_deformableCube->setWireframe(true);
 
-        // Add deformers
+        // Create and configure a twist deformer (twists along Y axis)
+
         m_twistDeformer = TwistDeformer::create(glm::vec3(0, 1, 0));
+
+        // Create and configure a bend deformer (bends along Y axis)
 
         m_bendDeformer = BendDeformer::create(glm::vec3(0, 1, 0), glm::vec3(0, 0, 0));
         m_bendDeformer->setCurvature(2.5f);
@@ -80,28 +100,38 @@ public:
         m_bendDeformer->setAxis(glm::vec3(0, 1, 0));
         m_bendDeformer->setCenter(glm::vec3(0, 0, 0));
 
+        // Add deformers to the deformable cube
+
         m_deformableCube->addDeformer(m_twistDeformer);
         m_deformableCube->addDeformer(m_bendDeformer);
 
-        // Use like any other MeshNode
+        // Apply deformers to update the mesh
+
         m_deformableCube->applyDeformers();
+
+        // Add the deformable cube to the scene
 
         this->add(m_deformableCube);
 
+        // Set the camera position for a good view of the object
+
         this->cameraManipulator()->setCameraPosition(glm::vec3(0, 5, 20));
+
+        // Create and show a UI inspector for the twist deformer
 
         m_twistInspector = ObjectInspector::create("Twist");
         m_twistInspector->setObject(m_twistDeformer);
         m_twistInspector->setVisible(true);
-
         this->addUiWindow(m_twistInspector);
 
+        // Create and show a UI inspector for the bend deformer
+        
         m_bendInspector = ObjectInspector::create("Bend");
         m_bendInspector->setObject(m_bendDeformer);
         m_bendInspector->setVisible(true);
-
         this->addUiWindow(m_bendInspector);
 
+        // Return 0 to indicate successful setup
         return 0;
     }
 

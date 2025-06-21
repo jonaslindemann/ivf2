@@ -1,3 +1,16 @@
+/**
+ * @file primitives1.cpp
+ * @brief Primitives example
+ * @author Jonas Lindemann
+ * @example primitives1.cpp
+ * @ingroup primivites_examples
+ *
+ * This example demonstrates the creation and rendering of various 3D geometric primitives
+ * including spheres, boxes, cylinders, cones, and more. It sets up a basic scene with an axis,
+ * grid, and multiple primitive shapes positioned in 3D space.
+ * The scene allows for camera manipulation to view the primitives from different angles.
+ */
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -25,68 +38,103 @@ public:
 
     int onSetup()
     {
+        // Create an axis for orientation
+
         auto axis = Axis::create();
+
+        // Create a grid for the scene
+
         auto grid = Grid::create();
-        grid->setTicks(15, 15, 15);
-        grid->setType(GridType::LinesAndMarkers);
+        grid->setTicks(15, 15, 15); // Set grid ticks
+        grid->setType(GridType::LinesAndMarkers); // Set grid type
+
+        // Create a material and configure its properties
 
         auto material = Material::create();
-        material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-        material->setUseTexture(true);
-        material->setUseTexture(false);
-        material->setShininess(50.0);
+        material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)); // Set diffuse color
+        material->setUseTexture(true); // Enable texture (overwritten below)
+        material->setUseTexture(false); // Disable texture
+        material->setShininess(50.0); // Set shininess
+
+        // Create a sphere primitive and set its properties
 
         auto sphere = Sphere::create();
         sphere->setMaterial(material);
         sphere->setPos(glm::vec3(-3.0, 0.0, -3.0));
 
+        // Create a box primitive and set its properties
+
         auto box = Box::create();
         box->setMaterial(material);
         box->setPos(glm::vec3(0.0, .0, -3.0));
+
+        // Create a rounded box primitive and set its properties
 
         auto rbox = RoundedBox::create();
         rbox->setMaterial(material);
         rbox->setPos(glm::vec3(3.0, 0.0, -3.0));
 
+        // Create a capped cylinder primitive and set its properties
+
         auto capCyl = CappedCylinder::create();
         capCyl->setMaterial(material);
         capCyl->setPos(glm::vec3(-3.0, 0.0, 0.0));
+
+        // Create an open cylinder primitive and set its properties
 
         auto opCyl = Cylinder::create();
         opCyl->setMaterial(material);
         opCyl->setPos(glm::vec3(0.0, 0.0, 0.0));
 
+        // Create a cone primitive and set its properties
+
         auto cone = Cone::create();
         cone->setMaterial(material);
         cone->setPos(glm::vec3(3.0, 0.0, 0.0));
+
+        // Create a capped cone primitive and set its properties
 
         auto capCone = CappedCone::create();
         capCone->setMaterial(material);
         capCone->setPos(glm::vec3(-3.0, 0.0, 3.0));
 
+        // Create a dodecahedron primitive and set its properties
+
         auto dodeka = Dodecahedron::create();
         dodeka->setMaterial(material);
         dodeka->setPos(glm::vec3(0.0, 0.0, 3.0));
+
+        // Create a capsule primitive and set its properties
 
         auto capsule = Capsule::create();
         capsule->setMaterial(material);
         capsule->setPos(glm::vec3(3.0, 0.0, 3.0));
 
+        // Create a capped tube primitive and set its properties
+
         auto cappedTube = CappedTube::create();
         cappedTube->setMaterial(material);
         cappedTube->setPos(glm::vec3(-3.0, 0.0, 6.0));
+
+        // Create a tube primitive and set its properties
 
         auto tube = Tube::create();
         tube->setMaterial(material);
         tube->setPos(glm::vec3(0.0, 0.0, 6.0));
 
+        // Create a disk primitive and set its properties
+
         auto disk = Disk::create();
         disk->setMaterial(material);
         disk->setPos(glm::vec3(3.0, 0.0, 6.0));
 
+        // Create a plane primitive and set its properties
+
         auto plane = Plane::create();
         plane->setMaterial(material);
         plane->setPos(glm::vec3(-3.0, 0.0, 9.0));
+
+        // Add primitives to the scene
 
         this->add(box);
         this->add(rbox);
@@ -102,8 +150,12 @@ public:
         this->add(disk);
         this->add(plane);
 
+        // Add axis and grid to the scene
+
         this->add(axis);
         this->add(grid);
+
+        // Set the camera position for the scene
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(15.0, 5.0, 0.0));
 

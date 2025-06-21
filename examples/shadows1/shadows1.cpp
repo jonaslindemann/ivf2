@@ -1,3 +1,13 @@
+/**
+ * @file shadows1.cpp
+ * @brief Shadow mapping example
+ * @author Jonas Lindemann
+ * @example shadows1.cpp
+ * @ingroup effects_examples
+ *
+ * Example demonstrating how to use shadow mapping in IVF.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -58,11 +68,27 @@ public:
 
     virtual int onSetup() override
     {
+        // Get the singleton instance of the LightManager
+
         auto lightManager = LightManager::instance();
+
+        // Remove all lights from the scene
+
         lightManager->clearLights();
+
+        // Enable shadow mapping
+
         lightManager->setUseShadows(true);
+
+        // Disable automatic bounding box calculation for the scene
+
         lightManager->setAutoCalcBBox(false);
+
+        // Manually set the scene bounding box for shadow calculations
+
         lightManager->setSceneBoundingBox(glm::vec3(-30.0, -30.0, -20.0), glm::vec3(30.0, 30.0, 30.0));
+
+        // Add a directional light to the scene
 
         m_dirLight0 = lightManager->addDirectionalLight();
         m_dirLight0->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
@@ -70,26 +96,49 @@ public:
         m_dirLight0->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
         m_dirLight0->setDirection(glm::vec3(-0.2, -1.0, -0.2));
         m_dirLight0->setEnabled(true);
+
+        // Enable shadow casting for the directional light
+
         m_dirLight0->setCastShadows(true);
+
+        // Set the shadow map resolution for the directional light
+
         m_dirLight0->setShadowMapSize(4096, 4096);
+
+        // Set the strength of the shadows cast by the directional light
+
         m_dirLight0->setShadowStrength(0.3f); // Set shadow strength (0.0 to 1.0) for the directional light
+
+        // Apply the light settings to the scene
 
         lightManager->apply();
 
+        // Create an axis node (not added to the scene in this example)
+
         auto axis = Axis::create();
+
+        // Create a material for the ground plane and set its diffuse color
 
         auto planeMaterial = Material::create();
         planeMaterial->setDiffuseColor(glm::vec4(0.8, 0.8, 0.8, 1.0));
+
+        // Create a ground plane, set its size and subdivisions, and assign the material
 
         auto plane = Plane::create();
         plane->set(20.0, 20.0, 10, 10);
         plane->refresh();
         plane->setMaterial(planeMaterial);
 
+        // Create a material for the boxes and set its diffuse color
+
         auto boxMaterial = Material::create();
         boxMaterial->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
 
+        // Create a composite node to hold the grid of boxes
+
         m_grid = CompositeNode::create();
+
+        // Populate the grid with rounded boxes in a 3D arrangement
 
         for (auto row = -3; row <= 3; row++)
         {
@@ -97,7 +146,11 @@ public:
             {
                 for (auto stack = -3; stack <= 3; stack++)
                 {
+
+                    // Create a rounded box and set its properties
+
                     auto box = RoundedBox::create();
+
                     box->setPos(glm::vec3(row * 2.0, stack * 2.0, col * 2.0));
                     box->setSize(0.3, 0.3, 0.3);
                     box->setSegments(5, 5, 5);
@@ -105,18 +158,24 @@ public:
                     box->setSlices(5);
                     box->refresh();
                     box->setMaterial(boxMaterial);
+
                     m_grid->add(box);
                 }
             }
         }
 
+        // Set the position of the entire grid of boxes
+
         m_grid->setPos(glm::vec3(0.0, 12.0, 0.0));
 
         this->add(m_grid);
-
         this->add(plane);
 
+        // Set the initial camera position for the scene
+
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, 8.0, 70.0));
+
+        // Return 0 to indicate successful setup
 
         return 0;
     }

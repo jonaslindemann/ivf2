@@ -1,3 +1,18 @@
+/**
+ * @file ui1.cpp
+ * @brief UI example with multiple transforms
+ * @author Jonas Lindemann
+ * @example ui1.cpp
+ * @ingroup ui_examples
+ *
+ * This example demonstrates the use of the IVF library to create a scene with
+ * various geometric shapes, a camera manipulator, and multiple UI windows.
+ * It includes a main window with a scene containing randomly positioned and colored shapes,
+ * two example windows for additional UI functionality,
+ * and a camera manipulator for navigating the scene.
+ */
+
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -35,66 +50,99 @@ public:
 
     int onSetup()
     {
+        // Create and initialize the shader manager, then load the basic shader.
+        
         auto shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
+        // Check for shader compilation or linking errors.
+        
         if (shaderMgr->compileLinkErrors())
         {
             cout << "Couldn't compile shaders, exiting..." << endl;
             return -1;
         }
 
+        // Create the light manager.
+        
         auto lightMgr = LightManager::create();
 
+        // Add and configure a point light.
+        
         auto pointLight1 = lightMgr->addPointLight();
         pointLight1->setEnabled(true);
+
         pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+
         pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+
         pointLight1->setAttenuation(1.0, 0.0, 0.0);
+
         pointLight1->setPosition(glm::vec3(5.0, 5.0, 5.0));
+
         lightMgr->apply();
 
+        // Create the main scene composite node.
+        
         m_scene = CompositeNode::create();
 
+        // Add an axis to the scene.
+        
         auto axis = Axis::create();
 
         m_scene->add(axis);
 
+        // Add 500 randomly generated shapes to the scene.
+        
         for (auto i = 0; i < 500; i++)
         {
+            // Generate a random number to select the shape type.
+            
             double r = random(0.0, 9.0);
 
             TransformNodePtr node;
 
+            // Create a random geometric shape based on the value of r.
+            
             if (r < 1.0)
-                node = Cube::create();
+            node = Cube::create();
             else if ((r >= 1) && (r < 2.0))
-                node = Sphere::create(random(0.2, 1.0));
+            node = Sphere::create(random(0.2, 1.0));
             else if ((r >= 2.0) && (r < 3.0))
-                node = Box::create(glm::vec3(random(0.2, 2.0), random(0.2, 2.0), random(0.2, 2.0)));
+            node = Box::create(glm::vec3(random(0.2, 2.0), random(0.2, 2.0), random(0.2, 2.0)));
             else if ((r >= 3.0) && (r < 4.0))
-                node = RoundedBox::create(glm::vec3(random(0.2, 2.0), random(0.2, 2.0), random(0.2, 2.0)));
+            node = RoundedBox::create(glm::vec3(random(0.2, 2.0), random(0.2, 2.0), random(0.2, 2.0)));
             else if ((r >= 4.0) && (r < 5.0))
-                node = CappedCylinder::create(random(0.2, 1.0), random(0.2, 1.0));
+            node = CappedCylinder::create(random(0.2, 1.0), random(0.2, 1.0));
             else if ((r >= 5.0) && (r < 6.0))
-                node = Cylinder::create(random(0.2, 1.0), random(0.2, 1.0));
+            node = Cylinder::create(random(0.2, 1.0), random(0.2, 1.0));
             else if ((r >= 6.0) && (r < 7.0))
-                node = CappedCone::create(random(0.2, 1.0), random(0.2, 1.0));
+            node = CappedCone::create(random(0.2, 1.0), random(0.2, 1.0));
             else if ((r >= 7.0) && (r < 8.0))
-                node = Cone::create(random(0.2, 1.0), random(0.2, 1.0));
+            node = Cone::create(random(0.2, 1.0), random(0.2, 1.0));
             else
-                node = Dodecahedron::create(random(0.2, 1.0));
+            node = Dodecahedron::create(random(0.2, 1.0));
 
+            // Create and set a random material for the shape.
+            
             auto material = Material::create();
             material->setDiffuseColor(glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0));
+
             material->setAmbientColor(glm::vec4(0.1, 0.1, 0.1, 1.0));
 
+            // Set a random position for the shape.
+            
             node->setPos(glm::vec3(random(-20.0, 20.0), random(-20.0, 20.0), random(-20.0, 20.0)));
+
             node->setMaterial(material);
 
+            // Add the shape to the scene.
+            
             m_scene->add(node);
         }
 
+        // Create the camera manipulator for scene navigation.
+        
         m_camManip = CameraManipulator::create(this->ref());
 
         return 0;

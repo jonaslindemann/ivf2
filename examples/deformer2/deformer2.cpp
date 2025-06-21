@@ -1,3 +1,14 @@
+/**
+ * @file deformer2.cpp
+ * @brief Deformer example
+ * @author Jonas Lindemann
+ * @example deformer2.cpp
+ * @ingroup deformer_examples
+ *
+ * This example demonstrates the use of multiple wave deformers and turbulence
+ * to create a dynamic, animated surface effect on a plane mesh.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -45,9 +56,12 @@ public:
 
     virtual int onSetup() override
     {
-        auto axis = Axis::create();
+        // Create and add axis to the scene for orientation
 
+        auto axis = Axis::create();
         this->add(axis);
+
+        // Create some materials for potential use
 
         auto redMaterial = Material::create();
         redMaterial->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
@@ -64,39 +78,53 @@ public:
         auto whiteMaterial = Material::create();
         whiteMaterial->setDiffuseColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
 
+        // Set mesh usage for dynamic updates
+
         mmDefaultMeshUsage(GL_DYNAMIC_DRAW);
 
+        // Create a deformable plane primitive
+
         m_deformable = DeformablePrimitive<Plane>::create();
-        m_deformable->primitive()->set(20.0, 20.0, 200.0, 200.0); // Set width, depth, rows, cols
+        m_deformable->primitive()->set(20.0, 20.0, 200.0, 200.0); // width, depth, rows, cols
         m_deformable->refresh();                                  // Update geometry and deformer setup
         m_deformable->setMaterial(whiteMaterial);
         m_deformable->setWireframe(false);
 
-        // Large waves
+        // Create large wave deformers
+
         auto wave1 = WaveDeformer::create(0.2f, 0.8f, 1.2f, glm::vec3(1, 0, 0.3f), glm::vec3(0, 1, 0));
         auto wave2 = WaveDeformer::create(0.1f, 1.1f, 0.9f, glm::vec3(0.7f, 0, -0.7f), glm::vec3(0, 1, 0));
 
-        // Medium waves
+        // Create medium wave deformers
+        
         auto wave3 = WaveDeformer::create(0.05f, 2.2f, 1.8f, glm::vec3(-0.5f, 0, 0.8f), glm::vec3(0, 1, 0));
         auto wave4 = WaveDeformer::create(0.03f, 2.8f, 2.2f, glm::vec3(0.9f, 0, 0.4f), glm::vec3(0, 1, 0));
 
-        // Small ripples
+        // Create small ripple deformer
+
         auto wave5 = WaveDeformer::create(0.02f, 4.5f, 3.1f, glm::vec3(0.3f, 0, -0.9f), glm::vec3(0, 1, 0));
 
+        // Store all wave deformers in a vector for easy access
+
         m_waves = {wave1, wave2, wave3, wave4, wave5};
+
+        // Add all wave deformers to the deformable mesh
 
         for (auto &wave : m_waves)
         {
             m_deformable->addDeformer(wave);
         }
 
-        // Add surface turbulence
+        // Add a turbulence deformer for surface detail
+
         m_surfaceTurbulence = TurbulenceDeformer::create(10.0f, 0.01f, 4, 0.5f, 0.001f);
         m_deformable->addDeformer(m_surfaceTurbulence);
 
+        // Add the deformable mesh to the scene
+
         this->add(m_deformable);
 
-        // Create object inspectors for each wave and turbulence
+        // Create object inspectors for each wave and turbulence deformer
 
         m_wave1Inspector = ObjectInspector::create("Wave 1");
         m_wave1Inspector->setObject(wave1);
@@ -122,6 +150,8 @@ public:
         m_surfaceTurbulenceInspector->setObject(m_surfaceTurbulence);
         m_surfaceTurbulenceInspector->setVisible(true);
 
+        // Add all inspectors as UI windows
+
         this->addUiWindow(m_wave1Inspector);
         this->addUiWindow(m_wave2Inspector);
         this->addUiWindow(m_wave3Inspector);
@@ -129,6 +159,8 @@ public:
         this->addUiWindow(m_wave5Inspector);
         this->addUiWindow(m_surfaceTurbulenceInspector);
 
+        // Set initial camera position for a good view of the scene
+        
         this->cameraManipulator()->setCameraPosition(glm::vec3(0, 5, 20));
 
         return 0;

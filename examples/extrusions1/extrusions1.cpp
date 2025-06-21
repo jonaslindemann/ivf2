@@ -1,3 +1,15 @@
+/**
+ * @file extrusions1.cpp
+ * @brief Extrusions example
+ * @author Jonas Lindemann
+ * @example extrusions1.cpp
+ * @ingroup primitives_examples
+ *
+ * This example demonstrates the creation and rendering of extrusions
+ * using solid lines and solid polylines. It sets up a basic scene with
+ * an axis, grid, and two extrusion shapes: a solid line and a solid polyline.
+ */
+
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -26,13 +38,21 @@ public:
 
     int onSetup()
     {
+        // Enable depth testing for correct 3D rendering
+
         glEnable(GL_DEPTH_TEST);
+
+        // Create and load font face for UI rendering
 
         auto fontMgr = FontManager::create();
         fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
 
+        // Create and load basic shader for rendering
+
         ShaderManagerPtr shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
+
+        // Check for shader compilation/linking errors
 
         if (shaderMgr->compileLinkErrors())
         {
@@ -40,17 +60,27 @@ public:
             return -1;
         }
 
+        // Create and enable lighting manager
+
         auto lightMgr = LightManager::create();
         lightMgr->enableLighting();
+
+        // Add and configure a directional light
 
         auto dirLight = lightMgr->addDirectionalLight();
         dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
         dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
         dirLight->setEnabled(true);
 
+        // Apply lighting settings
+
         lightMgr->apply();
 
+        // Create the scene graph root node
+
         m_scene = CompositeNode::create();
+
+        // Add axis and grid to the scene
 
         AxisPtr axis = Axis::create();
         GridPtr grid = Grid::create();
@@ -58,14 +88,20 @@ public:
         m_scene->add(axis);
         m_scene->add(grid);
 
+        // Create yellow and red materials
+
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
 
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
+        // Create a solid yellow line and add to the scene
+
         auto line = SolidLine::create(glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 1.0, 0.0), 0.1);
         line->setMaterial(yellowMat);
+
+        // Create a solid yellow polyline extrusion and add to the scene
 
         auto extrusion = SolidPolyLine::create(0.1);
         extrusion->addPoint(gml::dvec3(0.5, -1.0, -1.0));
@@ -77,6 +113,8 @@ public:
         m_scene->add(line);
         m_scene->add(extrusion);
 
+        // Create camera manipulator for interactive view control
+
         m_camManip = CameraManipulator::create(this->ref());
 
         return 0;
@@ -84,19 +122,27 @@ public:
 
     void onDraw()
     {
+        // Clear the screen and depth buffer
+
         glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        // Draw the scene graph
 
         m_scene->draw();
     }
 
     void onUpdateOtherUi()
     {
+        // Update the camera manipulator state
+
         m_camManip->update();
     }
 
     void onResize(int width, int height)
     {
+        // Update the camera manipulator with new window dimensions
+
         m_camManip->update();
     }
 };

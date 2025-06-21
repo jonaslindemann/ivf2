@@ -49,3 +49,4 @@ docs/doxygen/latex/
 /.VSCodeCounter
 _CMakePresets.json
 /docs/site
+/docs/docs/doxygen

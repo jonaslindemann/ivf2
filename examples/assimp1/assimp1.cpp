@@ -1,3 +1,14 @@
+/**
+ * @file assimp1.cpp
+ * @brief Assimp model loading example
+ * @author Jonas Lindemann
+ * @example assimp1.cpp
+ * @ingroup file_io_examples
+ *
+ * This example demonstrates loading and displaying a 3D model using the Assimp library.
+ * It creates a scene with a grid, axis, and a model loaded from an .ac file.
+ */
+
 #include <cmath>
 #include <iostream>
 #include <memory>
@@ -35,33 +46,52 @@ public:
 
     virtual int onSetup() override
     {
-        // this->setSelectionEnabled(true);
-        // this->setRenderToTexture(true);
+        // Enable a headlight for basic scene illumination
 
         this->enableHeadlight();
 
+        // Create and add an axis to the scene for orientation reference
+
         auto axis = Axis::create();
+
+        // Create and add a grid to the scene, using marker style
+
         auto grid = Grid::create();
         grid->setType(GridType::Markers);
+
+        // Create a box node, set its size, and refresh its geometry
 
         auto box = Box::create();
         box->setSize(0.5, 0.5, 0.5);
         box->refresh();
 
+        // Load a 3D model from an .ac file using Assimp
+
         auto model = ModelLoader::loadModel("assets/city.ac");
+
+        // Create a material and set its properties
 
         auto material = Material::create();
         material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
         material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
         material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
+
+        // Assign the material to the loaded model
+
         model->setMaterial(material);
 
+        // Assign the same material to the box
+
         box->setMaterial(material);
+
+        // Add all nodes to the scene
 
         this->add(axis);
         this->add(grid);
         this->add(model);
         this->add(box);
+
+        // Return 0 to indicate successful setup
 
         return 0;
     }

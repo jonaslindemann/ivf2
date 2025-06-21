@@ -1,3 +1,14 @@
+/**
+ * @file scene_ui1.cpp
+ * @brief Hello IVF example
+ * @author Jonas Lindemann
+ * @example scene_ui1.cpp
+ * @ingroup ui_examples
+ *
+ * This example demonstrates the use of the IVF library to create a scene with
+ * various geometric shapes, a main menu, and multiple UI windows.
+ */
+
 #include <iostream>
 #include <memory>
 #include <string>
@@ -40,24 +51,44 @@ public:
     {
         // Add main menu
 
+        // Create the File menu
+
         auto fileMenu = UiMenu::create("File");
+
+        // Add Exit item to the File menu
+
         fileMenu->addItem(UiMenuItem::create("Exit", "ALT+F4", [this]() { this->onExit(); }));
+
+        // Add the File menu to the main menu
 
         this->mainMenu()->addMenu(fileMenu);
 
+        // Enable rendering to texture
+
         this->setRenderToTexture(true);
+
+        // Add example UI windows
+
         this->addUiWindow(m_exampleWindow1);
         this->addUiWindow(m_exampleWindow2);
+
+        // Create and add an axis to the scene
 
         auto axis = Axis::create();
 
         this->add(axis);
 
+        // Add 500 random geometric shapes to the scene
+
         for (auto i = 0; i < 500; i++)
         {
+            // Generate a random number to select shape type
+
             double r = random(0.0, 9.0);
 
             TransformNodePtr node;
+
+            // Create a random shape based on r
 
             if (r < 1.0)
                 node = Cube::create();
@@ -78,12 +109,18 @@ public:
             else
                 node = Dodecahedron::create(random(0.2, 1.0));
 
+            // Create and set a random material for the shape
+
             auto material = Material::create();
             material->setDiffuseColor(glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0));
             material->setAmbientColor(glm::vec4(0.1, 0.1, 0.1, 1.0));
 
+            // Set a random position for the shape
+
             node->setPos(glm::vec3(random(-20.0, 20.0), random(-20.0, 20.0), random(-20.0, 20.0)));
             node->setMaterial(material);
+
+            // Add the shape to the scene
 
             this->add(node);
         }
@@ -93,11 +130,15 @@ public:
 
     void onExit()
     {
+        // Handle exit action, e.g., close the window or application
+
         this->close();
     }
 
     void onUpdateUi()
     {
+        // Update UI elements
+
         if (m_showDemoWindow)
             ImGui::ShowDemoWindow(&m_showDemoWindow);
 
@@ -113,6 +154,8 @@ public:
 
     void onKey(int key, int scancode, int action, int mods)
     {
+        // Handle key events
+
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         {
             this->close();

@@ -17,7 +17,9 @@ ivf::CompositeNode::~CompositeNode()
 
 std::shared_ptr<CompositeNode> ivf::CompositeNode::create()
 {
-    return std::make_shared<CompositeNode>();
+    auto compositeNode = std::make_shared<CompositeNode>();
+    compositeNode->doSetup();
+    return compositeNode;
 }
 
 void CompositeNode::add(std::shared_ptr<Node> node)

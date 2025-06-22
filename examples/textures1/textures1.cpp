@@ -51,12 +51,12 @@ public:
     int onSetup()
     {
         // Create and load the basic shader using the ShaderManager.
-        
+
         ShaderManagerPtr shaderMgr = ShaderManager::create();
         shaderMgr->loadBasicShader();
 
         // Check for shader compilation and linking errors.
-        
+
         if (shaderMgr->compileLinkErrors())
         {
             cout << "Couldn't compile shaders, exiting..." << endl;
@@ -64,11 +64,11 @@ public:
         }
 
         // Create the LightManager and add a point light to the scene.
-        
+
         m_lightMgr = LightManager::create();
 
         // Configure the point light's properties.
-        
+
         auto pointLight1 = m_lightMgr->addPointLight();
         pointLight1->setEnabled(true);
         pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
@@ -78,30 +78,30 @@ public:
         m_lightMgr->apply();
 
         // Create the TextureManager and enable texture usage.
-        
+
         m_texMgr = TextureManager::create();
         m_texMgr->setUseTexture(true);
         m_texMgr->apply();
 
         // Create the root scene node.
-        
+
         m_scene = CompositeNode::create();
 
         // Add axis and grid helpers to the scene.
-        
+
         auto axis = Axis::create();
         auto grid = Grid::create();
         grid->setType(GridType::LinesAndMarkers);
 
         // Create a material for the sphere and enable texture usage.
-        
+
         auto sphereMaterial = Material::create();
         sphereMaterial->setDiffuseColor(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
         sphereMaterial->setUseTexture(true);
         sphereMaterial->setShininess(100.0);
 
         // Load textures for the sphere and box.
-        
+
         auto textureCat = Texture::create();
         textureCat->load("assets/pop_cat.png");
 
@@ -109,34 +109,30 @@ public:
         textureBrick->load("assets/brick.png");
 
         // Create a textured sphere and set its position.
-        
+
         auto sphere = Sphere::create();
         sphere->setTexture(textureCat);
         sphere->setMaterial(sphereMaterial);
-        sphere->setPos(glm::vec3(0.0, 3.0, 0.0));
+        sphere->setPos(glm::vec3(-3.0, 0.0, 0.0));
 
         // Create a textured box and set its position.
-        
+
         auto box = Box::create();
         box->setTexture(textureBrick);
         box->setMaterial(sphereMaterial);
         box->setPos(glm::vec3(3.0, 0.0, 0.0));
 
         // Add objects and helpers to the scene.
-        
+
         m_scene->add(box);
         m_scene->add(sphere);
 
-        m_scene->add(axis);
-        m_scene->add(grid);
-
         // Create and configure the camera manipulator.
-        
+
         m_camManip = CameraManipulator::create(this->ref());
         m_camManip->setCameraPosition(glm::vec3(0.0, 0.0, 10.0));
 
         return 0;
-
     }
 
     void onDraw()
@@ -226,7 +222,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Textures");
+    auto window = ExampleWindow::create(1280, 800, "Textures");
     window->maximize();
 
     app->addWindow(window);

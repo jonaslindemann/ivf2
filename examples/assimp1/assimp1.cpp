@@ -86,10 +86,7 @@ public:
 
         // Add all nodes to the scene
 
-        this->add(axis);
-        this->add(grid);
         this->add(model);
-        this->add(box);
 
         // Return 0 to indicate successful setup
 
@@ -111,7 +108,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Assimp");
+    auto window = ExampleWindow::create(1280, 800, "Assimp");
     // window->maximize();
 
     app->addWindow(window);

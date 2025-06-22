@@ -11,6 +11,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <functional>
 
 namespace ivfui {
 
@@ -24,9 +25,10 @@ namespace ivfui {
  */
 class ObjectInspector : public UiWindow {
 private:
-    std::shared_ptr<ivf::PropertyInspectable> m_currentObject; ///< Currently inspected object.
-    std::string m_objectName;                                  ///< Name of the inspected object.
-    std::vector<std::string> m_expandedCategories;             ///< Expanded property categories in the UI.
+    std::shared_ptr<ivf::PropertyInspectable> m_currentObject;          ///< Currently inspected object.
+    std::string m_objectName;                                           ///< Name of the inspected object.
+    std::vector<std::string> m_expandedCategories;                      ///< Expanded property categories in the UI.
+    std::function<void(const std::string &)> m_propertyChangedCallback; ///< Callback for property changes.
 
     // UI state
     bool m_showAdvanced; ///< Show advanced properties flag.
@@ -43,6 +45,11 @@ public:
      * @brief Destructor.
      */
     virtual ~ObjectInspector();
+
+    void setPropertyChangedCallback(const std::function<void(const std::string &)> &callback)
+    {
+        m_propertyChangedCallback = callback;
+    }
 
     /**
      * @brief Factory method to create a shared pointer to an ObjectInspector instance.

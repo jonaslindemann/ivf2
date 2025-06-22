@@ -243,20 +243,13 @@ public:
 
         // Add effects to the window (order matters for compositing)
 
-        this->addEffect(blurEffect); // 0
-
-        this->addEffect(tintEffect); // 1
-
-        this->addEffect(chromaticEffect); // 2
-
-        this->addEffect(ditheringEffect); // 3
-
-        this->addEffect(bloomEffect);     // 4
-
+        this->addEffect(blurEffect);       // 0
+        this->addEffect(tintEffect);       // 1
+        this->addEffect(chromaticEffect);  // 2
+        this->addEffect(ditheringEffect);  // 3
+        this->addEffect(bloomEffect);      // 4
         this->addEffect(pixelationEffect); // 5
-
         this->addEffect(vignetteEffect);   // 6
-
         this->addEffect(filmgrainEffect);  // 7
 
         // Disable all effects by default
@@ -423,7 +416,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Example 6");
+    auto window = ExampleWindow::create(1280, 800, "Example 6");
     // window->maximize();
 
     app->addWindow(window);

@@ -125,7 +125,7 @@ public:
         this->addUiWindow(m_twistInspector);
 
         // Create and show a UI inspector for the bend deformer
-        
+
         m_bendInspector = ObjectInspector::create("Bend");
         m_bendInspector->setObject(m_bendDeformer);
         m_bendInspector->setVisible(true);
@@ -166,7 +166,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Animation");
+    auto window = ExampleWindow::create(1280, 800, "Animation");
     window->maximize();
 
     app->addWindow(window);

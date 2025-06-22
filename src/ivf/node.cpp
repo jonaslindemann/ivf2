@@ -122,6 +122,9 @@ void ivf::Node::doPostDraw()
 void ivf::Node::doDrawSelection()
 {}
 
+void ivf::Node::doSetup()
+{}
+
 uint32_t ivf::Node::doEnumerateIds(uint32_t startId)
 {
     m_objectId = startId;

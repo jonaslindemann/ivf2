@@ -116,42 +116,42 @@ public:
 
         for (auto i = 0; i < 11; i++)
             for (auto j = 0; j < 11; j++)
-            for (auto k = 0; k < 11; k++)
-            {
-                if (true)
+                for (auto k = 0; k < 11; k++)
                 {
-                // Use instancing for efficiency
+                    if (true)
+                    {
+                        // Use instancing for efficiency
 
-                auto instSphere = InstanceNode::create();
-                instSphere->setNode(sphere);
-                instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+                        auto instSphere = InstanceNode::create();
+                        instSphere->setNode(sphere);
+                        instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
 
-                // Assign a random colored material to the instance
+                        // Assign a random colored material to the instance
 
-                auto material = Material::create();
-                material->setDiffuseColor(
-                    glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                material->setShininess(40.0);
+                        auto material = Material::create();
+                        material->setDiffuseColor(
+                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+                        material->setShininess(40.0);
 
-                instSphere->setMaterial(material);
-                this->add(instSphere);
+                        instSphere->setMaterial(material);
+                        this->add(instSphere);
+                    }
+                    else
+                    {
+                        // (Unused branch) Create individual spheres instead of instances
+
+                        auto sphere = Sphere::create(0.15);
+                        sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+
+                        auto material = Material::create();
+                        material->setDiffuseColor(
+                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+                        material->setShininess(40.0);
+
+                        sphere->setMaterial(material);
+                        this->add(sphere);
+                    }
                 }
-                else
-                {
-                // (Unused branch) Create individual spheres instead of instances
-
-                auto sphere = Sphere::create(0.15);
-                sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
-
-                auto material = Material::create();
-                material->setDiffuseColor(
-                    glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                material->setShininess(40.0);
-
-                sphere->setMaterial(material);
-                this->add(sphere);
-                }
-            }
 
         // Add the axis to the scene
 
@@ -201,7 +201,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Lighting");
+    auto window = ExampleWindow::create(1280, 800, "Lighting");
     window->maximize();
 
     app->addWindow(window);

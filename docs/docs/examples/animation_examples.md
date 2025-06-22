@@ -1,79 +1,53 @@
-# Animation Examples
+# Animation examples
 
-This section explores the animation examples provided with ivf2.
+In the following examples, we will explore how to create animations using the ivf2 library. We will demonstrate how to use the `onUpdate()` function to create smooth animations and how to control animations using ImGui windows.
 
-## animation1 Example
+## Animation using onUpdate()
 
-The `animation1` example demonstrates simple animations using direct manipulation within the update loop.
+![animiation1](../images/sc_animation1.png)
 
-### Key Concepts Demonstrated
+In this example, we will create a simple animation using the `onUpdate()` function. The animation will move a rectangle across the screen. The elapsedTime() method will be used to determine how much time has passed since the last frame, allowing us to create smooth animations.
 
-- Basic rotation animation
-- Time-based animation
-- Multiple animated objects
 
-### Code Walkthrough
+### animation1.cpp
 
 ```cpp
-virtual void onUpdate()
-{
-    m_cube->setRotAxis(glm::vec3(1.0, 1.0, 1.0));
-    m_cube->setRotAngle(20.0 * elapsedTime());
-
-    m_sphereXfm->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
-    m_sphereXfm->setRotAngle(20.0 * elapsedTime());
-}
+--8<-- "examples/animation1/animation1.cpp"
 ```
 
-The above code rotates a cube around a diagonal axis and a sphere around the Y axis. The rotation speed is controlled by the elapsed time.
+## Animation controlled by ImGui Window
 
-## animation2 Example
+![animation1](../images/sc_animation2.png)
 
-The `animation2` example shows a more complex Lissajous animation with an interactive UI.
+In this example, we will create a simple animation using the `onUpdate()` function. The animation will move a rectangle across the screen. The elapsedTime() method will be used to determine how much time has passed since the last frame, allowing us to create smooth animations.
 
-### Key Concepts Demonstrated
 
-- Lissajous curve animation
-- LineTrace for path visualization
-- Interactive parameter control with ImGui
-- Dynamic parameter updates
-
-### Lissajous Class
+### lissajou_window.h 
 
 ```cpp
-class Lissajous {
-private:
-    float m_a, m_b, m_c, m_d, m_e, m_f, m_g, m_h, m_i;
-
-public:
-    // ... constructor and methods ...
-
-    glm::vec3 operator()(float t) {
-        return glm::vec3(m_a * sin(m_b * t + m_d), m_c * sin(m_e * t + m_f), m_g * sin(m_h * t + m_i));
-    }
-};
+--8<-- "examples/animation2/lissajou_window.h"
 ```
 
-### Update Loop
+### lissajou_window.cpp
 
 ```cpp
-virtual void onUpdate() override
-{
-    // Check if UI parameters were changed
-    if (m_lissajouWindow->is_dirty())
-    {
-        float a, b, c, d, e, f, g, h, i;
-        m_lissajouWindow->get_params(a, b, c, d, e, f, g, h, i);
-        m_lissajous.setParameters(a, b, c, d, e, f, g, h, i);
-        m_speed = m_lissajouWindow->speed();
-        m_trace->setSize(m_lissajouWindow->size());
-        m_trace->reset();
-    }
+--8<-- "examples/animation2/lissajou_window.cpp"
+```
 
-    // Update sphere position
-    auto pos = m_lissajous(elapsedTime() * m_speed);
-    m_sphere->setPos(pos);
-    m_trace->add(pos);
-    m_trace->refresh();
-}
+### animation2.cpp
+
+```cpp
+--8<-- "examples/animation2/animation2.cpp"
+```
+
+## Animation using Splines and Keyframes
+
+![animation1](../images/sc_animation3.png)
+
+In this example, we will create a more complex animation using splines and keyframes. A Sphere will move along a spline path defined by keyframes. The Cube is animated using keyframe anitmation, where the Cube's position and rotation are defined by keyframes. To illustrate the animation a trace is drawn along both of the object using the `LineTrace` node. 
+
+### animation3.cpp
+
+```cpp
+--8<-- "examples/animation3/animation3.cpp"
 ```

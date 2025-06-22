@@ -38,23 +38,13 @@ public:
 
     int onSetup()
     {
-        // Create an axis for orientation
-
-        auto axis = Axis::create();
-
-        // Create a grid for the scene
-
-        auto grid = Grid::create();
-        grid->setTicks(15, 15, 15); // Set grid ticks
-        grid->setType(GridType::LinesAndMarkers); // Set grid type
-
         // Create a material and configure its properties
 
         auto material = Material::create();
         material->setDiffuseColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f)); // Set diffuse color
-        material->setUseTexture(true); // Enable texture (overwritten below)
-        material->setUseTexture(false); // Disable texture
-        material->setShininess(50.0); // Set shininess
+        material->setUseTexture(true);                                // Enable texture (overwritten below)
+        material->setUseTexture(false);                               // Disable texture
+        material->setShininess(50.0);                                 // Set shininess
 
         // Create a sphere primitive and set its properties
 
@@ -152,9 +142,6 @@ public:
 
         // Add axis and grid to the scene
 
-        this->add(axis);
-        this->add(grid);
-
         // Set the camera position for the scene
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(15.0, 5.0, 0.0));
@@ -174,7 +161,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Primitives");
+    auto window = ExampleWindow::create(1280, 800, "Primitives");
     window->maximize();
 
     app->addWindow(window);

@@ -96,7 +96,7 @@ public:
         auto wave2 = WaveDeformer::create(0.1f, 1.1f, 0.9f, glm::vec3(0.7f, 0, -0.7f), glm::vec3(0, 1, 0));
 
         // Create medium wave deformers
-        
+
         auto wave3 = WaveDeformer::create(0.05f, 2.2f, 1.8f, glm::vec3(-0.5f, 0, 0.8f), glm::vec3(0, 1, 0));
         auto wave4 = WaveDeformer::create(0.03f, 2.8f, 2.2f, glm::vec3(0.9f, 0, 0.4f), glm::vec3(0, 1, 0));
 
@@ -160,7 +160,7 @@ public:
         this->addUiWindow(m_surfaceTurbulenceInspector);
 
         // Set initial camera position for a good view of the scene
-        
+
         this->cameraManipulator()->setCameraPosition(glm::vec3(0, 5, 20));
 
         return 0;
@@ -203,7 +203,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Animation");
+    auto window = ExampleWindow::create(1280, 800, "Animation");
     window->maximize();
 
     app->addWindow(window);

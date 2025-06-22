@@ -4,8 +4,9 @@
  * @author Jonas Lindemann
  * @example animation3.cpp
  * @ingroup animation_examples
- * 
- * This example demonstrates advanced animation techniques. It includes spline and keyframe animations with a sphere moving along a spline path.
+ *
+ * This example demonstrates advanced animation techniques. It includes spline and keyframe animations with a sphere
+ * moving along a spline path.
  *
  */
 
@@ -86,7 +87,7 @@ public:
         m_cube->setMaterial(m_yellowMat);
 
         // Create a sphere, set its material and radius
-        
+
         m_sphere = Sphere::create();
         m_sphere->setMaterial(redMat);
         m_sphere->setRadius(0.1);
@@ -174,7 +175,7 @@ public:
         m_splineAnim->update(1.0 / 60.0);
 
         // Update the keyframe animation for the cube (advance by 1/60 second)
-        
+
         m_keyframeAnim->update(1.0 / 60.0);
 
         // Add the current position of the sphere to its trace and refresh the trace
@@ -200,7 +201,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Example 6");
+    auto window = ExampleWindow::create(1280, 800, "Example 6");
     // window->maximize();
 
     app->addWindow(window);

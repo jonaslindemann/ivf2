@@ -163,6 +163,11 @@ protected:
     virtual void doDrawSelection();
 
     /**
+     * @brief Called to set up the node's properties. Override to implement custom setup.
+     */
+    virtual void doSetup();
+
+    /**
      * @brief Called to enumerate object IDs. Override to implement custom ID enumeration.
      * The default implementation assigns the startId to the object ID and returns the next ID.
      * @param startId Starting object ID.

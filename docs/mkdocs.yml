@@ -24,6 +24,8 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.tabbed
   - pymdownx.arithmatex
+  - pymdownx.snippets:
+      base_path: ../
   - admonition
   - toc:
       permalink: true
@@ -42,38 +44,25 @@ nav:
   - Primitives:
     - Basic Primitives: primitives/basic_primitives.md
     - Complex Primitives: primitives/complex_primitives.md
-    - Text: primitives/text.md
-  - Effects:
-    - Blur: effects/blur.md
-    - Color Effects: effects/color_effects.md
-    - Film Effects: effects/film_effects.md
-    - Custom Effects: effects/custom_effects.md
-  - Animation:
-    - Basic Animation: animation/basic_animation.md
-    - Spline Animation: animation/spline_animation.md
-    - Keyframe Animation: animation/keyframe_animation.md
-    - Lissajous: animation/lissajous.md
   - UI:
     - UI Windows: ui/ui_windows.md
     - Scene Window: ui/scene_window.md
-    - Widgets: ui/widgets.md
-    - Scene UI Integration: ui/scene_ui_integration.md
-    - Custom UI: ui/custom_ui.md
-  - Advanced:
-    - Shadows: advanced/shadows.md
-    - Model Loading: advanced/model_loading.md
-    - Selection: advanced/selection.md
-    - Visitor Pattern: advanced/visitor_pattern.md
-  - API Reference:
-    - Overview: api/index.md
   - Examples:
+    - Primitive Examples: examples/primitives_examples.md
+    - Texture Examples: examples/texture_examples.md
     - Animation Examples: examples/animation_examples.md
+    - Asset Examples: examples/asset_examples.md
+    - Deformer Examples: examples/deformer_examples.md
     - Lighting Examples: examples/lighting_examples.md
+    - Interaction Examples: examples/interaction_examples.md
     - Effects Examples: examples/effects_examples.md
     - UI Examples: examples/ui_examples.md
-    - Advanced Examples: examples/advanced_examples.md
+
+  - API Reference:
+    - Overview: api/index.md
 
 plugins:
   - search
   - minify:
       minify_html: true
+

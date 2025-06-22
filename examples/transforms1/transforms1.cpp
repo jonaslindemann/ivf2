@@ -43,23 +43,23 @@ public:
     int onSetup()
     {
         // Create and add an axis to the scene for reference.
-        
+
         AxisPtr axis = Axis::create();
 
         this->add(axis);
 
         // Create a yellow material for potential use.
-        
+
         auto yellowMat = Material::create();
         yellowMat->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
 
         // Create a red material for the arrows.
-        
+
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
         // Create an arrow object and set its properties.
-        
+
         auto arrow = Arrow::create();
         arrow->setArrowType(ArrowType::RightSided);
         arrow->setLength(0.5);
@@ -68,22 +68,22 @@ public:
         arrow->setMaterial(redMat);
 
         // Create a 5x5x5 grid of arrows, each with a random orientation and position.
-        
+
         for (auto i = 0; i < 5; i++)
             for (auto j = 0; j < 5; j++)
-            for (auto k = 0; k < 5; k++)
-            {
-                // Create a transform node for each arrow.
-                
-                auto xfm = Transform::create();
-                xfm->add(arrow);
-                xfm->setPos(glm::vec3(-2.0 + i, -2.0 + j, -2.0 + k));
-                xfm->rotateToVector(glm::vec3(random(-1.0, 1.0), random(-1.0, 1.0), random(-1.0, 1.0)));
-                this->add(xfm);
-            }
+                for (auto k = 0; k < 5; k++)
+                {
+                    // Create a transform node for each arrow.
+
+                    auto xfm = Transform::create();
+                    xfm->add(arrow);
+                    xfm->setPos(glm::vec3(-2.0 + i, -2.0 + j, -2.0 + k));
+                    xfm->rotateToVector(glm::vec3(random(-1.0, 1.0), random(-1.0, 1.0), random(-1.0, 1.0)));
+                    this->add(xfm);
+                }
 
         // Return 0 to indicate successful setup.
-        
+
         return 0;
     }
 };
@@ -99,7 +99,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Transforms");
+    auto window = ExampleWindow::create(1280, 800, "Transforms");
     window->maximize();
 
     app->addWindow(window);

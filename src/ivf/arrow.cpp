@@ -7,21 +7,13 @@ Arrow::Arrow()
       m_arrowBody(nullptr), m_leftArrowCone(nullptr), m_rightArrowCone(nullptr), m_coneLength(0.4f)
 {
     this->setUseMaterial(true);
-
-    m_arrowBody = CappedCylinder::create();
-    m_leftArrowCone = CappedCone::create();
-    m_rightArrowCone = CappedCone::create();
-
-    this->add(m_arrowBody);
-    this->add(m_leftArrowCone);
-    this->add(m_rightArrowCone);
-
-    this->refresh();
 }
 
 std::shared_ptr<Arrow> Arrow::create()
 {
-    return std::make_shared<Arrow>();
+    auto arrow = std::make_shared<Arrow>();
+    arrow->doSetup();
+    return arrow;
 }
 
 void ivf::Arrow::setArrowType(ArrowType arrowType)
@@ -81,10 +73,23 @@ GLfloat ivf::Arrow::coneLength() const
 
 void ivf::Arrow::refresh()
 {
-    this->doSetup();
+    this->doInitialize();
 }
 
 void ivf::Arrow::doSetup()
+{
+    m_arrowBody = CappedCylinder::create();
+    m_leftArrowCone = CappedCone::create();
+    m_rightArrowCone = CappedCone::create();
+
+    this->add(m_arrowBody);
+    this->add(m_leftArrowCone);
+    this->add(m_rightArrowCone);
+
+    this->doInitialize();
+}
+
+void ivf::Arrow::doInitialize()
 {
     m_arrowBody->set(m_bodyRadius, m_length, 32, 8, 4, 0.0f, 2.0f * glm::pi<float>());
     m_leftArrowCone->set(m_coneRadius, m_coneLength, 32, 8, 4, 0.0f, 2.0f * glm::pi<float>());
@@ -107,7 +112,8 @@ void ivf::Arrow::doSetup()
     m_leftArrowCone->setRotAxis(glm::vec3(0.0f, 0.0f, 1.0f));
     m_leftArrowCone->setRotAngle(90.0);
 
-    switch (m_arrowType) {
+    switch (m_arrowType)
+    {
     case ArrowType::DoubleSided:
         m_leftArrowCone->setVisible(true);
         m_rightArrowCone->setVisible(true);

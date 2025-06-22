@@ -4,9 +4,9 @@
  * @author Jonas Lindemann
  * @example animation2.cpp
  * @ingroup animation_examples
- * 
+ *
  * This example demonstrates a more complex animation technique using the library.
- * 
+ *
  * It creates a Lissajous curve animation with a sphere tracing the curve.
  */
 
@@ -57,7 +57,7 @@ public:
     }
 };
 
-// 
+//
 
 class ExampleWindow : public GLFWSceneWindow {
 private:
@@ -77,7 +77,6 @@ public:
     {
         return std::make_shared<ExampleWindow>(width, height, title);
     }
-
 
     virtual int onSetup() override
     {
@@ -152,7 +151,7 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(800, 800, "Animation");
+    auto window = ExampleWindow::create(1280, 800, "Animation");
     window->maximize();
 
     app->addWindow(window);

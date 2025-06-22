@@ -268,6 +268,12 @@ private:
     float lerp(float t, float a, float b) const;
     float grad(int hash, float x, float y, float z) const;
     glm::vec3 randomGradient(int ix, int iy, int iz) const;
+
+protected:
+    /**
+     * @brief Register properties for inspection.
+     */
+    virtual void setupProperties() override;
 };
 
 /**

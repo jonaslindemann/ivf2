@@ -84,12 +84,12 @@ public:
         this->add(text);
 
         // Create FPS and text info UI windows
-        
+
         m_fpsWindow = FpsWindow::create();
         m_textWindow = TextWindow::create(text);
 
         // Add the UI windows to the main window
-        
+
         this->addUiWindow(m_fpsWindow);
         this->addUiWindow(m_textWindow);
 
@@ -111,7 +111,7 @@ int main()
     app->hint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-    auto window = ExampleWindow::create(800, 800, "Text");
+    auto window = ExampleWindow::create(1280, 800, "Text");
     window->maximize();
 
     app->addWindow(window);

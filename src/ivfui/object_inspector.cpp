@@ -260,6 +260,12 @@ void ObjectInspector::drawVectorProperty(const ivf::Property &prop)
     if (changed)
     {
         notifyPropertyChanged(prop.name);
+
+        // Notify the object that a property has changed
+        if (m_propertyChangedCallback)
+        {
+            m_propertyChangedCallback(prop.name);
+        }
     }
 }
 

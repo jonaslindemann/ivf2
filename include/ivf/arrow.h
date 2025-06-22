@@ -126,6 +126,8 @@ protected:
      * This method is called during construction and when the arrow is refreshed.
      */
     virtual void doSetup();
+
+    virtual void doInitialize();
 };
 
 /**

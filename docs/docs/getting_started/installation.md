@@ -34,7 +34,7 @@ Ivf2 uses vcpkg to manage its dependencies. Instruction on how to install vcpkg 
 To get started, clone the ivf2 repository from GitHub:
 
 ``` bash
-git clone https://github.com/your-username/ivf2.git
+git clone https://github.com/jonaslindemann/ivf2.git
 cd ivf2
 ```
 

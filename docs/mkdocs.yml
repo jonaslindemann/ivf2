@@ -2,6 +2,9 @@ site_name: Interactive Visual Framework 2
 site_description: Documentation for the Ivf2 C++ graphics library
 site_author: Jonas Lindemann
 
+repo_url: https://github.com/jonaslindemann/ivf2
+repo_name: GitHub
+
 theme:
   name: material
   palette: 

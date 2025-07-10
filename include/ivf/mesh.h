@@ -6,6 +6,7 @@
 #include <ivf/normals.h>
 #include <ivf/indices.h>
 #include <ivf/tex_coords.h>
+#include <ivf/material.h>
 
 #include <ivf/vertex_array.h>
 #include <ivf/vertex_buffer.h>
@@ -41,6 +42,8 @@ private:
     std::shared_ptr<Vertices> m_glVerts;  ///< OpenGL-side vertex positions.
     std::shared_ptr<Colors> m_glColors;   ///< OpenGL-side vertex colors.
     std::shared_ptr<Normals> m_glNormals; ///< OpenGL-side vertex normals.
+
+    ivf::MaterialPtr m_material; ///< Material properties for the mesh.
 
     int m_vertPos;     ///< Current vertex position index.
     int m_colorPos;    ///< Current color position index.
@@ -440,6 +443,8 @@ public:
      */
     std::shared_ptr<Indices> indices();
 
+    ivf::MaterialPtr material() const;
+    void setMaterial(ivf::MaterialPtr material);
     /**
      * @brief Print mesh information for debugging.
      */

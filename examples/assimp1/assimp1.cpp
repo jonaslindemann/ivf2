@@ -56,45 +56,74 @@ public:
 
         // Create and add a grid to the scene, using marker style
 
-        auto grid = Grid::create();
-        grid->setType(GridType::Markers);
-
         // Create a box node, set its size, and refresh its geometry
-
-        auto box = Box::create();
-        box->setSize(0.5, 0.5, 0.5);
-        box->refresh();
 
         // Load a 3D model from an .ac file using Assimp
 
-        auto model = ModelLoader::loadModel("assets/city.ac");
-
-        // Create a material and set its properties
-
-        auto material = Material::create();
-        material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
-        material->setDiffuseColor(glm::vec4(0.8, 0.8, 0.0, 1.0));
-        material->setAmbientColor(glm::vec4(0.2, 0.2, 0.0, 1.0));
+        // auto model = ModelLoader::loadModel("assets/X3D/ComputerKeyboard.x3d");
+        //  model->updateNormals();
 
         // Assign the material to the loaded model
 
-        model->setMaterial(material);
+        // model->setMaterial(material);
 
         // Assign the same material to the box
 
-        box->setMaterial(material);
+        // box->setMaterial(material);
 
         // Add all nodes to the scene
 
-        this->add(model);
+        this->setAxisVisible(true);
 
         // Return 0 to indicate successful setup
+
+        // Create the File menu
+
+        auto fileMenu = UiMenu::create("File");
+
+        // Add Exit item to the File menu
+
+        fileMenu->addItem(UiMenuItem::create("Open", "CTRL+O", [this]() { this->onOpen(); }));
+        fileMenu->addItem(UiMenuItem::create("Exit", "ALT+F4", [this]() { this->onExit(); }));
+
+        // Add the File menu to the main menu
+
+        this->mainMenu()->addMenu(fileMenu);
+
+        this->cameraManipulator()->setCameraPosition(glm::vec3(0.0f, 0.0f, 100.0f));
+        this->cameraManipulator()->setFarZ(1000.0f);
+
+        glPolygonMode(GL_FRONT, GL_FILL); // Force filled polygons
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_CULL_FACE);
 
         return 0;
     }
 
     virtual void onUpdate()
     {}
+
+    void onExit()
+    {
+        // Handle exit action, e.g., close the window or application
+        this->close();
+    }
+
+    void onOpen()
+    {
+        // Handle open action, e.g., load a model file
+        std::string filename = "assets/spider.obj"; // Example model file
+        auto model = ModelLoader::loadModel(filename);
+        if (model)
+        {
+            this->add(model);
+            std::cout << "Loaded model: " << filename << std::endl;
+        }
+        else
+        {
+            std::cerr << "Failed to load model: " << filename << std::endl;
+        }
+    }
 };
 
 typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;

@@ -8,6 +8,7 @@
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
 #include <ivf/utils.h>
+#include <ivf/material.h>
 
 using namespace ivf;
 using namespace std;
@@ -403,6 +404,9 @@ void ivf::Mesh::updateNormals()
 
 void Mesh::draw()
 {
+    if (m_material != nullptr)
+        m_material->apply();
+
     if ((m_polygonOffsetFactor != 0.0f) || (m_polygonOffsetUnits != 0.0f))
     {
         glEnable(GL_POLYGON_OFFSET_LINE);
@@ -513,6 +517,16 @@ std::shared_ptr<Vertices> ivf::Mesh::vertices()
 std::shared_ptr<Indices> ivf::Mesh::indices()
 {
     return m_indices;
+}
+
+ivf::MaterialPtr ivf::Mesh::material() const
+{
+    return m_material;
+}
+
+void ivf::Mesh::setMaterial(ivf::MaterialPtr material)
+{
+    m_material = material;
 }
 
 void ivf::Mesh::print()

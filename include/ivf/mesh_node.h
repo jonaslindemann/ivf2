@@ -21,6 +21,11 @@ namespace ivf {
  * transformation and hierarchical placement in the scene.
  */
 class MeshNode : public TransformNode {
+private:
+    std::shared_ptr<Mesh> m_normalVisMesh;
+    bool m_showNormals{false};
+    float m_normalLength{1.0f};
+
 protected:
     std::vector<std::shared_ptr<Mesh>> m_meshes; ///< List of meshes managed by this node.
 
@@ -122,6 +127,10 @@ public:
      * @brief Print mesh node information for debugging.
      */
     void print();
+
+    void setShowNormals(bool show, float length = 1.0f);
+    void updateNormalVisualization();
+    bool showNormals() const;
 
 protected:
     /**

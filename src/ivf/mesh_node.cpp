@@ -1,6 +1,7 @@
 #include <ivf/mesh_node.h>
 
 #include <ivf/mesh_manager.h>
+#include <ivf/light_manager.h>
 
 #include <generator/generator.hpp>
 #include <generator/utils.hpp>
@@ -158,11 +159,72 @@ void ivf::MeshNode::print()
         mesh->print();
 }
 
+void ivf::MeshNode::setShowNormals(bool show, float length)
+{
+    m_showNormals = show;
+    m_normalLength = length;
+    if (show)
+    {
+        updateNormalVisualization();
+    }
+}
+
+void ivf::MeshNode::updateNormalVisualization()
+{
+    if (!m_showNormals || m_meshes.empty())
+        return;
+
+    // Create combined normal visualization for all meshes
+    int totalVertices = 0;
+    for (const auto &mesh : m_meshes)
+    {
+        if (mesh->vertices())
+        {
+            totalVertices += mesh->vertices()->rows();
+        }
+    }
+
+    m_normalVisMesh = std::make_shared<Mesh>(totalVertices * 2, 0, GL_LINES);
+    m_normalVisMesh->begin(GL_LINES);
+
+    for (const auto &mesh : m_meshes)
+    {
+        if (!mesh->vertices() || !mesh->normals())
+            continue;
+
+        for (int i = 0; i < mesh->vertices()->rows(); ++i)
+        {
+            glm::vec3 vertex = mesh->vertices()->vertex(i);
+            glm::vec3 normal = mesh->normals()->normal(i);
+
+            m_normalVisMesh->vertex3f(vertex);
+            m_normalVisMesh->color3f(1.0f, 1.0f, 0.0f); // Yellow
+
+            m_normalVisMesh->vertex3f(vertex + normal * m_normalLength);
+            m_normalVisMesh->color3f(0.0f, 1.0f, 1.0f); // Cyan
+        }
+    }
+
+    m_normalVisMesh->end();
+}
+
+bool ivf::MeshNode::showNormals() const
+{
+    return false;
+}
+
 void ivf::MeshNode::doDraw()
 {
     for (auto &mesh : m_meshes)
         if (mesh->enabled())
             mesh->draw();
+
+    if (m_showNormals && m_normalVisMesh)
+    {
+        ivf::LightManager::instance()->setUseLighting(false); // Disable lighting for normal visualization
+        m_normalVisMesh->draw();
+        ivf::LightManager::instance()->setUseLighting(true); // Disable lighting for normal visualization
+    }
 }
 
 void MeshNode::doSetup()

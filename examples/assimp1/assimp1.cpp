@@ -27,6 +27,9 @@
 
 #include <ivfmath/spline.h>
 
+#include "ImGuiFileDialog.h"
+#include "ImGuiFileDialogConfig.h"
+
 using namespace ivf;
 using namespace ivfui;
 using namespace ivfmath;
@@ -35,6 +38,8 @@ using namespace std;
 
 class ExampleWindow : public GLFWSceneWindow {
 private:
+    bool m_openFileDialog{false};
+
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
     {}
@@ -52,30 +57,7 @@ public:
 
         // Create and add an axis to the scene for orientation reference
 
-        auto axis = Axis::create();
-
-        // Create and add a grid to the scene, using marker style
-
-        // Create a box node, set its size, and refresh its geometry
-
-        // Load a 3D model from an .ac file using Assimp
-
-        // auto model = ModelLoader::loadModel("assets/X3D/ComputerKeyboard.x3d");
-        //  model->updateNormals();
-
-        // Assign the material to the loaded model
-
-        // model->setMaterial(material);
-
-        // Assign the same material to the box
-
-        // box->setMaterial(material);
-
-        // Add all nodes to the scene
-
         this->setAxisVisible(true);
-
-        // Return 0 to indicate successful setup
 
         // Create the File menu
 
@@ -90,18 +72,64 @@ public:
 
         this->mainMenu()->addMenu(fileMenu);
 
-        this->cameraManipulator()->setCameraPosition(glm::vec3(0.0f, 0.0f, 100.0f));
+        this->cameraManipulator()->setCameraPosition(glm::vec3(0.0f, 0.0f, 10.0f));
         this->cameraManipulator()->setFarZ(1000.0f);
 
-        glPolygonMode(GL_FRONT, GL_FILL); // Force filled polygons
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Force filled polygons
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        glDisable(GL_CULL_FACE);
 
         return 0;
     }
 
     virtual void onUpdate()
     {}
+
+    virtual void onDrawUi() override
+    {
+        if (m_openFileDialog)
+        {
+            IGFD::FileDialogConfig config;
+            config.path = ".";
+            ImGuiFileDialog::Instance()->OpenDialog("ChooseFileDlgKey", "Choose File", ".*", config);
+        }
+
+        ImGui::SetNextWindowSize(ImVec2(800, 600), ImGuiCond_FirstUseEver);
+
+        if (ImGuiFileDialog::Instance()->Display("ChooseFileDlgKey"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+                std::string filename = ImGuiFileDialog::Instance()->GetCurrentFileName();
+
+                try
+                {
+                    auto model = ModelLoader::loadModel(filePathName);
+
+                    if (model)
+                    {
+                        this->clear(); // Clear previous models if needed
+                        this->add(model);
+                        std::cout << "Loaded model: " << filename << std::endl;
+                    }
+                    else
+                    {
+                        std::cerr << "Failed to load model: " << filename << std::endl;
+                    }
+
+                } catch (const std::exception &e)
+                {
+                    std::cerr << "Error loading file: " << e.what() << std::endl;
+                }
+            }
+
+            // close
+            ImGuiFileDialog::Instance()->Close();
+            m_openFileDialog = false;
+        }
+    }
 
     void onExit()
     {
@@ -112,17 +140,7 @@ public:
     void onOpen()
     {
         // Handle open action, e.g., load a model file
-        std::string filename = "assets/spider.obj"; // Example model file
-        auto model = ModelLoader::loadModel(filename);
-        if (model)
-        {
-            this->add(model);
-            std::cout << "Loaded model: " << filename << std::endl;
-        }
-        else
-        {
-            std::cerr << "Failed to load model: " << filename << std::endl;
-        }
+        m_openFileDialog = true;
     }
 };
 

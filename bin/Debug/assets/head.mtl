@@ -1,0 +1,24 @@
+newmtl acmat_0
+Kd 0 0 0
+Ka 0.2 0.2 0.2
+Ks 0 0 0
+Ns 10
+Tr 0
+newmtl acmat_1
+Kd 0.627451 0.752941 0.878431
+Ka 0.2 0.2 0.2
+Ks 0 0 0
+Ns 10
+Tr 0
+newmtl acmat_2
+Kd 1 1 1
+Ka 0.2 0.2 0.2
+Ks 0 0 0
+Ns 10
+Tr 0
+newmtl acmat_3
+Kd 0.937255 0.760784 0.713726
+Ka 0.2 0.2 0.2
+Ks 0 0 0
+Ns 10
+Tr 0

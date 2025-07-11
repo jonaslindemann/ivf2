@@ -110,12 +110,10 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
 
     // Handle normal generation based on file format and existing normals
     bool useAssimpNormals = aiMesh->HasNormals(); // Use original normals except for 3DS
-    bool regenerateNormals =
-        !useAssimpNormals || (std::string(scene->mRootNode->mName.C_Str()).find("bridge") != std::string::npos);
 
-    mesh->setGenerateNormals(regenerateNormals);
+    mesh->setGenerateNormals(!useAssimpNormals);
 
-    if (useAssimpNormals && !regenerateNormals)
+    if (useAssimpNormals)
     {
         std::cout << "  Using original normals from file" << std::endl;
     }
@@ -133,9 +131,12 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
 
         if (aiMesh->HasNormals())
         {
-            mesh->normal3f(aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z);
-        }
+            glm::vec3 normal(aiMesh->mNormals[i].x, aiMesh->mNormals[i].y, aiMesh->mNormals[i].z);
 
+            // Test both directions:
+            mesh->normal3f(normal.x, normal.y, normal.z); // Original
+            // mesh->normal3f(-normal.x, -normal.y, -normal.z); // Flipped        }
+        }
         if (aiMesh->HasTextureCoords(0))
         {
             mesh->tex2f(aiMesh->mTextureCoords[0][i].x, aiMesh->mTextureCoords[0][i].y);
@@ -152,33 +153,47 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
         }
     }
 
-    // Process faces with better winding order handling
+    // Process faces with adaptive winding order
     for (unsigned int i = 0; i < aiMesh->mNumFaces; i++)
     {
         aiFace face = aiMesh->mFaces[i];
 
-        if (face.mNumIndices < 3)
+        if (face.mNumIndices == 3)
         {
-            continue;
-        }
-        else if (face.mNumIndices == 3)
-        {
-            // Try reversing winding order if normals appear incorrect
-            mesh->index3i(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
-            // mesh->index3i(face.mIndices[2], face.mIndices[1], face.mIndices[0]);
-        }
-        else if (face.mNumIndices == 4)
-        {
-            // Quad triangulation - ensure consistent winding
-            mesh->index3i(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
-            mesh->index3i(face.mIndices[0], face.mIndices[2], face.mIndices[3]);
-        }
-        else
-        {
-            // Polygon fan triangulation
-            for (unsigned int j = 1; j < face.mNumIndices - 1; j++)
+            // Get vertices and calculate face normal
+            aiVector3D v0 = aiMesh->mVertices[face.mIndices[0]];
+            aiVector3D v1 = aiMesh->mVertices[face.mIndices[1]];
+            aiVector3D v2 = aiMesh->mVertices[face.mIndices[2]];
+
+            // Calculate face normal using cross product
+            aiVector3D edge1 = v1 - v0;
+            aiVector3D edge2 = v2 - v0;
+            aiVector3D faceNormal = edge1 ^ edge2; // Cross product
+            faceNormal.Normalize();
+
+            // Get vertex normal (if available)
+            if (aiMesh->HasNormals())
             {
-                mesh->index3i(face.mIndices[0], face.mIndices[j], face.mIndices[j + 1]);
+                aiVector3D vertexNormal = aiMesh->mNormals[face.mIndices[0]];
+
+                // Check if face normal and vertex normal agree
+                float dot = faceNormal * vertexNormal; // Dot product
+
+                if (dot > 0)
+                {
+                    // Normals agree - use original winding
+                    mesh->index3i(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
+                }
+                else
+                {
+                    // Normals disagree - flip winding
+                    mesh->index3i(face.mIndices[2], face.mIndices[1], face.mIndices[0]);
+                }
+            }
+            else
+            {
+                // No vertex normals - use your current global flip
+                mesh->index3i(face.mIndices[2], face.mIndices[1], face.mIndices[0]);
             }
         }
     }
@@ -192,7 +207,7 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
         {
             aiMaterial *aiMat = scene->mMaterials[aiMesh->mMaterialIndex];
             processMaterial(aiMat, meshNode);
-            meshNode->setShowNormals(true, 1.0f); // Enable normal visualization with a length of 0.1
+            // meshNode->setShowNormals(true, 0.1f); // Enable normal visualization with a length of 0.1
         } catch (const std::exception &e)
         {
             std::cout << "Warning: Failed to process material: " << e.what() << std::endl;
@@ -220,6 +235,11 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> n
     // Debug output with higher precision
     std::cout << "Material - Diffuse: (" << std::fixed << std::setprecision(6) << diffuse.r << ", " << diffuse.g << ", "
               << diffuse.b << "), Opacity: " << opacity << std::endl;
+    std::cout << "  Ambient: (" << ambient.r << ", " << ambient.g << ", " << ambient.b << ")" << std::endl;
+    std::cout << "  Specular: (" << specular.r << ", " << specular.g << ", " << specular.b << ")" << std::endl;
+
+    std::cout << "  Shininess: " << shininess << std::endl;
+    std::cout << "  Opacity: " << opacity << std::endl;
 
     try
     {
@@ -227,6 +247,11 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> n
         if (!material)
         {
             material = Material::create();
+            /*
+            material->setDiffuseColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
+            material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
+            material->setAmbientColor(glm::vec4(0.2, 0.2, 0.2, 1.0));
+            */
             node->setMaterial(material);
         }
 
@@ -307,11 +332,10 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
 {
     Assimp::Importer importer;
 
+    importer.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 80.0f);
+
     unsigned int postProcessFlags =
-        aiProcess_Triangulate | aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcess_CalcTangentSpace |
-        aiProcess_JoinIdenticalVertices | aiProcess_ValidateDataStructure | aiProcess_ImproveCacheLocality |
-        aiProcess_RemoveRedundantMaterials | aiProcess_FixInfacingNormals | // This should fix inverted normals
-        aiProcess_FindDegenerates | aiProcess_FindInvalidData | aiProcess_SortByPType;
+        aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_JoinIdenticalVertices | aiProcess_GenSmoothNormals;
 
     const aiScene *scene = importer.ReadFile(path, postProcessFlags);
 

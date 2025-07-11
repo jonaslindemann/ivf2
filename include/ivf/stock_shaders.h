@@ -42,7 +42,10 @@ void main()
 {
     fragPos = vec3(model * vec4(aPos, 1.0));
     mat3 normalMatrix = transpose(inverse(mat3(model)));
-    normal = normalMatrix * aNormal;
+    // Transform normal to world space
+    // and then to view space
+    //normal = normalMatrix * aNormal;
+    normal = mat3(model) * aNormal; 
 
     color = aColor;
     texCoord = aTex;
@@ -345,15 +348,21 @@ void main()
 
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap)
 {
+    vec3 norm = normalize(normal);
+    
+    // Make normals face the camera/light for two-sided lighting
+    if (dot(norm, viewDir) < 0.0) {
+        norm = -norm;  // Flip normal if it's facing away
+    }
+    
     vec3 lightDir = normalize(-light.direction);
-
-    // diffuse shading
-
-    float diff = max(dot(normal, lightDir), 0.0);
+    
+    // Continue with existing lighting calculation using 'norm'
+    float diff = max(dot(norm, lightDir), 0.0);
 
     // specular shading
 
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
     // combine results

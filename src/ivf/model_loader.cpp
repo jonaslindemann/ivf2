@@ -23,51 +23,48 @@ void ModelLoader::processNode(const aiScene *scene, aiNode *node, std::shared_pt
               << ", " << translation.z << ")"
               << " - Scale: (" << scaling.x << ", " << scaling.y << ", " << scaling.z << ")" << std::endl;
 
+    auto meshNode = MeshNode::create();
+    meshNode->setName(node->mName.C_Str());
+    meshNode->setPos(glm::vec3(translation.x, translation.y, translation.z));
+    meshNode->setScale(glm::vec3(scaling.x, scaling.y, scaling.z));
+
+    float angle = 2.0f * acos(rotation.w);
+    glm::vec3 axis;
+    float s = sqrt(1.0f - rotation.w * rotation.w);
+    if (s < 0.001f)
+    {
+        // If s is close to zero, direction of axis doesn't matter
+        axis = glm::vec3(1.0f, 0.0f, 0.0f);
+        angle = 0.0f;
+    }
+    else
+    {
+        axis = glm::vec3(rotation.x / s, rotation.y / s, rotation.z / s);
+    }
+
+    // Or if it uses axis-angle:
+    if (angle > 0.001f)
+    {
+        meshNode->setRotAxis(axis);
+        meshNode->setRotAngle(glm::degrees(angle));
+    }
+
     // Process all meshes in current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-
-        auto meshNode = MeshNode::create();
         processAiMesh(scene, mesh, meshNode);
-
-        // Apply transformations to the mesh node
-        // Convert aiQuaternion to axis-angle if your framework uses that
-        float angle = 2.0f * acos(rotation.w);
-        glm::vec3 axis;
-        float s = sqrt(1.0f - rotation.w * rotation.w);
-        if (s < 0.001f)
-        {
-            // If s is close to zero, direction of axis doesn't matter
-            axis = glm::vec3(1.0f, 0.0f, 0.0f);
-            angle = 0.0f;
-        }
-        else
-        {
-            axis = glm::vec3(rotation.x / s, rotation.y / s, rotation.z / s);
-        }
-
-        // Set transformations (assuming these methods exist on TransformNode/MeshNode)
-        meshNode->setPos(glm::vec3(translation.x, translation.y, translation.z));
-        meshNode->setScale(glm::vec3(scaling.x, scaling.y, scaling.z));
-
-        // If your framework supports quaternions directly:
-        // meshNode->setRotation(glm::quat(rotation.w, rotation.x, rotation.y, rotation.z));
-
-        // Or if it uses axis-angle:
-        if (angle > 0.001f)
-        {
-            meshNode->setRotAxis(axis);
-            meshNode->setRotAngle(glm::degrees(angle));
-        }
-
-        compNode->add(meshNode);
     }
+    compNode->add(meshNode);
 
     // Recursively process child nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        processNode(scene, node->mChildren[i], compNode, nodeTransform);
+        // Create a new CompositeNode for children
+        // Pass the current node's transformation to children
+        std::shared_ptr<CompositeNode> childCompNode = CompositeNode::create();
+        compNode->add(childCompNode);
+        processNode(scene, node->mChildren[i], childCompNode, nodeTransform);
     }
 }
 

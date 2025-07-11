@@ -91,6 +91,16 @@ uint32_t ivf::Node::objectId() const
     return m_objectId;
 }
 
+void ivf::Node::setName(const std::string &name)
+{
+    m_name = name;
+}
+
+std::string ivf::Node::name() const
+{
+    return m_name;
+}
+
 uint32_t ivf::Node::enumerateIds(uint32_t startId)
 {
     return this->doEnumerateIds(startId);

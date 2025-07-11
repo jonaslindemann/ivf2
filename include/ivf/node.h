@@ -32,6 +32,7 @@ private:
     bool m_visible{true};                          ///< Whether the node is visible.
     uint32_t m_objectId{0};                        ///< Object ID for selection.
     std::weak_ptr<Node> m_parent{};                ///< Parent node (for hierarchy).
+    std::string m_name;                            ///< Name of the node (for identification).
 
 public:
     /**
@@ -127,6 +128,18 @@ public:
      * @return uint32_t Object ID value.
      */
     uint32_t objectId() const;
+
+    /**
+     * @brief Set the name of the node.
+     * @param name Name string.
+     */
+    void setName(const std::string &name);
+
+    /**
+     * @brief Get the name of the node.
+     * @return std::string Name of the node.
+     */
+    std::string name() const;
 
     /**
      * @brief Enumerate and assign the next object ID for the node (used for selection).

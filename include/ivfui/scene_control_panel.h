@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <ivfui/ui_window.h>
+#include <ivfui/scene_inspector.h>
 
 namespace ivfui {
 
@@ -24,6 +25,11 @@ class SceneControlPanel : public ivfui::UiWindow {
 private:
     bool m_isDirty{false};                          ///< True if panel settings have been modified via the UI.
     ivfui::GLFWSceneWindow *m_sceneWindow{nullptr}; ///< Associated scene window.
+    /**
+     * @brief Whether to show the axis overlay.
+     * This controls whether the axis visualization is enabled in the scene.
+     */
+    ivfui::SceneInspectorPtr m_sceneInspector{nullptr}; ///< Associated scene inspector for node selection.
 
     bool m_showAxis{false}; ///< Show axis overlay.
     bool m_showGrid{false}; ///< Show grid overlay.

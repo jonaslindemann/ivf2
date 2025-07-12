@@ -9,7 +9,9 @@
 using namespace ivfui;
 
 SceneInspector::SceneInspector(const std::string &name) : UiWindow(name)
-{}
+{
+    this->setSize(500, 500);
+}
 
 SceneInspector::~SceneInspector()
 {}

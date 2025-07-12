@@ -24,6 +24,11 @@ private:
     std::string m_name; ///< Window name.
     bool m_visible;     ///< Window visibility state.
 
+    int m_x{-1};      ///< Window position (x and y coordinates).
+    int m_y{-1};      ///< Window position (x and y coordinates).
+    int m_width{-1};  ///< Window dimensions (width and height).
+    int m_height{-1}; ///< Window dimensions (width and height).
+
 public:
     /**
      * @brief Construct a UiWindow with the given name.
@@ -75,11 +80,53 @@ public:
      */
     void update();
 
+    /**
+     * @brief Set the window size.
+     * @param width Width in pixels.
+     * @param height Height in pixels.
+     */
+    void setSize(int width, int height);
+
+    /**
+     * @brief Get the window width.
+     * @return int Width in pixels.
+     */
+    int width() const;
+
+    /**
+     * @brief Get the window height.
+     * @return int Height in pixels.
+     */
+    int height() const;
+
+    /**
+     * @brief Set the window position.
+     * @param x X coordinate in pixels.
+     * @param y Y coordinate in pixels.
+     */
+    void setPosition(int x, int y);
+
+    /**
+     * @brief Get the window X position.
+     * @return int X coordinate in pixels.
+     */
+    int x() const;
+
+    /**
+     * @brief Get the window Y position.
+     * @return int Y coordinate in pixels.
+     */
+    int y() const;
+
 protected:
     /**
      * @brief Draw the window contents (override for custom UI).
      */
     virtual void doDraw();
+
+    virtual void doPreDraw();
+
+    virtual void doPostDraw();
 
     /**
      * @brief Update the window state (override for custom logic).

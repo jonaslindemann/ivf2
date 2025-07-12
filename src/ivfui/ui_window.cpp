@@ -19,9 +19,11 @@ void ivfui::UiWindow::draw()
 {
     if (m_visible)
     {
+        doPreDraw();
         ImGui::Begin(m_name.c_str(), 0, doWindowFlags()); //, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         doDraw();
         ImGui::End();
+        doPostDraw();
     }
 }
 
@@ -50,7 +52,58 @@ void ivfui::UiWindow::update()
     doUpdate();
 }
 
+void ivfui::UiWindow::setSize(int width, int height)
+{
+    m_width = width;
+    m_height = height;
+    ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+}
+
+int ivfui::UiWindow::width() const
+{
+    return m_width;
+}
+
+int ivfui::UiWindow::height() const
+{
+    return m_height;
+}
+
+void ivfui::UiWindow::setPosition(int x, int y)
+{
+    m_x = x;
+    m_y = y;
+    ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
+}
+
+int ivfui::UiWindow::x() const
+{
+    return m_x;
+}
+
+int ivfui::UiWindow::y() const
+{
+    return m_y;
+}
+
 void ivfui::UiWindow::doDraw()
+{}
+
+void ivfui::UiWindow::doPreDraw()
+{
+    // Set initial size and position for the window
+    if (m_width > 0 && m_height > 0)
+    {
+        ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+    }
+
+    if (m_x >= 0 && m_y >= 0)
+    {
+        ImGui::SetNextWindowPos(ImVec2(m_x, m_y), ImGuiCond_FirstUseEver);
+    }
+}
+
+void ivfui::UiWindow::doPostDraw()
 {}
 
 void ivfui::UiWindow::doUpdate()

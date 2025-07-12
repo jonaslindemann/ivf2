@@ -10,7 +10,25 @@ ivfui::SceneControlPanel::SceneControlPanel(std::string caption, GLFWSceneWindow
     : UiWindow(caption), m_isDirty(false), m_sceneWindow(sceneWindow), m_showAxis(false), m_showGrid(false),
       m_axisLength(1.0f), m_tickX(11), m_tickY(11), m_tickZ(11), m_tickSpacingX(1.0e-0), m_tickSpacingY(1.0e-0),
       m_tickSpacingZ(1.0e-0)
-{}
+{
+    if (m_sceneWindow == nullptr)
+    {
+        throw std::runtime_error("SceneControlPanel requires a valid GLFWSceneWindow pointer.");
+    }
+
+    // Initialize the scene inspector if needed
+
+    m_sceneInspector = ivfui::SceneInspector::create("Scene Inspector");
+    m_sceneInspector->setVisible(false);
+
+    if (m_sceneInspector == nullptr)
+    {
+        throw std::runtime_error("SceneControlPanel requires a valid SceneInspector in the GLFWSceneWindow.");
+    }
+
+    m_sceneInspector->setRootNode(m_sceneWindow->scene());
+    sceneWindow->addUiWindow(m_sceneInspector);
+}
 
 std::shared_ptr<SceneControlPanel> ivfui::SceneControlPanel::create(std::string caption, GLFWSceneWindow *sceneWindow)
 {
@@ -48,6 +66,11 @@ void SceneControlPanel::doDraw()
     if (ImGui::Button("Zoom Extent"))
     {
         m_sceneWindow->saveView();
+    }
+
+    if (ImGui::Button("Scene Inspector"))
+    {
+        m_sceneInspector->setVisible(!m_sceneInspector->visible());
     }
 
     ImGui::Separator();

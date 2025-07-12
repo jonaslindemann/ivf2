@@ -84,11 +84,12 @@ public:
 
         // Create and add a SceneInspector to the window
 
+        /*
         m_sceneInspector = SceneInspector::create("Scene Inspector");
         m_sceneInspector->setRootNode(this->scene());
         m_sceneInspector->setVisible(true);
-
         this->addUiWindow(m_sceneInspector);
+        */
 
         return 0;
     }

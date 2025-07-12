@@ -8,9 +8,11 @@
 #include <ivfui/ui_window.h>
 #include <ivf/node.h>
 #include <ivf/composite_node.h>
+#include <ivf/property_inspectable.h>
 
 #include <memory>
 #include <functional>
+#include <algorithm>
 
 namespace ivfui {
 
@@ -31,7 +33,12 @@ private:
     bool m_showInvisibleNodes{true};                                  ///< Whether to show invisible nodes in the tree.
     bool m_showNodeTypes{false};                                      ///< Whether to show node type information.
     bool m_showObjectIds{false};                                      ///< Whether to show object IDs.
-    int m_treeDepth{0}; ///< Current tree traversal depth (for indentation).
+    int m_treeDepth{0};                            ///< Current tree traversal depth (for indentation).
+    bool m_showProperties{true};                   ///< Whether to show the properties panel.
+    bool m_showAdvancedProperties{false};          ///< Whether to show advanced properties in the properties panel.
+    float m_dragSpeed{0.1f};                       ///< Speed for dragging numeric controls.
+    float m_splitterPosition{0.4f};                ///< Position of the splitter (0.0 = all tree, 1.0 = all properties).
+    std::vector<std::string> m_expandedCategories; ///< Expanded property categories in the properties panel.
 
 public:
     /**
@@ -118,12 +125,23 @@ public:
      */
     bool showObjectIds() const;
 
+    /**
+     * @brief Set whether to show the properties panel.
+     * @param show True to show properties panel, false to hide it.
+     */
+    void setShowProperties(bool show);
+
+    /**
+     * @brief Check if the properties panel is shown.
+     * @return bool True if properties panel is shown.
+     */
+    bool showProperties() const;
+
 protected:
     /**
      * @brief Draw the scene inspector window contents.
      */
     virtual void doDraw() override;
-
     virtual ImGuiWindowFlags doWindowFlags() const override;
 
 private:
@@ -175,6 +193,62 @@ private:
      * @brief Draw the inspector options/settings.
      */
     void drawInspectorOptions();
+
+    /**
+     * @brief Draw the properties panel for the selected node.
+     */
+    void drawPropertiesPanel();
+
+    /**
+     * @brief Draw property controls for a single property.
+     * @param prop Property to draw.
+     */
+    void drawProperty(const ivf::Property &prop);
+
+    /**
+     * @brief Draw vector property with component controls.
+     * @param prop Property to draw.
+     */
+    void drawVectorProperty(const ivf::Property &prop);
+
+    /**
+     * @brief Draw scalar property control.
+     * @param prop Property to draw.
+     */
+    void drawScalarProperty(const ivf::Property &prop);
+
+    /**
+     * @brief Draw boolean property control.
+     * @param prop Property to draw.
+     */
+    void drawBooleanProperty(const ivf::Property &prop);
+
+    /**
+     * @brief Draw string property control.
+     * @param prop Property to draw.
+     */
+    void drawStringProperty(const ivf::Property &prop);
+
+    /**
+     * @brief Check if a property category is expanded in the UI.
+     * @param category Category name.
+     * @return bool True if expanded.
+     */
+    bool isCategoryExpanded(const std::string &category) const;
+
+    /**
+     * @brief Set the expansion state of a property category.
+     * @param category Category name.
+     * @param expanded True to expand, false to collapse.
+     */
+    void setCategoryExpanded(const std::string &category, bool expanded);
+
+    /**
+     * @brief Generate a unique ImGui ID for a property.
+     * @param prop Property to generate ID for.
+     * @return std::string Unique ImGui ID.
+     */
+    std::string getPropertyId(const ivf::Property &prop) const;
 };
 
 /**

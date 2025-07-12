@@ -143,6 +143,7 @@ uint32_t ivf::Node::doEnumerateIds(uint32_t startId)
 
 void ivf::Node::setupProperties()
 {
+    addProperty("Name", &m_name, "Node");
     addProperty("Visible", &m_visible, "Node");
     addProperty("Use Material", &m_useMaterial, "Node");
     addProperty("Use Texture", &m_useTexture, "Node");

@@ -7,6 +7,7 @@ using namespace ivf;
 TraceNode::TraceNode(int numVertices) : LineTrace(numVertices)
 {
     this->doSetup();
+    this->setName("TraceNode");
 }
 
 TraceNode::~TraceNode()

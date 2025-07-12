@@ -8,6 +8,7 @@ using namespace generator;
 Box::Box(glm::vec3 size, glm::vec3 segments) : m_size(size), m_segments(segments)
 {
     this->doSetup();
+    this->setName("Box");
 }
 
 Box::Box(double w, double h, double d, int i, int j, int k)
@@ -52,9 +53,7 @@ Box &Box::operator=(const Box &other)
     return *this;
 }
 
-Box::Box(Box &&other) 
-    : m_size(std::move(other.m_size))
-    , m_segments(std::move(other.m_segments))
+Box::Box(Box &&other) : m_size(std::move(other.m_size)), m_segments(std::move(other.m_segments))
 {
     other.clear();
     this->doSetup();

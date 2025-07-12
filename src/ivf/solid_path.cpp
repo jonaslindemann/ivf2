@@ -7,10 +7,9 @@
 using namespace ivf;
 using namespace generator;
 
-SolidPath::SolidPath(double radius, int segments)
-    :m_radius(radius),
-     m_segments(segments)
+SolidPath::SolidPath(double radius, int segments) : m_radius(radius), m_segments(segments)
 {
+    this->setName("SolidPath");
 }
 
 std::shared_ptr<SolidPath> SolidPath::create(double radius, int segments)
@@ -39,27 +38,27 @@ void SolidPath::doSetup()
     AnyGenerator<Triangle> triangles = extrudeMesh.triangles();
 
     this->createFromGenerator(vertices, triangles);
-    //this->debugFromGenerator(vertices, triangles);
+    // this->debugFromGenerator(vertices, triangles);
 
-   /*
-    for (auto& p : m_points)
-    {
-        gml::dvec3 p0(m_p0.x, m_p0.y, m_p0.z);
-        gml::dvec3 p1(m_p1.x, m_p1.y, m_p1.z);
-        gml::dvec3 n(1.0, 0.0, 0.0);
+    /*
+     for (auto& p : m_points)
+     {
+         gml::dvec3 p0(m_p0.x, m_p0.y, m_p0.z);
+         gml::dvec3 p1(m_p1.x, m_p1.y, m_p1.z);
+         gml::dvec3 n(1.0, 0.0, 0.0);
 
-    }
+     }
 
-    LinePath line(p0, p1, n, 8);
-    CircleShape circle(m_radius, 32);
+     LinePath line(p0, p1, n, 8);
+     CircleShape circle(m_radius, 32);
 
-    ExtrudeMesh<CircleShape, LinePath> extrudeMesh(circle, line);
+     ExtrudeMesh<CircleShape, LinePath> extrudeMesh(circle, line);
 
-    AnyGenerator<MeshVertex> vertices = extrudeMesh.vertices();
-    AnyGenerator<Triangle> triangles = extrudeMesh.triangles();
+     AnyGenerator<MeshVertex> vertices = extrudeMesh.vertices();
+     AnyGenerator<Triangle> triangles = extrudeMesh.triangles();
 
-    this->createFromGenerator(vertices, triangles);
-    */
+     this->createFromGenerator(vertices, triangles);
+     */
 }
 
 void SolidPath::setRadius(double radius)

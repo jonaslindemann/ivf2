@@ -85,6 +85,8 @@ protected:
      * @brief Update the window state (override for custom logic).
      */
     virtual void doUpdate();
+
+    virtual ImGuiWindowFlags doWindowFlags() const;
 };
 
 /**

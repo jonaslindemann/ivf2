@@ -8,6 +8,7 @@ using namespace generator;
 SolidPolyLine::SolidPolyLine(double radius, int segments) : m_radius(radius), m_polyPath(segments)
 {
     this->doSetup();
+    this->setName("SolidPolyLine");
 }
 
 std::shared_ptr<SolidPolyLine> SolidPolyLine::create(double radius, int segments)

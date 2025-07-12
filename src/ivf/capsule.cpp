@@ -6,18 +6,14 @@ using namespace ivf;
 using namespace generator;
 
 Capsule::Capsule(double radius, double size, int slices, int segments, int rings, double start, double sweep)
-    :m_radius(1.0),
-     m_size(0.5),
-     m_slices(32),
-     m_segments(4),
-     m_rings(8),
-     m_start(0.0),
-     m_sweep(gml::radians(360.0))
+    : m_radius(1.0), m_size(0.5), m_slices(32), m_segments(4), m_rings(8), m_start(0.0), m_sweep(gml::radians(360.0))
 {
     this->doSetup();
+    this->setName("Capsule");
 }
 
-std::shared_ptr<Capsule> Capsule::create(double radius, double size, int slices, int segments, int rings, double start, double sweep)
+std::shared_ptr<Capsule> Capsule::create(double radius, double size, int slices, int segments, int rings, double start,
+                                         double sweep)
 {
     return std::make_shared<Capsule>(radius, size, slices, segments, rings, start, sweep);
 }
@@ -44,5 +40,3 @@ void Capsule::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
-
-

@@ -8,6 +8,7 @@ using namespace generator;
 SolidLine::SolidLine(glm::vec3 p0, glm::vec3 p1, double radius) : m_radius(radius), m_p0(p0), m_p1(p1)
 {
     this->doSetup();
+    this->setName("SolidLine");
 }
 
 std::shared_ptr<SolidLine> SolidLine::create(glm::vec3 p0, glm::vec3 p1, double radius)

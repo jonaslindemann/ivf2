@@ -9,6 +9,7 @@ Plane::Plane(double width, double depth, int rows, int cols)
     : m_width(width), m_depth(depth), m_rows(rows), m_cols(cols)
 {
     this->doSetup();
+    this->setName("Plane");
 }
 
 std::shared_ptr<Plane> Plane::create(double width, double depth, int rows, int cols)

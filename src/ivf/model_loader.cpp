@@ -23,51 +23,73 @@ void ModelLoader::processNode(const aiScene *scene, aiNode *node, std::shared_pt
               << ", " << translation.z << ")"
               << " - Scale: (" << scaling.x << ", " << scaling.y << ", " << scaling.z << ")" << std::endl;
 
-    auto meshNode = MeshNode::create();
-    meshNode->setName(node->mName.C_Str());
-    meshNode->setPos(glm::vec3(translation.x, translation.y, translation.z));
-    meshNode->setScale(glm::vec3(scaling.x, scaling.y, scaling.z));
-
-    float angle = 2.0f * acos(rotation.w);
-    glm::vec3 axis;
-    float s = sqrt(1.0f - rotation.w * rotation.w);
-    if (s < 0.001f)
+    // Process meshes in current node
+    if (node->mNumMeshes > 0)
     {
-        // If s is close to zero, direction of axis doesn't matter
-        axis = glm::vec3(1.0f, 0.0f, 0.0f);
-        angle = 0.0f;
-    }
-    else
-    {
-        axis = glm::vec3(rotation.x / s, rotation.y / s, rotation.z / s);
+        auto meshNode = MeshNode::create();
+        meshNode->setName(node->mName.C_Str());
+        meshNode->setPos(glm::vec3(translation.x, translation.y, translation.z));
+        meshNode->setScale(glm::vec3(scaling.x, scaling.y, scaling.z));
+
+        float angle = 2.0f * acos(rotation.w);
+        glm::vec3 axis;
+        float s = sqrt(1.0f - rotation.w * rotation.w);
+        if (s < 0.001f)
+        {
+            axis = glm::vec3(1.0f, 0.0f, 0.0f);
+            angle = 0.0f;
+        }
+        else
+        {
+            axis = glm::vec3(rotation.x / s, rotation.y / s, rotation.z / s);
+        }
+
+        if (angle > 0.001f)
+        {
+            meshNode->setRotAxis(axis);
+            meshNode->setRotAngle(glm::degrees(angle));
+        }
+
+        for (unsigned int i = 0; i < node->mNumMeshes; i++)
+        {
+            aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+            processAiMesh(scene, mesh, meshNode);
+        }
+        compNode->add(meshNode);
     }
 
-    // Or if it uses axis-angle:
-    if (angle > 0.001f)
-    {
-        meshNode->setRotAxis(axis);
-        meshNode->setRotAngle(glm::degrees(angle));
-    }
-
-    // Process all meshes in current node
-    for (unsigned int i = 0; i < node->mNumMeshes; i++)
-    {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        processAiMesh(scene, mesh, meshNode);
-    }
-    compNode->add(meshNode);
-
-    // Recursively process child nodes
+    // Process child nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        // Create a new CompositeNode for children
-        // Pass the current node's transformation to children
-        std::shared_ptr<CompositeNode> childCompNode = CompositeNode::create();
-        compNode->add(childCompNode);
-        processNode(scene, node->mChildren[i], childCompNode, nodeTransform);
+        aiNode *childNode = node->mChildren[i];
+
+        // Count total meshes in this child and all its descendants
+        std::function<int(aiNode *)> countMeshes = [&](aiNode *n) -> int {
+            int count = n->mNumMeshes;
+            for (unsigned int j = 0; j < n->mNumChildren; j++)
+            {
+                count += countMeshes(n->mChildren[j]);
+            }
+            return count;
+        };
+
+        int totalMeshesInChild = countMeshes(childNode);
+
+        if (totalMeshesInChild <= 1)
+        {
+            // Child has 0 or 1 mesh - process directly into current composite (no intermediate composite)
+            processNode(scene, childNode, compNode, nodeTransform);
+        }
+        else
+        {
+            // Child has multiple meshes - create a composite for it
+            std::shared_ptr<CompositeNode> childCompNode = CompositeNode::create();
+            childCompNode->setName(std::string(childNode->mName.C_Str()));
+            compNode->add(childCompNode);
+            processNode(scene, childNode, childCompNode, nodeTransform);
+        }
     }
 }
-
 void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode)
 {
     std::cout << "Processing mesh:" << std::endl;
@@ -349,6 +371,18 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
     processNode(scene, scene->mRootNode, compositeNode, aiMatrix4x4());
 
     std::cout << "Model loading complete. CompositeNode has " << compositeNode->count() << " children." << std::endl;
+
+    // If the top-level composite only has one child and that child is also a composite,
+    // return the child directly to eliminate unnecessary nesting
+    if (compositeNode->count() == 1)
+    {
+        auto firstChild = std::dynamic_pointer_cast<CompositeNode>(compositeNode->at(0));
+        if (firstChild)
+        {
+            std::cout << "Eliminating top-level composite wrapper" << std::endl;
+            return firstChild;
+        }
+    }
 
     return compositeNode;
 }

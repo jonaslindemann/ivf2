@@ -8,6 +8,7 @@ using namespace ivf;
 CompositeNode::CompositeNode() : TransformNode(), m_singleObjectId(false)
 {
     this->setUseMaterial(false);
+    this->setName("Composite");
 }
 
 ivf::CompositeNode::~CompositeNode()

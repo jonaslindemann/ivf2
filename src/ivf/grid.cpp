@@ -13,6 +13,7 @@ Grid::Grid()
 
 {
     this->doSetup();
+    this->setName("Grid");
 }
 
 Grid::~Grid()

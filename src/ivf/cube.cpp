@@ -6,6 +6,7 @@ Cube::Cube(GLfloat size) : m_size(size)
 {
     this->newMesh(24, 12);
     this->doSetup();
+    this->setName("Cube");
 }
 
 Cube::~Cube()

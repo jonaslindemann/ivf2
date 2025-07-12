@@ -19,8 +19,7 @@ void ivfui::UiWindow::draw()
 {
     if (m_visible)
     {
-        ImGui::Begin(m_name.c_str(), 0,
-                     ImGuiWindowFlags_AlwaysAutoResize); //, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Begin(m_name.c_str(), 0, doWindowFlags()); //, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         doDraw();
         ImGui::End();
     }
@@ -56,3 +55,8 @@ void ivfui::UiWindow::doDraw()
 
 void ivfui::UiWindow::doUpdate()
 {}
+
+ImGuiWindowFlags ivfui::UiWindow::doWindowFlags() const
+{
+    return ImGuiWindowFlags_AlwaysAutoResize;
+}

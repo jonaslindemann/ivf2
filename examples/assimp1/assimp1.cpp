@@ -17,6 +17,7 @@
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
 #include <ivfui/ui.h>
+#include <ivfui/scene_inspector.h>
 
 #include <ivf/node_visitor.h>
 #include <ivf/stock_shaders.h>
@@ -39,6 +40,8 @@ using namespace std;
 class ExampleWindow : public GLFWSceneWindow {
 private:
     bool m_openFileDialog{false};
+
+    SceneInspectorPtr m_sceneInspector{nullptr};
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -78,6 +81,14 @@ public:
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Force filled polygons
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
+
+        // Create and add a SceneInspector to the window
+
+        m_sceneInspector = SceneInspector::create("Scene Inspector");
+        m_sceneInspector->setRootNode(this->scene());
+        m_sceneInspector->setVisible(true);
+
+        this->addUiWindow(m_sceneInspector);
 
         return 0;
     }

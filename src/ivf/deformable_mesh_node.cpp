@@ -5,7 +5,9 @@
 using namespace ivf;
 
 DeformableMeshNode::DeformableMeshNode() : MeshNode(), m_deformerStack(DeformerStack::create()), m_autoUpdate(false)
-{}
+{
+    this->setName("DeformableMeshNode");
+}
 
 std::shared_ptr<DeformableMeshNode> DeformableMeshNode::create()
 {

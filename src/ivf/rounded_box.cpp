@@ -9,6 +9,7 @@ RoundedBox::RoundedBox(glm::vec3 size, glm::vec3 segments, double radius, int sl
     : m_size(size), m_segments(segments), m_radius(radius), m_slices(slices)
 {
     this->doSetup();
+    this->setName("RoundedBox");
 }
 
 std::shared_ptr<RoundedBox> RoundedBox::create(glm::vec3 size, glm::vec3 segments, double radius, int slices)

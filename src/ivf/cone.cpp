@@ -6,14 +6,10 @@ using namespace ivf;
 using namespace generator;
 
 Cone::Cone(double radius, double size, int slices, int segments, double start, double sweep)
-    :m_radius(radius),
-     m_size(size),
-     m_slices(slices),
-     m_segments(segments),
-     m_start(start),
-     m_sweep(sweep)
+    : m_radius(radius), m_size(size), m_slices(slices), m_segments(segments), m_start(start), m_sweep(sweep)
 {
     this->doSetup();
+    this->setName("Cone");
 }
 
 std::shared_ptr<Cone> Cone::create(double radius, double size, int slices, int segments, double start, double sweep)
@@ -41,5 +37,3 @@ void Cone::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
-
-

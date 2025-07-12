@@ -6,11 +6,10 @@ using namespace ivf;
 using namespace generator;
 
 Dodecahedron::Dodecahedron(double radius, int segments, int rings)
-    :m_radius(radius),
-     m_segments(segments),
-     m_rings(rings)
+    : m_radius(radius), m_segments(segments), m_rings(rings)
 {
     this->doSetup();
+    this->setName("Dodecahedron");
 }
 
 std::shared_ptr<Dodecahedron> Dodecahedron::create(double radius, int segments, int rings)
@@ -35,5 +34,3 @@ void Dodecahedron::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
-
-

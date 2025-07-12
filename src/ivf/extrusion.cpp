@@ -35,7 +35,7 @@ void ivf::Extrusion::transformFirstContour()
     int vertexCount = (int)m_contour.size();
 
     glm::mat4 matrix(1.0f);
-    //Matrix4 matrix;
+    // Matrix4 matrix;
 
     if (pathCount > 0)
     {
@@ -46,7 +46,7 @@ void ivf::Extrusion::transformFirstContour()
         glm::mat4 translate = glm::translate(m_path[0]);
 
         matrix = matrix * translate;
-        //matrix.translate(path[0]);
+        // matrix.translate(path[0]);
 
         // multiply matrix to the contour
         // NOTE: the contour vertices are transformed here
@@ -82,10 +82,10 @@ std::vector<glm::vec3> ivf::Extrusion::projectContour(int fromIndex, int toIndex
 
     // project each vertex of contour to the plane
 
-    std::vector<glm::vec3>& fromContour = m_contours[fromIndex];
+    std::vector<glm::vec3> &fromContour = m_contours[fromIndex];
     std::vector<glm::vec3> toContour;
 
-    for (auto i = 0; i<int(fromContour.size()); ++i)
+    for (auto i = 0; i < int(fromContour.size()); ++i)
     {
         line.set(dir1, fromContour[i]);
         toContour.push_back(plane.intersect(line));
@@ -97,7 +97,7 @@ std::vector<glm::vec3> ivf::Extrusion::projectContour(int fromIndex, int toIndex
 std::vector<glm::vec3> ivf::Extrusion::computeContourNormal(int pathIndex)
 {
     // get current contour and center point
-    std::vector<glm::vec3>& contour = m_contours[pathIndex];
+    std::vector<glm::vec3> &contour = m_contours[pathIndex];
     glm::vec3 center = m_path[pathIndex];
 
     std::vector<glm::vec3> contourNormal;
@@ -111,7 +111,7 @@ std::vector<glm::vec3> ivf::Extrusion::computeContourNormal(int pathIndex)
     return contourNormal;
 }
 
-glm::vec3 ivf::Extrusion::intersectPlane(glm::vec3& pos, glm::vec3& dir, glm::vec3& planePos, glm::vec3& planeDir)
+glm::vec3 ivf::Extrusion::intersectPlane(glm::vec3 &pos, glm::vec3 &dir, glm::vec3 &planePos, glm::vec3 &planeDir)
 {
     float d;
     bool intersects = glm::intersectRayPlane(pos, dir, planePos, planeDir, d);
@@ -131,21 +131,22 @@ ivf::Extrusion::Extrusion()
 {
     this->setUseTexture(false);
     this->setUseMaterial(true);
+    this->setName("Extrusion");
 }
 
 std::shared_ptr<Extrusion> ivf::Extrusion::create()
 {
-	return std::make_shared<Extrusion>();
+    return std::make_shared<Extrusion>();
 }
 
 void ivf::Extrusion::addPathPoint(glm::vec3 p)
 {
-	m_path.push_back(p);
+    m_path.push_back(p);
 }
 
 void ivf::Extrusion::clearPath()
 {
-	m_path.clear();
+    m_path.clear();
 }
 
 void ivf::Extrusion::createCircleSection(float r, int segments)
@@ -168,8 +169,8 @@ void ivf::Extrusion::createCircleSection(float r, int segments)
 
 void ivf::Extrusion::addSectionPoint(glm::vec2 p)
 {
-	glm::vec3 pp(p.x, p.y, 0.0);
-	m_contour.push_back(pp);
+    glm::vec3 pp(p.x, p.y, 0.0);
+    m_contour.push_back(pp);
 }
 
 void ivf::Extrusion::clearSection()
@@ -203,14 +204,14 @@ void ivf::Extrusion::doSetup()
     mesh()->end();
     */
 
-    for (auto i = 0; i < m_path.size()-1; i++)
+    for (auto i = 0; i < m_path.size() - 1; i++)
     {
         std::vector<glm::vec3> c1 = m_contours[i];
-        std::vector<glm::vec3> c2 = m_contours[i+1];
+        std::vector<glm::vec3> c2 = m_contours[i + 1];
         std::vector<glm::vec3> n1 = m_normals[i];
-        std::vector<glm::vec3> n2 = m_normals[i+1];
+        std::vector<glm::vec3> n2 = m_normals[i + 1];
 
-        this->newMesh((c1.size()+1)*2);
+        this->newMesh((c1.size() + 1) * 2);
 
         currentMesh()->begin(GL_TRIANGLE_STRIP);
         for (auto j = 0; j < c1.size(); j++)

@@ -13,7 +13,9 @@ using namespace ivf;
 using namespace generator;
 
 MeshNode::MeshNode() : TransformNode() // Initialize the base class TransformNode
-{}
+{
+    this->setName("Mesh");
+}
 
 std::shared_ptr<MeshNode> ivf::MeshNode::create()
 {

@@ -7,6 +7,7 @@ using namespace ivf;
 Axis::Axis(GLfloat size) : m_size(size)
 {
     this->doSetup();
+    this->setName("Axis");
 }
 
 Axis::~Axis()

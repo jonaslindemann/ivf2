@@ -6,17 +6,14 @@ using namespace ivf;
 using namespace generator;
 
 Cylinder::Cylinder(double radius, double size, int slices, int segments, double start, double sweep)
-    :m_radius(radius),
-     m_size(size),
-     m_slices(slices),
-     m_segments(segments),
-     m_start(start),
-     m_sweep(sweep)
+    : m_radius(radius), m_size(size), m_slices(slices), m_segments(segments), m_start(start), m_sweep(sweep)
 {
     this->doSetup();
+    this->setName("Cylinder");
 }
 
-std::shared_ptr<Cylinder> Cylinder::create(double radius, double size, int slices, int segments, double start, double sweep)
+std::shared_ptr<Cylinder> Cylinder::create(double radius, double size, int slices, int segments, double start,
+                                           double sweep)
 {
     return std::make_shared<Cylinder>(radius, size, slices, segments, start, sweep);
 }
@@ -41,5 +38,3 @@ void Cylinder::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
-
-

@@ -11,6 +11,7 @@ CappedTube::CappedTube(double radius, double innerRadius, double size, int slice
       m_rings(rings), m_start(start), m_sweep(sweep)
 {
     this->doSetup();
+    this->setName("CappedTube");
 }
 
 std::shared_ptr<CappedTube> CappedTube::create(double radius, double innerRadius, double size, int slices, int segments,

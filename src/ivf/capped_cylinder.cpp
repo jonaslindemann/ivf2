@@ -11,6 +11,7 @@ CappedCylinder::CappedCylinder(double radius, double size, int slices, int segme
       m_sweep(sweep)
 {
     this->doSetup();
+    this->setName("CappedCylinder");
 }
 
 std::shared_ptr<CappedCylinder> CappedCylinder::create(double radius, double size, int slices, int segments, int rings,

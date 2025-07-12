@@ -10,6 +10,7 @@ CappedCone::CappedCone(double radius, double size, int slices, int segments, int
       m_sweep(sweep)
 {
     this->doSetup();
+    this->setName("CappedCone");
 }
 
 std::shared_ptr<CappedCone> CappedCone::create(double radius, double size, int slices, int segments, int rings,

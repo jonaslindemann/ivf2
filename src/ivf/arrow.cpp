@@ -7,6 +7,7 @@ Arrow::Arrow()
       m_arrowBody(nullptr), m_leftArrowCone(nullptr), m_rightArrowCone(nullptr), m_coneLength(0.4f)
 {
     this->setUseMaterial(true);
+    this->setName("Arrow");
 }
 
 std::shared_ptr<Arrow> Arrow::create()

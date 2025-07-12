@@ -11,28 +11,17 @@
 using namespace std;
 using namespace ivf;
 
-
 TextNode::TextNode()
-    :m_text(""),
-    m_VAO(0),
-    m_vertexVBO(0),
-    m_texVBO(0),
-    m_textColor(1.0f, 1.0f, 0.0f),
-    m_textRendering(true),
-    m_useFixedTextColor(false),
-    m_maxPixels(400),
-    m_scale(1.0),
-    m_textAlignX(TextAlignX::LEFT),
-    m_textAlignY(TextAlignY::BOTTOM),
-    m_textHeight(-1.0),
-    m_textWidth(-1.0)
+    : m_text(""), m_VAO(0), m_vertexVBO(0), m_texVBO(0), m_textColor(1.0f, 1.0f, 0.0f), m_textRendering(true),
+      m_useFixedTextColor(false), m_maxPixels(400), m_scale(1.0), m_textAlignX(TextAlignX::LEFT),
+      m_textAlignY(TextAlignY::BOTTOM), m_textHeight(-1.0), m_textWidth(-1.0)
 {
     m_textRenderingId = ShaderManager::instance()->currentProgram()->uniformLoc("textRendering");
     m_useFixedTextColorId = ShaderManager::instance()->currentProgram()->uniformLoc("useFixedTextColor");
     m_textColorId = ShaderManager::instance()->currentProgram()->uniformLoc("textColor");
     m_useTextureId = ShaderManager::instance()->currentProgram()->uniformLoc("useTexture");
 
-	this->setUseMaterial(true);
+    this->setUseMaterial(true);
     this->setUseTexture(false);
 
     m_vertexAttrId = ShaderManager::instance()->currentProgram()->attribId("aPos");
@@ -42,22 +31,23 @@ TextNode::TextNode()
 
     this->updateCharMap();
     this->prepareBuffers();
+    this->setName("TextNode");
 }
 
 std::shared_ptr<TextNode> ivf::TextNode::create()
 {
-	return std::make_shared<TextNode>();
+    return std::make_shared<TextNode>();
 }
 
 void ivf::TextNode::setText(const std::string text)
 {
-	m_text = text;
+    m_text = text;
     updateTextSize();
 }
 
 std::string ivf::TextNode::text()
 {
-	return m_text;
+    return m_text;
 }
 
 void ivf::TextNode::setSize(const float size)
@@ -121,7 +111,7 @@ float ivf::TextNode::textHeight()
 void ivf::TextNode::updateCharMap()
 {
     if (m_charMap.size() != 0)
-        for (auto& it : m_charMap)
+        for (auto &it : m_charMap)
             glDeleteTextures(1, &it.second.textureID);
 
     m_charMap.clear();
@@ -149,17 +139,8 @@ void ivf::TextNode::updateCharMap()
 
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RED,
-            face->glyph->bitmap.width,
-            face->glyph->bitmap.rows,
-            0,
-            GL_RED,
-            GL_UNSIGNED_BYTE,
-            face->glyph->bitmap.buffer
-        );
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED,
+                     GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
 
         /*
         glTexImage2D(
@@ -181,12 +162,9 @@ void ivf::TextNode::updateCharMap()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         // now store character for later use
-        CharacterInfo character = {
-            texture,
-            glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-            glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-            static_cast<unsigned int>(face->glyph->advance.x)
-        };
+        CharacterInfo character = {texture, glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+                                   glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+                                   static_cast<unsigned int>(face->glyph->advance.x)};
         m_charMap.insert(std::pair<char, CharacterInfo>(c, character));
         glBindTexture(GL_TEXTURE_2D, 0);
     }
@@ -197,37 +175,19 @@ void ivf::TextNode::prepareBuffers()
     // configure VAO/VBO for texture quads
     // -----------------------------------
 
-    float texCoords[6][2] = {
-        { 0.0f, 0.0f },
-        { 0.0f, 1.0f },
-        { 1.0f, 1.0f },
+    float texCoords[6][2] = {{0.0f, 0.0f}, {0.0f, 1.0f}, {1.0f, 1.0f},
 
-        { 0.0f, 0.0f },
-        { 1.0f, 1.0f },
-        { 1.0f, 0.0f }
-    };
+                             {0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 0.0f}};
 
-    float colors[6][4] = {
-        { 1.0f, 1.0f, 1.0f, 1.0f },
-        { 1.0f, 1.0f, 1.0f, 1.0f },
-        { 1.0f, 1.0f, 1.0f, 1.0f },
+    float colors[6][4] = {{1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f},
 
-        { 1.0f, 1.0f, 1.0f, 1.0f },
-        { 1.0f, 1.0f, 1.0f, 1.0f },
-        { 1.0f, 1.0f, 1.0f, 1.0f }
-    };
+                          {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f, 1.0f}};
 
-    float normals[6][3] = {
-        { 0.0f, 0.0f, 1.0f },
-        { 0.0f, 0.0f, 1.0f },
-        { 0.0f, 0.0f, 1.0f },
+    float normals[6][3] = {{0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f},
 
-        { 0.0f, 0.0f, 1.0f },
-        { 0.0f, 0.0f, 1.0f },
-        { 0.0f, 0.0f, 1.0f }
-    };
+                           {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 1.0f}};
 
-    GLuint indices[6] = { 0, 1, 2, 3, 4, 5 };
+    GLuint indices[6] = {0, 1, 2, 3, 4, 5};
 
     glGenVertexArrays(1, &m_VAO);
 
@@ -240,9 +200,9 @@ void ivf::TextNode::prepareBuffers()
     glBindVertexArray(m_VAO);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*6, indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * 6, indices, GL_STATIC_DRAW);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexVBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 3, 0, GL_DYNAMIC_DRAW);
     glVertexAttribPointer(m_vertexAttrId, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
@@ -291,10 +251,10 @@ void ivf::TextNode::doDraw()
 
     if (m_textAlignX == TextAlignX::LEFT)
         x = 0.0;
-    
+
     if (m_textAlignX == TextAlignX::RIGHT)
         x = -m_textWidth * scale;
-    
+
     if (m_textAlignX == TextAlignX::CENTER)
         x = -m_textWidth * scale / 2.0f;
 
@@ -312,19 +272,15 @@ void ivf::TextNode::doDraw()
         CharacterInfo ch = m_charMap[*c];
 
         float xpos = x + ch.glyphBearing.x * scale;
-        float ypos = - (ch.glyphSize.y - ch.glyphBearing.y) * scale - dy;
+        float ypos = -(ch.glyphSize.y - ch.glyphBearing.y) * scale - dy;
 
         float w = ch.glyphSize.x * scale;
         float h = ch.glyphSize.y * scale;
 
         float vertices[6][3] = {
-            { xpos,     ypos + h,   0.0f },
-            { xpos,     ypos,       0.0f },
-            { xpos + w, ypos,       0.0f },
+            {xpos, ypos + h, 0.0f}, {xpos, ypos, 0.0f},     {xpos + w, ypos, 0.0f},
 
-            { xpos,     ypos + h,   0.0f },
-            { xpos + w, ypos,       0.0f },
-            { xpos + w, ypos + h,   0.0f },
+            {xpos, ypos + h, 0.0f}, {xpos + w, ypos, 0.0f}, {xpos + w, ypos + h, 0.0f},
         };
 
         // render glyph texture over quad
@@ -336,15 +292,16 @@ void ivf::TextNode::doDraw()
         GL_ERR(glBindVertexArray(m_VAO));
 
         GL_ERR(glBindBuffer(GL_ARRAY_BUFFER, m_vertexVBO));
-        GL_ERR(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW)); // be sure to use glBufferSubData and not glBufferData
+        GL_ERR(glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,
+                            GL_DYNAMIC_DRAW)); // be sure to use glBufferSubData and not glBufferData
         GL_ERR(glBindBuffer(GL_ARRAY_BUFFER, 0));
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
         GL_ERR(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-
-        x += (ch.glyphAdvance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
+        x += (ch.glyphAdvance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th
+                                             // pixels by 64 to get amount of pixels))
 
         GL_ERR(glBindTexture(GL_TEXTURE_2D, 0));
         GL_ERR(glBindVertexArray(0));

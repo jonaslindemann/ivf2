@@ -11,7 +11,7 @@
     },
     {
       "name": "default_l",
-      "toolchainFile": "/home/admin/Development/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      "toolchainFile": "/home/lindemann/Development/vcpkg/scripts/buildsystems/vcpkg.cmake"
     }
   ]
 }

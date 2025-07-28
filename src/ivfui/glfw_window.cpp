@@ -350,6 +350,7 @@ void GLFWWindow::doDraw()
 
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 
     m_t0 = glfwGetTime();
     onDraw();

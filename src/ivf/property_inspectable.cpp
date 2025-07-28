@@ -122,6 +122,18 @@ void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::vec
     m_properties.push_back(prop);
 }
 
+void PropertyInspectable::addProperty(const std::string &name, glm::uvec3 *value, const std::string &category)
+{
+    m_properties.emplace_back(name, value, category);
+}
+
+void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::uvec3 *value, double minVal, double maxVal,
+                                               const std::string &category)
+{
+    Property prop(name, value, minVal, maxVal, category);
+    m_properties.push_back(prop);
+}
+
 void PropertyInspectable::addReadOnlyProperty(const std::string &name, PropertyValue value, const std::string &category)
 {
     Property prop(name, value, category);
@@ -174,6 +186,10 @@ std::string PropertyEditor::getValueAsString(const Property &prop)
             {
                 return std::to_string(*arg);
             }
+            else if constexpr (std::is_same_v<T, glm::uint *>)
+            {
+                return std::to_string(*arg);
+            }
             else if constexpr (std::is_same_v<T, bool *>)
             {
                 return *arg ? "true" : "false";
@@ -214,6 +230,11 @@ bool PropertyEditor::setValueFromString(const Property &prop, const std::string 
                     return true;
                 }
                 else if constexpr (std::is_same_v<T, int *>)
+                {
+                    *arg = std::stoi(value);
+                    return true;
+                }
+                else if constexpr (std::is_same_v<T, glm::uint *>)
                 {
                     *arg = std::stoi(value);
                     return true;
@@ -263,6 +284,10 @@ std::string PropertyEditor::getPropertyType(const Property &prop)
             {
                 return "int";
             }
+            else if constexpr (std::is_same_v<T, glm::uint *>)
+            {
+                return "uint";
+            }
             else if constexpr (std::is_same_v<T, bool *>)
             {
                 return "bool";
@@ -282,6 +307,14 @@ std::string PropertyEditor::getPropertyType(const Property &prop)
             else if constexpr (std::is_same_v<T, glm::vec4 *>)
             {
                 return "vec4";
+            }
+            else if constexpr (std::is_same_v<T, glm::uvec3 *>)
+            {
+                return "uvec3";
+            }
+            else if constexpr (std::is_same_v<T, glm::uvec4 *>)
+            {
+                return "uvec4";
             }
             return "unknown";
         },

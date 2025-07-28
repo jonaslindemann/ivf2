@@ -120,3 +120,12 @@ void Cube::doSetup()
 
     mesh()->end();
 }
+
+void ivf::Cube::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Size", &m_size, "Geometry");
+}
+
+void ivf::Cube::onPropertyChanged(const std::string &name)
+{}

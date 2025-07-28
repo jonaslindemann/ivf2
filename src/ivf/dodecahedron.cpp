@@ -34,3 +34,16 @@ void Dodecahedron::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::Dodecahedron::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Radius", &m_radius, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Rings", &m_rings, "Geometry");
+}
+
+void ivf::Dodecahedron::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

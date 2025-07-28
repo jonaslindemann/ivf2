@@ -476,7 +476,7 @@ void SceneInspector::drawProperty(const ivf::Property &prop)
     }
 
     // Draw appropriate control based on type
-    if (type == "vec3" || type == "vec4")
+    if (type == "vec3" || type == "vec4" || type == "uvec3" || type == "uvec4")
     {
         drawVectorProperty(prop);
     }
@@ -514,7 +514,8 @@ void SceneInspector::drawProperty(const ivf::Property &prop)
 void SceneInspector::drawVectorProperty(const ivf::Property &prop)
 {
     std::string type = ivf::PropertyEditor::getPropertyType(prop);
-    int componentCount = (type == "vec3") ? 3 : 4;
+    int componentCount = (type == "vec3" || type == "uvec3") ? 3 : 4;
+    bool isUnsigned = (type == "uvec3" || type == "uvec4");
 
     // Vector display with components
     ImGui::Text("%s", prop.name.c_str());
@@ -543,11 +544,21 @@ void SceneInspector::drawVectorProperty(const ivf::Property &prop)
 
         if (prop.hasRange)
         {
-            if (ImGui::SliderFloat(componentId.c_str(), &value, static_cast<float>(prop.minValue),
-                                   static_cast<float>(prop.maxValue), "%.3f"))
+            float minVal = static_cast<float>(prop.minValue);
+            float maxVal = static_cast<float>(prop.maxValue);
+
+            // For unsigned types, ensure minimum is 0 or greater
+            if (isUnsigned && minVal < 0.0f)
+                minVal = 0.0f;
+
+            if (ImGui::SliderFloat(componentId.c_str(), &value, minVal, maxVal, "%.0f"))
             {
                 if (value != oldValue)
                 {
+                    // For unsigned types, clamp to non-negative values
+                    if (isUnsigned && value < 0.0f)
+                        value = 0.0f;
+
                     ivf::PropertyEditor::setComponentValue(prop, i, value);
                     changed = true;
                 }
@@ -555,10 +566,18 @@ void SceneInspector::drawVectorProperty(const ivf::Property &prop)
         }
         else
         {
-            if (ImGui::DragFloat(componentId.c_str(), &value, m_dragSpeed, 0.0f, 0.0f, "%.3f"))
+            // Use appropriate format string for unsigned vs signed
+            const char *format = isUnsigned ? "%.0f" : "%.3f";
+
+            if (ImGui::DragFloat(componentId.c_str(), &value, m_dragSpeed, isUnsigned ? 0.0f : -FLT_MAX, FLT_MAX,
+                                 format))
             {
                 if (value != oldValue)
                 {
+                    // For unsigned types, clamp to non-negative values
+                    if (isUnsigned && value < 0.0f)
+                        value = 0.0f;
+
                     ivf::PropertyEditor::setComponentValue(prop, i, value);
                     changed = true;
                 }
@@ -721,8 +740,67 @@ void SceneInspector::drawScalarProperty(const ivf::Property &prop)
             ImGui::EndDisabled();
         }
     }
-}
+    else if (type == "uint")
+    {
+        glm::uint *uintPtr = std::get<glm::uint *>(prop.value);
+        glm::uint oldValue = *uintPtr;
 
+        // Convert to int for ImGui (which doesn't have unsigned int controls)
+        int intValue = static_cast<int>(*uintPtr);
+
+        if (prop.readOnly)
+        {
+            ImGui::BeginDisabled();
+        }
+
+        if (prop.hasRange)
+        {
+            int minVal = static_cast<int>(std::max(0.0, prop.minValue));
+            int maxVal = static_cast<int>(prop.maxValue);
+
+            if (ImGui::SliderInt(prop.name.c_str(), &intValue, minVal, maxVal))
+            {
+                // Ensure non-negative
+                intValue = std::max(0, intValue);
+                glm::uint newValue = static_cast<glm::uint>(intValue);
+
+                if (newValue != oldValue)
+                {
+                    *uintPtr = newValue;
+                    auto inspectable = std::dynamic_pointer_cast<ivf::PropertyInspectable>(m_selectedNode);
+                    if (inspectable)
+                    {
+                        inspectable->notifyPropertyChanged(prop.name);
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (ImGui::DragInt(prop.name.c_str(), &intValue, 1.0f, 0, INT_MAX))
+            {
+                // Ensure non-negative
+                intValue = std::max(0, intValue);
+                glm::uint newValue = static_cast<glm::uint>(intValue);
+
+                if (newValue != oldValue)
+                {
+                    *uintPtr = newValue;
+                    auto inspectable = std::dynamic_pointer_cast<ivf::PropertyInspectable>(m_selectedNode);
+                    if (inspectable)
+                    {
+                        inspectable->notifyPropertyChanged(prop.name);
+                    }
+                }
+            }
+        }
+
+        if (prop.readOnly)
+        {
+            ImGui::EndDisabled();
+        }
+    }
+}
 void SceneInspector::drawBooleanProperty(const ivf::Property &prop)
 {
     bool *boolPtr = std::get<bool *>(prop.value);

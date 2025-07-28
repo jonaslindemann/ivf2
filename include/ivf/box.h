@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ivf/mesh_node.h>
-#include <ivf/property_inspectable.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
@@ -20,7 +19,7 @@ namespace ivf {
 class Box : public MeshNode {
 private:
     glm::vec3 m_size{1.0f, 1.0f, 1.0f}; ///< Size of the box along each axis (width, height, depth).
-    int m_segments[3]{8, 8, 8};         ///< Number of segments along each axis (X, Y, Z).
+    glm::uvec3 m_segments{8, 8, 8};     ///< Number of segments along each axis.
 
 public:
     /**

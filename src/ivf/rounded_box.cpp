@@ -100,3 +100,17 @@ void RoundedBox::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::RoundedBox::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Size", &m_size, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Rounding radius", &m_radius, "Geometry");
+    addProperty("Slices", &m_slices, "Geometry");
+}
+
+void ivf::RoundedBox::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

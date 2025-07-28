@@ -37,3 +37,19 @@ void Cone::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::Cone::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Base radius", &m_radius, "Geometry");
+    addProperty("Height", &m_size, "Geometry");
+    addProperty("Slices", &m_slices, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Start angle", &m_start, "Geometry");
+    addProperty("Sweep angle", &m_sweep, "Geometry");
+}
+
+void ivf::Cone::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

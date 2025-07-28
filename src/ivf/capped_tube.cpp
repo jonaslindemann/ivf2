@@ -44,3 +44,21 @@ void CappedTube::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::CappedTube::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Outer radius", &m_radius, "Geometry");
+    addProperty("Inner radius", &m_innerRadius, "Geometry");
+    addProperty("Height", &m_size, "Geometry");
+    addProperty("Slices", &m_slices, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Rings", &m_rings, "Geometry");
+    addProperty("Start angle", &m_start, "Geometry");
+    addProperty("Sweep angle", &m_sweep, "Geometry");
+}
+
+void ivf::CappedTube::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

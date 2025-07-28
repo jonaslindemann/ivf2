@@ -35,3 +35,17 @@ void Plane::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::Plane::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Width", &m_width, "Geometry");
+    addProperty("Depth", &m_depth, "Geometry");
+    addProperty("Rows", &m_rows, "Geometry");
+    addProperty("Columns", &m_cols, "Geometry");
+}
+
+void ivf::Plane::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

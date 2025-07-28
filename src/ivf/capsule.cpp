@@ -40,3 +40,20 @@ void Capsule::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::Capsule::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Radius", &m_radius, "Geometry");
+    addProperty("Height", &m_size, "Geometry");
+    addProperty("Slices", &m_slices, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Rings", &m_rings, "Geometry");
+    addProperty("Start angle", &m_start, "Geometry");
+    addProperty("Sweep angle", &m_sweep, "Geometry");
+}
+
+void ivf::Capsule::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

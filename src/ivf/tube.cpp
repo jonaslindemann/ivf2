@@ -40,3 +40,20 @@ void Tube::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::Tube::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Outer Radius", &m_radius, "Geometry");
+    addProperty("Inner Radius", &m_innerRadius, "Geometry");
+    addProperty("Size", &m_size, "Geometry");
+    addProperty("Slices", &m_slices, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Start Angle", &m_start, "Geometry");
+    addProperty("Sweep Angle", &m_sweep, "Geometry");
+}
+
+void ivf::Tube::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

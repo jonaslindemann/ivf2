@@ -122,12 +122,36 @@ void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::vec
     m_properties.push_back(prop);
 }
 
+void PropertyInspectable::addProperty(const std::string &name, glm::uint *value, const std::string &category)
+{
+    m_properties.emplace_back(name, value, category);
+}
+
+void PropertyInspectable::addProperty(const std::string &name, glm::uint *value, double min, double max,
+                                      const std::string &category)
+{
+    Property prop(name, value, min, max, category);
+    m_properties.push_back(prop);
+}
+
 void PropertyInspectable::addProperty(const std::string &name, glm::uvec3 *value, const std::string &category)
 {
     m_properties.emplace_back(name, value, category);
 }
 
 void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::uvec3 *value, double minVal, double maxVal,
+                                               const std::string &category)
+{
+    Property prop(name, value, minVal, maxVal, category);
+    m_properties.push_back(prop);
+}
+
+void PropertyInspectable::addProperty(const std::string &name, glm::uvec4 *value, const std::string &category)
+{
+    m_properties.emplace_back(name, value, category);
+}
+
+void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::uvec4 *value, double minVal, double maxVal,
                                                const std::string &category)
 {
     Property prop(name, value, minVal, maxVal, category);
@@ -186,10 +210,6 @@ std::string PropertyEditor::getValueAsString(const Property &prop)
             {
                 return std::to_string(*arg);
             }
-            else if constexpr (std::is_same_v<T, glm::uint *>)
-            {
-                return std::to_string(*arg);
-            }
             else if constexpr (std::is_same_v<T, bool *>)
             {
                 return *arg ? "true" : "false";
@@ -212,6 +232,20 @@ std::string PropertyEditor::getValueAsString(const Property &prop)
                 return "(" + std::to_string((*arg)[0]) + ", " + std::to_string((*arg)[1]) + ", " +
                        std::to_string((*arg)[2]) + ", " + std::to_string((*arg)[3]) + ")";
             }
+            else if constexpr (std::is_same_v<T, glm::uint *>)
+            {
+                return std::to_string(*arg);
+            }
+            else if constexpr (std::is_same_v<T, glm::uvec3 *>)
+            {
+                return "(" + std::to_string((*arg)[0]) + ", " + std::to_string((*arg)[1]) + ", " +
+                       std::to_string((*arg)[2]) + ")";
+            }
+            else if constexpr (std::is_same_v<T, glm::uvec4 *>)
+            {
+                return "(" + std::to_string((*arg)[0]) + ", " + std::to_string((*arg)[1]) + ", " +
+                       std::to_string((*arg)[2]) + ", " + std::to_string((*arg)[3]) + ")";
+            }
             return "";
         },
         prop.value);
@@ -230,11 +264,6 @@ bool PropertyEditor::setValueFromString(const Property &prop, const std::string 
                     return true;
                 }
                 else if constexpr (std::is_same_v<T, int *>)
-                {
-                    *arg = std::stoi(value);
-                    return true;
-                }
-                else if constexpr (std::is_same_v<T, glm::uint *>)
                 {
                     *arg = std::stoi(value);
                     return true;
@@ -262,6 +291,20 @@ bool PropertyEditor::setValueFromString(const Property &prop, const std::string 
                 {
                     return parseVec4(value, *arg);
                 }
+                else if constexpr (std::is_same_v<T, glm::uint *>)
+                {
+                    unsigned long ulValue = std::stoul(value);
+                    *arg = static_cast<glm::uint>(ulValue);
+                    return true;
+                }
+                else if constexpr (std::is_same_v<T, glm::uvec3 *>)
+                {
+                    return parseUvec3(value, *arg);
+                }
+                else if constexpr (std::is_same_v<T, glm::uvec4 *>)
+                {
+                    return parseUvec4(value, *arg);
+                }
                 return false;
             },
             prop.value);
@@ -284,10 +327,6 @@ std::string PropertyEditor::getPropertyType(const Property &prop)
             {
                 return "int";
             }
-            else if constexpr (std::is_same_v<T, glm::uint *>)
-            {
-                return "uint";
-            }
             else if constexpr (std::is_same_v<T, bool *>)
             {
                 return "bool";
@@ -308,6 +347,10 @@ std::string PropertyEditor::getPropertyType(const Property &prop)
             {
                 return "vec4";
             }
+            else if constexpr (std::is_same_v<T, glm::uint *>)
+            {
+                return "uint";
+            }
             else if constexpr (std::is_same_v<T, glm::uvec3 *>)
             {
                 return "uvec3";
@@ -324,7 +367,7 @@ std::string PropertyEditor::getPropertyType(const Property &prop)
 std::string PropertyEditor::getComponentName(const Property &prop, int component)
 {
     std::string type = getPropertyType(prop);
-    if (type == "vec3" || type == "vec4")
+    if (type == "vec3" || type == "vec4" || type == "uvec3" || type == "uvec4")
     {
         const char *components[] = {"X", "Y", "Z", "W"};
         if (component >= 0 && component < 4)
@@ -354,6 +397,20 @@ float PropertyEditor::getComponentValue(const Property &prop, int component)
                     return (*arg)[component];
                 }
             }
+            else if constexpr (std::is_same_v<T, glm::uvec3 *>)
+            {
+                if (component >= 0 && component < 3)
+                {
+                    return static_cast<float>((*arg)[component]);
+                }
+            }
+            else if constexpr (std::is_same_v<T, glm::uvec4 *>)
+            {
+                if (component >= 0 && component < 4)
+                {
+                    return static_cast<float>((*arg)[component]);
+                }
+            }
             return 0.0f;
         },
         prop.value);
@@ -377,6 +434,22 @@ bool PropertyEditor::setComponentValue(const Property &prop, int component, floa
                 if (component >= 0 && component < 4)
                 {
                     (*arg)[component] = value;
+                    return true;
+                }
+            }
+            else if constexpr (std::is_same_v<T, glm::uvec3 *>)
+            {
+                if (component >= 0 && component < 3)
+                {
+                    (*arg)[component] = static_cast<glm::uint>(std::max(0.0f, value));
+                    return true;
+                }
+            }
+            else if constexpr (std::is_same_v<T, glm::uvec4 *>)
+            {
+                if (component >= 0 && component < 4)
+                {
+                    (*arg)[component] = static_cast<glm::uint>(std::max(0.0f, value));
                     return true;
                 }
             }
@@ -420,6 +493,46 @@ bool PropertyEditor::parseVec4(const std::string &str, glm::vec4 &vec)
     if (iss >> x >> y >> z >> w)
     {
         vec = glm::vec4(x, y, z, w);
+        return true;
+    }
+    return false;
+}
+
+bool PropertyEditor::parseUvec3(const std::string &str, glm::uvec3 &vec)
+{
+    std::string cleaned = str;
+
+    // Remove parentheses and replace commas with spaces
+    std::replace(cleaned.begin(), cleaned.end(), '(', ' ');
+    std::replace(cleaned.begin(), cleaned.end(), ')', ' ');
+    std::replace(cleaned.begin(), cleaned.end(), ',', ' ');
+
+    std::istringstream iss(cleaned);
+    unsigned int x, y, z;
+
+    if (iss >> x >> y >> z)
+    {
+        vec = glm::uvec3(x, y, z);
+        return true;
+    }
+    return false;
+}
+
+bool PropertyEditor::parseUvec4(const std::string &str, glm::uvec4 &vec)
+{
+    std::string cleaned = str;
+
+    // Remove parentheses and replace commas with spaces
+    std::replace(cleaned.begin(), cleaned.end(), '(', ' ');
+    std::replace(cleaned.begin(), cleaned.end(), ')', ' ');
+    std::replace(cleaned.begin(), cleaned.end(), ',', ' ');
+
+    std::istringstream iss(cleaned);
+    unsigned int x, y, z, w;
+
+    if (iss >> x >> y >> z >> w)
+    {
+        vec = glm::uvec4(x, y, z, w);
         return true;
     }
     return false;

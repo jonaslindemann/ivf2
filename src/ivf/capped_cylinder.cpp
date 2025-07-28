@@ -42,3 +42,19 @@ void CappedCylinder::doSetup()
 
     this->createFromGenerator(vertices, triangles);
 }
+
+void ivf::CappedCylinder::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Radius", &m_radius, "Geometry");
+    addProperty("Height", &m_size, "Geometry");
+    addProperty("Slices", &m_slices, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Rings", &m_rings, "Geometry");
+    addProperty("Start angle", &m_start, "Geometry");
+}
+
+void ivf::CappedCylinder::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}

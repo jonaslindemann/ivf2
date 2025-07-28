@@ -49,6 +49,9 @@ protected:
      * @brief Internal setup method for initializing the cube geometry.
      */
     virtual void doSetup();
+
+    virtual void setupProperties() override;
+    virtual void onPropertyChanged(const std::string &name) override;
 };
 
 /**

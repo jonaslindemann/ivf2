@@ -16,7 +16,8 @@ class Base;
 /**
  * @brief Represents different property types that can be exposed for inspection.
  */
-using PropertyValue = std::variant<double *, int *, bool *, std::string *, float *, glm::vec3 *, glm::vec4 *>;
+using PropertyValue = std::variant<double *, int *, bool *, std::string *, float *, glm::vec3 *, glm::vec4 *,
+                                   glm::uint *, glm::uvec3 *, glm::uvec4 *>;
 
 /**
  * @struct Property
@@ -139,6 +140,27 @@ protected:
                               const std::string &category = "General");
 
     /**
+     * @brief Register a glm::uint property for inspection.
+     */
+    void addProperty(const std::string &name, glm::uint *value, const std::string &category = "General");
+    void addProperty(const std::string &name, glm::uint *value, double min, double max,
+                     const std::string &category = "General");
+
+    /**
+     * @brief Register a glm::uvec3 property for inspection.
+     */
+    void addProperty(const std::string &name, glm::uvec3 *value, const std::string &category = "General");
+    void addPropertyWithRange(const std::string &name, glm::uvec3 *value, double minVal, double maxVal,
+                              const std::string &category = "General");
+
+    /**
+     * @brief Register a glm::uvec4 property for inspection.
+     */
+    void addProperty(const std::string &name, glm::uvec4 *value, const std::string &category = "General");
+    void addPropertyWithRange(const std::string &name, glm::uvec4 *value, double minVal, double maxVal,
+                              const std::string &category = "General");
+
+    /**
      * @brief Add a read-only property for inspection.
      * @param name Property name.
      * @param value Property value pointer.
@@ -230,6 +252,22 @@ private:
      * @return bool True if successful.
      */
     static bool parseVec4(const std::string &str, glm::vec4 &vec);
+
+    /**
+     * @brief Parse a glm::uvec3 from a string.
+     * @param str String to parse.
+     * @param vec Output vector.
+     * @return bool True if successful.
+     */
+    static bool parseUvec3(const std::string &str, glm::uvec3 &vec);
+
+    /**
+     * @brief Parse a glm::uvec4 from a string.
+     * @param str String to parse.
+     * @param vec Output vector.
+     * @return bool True if successful.
+     */
+    static bool parseUvec4(const std::string &str, glm::uvec4 &vec);
 };
 
 } // namespace ivf

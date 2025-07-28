@@ -30,6 +30,21 @@ void Sphere::doSetup()
     this->createFromGenerator(vertices, triangles);
 }
 
+void ivf::Sphere::setupProperties()
+{
+    MeshNode::setupProperties();
+    addProperty("Radius", &m_radius, "Geometry");
+    addProperty("Slices", &m_slices, "Geometry");
+    addProperty("Segments", &m_segments, "Geometry");
+    addProperty("Slice Start", &m_sliceStart, "Geometry");
+    addProperty("Slice Sweep", &m_sliceSweep, "Geometry");
+}
+
+void ivf::Sphere::onPropertyChanged(const std::string &name)
+{
+    this->refresh();
+}
+
 void Sphere::setRadius(double radius)
 {
     m_radius = radius;

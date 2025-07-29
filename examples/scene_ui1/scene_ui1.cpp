@@ -51,32 +51,16 @@ public:
     {
         // Add main menu
 
-        // Create the File menu
-
-        auto fileMenu = UiMenu::create("File");
-
-        // Add Exit item to the File menu
-
-        fileMenu->addItem(UiMenuItem::create("Exit", "ALT+F4", [this]() { this->onExit(); }));
-
-        // Add the File menu to the main menu
-
-        this->mainMenu()->addMenu(fileMenu);
-
-        // Enable rendering to texture
-
-        this->setRenderToTexture(true);
+        this->setRenderToTexture(false);
 
         // Add example UI windows
 
         this->addUiWindow(m_exampleWindow1);
         this->addUiWindow(m_exampleWindow2);
 
-        // Create and add an axis to the scene
+        // Show axis
 
-        auto axis = Axis::create();
-
-        this->add(axis);
+        this->enableAxis();
 
         // Add 500 random geometric shapes to the scene
 
@@ -126,13 +110,6 @@ public:
         }
 
         return 0;
-    }
-
-    void onExit()
-    {
-        // Handle exit action, e.g., close the window or application
-
-        this->close();
     }
 
     void onUpdateUi()

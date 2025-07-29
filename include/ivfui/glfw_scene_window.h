@@ -46,8 +46,9 @@ private:
     ivf::FrameBufferPtr m_frameBuffer;           ///< Framebuffer for offscreen rendering.
     ivf::PostProcessorPtr m_postProcessor;       ///< Post-processing pipeline.
     ivfui::UiMainMenuPtr m_mainMenu;             ///< Main menu UI.
-    SceneControlPanelPtr m_sceneControlPanel;    ///< Scene control panel UI.
-    CameraWindowPtr m_cameraWindow;              ///< Camera control window UI.
+
+    SceneControlPanelPtr m_sceneControlPanel; ///< Scene control panel UI.
+    CameraWindowPtr m_cameraWindow;           ///< Camera control window UI.
 
     bool m_selectionEnabled{false}; ///< Selection mode enabled.
     ivf::Node *m_lastNode;          ///< Last node under the cursor.
@@ -57,6 +58,7 @@ private:
     bool m_selectionRendering{false}; ///< Selection rendering in progress.
     bool m_showAxis{false};           ///< Show axis overlay.
     bool m_showGrid{false};           ///< Show grid overlay.
+    bool m_showMainMenu{true};        ///< Show main menu.
 
     ivf::AxisPtr m_axis; ///< Axis overlay object.
     ivf::GridPtr m_grid; ///< Grid overlay object.
@@ -289,6 +291,19 @@ public:
      */
     void showCameraWindow();
 
+    void showMainMenu();
+
+    /**
+     * @brief Hide the main menu UI.
+     */
+    void hideMainMenu();
+
+    /**
+     * @brief Check if the main menu is currently visible.
+     * @return bool True if the main menu is visible.
+     */
+    bool isMainMenuVisible() const;
+
     /**
      * @brief Get the root scene node.
      * @return ivf::CompositeNodePtr Shared pointer to the scene.
@@ -335,6 +350,8 @@ public:
      */
     virtual void onLeaveNode(ivf::Node *node);
 
+    virtual void onAddMenuItems(ivfui::UiMenu *menu);
+
 protected:
     /**
      * @brief Internal handler for mouse entering a node.
@@ -376,6 +393,8 @@ protected:
      * @return int Status code.
      */
     virtual int doSetup() override;
+
+    virtual void doSetupMainMenu();
 
     /**
      * @brief Draw the scene (called per frame).

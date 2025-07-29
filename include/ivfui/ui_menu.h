@@ -21,12 +21,12 @@ namespace ivfui {
  */
 class UiMenuItem {
 private:
-    std::string m_name;             ///< Menu item name.
-    std::string m_shortcut;         ///< Keyboard shortcut string.
-    bool m_enabled{true};           ///< Enabled state.
-    bool m_selected{false};         ///< Selected state.
-    bool m_useSelection{false};     ///< Use selection highlight.
-    std::function<void()> m_action; ///< Action callback.
+    std::string m_name;                       ///< Menu item name.
+    std::string m_shortcut;                   ///< Keyboard shortcut string.
+    bool m_enabled{true};                     ///< Enabled state.
+    bool m_selected{false};                   ///< Selected state.
+    std::function<void()> m_actionCallback;   ///< Action callback.
+    std::function<bool()> m_selectedCallback; ///< Selection callback (optional).
 
 public:
     /**
@@ -35,7 +35,8 @@ public:
      * @param shortcut Keyboard shortcut (optional).
      * @param action Callback to invoke when selected (optional).
      */
-    UiMenuItem(const std::string &name, const std::string &shortcut = "", const std::function<void()> action = nullptr);
+    UiMenuItem(const std::string &name, const std::string &shortcut = "", const std::function<void()> action = nullptr,
+               const std::function<bool()> selected = nullptr);
 
     /**
      * @brief Factory method to create a shared pointer to a UiMenuItem instance.
@@ -45,7 +46,8 @@ public:
      * @return std::shared_ptr<UiMenuItem> New UiMenuItem instance.
      */
     static std::shared_ptr<UiMenuItem> create(const std::string &name, const std::string &shortcut = "",
-                                              const std::function<void()> action = nullptr);
+                                              const std::function<void()> action = nullptr,
+                                              const std::function<bool()> selected = nullptr);
 
     /**
      * @brief Draw the menu item in the current ImGui menu.
@@ -208,6 +210,11 @@ public:
      * @return const std::vector<std::shared_ptr<UiMenu>>& Menus.
      */
     const std::vector<std::shared_ptr<UiMenu>> &menus() const;
+
+    /**
+     * @brief clera all menus in the main menu bar.
+     */
+    void clear();
 
     /**
      * @brief Draw the main menu bar and its menus in the current ImGui context.

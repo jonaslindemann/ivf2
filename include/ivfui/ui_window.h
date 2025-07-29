@@ -66,6 +66,11 @@ public:
     bool visible();
 
     /**
+     * @brief Toggle the window visibility.
+     */
+    void toggleVisibility();
+
+    /**
      * @brief Show the window.
      */
     void show();
@@ -117,6 +122,18 @@ public:
      * @return int Y coordinate in pixels.
      */
     int y() const;
+
+    /**
+     * @brief Set the window name.
+     * @param name New window name.
+     */
+    void setName(const std::string &name);
+
+    /**
+     * @brief Get the window name.
+     * @return const std::string& Window name.
+     */
+    const std::string &name() const;
 
 protected:
     /**

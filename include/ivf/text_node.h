@@ -177,6 +177,9 @@ protected:
      * @brief Internal draw method for rendering the text.
      */
     virtual void doDraw();
+
+    virtual void setupProperties();
+    virtual void onPropertyChanged(const std::string &propertyName);
 };
 
 /**

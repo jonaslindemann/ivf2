@@ -181,14 +181,19 @@ void ivfui::GLFWSceneWindow::enableHeadlight()
         dirLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
         dirLight->setDirection(glm::vec3(-1.0, -2.0, -3.0));
         dirLight->setEnabled(true);
-        lightMgr->apply();
-
         m_camManip->setHeadlight(dirLight);
+        lightMgr->apply();
     }
     else
     {
         auto dirLight = lightMgr->getDirectionalLight(0);
+        dirLight->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
+        dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        dirLight->setDirection(glm::vec3(-1.0, -2.0, -3.0));
+        dirLight->setEnabled(true);
         m_camManip->setHeadlight(dirLight);
+        lightMgr->apply();
     }
 }
 
@@ -288,6 +293,21 @@ void ivfui::GLFWSceneWindow::showCameraWindow()
     m_cameraWindow->show();
 }
 
+void ivfui::GLFWSceneWindow::showMainMenu()
+{
+    m_showMainMenu = true;
+}
+
+void ivfui::GLFWSceneWindow::hideMainMenu()
+{
+    m_showMainMenu = false;
+}
+
+bool ivfui::GLFWSceneWindow::isMainMenuVisible() const
+{
+    return m_showMainMenu;
+}
+
 ivf::CompositeNodePtr ivfui::GLFWSceneWindow::scene()
 {
     return m_scene;
@@ -354,6 +374,8 @@ int ivfui::GLFWSceneWindow::doSetup()
 
     smSetCurrentProgram("basic");
 
+    doSetupMainMenu();
+
     m_sceneControlPanel = ivfui::SceneControlPanel::create("Control panel", this);
     m_sceneControlPanel->hide();
 
@@ -365,6 +387,107 @@ int ivfui::GLFWSceneWindow::doSetup()
     this->addUiWindow(m_cameraWindow);
 
     return retVal;
+}
+
+void ivfui::GLFWSceneWindow::doSetupMainMenu()
+{
+    if (!m_mainMenu)
+        return;
+
+    // Clear existing menus if any
+
+    m_mainMenu->clear();
+
+    // Create the File menu
+
+    auto fileMenu = UiMenu::create("File");
+
+    this->onAddMenuItems(fileMenu.get());
+
+    fileMenu->addItem(UiMenuItem::create("Exit", "ALT+F4", [this]() { this->close(); }));
+    m_mainMenu->addMenu(fileMenu);
+
+    // Create the View menu
+
+    auto viewMenu = UiMenu::create("View");
+    viewMenu->addItem(UiMenuItem::create(
+        "Control panel", "/", [this]() { this->showControlPanel(); },
+        [this]() {
+            return m_sceneControlPanel->visible(); // Enable/disable based on visibility
+        }));
+    viewMenu->addItem(UiMenuItem::create(
+        "Camera control", "v", [this]() { this->showCameraWindow(); },
+        [this]() {
+            return m_cameraWindow->visible(); // Enable/disable based on visibility
+        }));
+    viewMenu->addItem(UiMenuItem::create(
+        "Axis", "a",
+        [this]() {
+            if (m_showAxis)
+                this->disableAxis();
+            else
+                this->enableAxis();
+        },
+        [this]() {
+            return m_showAxis; // Enable/disable based on current state
+        }));
+
+    viewMenu->addItem(UiMenuItem::create(
+        "Grid", "g",
+        [this]() {
+            if (m_showGrid)
+                this->disableGrid();
+            else
+                this->enableGrid();
+        },
+        [this]() {
+            return m_showGrid; // Enable/disable based on current state
+        }));
+
+    viewMenu->addItem(UiMenuItem::create(
+        "Headlight", "h",
+        [this]() {
+            if (m_camManip->headlight() != nullptr)
+                this->disableHeadlight();
+            else
+                this->enableHeadlight();
+        },
+        [this]() {
+            return (m_camManip->headlight() != nullptr); // Enable/disable based on headlight state
+        }));
+
+    viewMenu->addItem(UiMenuItem::create(
+        "Main menu", "CTRL+M",
+        [this]() {
+            if (m_showMainMenu)
+                this->hideMainMenu();
+            else
+                this->showMainMenu();
+        },
+        [this]() {
+            return m_showMainMenu; // Enable/disable based on current state
+        }));
+
+    this->onAddMenuItems(viewMenu.get());
+
+    m_mainMenu->addMenu(viewMenu);
+
+    if (!m_uiWindows.empty())
+    {
+        auto windowMenu = UiMenu::create("Windows");
+
+        for (const auto &uiWindow : m_uiWindows)
+        {
+            if (uiWindow)
+            {
+                windowMenu->addItem(UiMenuItem::create(
+                    uiWindow->name(), "", [uiWindow]() { uiWindow->toggleVisibility(); },
+                    [uiWindow]() { return uiWindow->visible(); }));
+            }
+        }
+
+        m_mainMenu->addMenu(windowMenu);
+    }
 }
 
 void GLFWSceneWindow::doResize(int width, int height)
@@ -440,7 +563,8 @@ void GLFWSceneWindow::doDraw()
 
 void ivfui::GLFWSceneWindow::doDrawUi()
 {
-    m_mainMenu->draw();
+    if (m_showMainMenu)
+        m_mainMenu->draw();
 
     for (auto uiWindow : m_uiWindows)
         uiWindow->draw();
@@ -500,6 +624,32 @@ void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
     {
         this->showControlPanel();
     }
+    if (key == GLFW_KEY_V)
+    {
+        this->showCameraWindow();
+    }
+    if (key == GLFW_KEY_A)
+    {
+        if (m_showAxis)
+            this->disableAxis();
+        else
+            this->enableAxis();
+    }
+    if (key == GLFW_KEY_G)
+    {
+        if (m_showGrid)
+            this->disableGrid();
+        else
+            this->enableGrid();
+    }
+    if (key == GLFW_KEY_H)
+    {
+        if (m_camManip->headlight() != nullptr)
+            this->disableHeadlight();
+        else
+            this->enableHeadlight();
+    }
+
     GLFWWindow::doKey(key, scancode, action, mods);
 }
 
@@ -516,6 +666,9 @@ void ivfui::GLFWSceneWindow::onOverNode(ivf::Node *node)
 {}
 
 void ivfui::GLFWSceneWindow::onLeaveNode(ivf::Node *node)
+{}
+
+void ivfui::GLFWSceneWindow::onAddMenuItems(ivfui::UiMenu *menu)
 {}
 
 void ivfui::GLFWSceneWindow::doEnterNode(ivf::Node *node)

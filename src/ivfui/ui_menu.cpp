@@ -4,14 +4,17 @@
 
 using namespace ivfui;
 
-UiMenuItem::UiMenuItem(const std::string &name, const std::string &shortcut, const std::function<void()> action)
-    : m_name(name), m_selected(false), m_enabled(true), m_shortcut(shortcut), m_useSelection(false), m_action(action)
+UiMenuItem::UiMenuItem(const std::string &name, const std::string &shortcut, const std::function<void()> action,
+                       const std::function<bool()> selected)
+    : m_name(name), m_selected(false), m_enabled(true), m_shortcut(shortcut), m_actionCallback(action),
+      m_selectedCallback(selected)
 {}
 
 std::shared_ptr<UiMenuItem> ivfui::UiMenuItem::create(const std::string &name, const std::string &shortcut,
-                                                      const std::function<void()> action)
+                                                      const std::function<void()> action,
+                                                      const std::function<bool()> selected)
 {
-    return std::make_shared<UiMenuItem>(name, shortcut, action);
+    return std::make_shared<UiMenuItem>(name, shortcut, action, selected);
 }
 
 void UiMenuItem::draw()
@@ -56,20 +59,22 @@ bool ivfui::UiMenuItem::isSelected() const
 
 void ivfui::UiMenuItem::doDraw()
 {
-    if (m_useSelection)
+    if (m_selectedCallback)
     {
+        m_selected = m_selectedCallback();
+
         if (ImGui::MenuItem(m_name.c_str(), m_shortcut.c_str(), &m_selected, &m_enabled))
         {
-            if (m_action)
-                m_action();
+            if (m_actionCallback)
+                m_actionCallback();
         }
     }
     else
     {
         if (ImGui::MenuItem(m_name.c_str(), m_shortcut.c_str(), nullptr, m_enabled))
         {
-            if (m_action)
-                m_action();
+            if (m_actionCallback)
+                m_actionCallback();
         }
     }
 }
@@ -135,6 +140,11 @@ void ivfui::UiMainMenu::addMenu(const std::shared_ptr<UiMenu> &menu)
 const std::vector<std::shared_ptr<UiMenu>> &ivfui::UiMainMenu::menus() const
 {
     return m_menus;
+}
+
+void ivfui::UiMainMenu::clear()
+{
+    m_menus.clear();
 }
 
 void ivfui::UiMainMenu::draw()

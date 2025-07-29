@@ -20,7 +20,7 @@ void ivfui::UiWindow::draw()
     if (m_visible)
     {
         doPreDraw();
-        ImGui::Begin(m_name.c_str(), 0, doWindowFlags()); //, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Begin(m_name.c_str(), &m_visible, doWindowFlags()); //, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         doDraw();
         ImGui::End();
         doPostDraw();
@@ -35,6 +35,11 @@ void ivfui::UiWindow::setVisible(bool flag)
 bool ivfui::UiWindow::visible()
 {
     return m_visible;
+}
+
+void ivfui::UiWindow::toggleVisibility()
+{
+    m_visible = !m_visible;
 }
 
 void ivfui::UiWindow::show()
@@ -84,6 +89,16 @@ int ivfui::UiWindow::x() const
 int ivfui::UiWindow::y() const
 {
     return m_y;
+}
+
+void ivfui::UiWindow::setName(const std::string &name)
+{
+    m_name = name;
+}
+
+const std::string &ivfui::UiWindow::name() const
+{
+    return m_name;
 }
 
 void ivfui::UiWindow::doDraw()

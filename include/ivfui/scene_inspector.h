@@ -36,6 +36,7 @@ private:
     int m_treeDepth{0};                            ///< Current tree traversal depth (for indentation).
     bool m_showProperties{true};                   ///< Whether to show the properties panel.
     bool m_showAdvancedProperties{false};          ///< Whether to show advanced properties in the properties panel.
+    bool m_showOptions{false};                     ///< Whether to show inspector options/settings.
     float m_dragSpeed{0.1f};                       ///< Speed for dragging numeric controls.
     float m_splitterPosition{0.4f};                ///< Position of the splitter (0.0 = all tree, 1.0 = all properties).
     std::vector<std::string> m_expandedCategories; ///< Expanded property categories in the properties panel.
@@ -136,6 +137,12 @@ public:
      * @return bool True if properties panel is shown.
      */
     bool showProperties() const;
+
+    /**
+     * @brief Set whether to show advanced properties in the properties panel.
+     * @param show True to show advanced properties, false to hide them.
+     */
+    void setShowOptions(bool show);
 
 protected:
     /**

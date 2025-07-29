@@ -90,20 +90,30 @@ bool SceneInspector::showProperties() const
     return m_showProperties;
 }
 
+void ivfui::SceneInspector::setShowOptions(bool show)
+{
+    m_showOptions = show;
+}
+
 void SceneInspector::doDraw()
 {
     // Draw inspector options in a collapsible header
     // if (ImGui::CollapsingHeader("Inspector Options", ImGuiTreeNodeFlags_DefaultOpen))
-    if (ImGui::CollapsingHeader("Inspector Options"))
+
+    if (m_showOptions)
     {
-        ImGui::Indent();
-        drawInspectorOptions();
-        ImGui::Unindent();
+
+        if (ImGui::CollapsingHeader("Inspector Options"))
+        {
+            ImGui::Indent();
+            drawInspectorOptions();
+            ImGui::Unindent();
+            ImGui::Spacing();
+        }
+
+        ImGui::Separator();
         ImGui::Spacing();
     }
-
-    ImGui::Separator();
-    ImGui::Spacing();
 
     // Main content area with splitter
     if (m_rootNode)

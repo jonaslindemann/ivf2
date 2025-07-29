@@ -62,40 +62,30 @@ public:
 
         this->setAxisVisible(true);
 
-        // Create the File menu
-
-        auto fileMenu = UiMenu::create("File");
-
-        // Add Exit item to the File menu
-
-        fileMenu->addItem(UiMenuItem::create("Open", "CTRL+O", [this]() { this->onOpen(); }));
-        fileMenu->addItem(UiMenuItem::create("Exit", "ALT+F4", [this]() { this->onExit(); }));
-
-        // Add the File menu to the main menu
-
-        this->mainMenu()->addMenu(fileMenu);
+        // Setup camera
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0f, 0.0f, 10.0f));
         this->cameraManipulator()->setFarZ(1000.0f);
 
+        // Set some OpenGL state variables
+
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Force filled polygons
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
-
-        // Create and add a SceneInspector to the window
-
-        /*
-        m_sceneInspector = SceneInspector::create("Scene Inspector");
-        m_sceneInspector->setRootNode(this->scene());
-        m_sceneInspector->setVisible(true);
-        this->addUiWindow(m_sceneInspector);
-        */
 
         return 0;
     }
 
     virtual void onUpdate()
     {}
+
+    virtual void onAddMenuItems(UiMenu *menu) override
+    {
+        if (menu->name() == "File")
+        {
+            menu->addItem(UiMenuItem::create("Open", "CTRL+O", [this]() { this->onOpen(); }));
+        }
+    }
 
     virtual void onDrawUi() override
     {

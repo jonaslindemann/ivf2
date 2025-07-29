@@ -294,6 +294,12 @@ void ivfui::CameraManipulator::setMouseScaling(double sx, double sy)
 void ivfui::CameraManipulator::setHeadlight(ivf::DirectionalLightPtr dirLight)
 {
     m_headlight = dirLight;
+
+    if (m_headlight)
+    {
+        m_headlight->setDirection(glm::normalize(m_cameraTarget - m_cameraNewPos));
+        LightManager::instance()->apply();
+    }
 }
 
 ivf::DirectionalLightPtr ivfui::CameraManipulator::headlight()

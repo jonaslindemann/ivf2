@@ -311,3 +311,25 @@ void ivf::TextNode::doDraw()
     ShaderManager::instance()->currentProgram()->uniformBool(m_useTextureId, false);
     glDisable(GL_BLEND);
 }
+
+void ivf::TextNode::setupProperties()
+{
+    TransformNode::setupProperties();
+    this->addProperty("Text", &m_text, "Geometry");
+    this->addProperty("Size", &m_scale, "Geometry");
+}
+
+void ivf::TextNode::onPropertyChanged(const std::string &propertyName)
+{
+    if (propertyName == "Text")
+    {
+        this->updateCharMap();
+        this->updateTextSize();
+        this->prepareBuffers();
+    }
+    else if (propertyName == "Size")
+    {
+        this->updateTextSize();
+    }
+    TransformNode::onPropertyChanged(propertyName);
+}

@@ -5,7 +5,9 @@
 using namespace ivf;
 
 ivf::FilmgrainEffect::FilmgrainEffect() : m_noiseIntensity(0.1), m_grainBlending(0.1)
-{}
+{
+    setName("Grain");
+}
 
 std::shared_ptr<FilmgrainEffect> ivf::FilmgrainEffect::create()
 {

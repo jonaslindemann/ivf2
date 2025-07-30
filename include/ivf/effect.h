@@ -16,9 +16,10 @@ namespace ivf {
  */
 class Effect : public GLBase, public PropertyInspectable {
 private:
-    float m_time{0.0}; ///< Current effect time (for time-based effects).
-    int m_width{0};    ///< Width of the effect's render target.
-    int m_height{0};   ///< Height of the effect's render target.
+    float m_time{0.0};  ///< Current effect time (for time-based effects).
+    int m_width{0};     ///< Width of the effect's render target.
+    int m_height{0};    ///< Height of the effect's render target.
+    std::string m_name; ///< Name of the effect (optional).
 
 public:
     /**
@@ -49,6 +50,18 @@ public:
      * @param height Height in pixels.
      */
     void setResolution(int width, int height);
+
+    /**
+     * @brief Set the name of the effect (for identification).
+     * @param name Name of the effect.
+     */
+    void setName(const std::string &name);
+
+    /**
+     * @brief Get the name of the effect.
+     * @return std::string Name of the effect.
+     */
+    std::string name() const;
 
     /**
      * @brief Get the current effect time.

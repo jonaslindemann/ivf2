@@ -81,22 +81,31 @@ void ivfui::GLFWSceneWindow::addEffect(ivf::EffectPtr effect)
     m_postProcessor->addEffect(effect->program());
 }
 
-void ivfui::GLFWSceneWindow::clearEffects()
+// EffectListProvider interface implementation
+
+int GLFWSceneWindow::getEffectCount() const
 {
-    m_effects.clear();
-    m_postProcessor->clearEffects();
+    return static_cast<int>(m_effects.size());
 }
 
-void ivfui::GLFWSceneWindow::enableEffect(int index)
+std::shared_ptr<ivf::Effect> GLFWSceneWindow::getEffect(int index) const
 {
-    if (index < 0 || index >= m_effects.size())
+    if (index < 0 || index >= static_cast<int>(m_effects.size()))
+    {
+        return nullptr;
+    }
+    return m_effects[index];
+}
+
+void GLFWSceneWindow::enableEffect(int index)
+{
+    if (index < 0 || index >= static_cast<int>(m_effects.size()))
     {
         cout << "Invalid effect index: " << index << endl;
         return;
     }
 
     auto effect = m_effects[index];
-
     if (effect)
     {
         effect->program()->setEnabled(true);
@@ -107,16 +116,15 @@ void ivfui::GLFWSceneWindow::enableEffect(int index)
     }
 }
 
-void ivfui::GLFWSceneWindow::disableEffect(int index)
+void GLFWSceneWindow::disableEffect(int index)
 {
-    if (index < 0 || index >= m_effects.size())
+    if (index < 0 || index >= static_cast<int>(m_effects.size()))
     {
         cout << "Invalid effect index: " << index << endl;
         return;
     }
 
     auto effect = m_effects[index];
-
     if (effect)
     {
         effect->program()->setEnabled(false);
@@ -127,9 +135,9 @@ void ivfui::GLFWSceneWindow::disableEffect(int index)
     }
 }
 
-bool ivfui::GLFWSceneWindow::isEffectEnabled(int index)
+bool GLFWSceneWindow::isEffectEnabled(int index) const
 {
-    if (index < 0 || index >= m_effects.size())
+    if (index < 0 || index >= static_cast<int>(m_effects.size()))
     {
         cout << "Invalid effect index: " << index << endl;
         return false;
@@ -146,7 +154,7 @@ bool ivfui::GLFWSceneWindow::isEffectEnabled(int index)
     }
 }
 
-void ivfui::GLFWSceneWindow::disableAllEffects()
+void GLFWSceneWindow::disableAllEffects()
 {
     for (auto &effect : m_effects)
     {
@@ -159,14 +167,43 @@ void ivfui::GLFWSceneWindow::disableAllEffects()
     }
 }
 
-ivf::EffectPtr ivfui::GLFWSceneWindow::effect(int index)
+void GLFWSceneWindow::clearEffects()
 {
-    if (index < 0 || index >= m_effects.size())
+    m_effects.clear();
+    m_postProcessor->clearEffects();
+}
+
+bool GLFWSceneWindow::reorderEffect(int fromIndex, int toIndex)
+{
+    if (fromIndex < 0 || fromIndex >= static_cast<int>(m_effects.size()) || toIndex < 0 ||
+        toIndex >= static_cast<int>(m_effects.size()) || fromIndex == toIndex)
     {
-        cout << "Invalid effect index: " << index << endl;
-        return nullptr;
+        return false;
     }
-    return m_effects[index];
+
+    // Reorder in the effects vector
+    auto effect = m_effects[fromIndex];
+    m_effects.erase(m_effects.begin() + fromIndex);
+    m_effects.insert(m_effects.begin() + toIndex, effect);
+
+    // Rebuild the post-processor with the new order
+    m_postProcessor->clearEffects();
+    for (const auto &eff : m_effects)
+    {
+        if (eff)
+        {
+            m_postProcessor->addEffect(eff->program());
+        }
+    }
+
+    return true;
+}
+
+// Legacy effect interface methods (for backward compatibility)
+
+ivf::EffectPtr GLFWSceneWindow::effect(int index)
+{
+    return getEffect(index);
 }
 
 void ivfui::GLFWSceneWindow::enableHeadlight()
@@ -293,6 +330,11 @@ void ivfui::GLFWSceneWindow::showCameraWindow()
     m_cameraWindow->show();
 }
 
+void ivfui::GLFWSceneWindow::showEffectInspector()
+{
+    m_effectInspector->show();
+}
+
 void ivfui::GLFWSceneWindow::showMainMenu()
 {
     m_showMainMenu = true;
@@ -362,8 +404,6 @@ int ivfui::GLFWSceneWindow::doSetup()
     m_axis->setVisible(m_showAxis);
     m_grid->setVisible(m_showGrid);
 
-    auto retVal = onSetup();
-
     if (m_selectionEnabled)
         m_bufferSelection->initialize(width(), height());
 
@@ -374,8 +414,6 @@ int ivfui::GLFWSceneWindow::doSetup()
 
     smSetCurrentProgram("basic");
 
-    doSetupMainMenu();
-
     m_sceneControlPanel = ivfui::SceneControlPanel::create("Control panel", this);
     m_sceneControlPanel->hide();
 
@@ -385,6 +423,15 @@ int ivfui::GLFWSceneWindow::doSetup()
     m_cameraWindow->hide();
 
     this->addUiWindow(m_cameraWindow);
+
+    // Create EffectInspector with the new interface, passing 'this' as EffectListProvider
+    m_effectInspector = ivfui::EffectInspector::create("Effect Inspector", this);
+    m_effectInspector->hide();
+
+    this->addUiWindow(m_effectInspector);
+
+    auto retVal = onSetup();
+    doSetupMainMenu();
 
     return retVal;
 }
@@ -419,6 +466,11 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
         "Camera control", "v", [this]() { this->showCameraWindow(); },
         [this]() {
             return m_cameraWindow->visible(); // Enable/disable based on visibility
+        }));
+    viewMenu->addItem(UiMenuItem::create(
+        "Effect Inspector", "e", [this]() { this->showEffectInspector(); },
+        [this]() {
+            return m_effectInspector->visible(); // Enable/disable based on visibility
         }));
     viewMenu->addItem(UiMenuItem::create(
         "Axis", "a",

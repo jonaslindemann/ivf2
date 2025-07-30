@@ -104,17 +104,15 @@ public:
 
     virtual int onSetup() override
     {
-        // Enable rendering to texture for post-processing effects
-
-        this->setRenderToTexture(true);
-
         // Enable a headlight for the scene
 
         this->enableHeadlight();
 
-        // Create an axis (not added to the scene by default)
+        // Enable rendering to texture for post-processing effects
 
-        auto axis = Axis::create();
+        this->setRenderToTexture(true);
+
+        // Create an axis (not added to the scene by default)
 
         // Create a base material for the objects
 
@@ -258,8 +256,7 @@ public:
 
         // Create and add the object inspector UI window
 
-        m_inspector = ObjectInspector::create("Inspector");
-        this->addUiWindow(m_inspector);
+        this->showEffectInspector();
 
         return 0;
     }
@@ -269,139 +266,6 @@ public:
         // Update the function visitor to animate the nodes
 
         m_nodes->accept(&m_visitor);
-    }
-
-    virtual void onKey(int key, int scancode, int action, int mods) override
-    {
-        // Handle key events for toggling effects and showing UI
-
-        if (action == GLFW_PRESS)
-        {
-            if (key == GLFW_KEY_0)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(0));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(0))
-                        this->disableEffect(0);
-                    else
-                        this->enableEffect(0);
-                }
-            }
-            else if (key == GLFW_KEY_1)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(1));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(1))
-                        this->disableEffect(1);
-                    else
-                        this->enableEffect(1);
-                }
-            }
-            else if (key == GLFW_KEY_2)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(2));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(2))
-                        this->disableEffect(2);
-                    else
-                        this->enableEffect(2);
-                }
-            }
-            else if (key == GLFW_KEY_3)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(3));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(3))
-                        this->disableEffect(3);
-                    else
-                        this->enableEffect(3);
-                }
-            }
-            else if (key == GLFW_KEY_4)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(4));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(4))
-                        this->disableEffect(4);
-                    else
-                        this->enableEffect(4);
-                }
-            }
-            else if (key == GLFW_KEY_5)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(5));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(5))
-                        this->disableEffect(5);
-                    else
-                        this->enableEffect(5);
-                }
-            }
-            else if (key == GLFW_KEY_6)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(6));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(6))
-                        this->disableEffect(6);
-                    else
-                        this->enableEffect(6);
-                }
-            }
-            else if (key == GLFW_KEY_7)
-            {
-                if (mods & GLFW_MOD_SHIFT)
-                {
-                    m_inspector->setObject(this->effect(7));
-                }
-                else
-                {
-                    if (this->isEffectEnabled(7))
-                        this->disableEffect(7);
-                    else
-                        this->enableEffect(7);
-                }
-            }
-            if (key == GLFW_KEY_ESCAPE)
-            {
-                this->close();
-            }
-            else if (key == GLFW_KEY_F1)
-            {
-                this->showControlPanel();
-            }
-            else if (key == GLFW_KEY_F2)
-            {
-                this->showCameraWindow();
-            }
-        }
     }
 };
 

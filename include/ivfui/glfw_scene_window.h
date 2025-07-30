@@ -24,6 +24,7 @@
 
 #include <ivfui/scene_control_panel.h>
 #include <ivfui/camera_window.h>
+#include <ivfui/effect_inspector.h>
 #include <ivfui/ui_menu.h>
 
 namespace ivfui {
@@ -35,9 +36,10 @@ namespace ivfui {
  * The GLFWSceneWindow class provides a comprehensive window for rendering a 3D scene using
  * a scene graph (CompositeNode), camera manipulation, UI overlays, and post-processing effects.
  * It supports node selection, render-to-texture, axis/grid overlays, and integration with
- * custom UI windows and control panels. Inherits from GLFWWindow.
+ * custom UI windows and control panels. Inherits from GLFWWindow and implements EffectListProvider
+ * to provide effect management capabilities to UI components like EffectInspector.
  */
-class GLFWSceneWindow : public GLFWWindow {
+class GLFWSceneWindow : public GLFWWindow, public EffectListProvider {
 private:
     ivf::CompositeNodePtr m_scene;               ///< Root scene node.
     ivfui::CameraManipulatorPtr m_camManip;      ///< Camera manipulator for navigation.
@@ -49,6 +51,7 @@ private:
 
     SceneControlPanelPtr m_sceneControlPanel; ///< Scene control panel UI.
     CameraWindowPtr m_cameraWindow;           ///< Camera control window UI.
+    EffectInspectorPtr m_effectInspector;     ///< Effect inspector window UI.
 
     bool m_selectionEnabled{false}; ///< Selection mode enabled.
     ivf::Node *m_lastNode;          ///< Last node under the cursor.
@@ -147,37 +150,62 @@ public:
      */
     void addEffect(ivf::EffectPtr effect);
 
+    // EffectListProvider interface implementation
+    
     /**
-     * @brief Remove all post-processing effects.
+     * @brief Get the number of effects in the list.
+     * @return int Number of effects.
      */
-    void clearEffects();
+    virtual int getEffectCount() const override;
 
     /**
-     * @brief Enable a specific post-processing effect by index.
+     * @brief Get an effect by index.
      * @param index Effect index.
+     * @return std::shared_ptr<ivf::Effect> Effect at the given index, or nullptr if invalid.
      */
-    void enableEffect(int index);
+    virtual std::shared_ptr<ivf::Effect> getEffect(int index) const override;
 
     /**
-     * @brief Disable a specific post-processing effect by index.
+     * @brief Enable a specific effect by index.
      * @param index Effect index.
      */
-    void disableEffect(int index);
+    virtual void enableEffect(int index) override;
+
+    /**
+     * @brief Disable a specific effect by index.
+     * @param index Effect index.
+     */
+    virtual void disableEffect(int index) override;
 
     /**
      * @brief Check if a specific effect is enabled.
      * @param index Effect index.
-     * @return bool True if enabled.
+     * @return bool True if enabled, false otherwise.
      */
-    bool isEffectEnabled(int index);
+    virtual bool isEffectEnabled(int index) const override;
 
     /**
-     * @brief Disable all post-processing effects.
+     * @brief Disable all effects.
      */
-    void disableAllEffects();
+    virtual void disableAllEffects() override;
 
     /**
-     * @brief Get a specific effect by index.
+     * @brief Remove all effects.
+     */
+    virtual void clearEffects() override;
+
+    /**
+     * @brief Reorder an effect from one index to another.
+     * @param fromIndex Source index.
+     * @param toIndex Target index.
+     * @return bool True if reordering was successful.
+     */
+    virtual bool reorderEffect(int fromIndex, int toIndex) override;
+
+    // Legacy effect interface methods (for backward compatibility)
+    
+    /**
+     * @brief Get a specific effect by index (legacy method).
      * @param index Effect index.
      * @return ivf::EffectPtr Shared pointer to the effect.
      */
@@ -290,6 +318,11 @@ public:
      * @brief Show the camera control window UI.
      */
     void showCameraWindow();
+
+    /**
+     * @brief Show the effect inspector window UI.
+     */
+    void showEffectInspector();
 
     void showMainMenu();
 

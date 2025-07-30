@@ -6,7 +6,9 @@ using namespace ivf;
 
 ivf::TintEffect::TintEffect()
     : m_tintColor(glm::vec3(1.2, 0.9, 0.7)), m_tintStrength(0.5), m_grayScaleWeights(glm::vec3(0.299, 0.587, 0.114))
-{}
+{
+    setName("Tint");
+}
 
 std::shared_ptr<TintEffect> ivf::TintEffect::create()
 {

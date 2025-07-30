@@ -5,7 +5,9 @@
 using namespace ivf;
 
 ivf::BloomEffect::BloomEffect() : Effect(), m_threshold(1.0), m_intensity(1.0)
-{}
+{
+    this->setName("Bloom");
+}
 
 std::shared_ptr<BloomEffect> ivf::BloomEffect::create()
 {

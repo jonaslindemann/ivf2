@@ -5,7 +5,9 @@
 using namespace ivf;
 
 ivf::DitheringEffect::DitheringEffect()
-{}
+{
+    setName("Dithering");
+}
 
 std::shared_ptr<DitheringEffect> ivf::DitheringEffect::create()
 {

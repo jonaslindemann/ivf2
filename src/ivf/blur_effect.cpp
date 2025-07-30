@@ -5,7 +5,9 @@
 using namespace ivf;
 
 ivf::BlurEffect::BlurEffect()
-{}
+{
+    this->setName("Blur");
+}
 
 ivf::BlurEffect::~BlurEffect()
 {}

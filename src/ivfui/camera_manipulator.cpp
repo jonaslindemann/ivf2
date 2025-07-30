@@ -69,6 +69,7 @@ void CameraManipulator::update()
         xfmMgr->identity();
         xfmMgr->perspective(m_fov, (GLfloat)width / (GLfloat)height, m_nearZ, m_farZ);
         xfmMgr->enableModelMatrix();
+        LightManager::instance()->apply();
     }
 
     if (m_firstTime)
@@ -77,6 +78,7 @@ void CameraManipulator::update()
         xfmMgr->identity();
         xfmMgr->lookAt(m_cameraPosition, m_cameraTarget);
         xfmMgr->enableModelMatrix();
+        LightManager::instance()->apply();
         m_firstTime = false;
     }
 
@@ -129,8 +131,8 @@ void CameraManipulator::update()
         if (m_headlight)
         {
             m_headlight->setDirection(glm::normalize(m_cameraTarget - m_cameraNewPos));
-            LightManager::instance()->apply();
         }
+        LightManager::instance()->apply();
 
         xfmMgr->enableModelMatrix();
     }
@@ -154,9 +156,9 @@ void CameraManipulator::update()
         if (m_headlight)
         {
             m_headlight->setDirection(glm::normalize(m_cameraTarget - m_cameraNewPos));
-            LightManager::instance()->apply();
         }
 
+        LightManager::instance()->apply();
         xfmMgr->enableModelMatrix();
     }
     else if ((m_middleMouseButton) || ((m_rightMouseButton) && (m_shiftKey)))
@@ -188,8 +190,8 @@ void CameraManipulator::update()
         if (m_headlight)
         {
             m_headlight->setDirection(glm::normalize(m_cameraTarget - m_cameraNewPos));
-            LightManager::instance()->apply();
         }
+        LightManager::instance()->apply();
 
         xfmMgr->enableModelMatrix();
     }

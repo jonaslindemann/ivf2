@@ -5,7 +5,9 @@
 using namespace ivf;
 
 ivf::VignetteEffect::VignetteEffect() : m_vignetteSize(1.5f), m_vignetteSmoothness(1.0f)
-{}
+{
+    setName("Vignette");
+}
 
 std::shared_ptr<VignetteEffect> ivf::VignetteEffect::create()
 {

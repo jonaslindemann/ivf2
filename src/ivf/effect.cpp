@@ -39,6 +39,16 @@ int ivf::Effect::height()
     return m_height;
 }
 
+void ivf::Effect::setName(const std::string &name)
+{
+    m_name = name;
+}
+
+std::string ivf::Effect::name() const
+{
+    return m_name;
+}
+
 void ivf::Effect::load()
 {
     doLoad();

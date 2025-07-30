@@ -5,7 +5,9 @@
 using namespace ivf;
 
 ivf::PixelationEffect::PixelationEffect() : Effect(), m_pixelSize(4.0f)
-{}
+{
+    setName("Pixelation");
+}
 
 ivf::PixelationEffect::~PixelationEffect()
 {}

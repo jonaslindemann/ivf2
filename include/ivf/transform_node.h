@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ivf/node.h>
+#include <ivf/bounding_box.h>
 #include <glm/glm.hpp>
 
 namespace ivf {
@@ -23,6 +24,8 @@ private:
     glm::vec3 m_vecRot;      ///< Vector rotation (for advanced rotation control)
     glm::vec3 m_eulerAngles; ///< Euler angles for rotation
     glm::vec3 m_storedPos;   ///< Stored position for temporary transformations
+    BoundingBox m_localBbox; ///< Local bounding box of this node
+    bool m_autoUpdateBoundingBox; ///< Flag to enable/disable automatic bounding box updates
 
 public:
     /**
@@ -153,9 +156,45 @@ public:
 
     /**
      * @brief Get the world position of the node.
-     * @return The world position as a glm::vec3.
+     * @return glm::vec3 The world position.
      */
     glm::vec3 worldPos() const;
+
+    /**
+     * @brief Get the local bounding box of this node.
+     * @return BoundingBox The local bounding box.
+     */
+    virtual BoundingBox localBoundingBox() const;
+
+    /**
+     * @brief Get the world-space bounding box of this node.
+     * @return BoundingBox The world-space bounding box.
+     */
+    virtual BoundingBox worldBoundingBox() const;
+
+    /**
+     * @brief Set the local bounding box for this node.
+     * @param bbox The local bounding box.
+     */
+    void setLocalBoundingBox(const BoundingBox& bbox);
+
+    /**
+     * @brief Check if this node has a valid local bounding box.
+     * @return bool True if the node has a valid bounding box.
+     */
+    bool hasValidBoundingBox() const;
+
+    /**
+     * @brief Enable or disable automatic bounding box updates.
+     * @param autoUpdate True to enable automatic updates, false to disable.
+     */
+    void setAutoUpdateBoundingBox(bool autoUpdate);
+
+    /**
+     * @brief Check if automatic bounding box updates are enabled.
+     * @return bool True if auto-update is enabled.
+     */
+    bool autoUpdateBoundingBox() const;
 
 protected:
     /**

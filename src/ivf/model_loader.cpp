@@ -219,6 +219,22 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
 
     mesh->end();
 
+    // Update bounding box after mesh creation
+    meshNode->updateBoundingBox();
+    
+    // Debug: Print local bounding box information
+    auto localBbox = meshNode->localBoundingBox();
+    if (localBbox.isValid())
+    {
+        std::cout << "  Local bounding box: Min(" << localBbox.min().x << ", " << localBbox.min().y << ", " << localBbox.min().z 
+                  << ") Max(" << localBbox.max().x << ", " << localBbox.max().y << ", " << localBbox.max().z << ")" << std::endl;
+        std::cout << "  Size: " << localBbox.size().x << " x " << localBbox.size().y << " x " << localBbox.size().z << std::endl;
+    }
+    else
+    {
+        std::cout << "  Warning: Local bounding box is invalid!" << std::endl;
+    }
+
     // Process materials (simplified to avoid potential issues)
     if (aiMesh->mMaterialIndex >= 0)
     {

@@ -52,6 +52,19 @@ private:
     double m_nearZ;                       ///< Near clipping plane.
     double m_farZ;                        ///< Far clipping plane.
 
+    // Multi-slot view storage
+    struct ViewSlot {
+        glm::vec3 position;
+        glm::vec3 target;
+        double fov;
+        double nearZ;
+        double farZ;
+        bool hasData;
+
+        ViewSlot() : position(0.0f), target(0.0f), fov(45.0), nearZ(1.0), farZ(100.0), hasData(false) {}
+    };
+    ViewSlot m_viewSlots[10]; ///< Storage for 10 view slots (0-9)
+
 private:
     /**
      * @brief Update the projection matrix based on current parameters.
@@ -175,6 +188,32 @@ public:
      * @return ivf::DirectionalLightPtr Shared pointer to the headlight.
      */
     ivf::DirectionalLightPtr headlight();
+
+    /**
+     * @brief Zoom the camera to fit the entire scene extent.
+     * @param scene The scene to compute extent for.
+     * @param includeInvisible Whether to include invisible nodes in extent calculation.
+     */
+    void zoomToExtent(ivf::CompositeNodePtr scene, bool includeInvisible = false);
+
+    /**
+     * @brief Save camera state to a specific slot.
+     * @param slot Slot number (0-9).
+     */
+    void saveStateToSlot(int slot);
+
+    /**
+     * @brief Restore camera state from a specific slot.
+     * @param slot Slot number (0-9).
+     */
+    void restoreStateFromSlot(int slot);
+
+    /**
+     * @brief Check if a view slot has saved data.
+     * @param slot Slot number (0-9).
+     * @return bool True if slot has saved data.
+     */
+    bool hasSlotData(int slot) const;
 };
 
 /**

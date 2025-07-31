@@ -335,6 +335,16 @@ void ivfui::GLFWSceneWindow::showEffectInspector()
     m_effectInspector->show();
 }
 
+void ivfui::GLFWSceneWindow::showSceneInspector()
+{
+    m_sceneInspector->show();
+}
+
+void ivfui::GLFWSceneWindow::zoomToExtent(bool includeInvisible)
+{
+    m_camManip->zoomToExtent(m_scene, includeInvisible);
+}
+
 void ivfui::GLFWSceneWindow::showMainMenu()
 {
     m_showMainMenu = true;
@@ -420,6 +430,7 @@ int ivfui::GLFWSceneWindow::doSetup()
     this->addUiWindow(m_sceneControlPanel);
 
     m_cameraWindow = ivfui::CameraWindow::create(m_camManip, "Camera");
+    m_cameraWindow->setScene(m_scene); // Set scene reference for extent calculation
     m_cameraWindow->hide();
 
     this->addUiWindow(m_cameraWindow);
@@ -429,6 +440,12 @@ int ivfui::GLFWSceneWindow::doSetup()
     m_effectInspector->hide();
 
     this->addUiWindow(m_effectInspector);
+
+    m_sceneInspector = ivfui::SceneInspector::create("Scene Inspector");
+    m_sceneInspector->hide();
+    m_sceneInspector->setRootNode(m_scene);
+
+    this->addUiWindow(m_sceneInspector);
 
     auto retVal = onSetup();
     doSetupMainMenu();
@@ -457,23 +474,15 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
     // Create the View menu
 
     auto viewMenu = UiMenu::create("View");
+
+    viewMenu->addItem(UiMenuItem::create("Zoom to Extent", "F", [this]() { this->zoomToExtent(); }));
+    viewMenu->addItem(UiMenuItem::create("Reset View", "CTRL+R", [this]() { this->resetView(); }));
+    viewMenu->addItem(UiMenuItem::create("Save View", "", [this]() { this->saveView(); }));
+
+    viewMenu->addSeparator();
+
     viewMenu->addItem(UiMenuItem::create(
-        "Control panel", "/", [this]() { this->showControlPanel(); },
-        [this]() {
-            return m_sceneControlPanel->visible(); // Enable/disable based on visibility
-        }));
-    viewMenu->addItem(UiMenuItem::create(
-        "Camera control", "v", [this]() { this->showCameraWindow(); },
-        [this]() {
-            return m_cameraWindow->visible(); // Enable/disable based on visibility
-        }));
-    viewMenu->addItem(UiMenuItem::create(
-        "Effect Inspector", "e", [this]() { this->showEffectInspector(); },
-        [this]() {
-            return m_effectInspector->visible(); // Enable/disable based on visibility
-        }));
-    viewMenu->addItem(UiMenuItem::create(
-        "Axis", "a",
+        "Axis", "A",
         [this]() {
             if (m_showAxis)
                 this->disableAxis();
@@ -485,7 +494,7 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
         }));
 
     viewMenu->addItem(UiMenuItem::create(
-        "Grid", "g",
+        "Grid", "G",
         [this]() {
             if (m_showGrid)
                 this->disableGrid();
@@ -497,7 +506,7 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
         }));
 
     viewMenu->addItem(UiMenuItem::create(
-        "Headlight", "h",
+        "Headlight", "H",
         [this]() {
             if (m_camManip->headlight() != nullptr)
                 this->disableHeadlight();
@@ -518,6 +527,25 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
         },
         [this]() {
             return m_showMainMenu; // Enable/disable based on current state
+        }));
+
+    viewMenu->addSeparator();
+
+    viewMenu->addItem(UiMenuItem::create(
+        "Camera control", "V", [this]() { this->showCameraWindow(); },
+        [this]() {
+            return m_cameraWindow->visible(); // Enable/disable based on visibility
+        }));
+
+    viewMenu->addItem(UiMenuItem::create(
+        "Scene Inspector", "S", [this]() { this->showSceneInspector(); },
+        [this]() {
+            return m_sceneInspector->visible(); // Enable/disable based on visibility
+        }));
+    viewMenu->addItem(UiMenuItem::create(
+        "Effect Inspector", "E", [this]() { this->showEffectInspector(); },
+        [this]() {
+            return m_effectInspector->visible(); // Enable/disable based on visibility
         }));
 
     this->onAddMenuItems(viewMenu.get());
@@ -672,34 +700,71 @@ void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
     std::cout << "Key: " << key << " Scancode: " << scancode << " Action: " << action << " Mods: " << mods << std::endl;
 #endif
 
-    if (key == GLFW_KEY_KP_DIVIDE)
+    if (action == GLFW_PRESS || action == GLFW_REPEAT)
     {
-        this->showControlPanel();
-    }
-    if (key == GLFW_KEY_V)
-    {
-        this->showCameraWindow();
-    }
-    if (key == GLFW_KEY_A)
-    {
-        if (m_showAxis)
-            this->disableAxis();
-        else
-            this->enableAxis();
-    }
-    if (key == GLFW_KEY_G)
-    {
-        if (m_showGrid)
-            this->disableGrid();
-        else
-            this->enableGrid();
-    }
-    if (key == GLFW_KEY_H)
-    {
-        if (m_camManip->headlight() != nullptr)
-            this->disableHeadlight();
-        else
-            this->enableHeadlight();
+        if (key == GLFW_KEY_V)
+        {
+            this->showCameraWindow();
+        }
+        if (key == GLFW_KEY_S)
+        {
+            this->showSceneInspector();
+        }
+        if (key == GLFW_KEY_E)
+        {
+            this->showEffectInspector();
+        }
+        if (key == GLFW_KEY_A)
+        {
+            if (m_showAxis)
+                this->disableAxis();
+            else
+                this->enableAxis();
+        }
+        if (key == GLFW_KEY_G)
+        {
+            if (m_showGrid)
+                this->disableGrid();
+            else
+                this->enableGrid();
+        }
+        if (key == GLFW_KEY_H)
+        {
+            if (m_camManip->headlight() != nullptr)
+                this->disableHeadlight();
+            else
+                this->enableHeadlight();
+        }
+
+        // New camera controls
+        if (key == GLFW_KEY_F) // F for "Fit" or "Frame"
+        {
+            this->zoomToExtent();
+        }
+        if (key == GLFW_KEY_R && (mods & GLFW_MOD_CONTROL)) // Ctrl+R for reset
+        {
+            this->resetView();
+        }
+
+        // Quick save slots with number keys (Ctrl+0-9 to save, 0-9 to restore)
+        if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9)
+        {
+            int slot = (key == GLFW_KEY_0) ? 0 : (key - GLFW_KEY_1 + 1);
+            if (slot == 0)
+                slot = 9; // Make 0 key map to slot 9 for easier access
+            else
+                slot = slot - 1; // Map 1-9 keys to slots 0-8
+
+            if (mods & GLFW_MOD_CONTROL)
+            {
+                m_camManip->saveStateToSlot(slot);
+            }
+            else
+            {
+                if (m_camManip->hasSlotData(slot))
+                    m_camManip->restoreStateFromSlot(slot);
+            }
+        }
     }
 
     GLFWWindow::doKey(key, scancode, action, mods);

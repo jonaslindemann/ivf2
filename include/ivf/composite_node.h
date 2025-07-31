@@ -84,6 +84,39 @@ public:
     void restoreChildrenPos();
 
     /**
+     * @brief Compute the aggregate bounding box of all child nodes.
+     * @param includeInvisible Whether to include invisible nodes in the computation.
+     * @return BoundingBox The aggregate bounding box in this node's local space.
+     */
+    BoundingBox computeChildrenBoundingBox(bool includeInvisible = false) const;
+
+    /**
+     * @brief Get the local bounding box, including children.
+     * @return BoundingBox The local bounding box including all children.
+     */
+    virtual BoundingBox localBoundingBox() const override;
+
+    /**
+     * @brief Get all TransformNode-derived children recursively.
+     * @param results Vector to store the results.
+     * @param includeInvisible Whether to include invisible nodes.
+     */
+    void getTransformNodes(std::vector<std::shared_ptr<TransformNode>>& results, bool includeInvisible = false) const;
+
+    /**
+     * @brief Get the world positions of all TransformNode-derived children.
+     * @param includeInvisible Whether to include invisible nodes.
+     * @return std::vector<glm::vec3> Vector of world positions.
+     */
+    std::vector<glm::vec3> getChildWorldPositions(bool includeInvisible = false) const;
+
+    /**
+     * @brief Get the world-space bounding box of this composite node, including all children.
+     * @return BoundingBox The world-space bounding box including children.
+     */
+    virtual BoundingBox worldBoundingBox() const override;
+
+    /**
      * @brief Accept a node visitor for traversal or processing.
      * @param visitor Pointer to the NodeVisitor.
      */

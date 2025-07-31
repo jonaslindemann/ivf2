@@ -7,7 +7,7 @@ using namespace ivf;
 
 TransformNode::TransformNode()
     : m_pos(0.0f), m_rotAxis(0.0f), m_rotAngle(0.0f), m_scale(1.0f), m_useTransform(true), m_vecRot(0.0f),
-      m_eulerAngles(0.0f), m_storedPos(0.0f)
+      m_eulerAngles(0.0f), m_storedPos(0.0f), m_autoUpdateBoundingBox(true)
 {
     m_rotAxis.y = 1.0f;
 }
@@ -202,4 +202,38 @@ void ivf::TransformNode::setupProperties()
     addProperty("Euler Angles", &m_eulerAngles, "Transform");
     addProperty("Stored Position", &m_storedPos, "Transform");
     addProperty("Scale", &m_scale, "Transform");
+    addProperty("Auto Update Bbox", &m_autoUpdateBoundingBox, "Transform");
+}
+
+BoundingBox TransformNode::localBoundingBox() const
+{
+    return m_localBbox;
+}
+
+BoundingBox TransformNode::worldBoundingBox() const
+{
+    if (!m_localBbox.isValid())
+        return BoundingBox();
+        
+    return m_localBbox.transform(globalTransform());
+}
+
+void TransformNode::setLocalBoundingBox(const BoundingBox& bbox)
+{
+    m_localBbox = bbox;
+}
+
+bool TransformNode::hasValidBoundingBox() const
+{
+    return m_localBbox.isValid();
+}
+
+void TransformNode::setAutoUpdateBoundingBox(bool autoUpdate)
+{
+    m_autoUpdateBoundingBox = autoUpdate;
+}
+
+bool TransformNode::autoUpdateBoundingBox() const
+{
+    return m_autoUpdateBoundingBox;
 }

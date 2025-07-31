@@ -66,6 +66,7 @@ public:
 
         this->cameraManipulator()->setCameraPosition(glm::vec3(0.0f, 0.0f, 10.0f));
         this->cameraManipulator()->setFarZ(1000.0f);
+        this->cameraManipulator()->saveState();
 
         // Set some OpenGL state variables
 
@@ -115,6 +116,23 @@ public:
                         this->clear(); // Clear previous models if needed
                         this->add(model);
                         std::cout << "Loaded model: " << filename << std::endl;
+
+                        auto wbbox = model->worldBoundingBox();
+
+                        std::cout << "World bounding box: "
+                                  << "Min: " << wbbox.min().x << ", " << wbbox.min().y << ", " << wbbox.min().z << "\n"
+                                  << "Max: " << wbbox.max().x << ", " << wbbox.max().y << ", " << wbbox.max().z << "\n"
+                                  << "Center: " << wbbox.center().x << ", " << wbbox.center().y << ", "
+                                  << wbbox.center().z << "\n";
+
+                        if (wbbox.isValid())
+                        {
+                            // Center the camera on the loaded model
+                            this->cameraManipulator()->setCameraTarget(wbbox.center());
+                            this->cameraManipulator()->setCameraPosition(
+                                glm::vec3(wbbox.center().x, wbbox.center().y, wbbox.max().z * 3.0f));
+                            this->cameraManipulator()->setFarZ(wbbox.max().z * 10.0f);
+                        }
                     }
                     else
                     {

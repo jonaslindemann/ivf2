@@ -118,3 +118,94 @@ uint32_t ivf::CompositeNode::doEnumerateIds(uint32_t startId)
         return nextId;
     }
 }
+
+BoundingBox CompositeNode::computeChildrenBoundingBox(bool includeInvisible) const
+{
+    BoundingBox aggregateBbox;
+
+    for (const auto& child : m_nodes)
+    {
+        if (!child || (!includeInvisible && !child->visible()))
+            continue;
+
+        auto transformChild = std::dynamic_pointer_cast<TransformNode>(child);
+        if (transformChild)
+        {
+            BoundingBox childBbox = transformChild->localBoundingBox();
+            if (childBbox.isValid())
+            {
+                // Transform the child's bounding box to this node's space
+                BoundingBox transformedChildBbox = childBbox.transform(transformChild->localTransform());
+                aggregateBbox.add(transformedChildBbox);
+            }
+        }
+    }
+
+    return aggregateBbox;
+}
+
+BoundingBox CompositeNode::localBoundingBox() const
+{
+    // For composite nodes, return the aggregate of all children plus our own local bbox
+    BoundingBox result = TransformNode::localBoundingBox();
+    BoundingBox childrenBbox = computeChildrenBoundingBox();
+
+    if (childrenBbox.isValid())
+    {
+        if (result.isValid())
+            result.add(childrenBbox);
+        else
+            result = childrenBbox;
+    }
+
+    return result;
+}
+
+void CompositeNode::getTransformNodes(std::vector<std::shared_ptr<TransformNode>>& results, bool includeInvisible) const
+{
+    for (const auto& child : m_nodes)
+    {
+        if (!child || (!includeInvisible && !child->visible()))
+            continue;
+
+        auto transformChild = std::dynamic_pointer_cast<TransformNode>(child);
+        if (transformChild)
+        {
+            results.push_back(transformChild);
+
+            // Recursively get transform nodes from composite children
+            auto compositeChild = std::dynamic_pointer_cast<CompositeNode>(child);
+            if (compositeChild)
+            {
+                compositeChild->getTransformNodes(results, includeInvisible);
+            }
+        }
+    }
+}
+
+std::vector<glm::vec3> CompositeNode::getChildWorldPositions(bool includeInvisible) const
+{
+    std::vector<glm::vec3> positions;
+    std::vector<std::shared_ptr<TransformNode>> transformNodes;
+
+    getTransformNodes(transformNodes, includeInvisible);
+
+    for (const auto& node : transformNodes)
+    {
+        positions.push_back(node->worldPos());
+    }
+
+    return positions;
+}
+
+BoundingBox CompositeNode::worldBoundingBox() const
+{
+    // Get the local bounding box including children
+    BoundingBox localBbox = localBoundingBox();
+    
+    if (!localBbox.isValid())
+        return BoundingBox();
+    
+    // Transform to world space using global transformation
+    return localBbox.transform(globalTransform());
+}

@@ -65,7 +65,7 @@ void SceneControlPanel::doDraw()
 
     if (ImGui::Button("Zoom Extent"))
     {
-        m_sceneWindow->saveView();
+        m_sceneWindow->zoomToExtent();
     }
 
     if (ImGui::Button("Scene Inspector"))

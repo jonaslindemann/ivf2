@@ -60,6 +60,9 @@ void DeformableMeshNode::applyDeformers()
             std::memcpy(meshVertices->data(), deformedVertices->data(), deformedVertices->memSize());
             mesh->updateVertices();
             mesh->updateNormals();
+            
+            // Update bounding box after deformation
+            updateBoundingBox();
         }
     }
 }
@@ -74,6 +77,9 @@ void DeformableMeshNode::resetDeformers()
         std::memcpy(meshVertices->data(), m_originalVertices->data(), m_originalVertices->memSize());
         mesh->updateVertices();
         mesh->updateNormals();
+        
+        // Update bounding box after reset
+        updateBoundingBox();
     }
 }
 

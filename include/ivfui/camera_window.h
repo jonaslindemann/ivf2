@@ -21,6 +21,7 @@ namespace ivfui {
 class CameraWindow : public ivfui::UiWindow {
 private:
     CameraManipulatorPtr m_cameraManipulator; ///< Associated camera manipulator.
+    ivf::CompositeNodePtr m_scene;             ///< Scene reference for extent calculation.
 
     float m_cameraTarget[3];      ///< Current camera target (look-at point).
     float m_newCameraTarget[3];   ///< Pending camera target (for UI changes).
@@ -35,6 +36,7 @@ private:
     float m_newFarZ;  ///< Pending far clipping plane (for UI changes).
 
     bool m_isDirty; ///< True if camera parameters have been modified via the UI.
+    bool m_includeInvisible; ///< Include invisible nodes in extent calculation.
 
     /**
      * @brief Update UI controls to reflect the current camera state.
@@ -61,6 +63,18 @@ public:
      * @return std::shared_ptr<CameraWindow> New CameraWindow instance.
      */
     static std::shared_ptr<CameraWindow> create(CameraManipulatorPtr camManip, std::string caption);
+
+    /**
+     * @brief Set the scene reference for extent calculation.
+     * @param scene Shared pointer to the scene.
+     */
+    void setScene(ivf::CompositeNodePtr scene);
+
+    /**
+     * @brief Get the scene reference.
+     * @return ivf::CompositeNodePtr Scene reference.
+     */
+    ivf::CompositeNodePtr scene() const;
 
     /**
      * @brief Draw the camera window UI (called per frame).

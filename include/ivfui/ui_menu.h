@@ -25,6 +25,7 @@ private:
     std::string m_shortcut;                   ///< Keyboard shortcut string.
     bool m_enabled{true};                     ///< Enabled state.
     bool m_selected{false};                   ///< Selected state.
+    bool m_isSeparator{false};                ///< True if this item is a separator.
     std::function<void()> m_actionCallback;   ///< Action callback.
     std::function<bool()> m_selectedCallback; ///< Selection callback (optional).
 
@@ -36,7 +37,7 @@ public:
      * @param action Callback to invoke when selected (optional).
      */
     UiMenuItem(const std::string &name, const std::string &shortcut = "", const std::function<void()> action = nullptr,
-               const std::function<bool()> selected = nullptr);
+               const std::function<bool()> selected = nullptr, const bool isSeparator = false);
 
     /**
      * @brief Factory method to create a shared pointer to a UiMenuItem instance.
@@ -47,7 +48,8 @@ public:
      */
     static std::shared_ptr<UiMenuItem> create(const std::string &name, const std::string &shortcut = "",
                                               const std::function<void()> action = nullptr,
-                                              const std::function<bool()> selected = nullptr);
+                                              const std::function<bool()> selected = nullptr,
+                                              const bool isSeparator = false);
 
     /**
      * @brief Draw the menu item in the current ImGui menu.
@@ -96,6 +98,9 @@ public:
      */
     bool isSelected() const;
 
+    bool isSeparator() const;
+    void setSeparator(bool isSeparator);
+
 protected:
     /**
      * @brief Draw the menu item (override for custom behavior).
@@ -140,6 +145,8 @@ public:
      * @param item Shared pointer to the menu item.
      */
     void addItem(const std::shared_ptr<UiMenuItem> &item);
+
+    void addSeparator();
 
     /**
      * @brief Draw the menu and its items in the current ImGui context.

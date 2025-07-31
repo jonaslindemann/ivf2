@@ -52,6 +52,7 @@ private:
     SceneControlPanelPtr m_sceneControlPanel; ///< Scene control panel UI.
     CameraWindowPtr m_cameraWindow;           ///< Camera control window UI.
     EffectInspectorPtr m_effectInspector;     ///< Effect inspector window UI.
+    SceneInspectorPtr m_sceneInspector;       ///< Scene inspector for debugging.
 
     bool m_selectionEnabled{false}; ///< Selection mode enabled.
     ivf::Node *m_lastNode;          ///< Last node under the cursor.
@@ -151,7 +152,7 @@ public:
     void addEffect(ivf::EffectPtr effect);
 
     // EffectListProvider interface implementation
-    
+
     /**
      * @brief Get the number of effects in the list.
      * @return int Number of effects.
@@ -203,7 +204,7 @@ public:
     virtual bool reorderEffect(int fromIndex, int toIndex) override;
 
     // Legacy effect interface methods (for backward compatibility)
-    
+
     /**
      * @brief Get a specific effect by index (legacy method).
      * @param index Effect index.
@@ -323,6 +324,17 @@ public:
      * @brief Show the effect inspector window UI.
      */
     void showEffectInspector();
+
+    /**
+     * @brief Show scene inspector window UI.
+     */
+    void showSceneInspector();
+
+    /**
+     * @brief Zoom camera to fit the entire scene.
+     * @param includeInvisible Whether to include invisible nodes.
+     */
+    void zoomToExtent(bool includeInvisible = false);
 
     void showMainMenu();
 

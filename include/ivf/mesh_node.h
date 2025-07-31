@@ -124,6 +124,11 @@ public:
     void updateNormals();
 
     /**
+     * @brief Automatically compute and update the local bounding box from mesh data.
+     */
+    void updateBoundingBox();
+
+    /**
      * @brief Print mesh node information for debugging.
      */
     void print();

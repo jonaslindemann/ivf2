@@ -5,16 +5,16 @@
 using namespace ivfui;
 
 UiMenuItem::UiMenuItem(const std::string &name, const std::string &shortcut, const std::function<void()> action,
-                       const std::function<bool()> selected)
+                       const std::function<bool()> selected, const bool isSeparator)
     : m_name(name), m_selected(false), m_enabled(true), m_shortcut(shortcut), m_actionCallback(action),
-      m_selectedCallback(selected)
+      m_selectedCallback(selected), m_isSeparator(isSeparator)
 {}
 
 std::shared_ptr<UiMenuItem> ivfui::UiMenuItem::create(const std::string &name, const std::string &shortcut,
                                                       const std::function<void()> action,
-                                                      const std::function<bool()> selected)
+                                                      const std::function<bool()> selected, const bool isSeparator)
 {
-    return std::make_shared<UiMenuItem>(name, shortcut, action, selected);
+    return std::make_shared<UiMenuItem>(name, shortcut, action, selected, isSeparator);
 }
 
 void UiMenuItem::draw()
@@ -57,6 +57,16 @@ bool ivfui::UiMenuItem::isSelected() const
     return m_selected;
 }
 
+bool ivfui::UiMenuItem::isSeparator() const
+{
+    return m_isSeparator;
+}
+
+void ivfui::UiMenuItem::setSeparator(bool isSeparator)
+{
+    m_isSeparator = isSeparator;
+}
+
 void ivfui::UiMenuItem::doDraw()
 {
     if (m_selectedCallback)
@@ -93,6 +103,11 @@ void ivfui::UiMenu::addItem(const std::shared_ptr<UiMenuItem> &item)
         m_items.push_back(item);
 }
 
+void ivfui::UiMenu::addSeparator()
+{
+    addItem(std::make_shared<UiMenuItem>("", "", nullptr, nullptr, true));
+}
+
 void ivfui::UiMenu::draw()
 {
     doDraw();
@@ -114,7 +129,10 @@ void ivfui::UiMenu::doDraw()
     {
         for (const auto &item : m_items)
         {
-            item->draw();
+            if (item->isSeparator())
+                ImGui::Separator();
+            else
+                item->draw();
         }
         ImGui::EndMenu();
     }

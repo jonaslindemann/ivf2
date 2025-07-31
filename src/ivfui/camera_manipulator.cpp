@@ -1,10 +1,13 @@
 #include <ivfui/camera_manipulator.h>
 
 #include <ivf/transform_manager.h>
+#include <ivf/extent_visitor.h>
 
 #include <glm/gtx/rotate_vector.hpp>
 
 #include <iostream>
+#include <algorithm>
+#include <cmath>
 
 using namespace ivfui;
 using namespace ivf;
@@ -307,4 +310,78 @@ void ivfui::CameraManipulator::setHeadlight(ivf::DirectionalLightPtr dirLight)
 ivf::DirectionalLightPtr ivfui::CameraManipulator::headlight()
 {
     return m_headlight;
+}
+
+void ivfui::CameraManipulator::zoomToExtent(ivf::CompositeNodePtr scene, bool includeInvisible)
+{
+    if (!scene)
+        return;
+
+    // Use ExtentVisitor to compute the bounding box of the scene
+    ivf::ExtentVisitor extentVisitor(includeInvisible);
+    scene->accept(&extentVisitor);
+    
+    auto bbox = extentVisitor.bbox();
+    
+    if (!bbox.isValid())
+    {
+        // If no valid bounding box, reset to default view
+        setCameraPosition(glm::vec3(0.0, 0.0, 5.0));
+        setCameraTarget(glm::vec3(0.0, 0.0, 0.0));
+        return;
+    }
+
+    // Calculate camera position based on bounding box
+    glm::vec3 center = bbox.center();
+    glm::vec3 size = bbox.size();
+    
+    // Calculate distance needed to fit the object in view
+    float maxDim = std::max({size.x, size.y, size.z});
+    float distance = maxDim / (2.0f * tan(glm::radians(m_fov * 0.5f))) * 1.2f; // Add 20% margin
+    
+    // Position camera looking at center from a good angle
+    glm::vec3 cameraPos = center + glm::vec3(distance * 0.7f, distance * 0.5f, distance);
+    
+    // Update camera parameters
+    setCameraTarget(center);
+    setCameraPosition(cameraPos);
+    
+    // Adjust near/far planes based on distance
+    setNearZ(distance * 0.01f);
+    setFarZ(distance * 10.0f);
+    
+    // Save this as the default state
+    saveState();
+}
+
+void ivfui::CameraManipulator::saveStateToSlot(int slot)
+{
+    if (slot < 0 || slot >= 10)
+        return;
+    
+    m_viewSlots[slot].position = m_cameraPosition;
+    m_viewSlots[slot].target = m_cameraTarget;
+    m_viewSlots[slot].fov = m_fov;
+    m_viewSlots[slot].nearZ = m_nearZ;
+    m_viewSlots[slot].farZ = m_farZ;
+    m_viewSlots[slot].hasData = true;
+}
+
+void ivfui::CameraManipulator::restoreStateFromSlot(int slot)
+{
+    if (slot < 0 || slot >= 10 || !m_viewSlots[slot].hasData)
+        return;
+    
+    setCameraPosition(m_viewSlots[slot].position);
+    setCameraTarget(m_viewSlots[slot].target);
+    setFov(m_viewSlots[slot].fov);
+    setNearZ(m_viewSlots[slot].nearZ);
+    setFarZ(m_viewSlots[slot].farZ);
+}
+
+bool ivfui::CameraManipulator::hasSlotData(int slot) const
+{
+    if (slot < 0 || slot >= 10)
+        return false;
+    return m_viewSlots[slot].hasData;
 }

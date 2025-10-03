@@ -20,7 +20,7 @@ CameraManipulator::CameraManipulator(GLFWwindow *window)
       m_leftMouseButton(false), m_middleMouseButton(false), m_rightMouseButton(false), m_anyMouseButton(false),
       m_shiftKey(false), m_ctrlKey(false), m_altKey(false), m_fov(45.0), m_nearZ(1.0), m_farZ(100.0),
       m_mouseScaleX(0.01), m_mouseScaleY(0.01), m_headlight(nullptr), m_savedCameraTarget(m_cameraTarget),
-      m_savedCameraPosition(m_cameraPosition)
+      m_savedCameraPosition(m_cameraPosition), m_manipulationBlocked(false)
 {}
 
 std::shared_ptr<CameraManipulator> ivfui::CameraManipulator::create(GLFWwindow *window)
@@ -83,6 +83,12 @@ void CameraManipulator::update()
         xfmMgr->enableModelMatrix();
         LightManager::instance()->apply();
         m_firstTime = false;
+    }
+
+    // Skip mouse manipulation if blocked
+    if (m_manipulationBlocked)
+    {
+        return;
     }
 
     m_leftMouseButton = (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
@@ -320,9 +326,9 @@ void ivfui::CameraManipulator::zoomToExtent(ivf::CompositeNodePtr scene, bool in
     // Use ExtentVisitor to compute the bounding box of the scene
     ivf::ExtentVisitor extentVisitor(includeInvisible);
     scene->accept(&extentVisitor);
-    
+
     auto bbox = extentVisitor.bbox();
-    
+
     if (!bbox.isValid())
     {
         // If no valid bounding box, reset to default view
@@ -334,22 +340,22 @@ void ivfui::CameraManipulator::zoomToExtent(ivf::CompositeNodePtr scene, bool in
     // Calculate camera position based on bounding box
     glm::vec3 center = bbox.center();
     glm::vec3 size = bbox.size();
-    
+
     // Calculate distance needed to fit the object in view
     float maxDim = std::max({size.x, size.y, size.z});
     float distance = maxDim / (2.0f * tan(glm::radians(m_fov * 0.5f))) * 1.2f; // Add 20% margin
-    
+
     // Position camera looking at center from a good angle
     glm::vec3 cameraPos = center + glm::vec3(distance * 0.7f, distance * 0.5f, distance);
-    
+
     // Update camera parameters
     setCameraTarget(center);
     setCameraPosition(cameraPos);
-    
+
     // Adjust near/far planes based on distance
     setNearZ(distance * 0.01f);
     setFarZ(distance * 10.0f);
-    
+
     // Save this as the default state
     saveState();
 }
@@ -358,7 +364,7 @@ void ivfui::CameraManipulator::saveStateToSlot(int slot)
 {
     if (slot < 0 || slot >= 10)
         return;
-    
+
     m_viewSlots[slot].position = m_cameraPosition;
     m_viewSlots[slot].target = m_cameraTarget;
     m_viewSlots[slot].fov = m_fov;
@@ -371,7 +377,7 @@ void ivfui::CameraManipulator::restoreStateFromSlot(int slot)
 {
     if (slot < 0 || slot >= 10 || !m_viewSlots[slot].hasData)
         return;
-    
+
     setCameraPosition(m_viewSlots[slot].position);
     setCameraTarget(m_viewSlots[slot].target);
     setFov(m_viewSlots[slot].fov);
@@ -384,4 +390,38 @@ bool ivfui::CameraManipulator::hasSlotData(int slot) const
     if (slot < 0 || slot >= 10)
         return false;
     return m_viewSlots[slot].hasData;
+}
+
+void ivfui::CameraManipulator::setManipulationBlocked(bool blocked)
+{
+    m_manipulationBlocked = blocked;
+}
+
+bool ivfui::CameraManipulator::isManipulationBlocked() const
+{
+    return m_manipulationBlocked;
+}
+
+glm::vec3 ivfui::CameraManipulator::computeMouseRay(int mouseX, int mouseY)
+{
+    if (m_width <= 0 || m_height <= 0)
+        return glm::vec3(0.0f, 0.0f, -1.0f); // Default forward vector
+    // Convert mouse coordinates to normalized device coordinates (NDC)
+    float x = (2.0f * mouseX) / m_width - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / m_height; // Invert Y for OpenGL
+    float z = 1.0f;                              // Forward direction in NDC
+    glm::vec3 rayNDC(x, y, z);
+    // Convert NDC to clip space
+    glm::vec4 rayClip(rayNDC.x, rayNDC.y, -1.0f, 1.0f);
+    // Convert clip space to eye space
+    glm::mat4 projMatrix = TransformManager::instance()->projectionMatrix();
+    glm::mat4 invProj = glm::inverse(projMatrix);
+    glm::vec4 rayEye = invProj * rayClip;
+    rayEye = glm::vec4(rayEye.x, rayEye.y, -1.0f, 0.0f); // Set forward direction
+    // Convert eye space to world space
+    glm::mat4 viewMatrix = TransformManager::instance()->viewMatrix();
+    glm::mat4 invView = glm::inverse(viewMatrix);
+    glm::vec4 rayWorld = invView * rayEye;
+    glm::vec3 rayDir = glm::normalize(glm::vec3(rayWorld));
+    return rayDir;
 }

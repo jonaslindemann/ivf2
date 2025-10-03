@@ -21,11 +21,13 @@
 #include <ivf/program.h>
 #include <ivf/post_processor.h>
 #include <ivf/effect.h>
+#include <ivf/cursor.h>
 
 #include <ivfui/scene_control_panel.h>
 #include <ivfui/camera_window.h>
 #include <ivfui/effect_inspector.h>
 #include <ivfui/ui_menu.h>
+#include <ivfui/ui_input_dialog.h>
 
 namespace ivfui {
 
@@ -48,6 +50,8 @@ private:
     ivf::FrameBufferPtr m_frameBuffer;           ///< Framebuffer for offscreen rendering.
     ivf::PostProcessorPtr m_postProcessor;       ///< Post-processing pipeline.
     ivfui::UiMainMenuPtr m_mainMenu;             ///< Main menu UI.
+    ivf::CursorPtr m_cursor;
+    ivf::SpherePtr m_sphere;
 
     SceneControlPanelPtr m_sceneControlPanel; ///< Scene control panel UI.
     CameraWindowPtr m_cameraWindow;           ///< Camera control window UI.
@@ -66,6 +70,16 @@ private:
 
     ivf::AxisPtr m_axis; ///< Axis overlay object.
     ivf::GridPtr m_grid; ///< Grid overlay object.
+
+    float m_gridSnapValue{0.1f}; ///< Grid snapping value.
+    bool m_snapToGrid{false};    ///< Snap to grid enabled.
+
+    bool m_lockPosXZ{false}; ///< Lock position in XZ plane.
+
+    glm::vec3 m_currentIntersectionPoint; ///< Current intersection point with the grid.
+
+    // Dialog state for grid snap value
+    UiInputDialogPtr m_inputDialog; ///< Generic input dialog.
 
     std::vector<ivf::EffectPtr> m_effects; ///< List of post-processing effects.
 
@@ -300,6 +314,74 @@ public:
      */
     void setGridSpacing(float x, float y, float z);
 
+    ivf::GridPtr grid();
+
+    /**
+     * @brief Get the cursor node.
+     * @return ivf::CursorPtr Shared pointer to the cursor.
+     */
+    ivf::CursorPtr cursor();
+
+    /**
+     * @brief Enable the cursor overlay.
+     */
+    void enableCursor();
+
+    /**
+     * @brief Disable the cursor overlay.
+     */
+    void disableCursor();
+
+    /**
+     * @brief Check if the cursor overlay is enabled.
+     * @return bool True if enabled.
+     */
+    bool cursorEnabled();
+
+    /**
+     * @brief Set the cursor overlay visibility.
+     * @param visible True to show, false to hide.
+     */
+    void setCursorVisible(bool visible);
+
+    /**
+     * @brief Check if the cursor overlay is visible.
+     * @return bool True if visible.
+     */
+    bool cursorVisible();
+
+    /**
+     * @brief Set the cursor position.
+     * @param x X coordinate.
+     * @param y Y coordinate.
+     * @param z Z coordinate.
+     */
+    void setCursorPosition(float x, float y, float z);
+
+    /**
+     * @brief Set the grid snapping value for transformations.
+     * @param value Snapping value.
+     */
+    void setGridSnapValue(float value);
+
+    /**
+     * @brief Get the current grid snapping value.
+     * @return float Snapping value.
+     */
+    float gridSnapValue();
+
+    /**
+     * @brief Enable or disable snapping to the grid during transformations.
+     * @param snap True to enable snapping, false to disable.
+     */
+    void setSnapToGrid(bool snap);
+
+    /**
+     * @brief Check if snapping to the grid is enabled.
+     * @return bool True if snapping is enabled.
+     */
+    bool snapToGrid();
+
     /**
      * @brief Reset the camera view to the default state.
      */
@@ -329,6 +411,11 @@ public:
      * @brief Show scene inspector window UI.
      */
     void showSceneInspector();
+
+    /**
+     * @brief Show grid snap value dialog.
+     */
+    void showGridSnapDialog();
 
     /**
      * @brief Zoom camera to fit the entire scene.
@@ -396,6 +483,8 @@ public:
     virtual void onLeaveNode(ivf::Node *node);
 
     virtual void onAddMenuItems(ivfui::UiMenu *menu);
+
+    virtual void onMousePosition3D(double x, double y, double z);
 
 protected:
     /**
@@ -469,6 +558,8 @@ protected:
      * @param mods Modifier flags.
      */
     virtual void doKey(int key, int scancode, int action, int mods) override;
+
+    virtual void doMousePosition(double x, double y) override;
 };
 
 /**

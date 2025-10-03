@@ -10,13 +10,15 @@ using namespace ivfui;
 
 #include <ivf/stock_shaders.h>
 
+#include <glm/gtx/intersect.hpp>
+
 using namespace ivf;
 
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
     : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
       m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false), m_showAxis(false),
-      m_showGrid(false)
+      m_showGrid(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f)
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());
@@ -24,6 +26,7 @@ GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title,
     m_frameBuffer = ivf::FrameBuffer::create(width, height);
     m_postProcessor = ivf::PostProcessor::create(width, height);
     m_mainMenu = ivfui::UiMainMenu::create();
+    m_inputDialog = ivfui::UiInputDialog::create("Grid Snap Value", "Snap Value:");
 }
 
 GLFWSceneWindow::~GLFWSceneWindow()
@@ -48,6 +51,19 @@ void ivfui::GLFWSceneWindow::remove(ivf::NodePtr node)
 void ivfui::GLFWSceneWindow::clear()
 {
     m_scene->clear();
+    // Re-add essential scene elements after clearing
+    if (m_cursor)
+    {
+        this->add(m_cursor);
+    }
+    if (m_axis)
+    {
+        this->add(m_axis);
+    }
+    if (m_grid)
+    {
+        this->add(m_grid);
+    }
 }
 
 void ivfui::GLFWSceneWindow::setSelectionEnabled(bool enabled)
@@ -310,6 +326,82 @@ void ivfui::GLFWSceneWindow::setGridSpacing(float x, float y, float z)
     m_grid->setSpacing(x, y, z);
 }
 
+ivf::GridPtr ivfui::GLFWSceneWindow::grid()
+{
+    return m_grid;
+}
+
+ivf::CursorPtr ivfui::GLFWSceneWindow::cursor()
+{
+    return m_cursor;
+}
+
+void ivfui::GLFWSceneWindow::enableCursor()
+{
+    if (m_cursor)
+    {
+        m_cursor->setVisible(true);
+    }
+}
+
+void ivfui::GLFWSceneWindow::disableCursor()
+{
+    if (m_cursor)
+    {
+        m_cursor->setVisible(false);
+    }
+}
+
+bool ivfui::GLFWSceneWindow::cursorEnabled()
+{
+    return m_cursor ? m_cursor->visible() : false;
+}
+
+void ivfui::GLFWSceneWindow::setCursorVisible(bool visible)
+{
+    if (m_cursor)
+    {
+        m_cursor->setVisible(visible);
+    }
+}
+
+bool ivfui::GLFWSceneWindow::cursorVisible()
+{
+    return m_cursor ? m_cursor->visible() : false;
+}
+
+void ivfui::GLFWSceneWindow::setCursorPosition(float x, float y, float z)
+{
+    if (m_cursor)
+    {
+        m_cursor->setPos(glm::vec3(x, y, z));
+        m_currentIntersectionPoint = glm::vec3(x, y, z);
+#ifdef IVF_DEBUG
+        std::cout << "Cursor position manually set to: " << x << ", " << y << ", " << z << std::endl;
+#endif
+    }
+}
+
+void ivfui::GLFWSceneWindow::setGridSnapValue(float value)
+{
+    m_gridSnapValue = value;
+}
+
+float ivfui::GLFWSceneWindow::gridSnapValue()
+{
+    return m_gridSnapValue;
+}
+
+void ivfui::GLFWSceneWindow::setSnapToGrid(bool snap)
+{
+    m_snapToGrid = snap;
+}
+
+bool ivfui::GLFWSceneWindow::snapToGrid()
+{
+    return m_snapToGrid;
+}
+
 void ivfui::GLFWSceneWindow::resetView()
 {
     m_camManip->reset();
@@ -407,13 +499,26 @@ int ivfui::GLFWSceneWindow::doSetup()
 
     m_axis = ivf::Axis::create();
     m_grid = ivf::Grid::create();
+    m_cursor = ivf::Cursor::create(0.5f, 0.05f, true); // Make cursor larger: 0.5 size, 0.05 gap
+    m_sphere = ivf::Sphere::create(0.02f, 10, 10);     // Small sphere for intersection point
 
     this->add(m_axis);
     this->add(m_grid);
+    this->add(m_cursor);
+    this->add(m_sphere);
 
     m_axis->setVisible(m_showAxis);
     m_grid->setVisible(m_showGrid);
 
+    // Make cursor visible by default and position it at origin
+    m_cursor->setVisible(true);
+    m_cursor->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+
+#ifdef IVF_DEBUG
+    std::cout << "Cursor created and positioned at origin: " << m_cursor->pos().x << ", " << m_cursor->pos().y << ", "
+              << m_cursor->pos().z << std::endl;
+    std::cout << "Cursor visible: " << m_cursor->visible() << std::endl;
+#endif
     if (m_selectionEnabled)
         m_bufferSelection->initialize(width(), height());
 
@@ -447,8 +552,10 @@ int ivfui::GLFWSceneWindow::doSetup()
 
     this->addUiWindow(m_sceneInspector);
 
+    this->doPreSetup();
     auto retVal = onSetup();
-    doSetupMainMenu();
+    this->doPostSetup();
+    this->doSetupMainMenu();
 
     return retVal;
 }
@@ -504,6 +611,26 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
         [this]() {
             return m_showGrid; // Enable/disable based on current state
         }));
+
+    viewMenu->addItem(UiMenuItem::create(
+        "Cursor", "C",
+        [this]() {
+            if (this->cursorVisible())
+                this->disableCursor();
+            else
+                this->enableCursor();
+        },
+        [this]() {
+            return this->cursorVisible(); // Enable/disable based on current state
+        }));
+
+    viewMenu->addItem(UiMenuItem::create(
+        "Snap to Grid", "", [this]() { this->setSnapToGrid(!this->snapToGrid()); },
+        [this]() { return this->snapToGrid(); }));
+
+    viewMenu->addItem(UiMenuItem::create("Grid Snap Value...", "CTRL+G", [this]() { this->showGridSnapDialog(); }));
+
+    viewMenu->addSeparator();
 
     viewMenu->addItem(UiMenuItem::create(
         "Headlight", "H",
@@ -646,6 +773,10 @@ void ivfui::GLFWSceneWindow::doDrawUi()
     if (m_showMainMenu)
         m_mainMenu->draw();
 
+    // Draw the input dialog if open
+    if (m_inputDialog)
+        m_inputDialog->draw();
+
     for (auto uiWindow : m_uiWindows)
         uiWindow->draw();
 
@@ -728,6 +859,20 @@ void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
             else
                 this->enableGrid();
         }
+        if (key == GLFW_KEY_C)
+        {
+            if (this->cursorVisible())
+                this->disableCursor();
+            else
+                this->enableCursor();
+        }
+        if (key == GLFW_KEY_T) // Test cursor position
+        {
+            static float testX = 0.0f;
+            testX += 1.0f; // Move cursor 1 unit along X each time T is pressed
+            this->setCursorPosition(testX, 0.0f, 0.0f);
+            std::cout << "Test: Moving cursor to X=" << testX << std::endl;
+        }
         if (key == GLFW_KEY_H)
         {
             if (m_camManip->headlight() != nullptr)
@@ -744,6 +889,10 @@ void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
         if (key == GLFW_KEY_R && (mods & GLFW_MOD_CONTROL)) // Ctrl+R for reset
         {
             this->resetView();
+        }
+        if (key == GLFW_KEY_G && (mods & GLFW_MOD_CONTROL)) // Ctrl+G for grid snap dialog
+        {
+            this->showGridSnapDialog();
         }
 
         // Quick save slots with number keys (Ctrl+0-9 to save, 0-9 to restore)
@@ -767,7 +916,142 @@ void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
         }
     }
 
+    if (mods & GLFW_MOD_SHIFT)
+    {
+        m_lockPosXZ = true;
+    }
+    else
+    {
+        m_lockPosXZ = false;
+    }
+
     GLFWWindow::doKey(key, scancode, action, mods);
+}
+
+void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
+{
+    GLFWWindow::doMousePosition(x, y);
+
+    // Only update cursor if it exists and is visible
+    if (!m_cursor || !m_cursor->visible())
+    {
+        return;
+    }
+
+    auto vec3 = this->cameraManipulator()->computeMouseRay(x, y);
+
+    // Compute intersection with XZ plane (ground plane at Y=0)
+
+    if (!m_lockPosXZ)
+    {
+        glm::vec3 rayOrigin = this->cameraManipulator()->cameraPosition();
+        glm::vec3 rayDirection = glm::normalize(vec3);
+        glm::vec3 planeOrigin(0.0f, 0.0f, 0.0f); // A point on the XZ plane (Y=0)
+        glm::vec3 planeNormal(0.0f, 1.0f, 0.0f); // Normal vector of the XZ plane (pointing up)
+
+        float intersectionDistance;
+        bool intersects = glm::intersectRayPlane(rayOrigin,           // Ray origin
+                                                 rayDirection,        // Ray direction (should be normalized)
+                                                 planeOrigin,         // Point on the plane
+                                                 planeNormal,         // Plane normal (should be normalized)
+                                                 intersectionDistance // Output: distance along ray to intersection
+        );
+
+        if (intersects && intersectionDistance > 0.0f) // Make sure intersection is in front of camera
+        {
+            // Calculate the actual intersection point
+            glm::vec3 intersectionPoint = rayOrigin + rayDirection * intersectionDistance;
+
+#ifdef IVF_DEBUG
+            std::cout << "Intersection found!" << std::endl;
+            std::cout << "Distance: " << intersectionDistance << std::endl;
+            std::cout << "Point: (" << intersectionPoint.x << ", " << intersectionPoint.y << ", " << intersectionPoint.z
+                      << ")" << std::endl;
+#endif
+
+            // Snap to grid
+            if (m_snapToGrid && m_gridSnapValue > 0.0f)
+            {
+                intersectionPoint.x = round(intersectionPoint.x / m_gridSnapValue) * m_gridSnapValue;
+                intersectionPoint.y = round(intersectionPoint.y / m_gridSnapValue) * m_gridSnapValue;
+                intersectionPoint.z = round(intersectionPoint.z / m_gridSnapValue) * m_gridSnapValue;
+            }
+
+            m_currentIntersectionPoint = intersectionPoint;
+
+            // Update cursor position
+            if (m_cursor)
+            {
+                m_cursor->setPos(intersectionPoint);
+            }
+
+            this->onMousePosition3D(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+        }
+#ifdef IVF_DEBUG
+        else
+        {
+            std::cout << "No intersection found (ray parallel to plane or behind camera)" << std::endl;
+        }
+#endif
+    }
+    else
+    {
+        // Lock position in XZ plane - constrain Y movement
+        glm::vec3 rayOrigin = this->cameraManipulator()->cameraPosition();
+        glm::vec3 rayDirection = glm::normalize(vec3);
+        glm::vec3 planeOrigin = m_currentIntersectionPoint; // Use current intersection point as plane origin
+        glm::vec3 planeNormal(0.0f, 0.0f, 1.0f);            // Normal vector of the YZ plane (constraining Z)
+
+        float intersectionDistance;
+
+        bool intersects = glm::intersectRayPlane(rayOrigin,           // Ray origin
+                                                 rayDirection,        // Ray direction (should be normalized)
+                                                 planeOrigin,         // Point on the plane
+                                                 planeNormal,         // Plane normal (should be normalized)
+                                                 intersectionDistance // Output: distance along ray to intersection
+        );
+
+        if (intersects && intersectionDistance > 0.0f)
+        {
+            // Calculate the actual intersection point
+            glm::vec3 intersectionPoint = rayOrigin + rayDirection * intersectionDistance;
+
+#ifdef IVF_DEBUG
+            std::cout << "Locked intersection found!" << std::endl;
+            std::cout << "Distance: " << intersectionDistance << std::endl;
+            std::cout << "Point: (" << intersectionPoint.x << ", " << intersectionPoint.y << ", " << intersectionPoint.z
+                      << ")" << std::endl;
+#endif
+
+            // Keep X and Z from previous position when locked
+            intersectionPoint.x = m_currentIntersectionPoint.x;
+            intersectionPoint.z = m_currentIntersectionPoint.z;
+
+            if (m_snapToGrid && m_gridSnapValue > 0.0f)
+            {
+                intersectionPoint.x = round(intersectionPoint.x / m_gridSnapValue) * m_gridSnapValue;
+                intersectionPoint.y = round(intersectionPoint.y / m_gridSnapValue) * m_gridSnapValue;
+                intersectionPoint.z = round(intersectionPoint.z / m_gridSnapValue) * m_gridSnapValue;
+            }
+
+            m_currentIntersectionPoint = intersectionPoint;
+
+            // Update cursor position
+            if (m_cursor)
+            {
+                m_cursor->refresh();
+                m_cursor->setPos(intersectionPoint);
+            }
+
+            this->onMousePosition3D(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
+        }
+#ifdef IVF_DEBUG
+        else
+        {
+            std::cout << "No locked intersection found (ray parallel to plane or behind camera)" << std::endl;
+        }
+#endif
+    }
 }
 
 void ivfui::GLFWSceneWindow::onUpdateUi()
@@ -786,6 +1070,9 @@ void ivfui::GLFWSceneWindow::onLeaveNode(ivf::Node *node)
 {}
 
 void ivfui::GLFWSceneWindow::onAddMenuItems(ivfui::UiMenu *menu)
+{}
+
+void ivfui::GLFWSceneWindow::onMousePosition3D(double x, double y, double z)
 {}
 
 void ivfui::GLFWSceneWindow::doEnterNode(ivf::Node *node)
@@ -811,4 +1098,21 @@ void ivfui::GLFWSceneWindow::doUpdateUi()
 void ivfui::GLFWSceneWindow::doUpdateEffects()
 {
     this->onUpdateEffects();
+}
+
+void ivfui::GLFWSceneWindow::showGridSnapDialog()
+{
+    m_inputDialog->openFloat(
+        m_gridSnapValue,
+        [this](bool accepted, const InputValue &value) {
+            if (accepted)
+            {
+                float *floatValue = std::get<float *>(value);
+                if (floatValue && *floatValue > 0.0f)
+                {
+                    m_gridSnapValue = *floatValue;
+                }
+            }
+        },
+        -FLT_MAX, FLT_MAX, 0.01f, 0.1f);
 }

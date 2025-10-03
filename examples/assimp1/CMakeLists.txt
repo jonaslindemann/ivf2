@@ -14,5 +14,5 @@ else()
     add_dependencies(assimp1 glad generator ivf ivfui)
     set_target_properties(assimp1 PROPERTIES FOLDER "examples")
 endif() 
-
+ 
 

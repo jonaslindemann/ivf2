@@ -10,6 +10,7 @@
 #include <ivf/composite_node.h>
 #include <ivf/cone.h>
 #include <ivf/cube.h>
+#include <ivf/cursor.h>
 #include <ivf/cylinder.h>
 #include <ivf/dir_light.h>
 #include <ivf/disk.h>

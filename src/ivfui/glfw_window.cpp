@@ -374,6 +374,9 @@ void ivfui::GLFWWindow::doUpdateOtherUi()
     onUpdateOtherUi();
 }
 
+void ivfui::GLFWWindow::doPreSetup()
+{}
+
 void ivfui::GLFWWindow::setError(int error)
 {
     m_lastError = error;
@@ -401,8 +404,17 @@ void ivfui::GLFWWindow::clearError()
 
 int GLFWWindow::doSetup()
 {
-    return onSetup();
+    // Run pre-setup routine
+    this->doPreSetup();
+    auto retval = onSetup();
+    // Run post-setup routine
+    this->doPostSetup();
+
+    return retval;
 }
+
+void ivfui::GLFWWindow::doPostSetup()
+{}
 
 void GLFWWindow::onKey(int key, int scancode, int action, int mods)
 {}

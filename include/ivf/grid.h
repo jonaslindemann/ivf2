@@ -16,12 +16,24 @@ enum GridType {
 };
 
 /**
+ * @enum GridPlane
+ * @brief Types of grid plane restrictions.
+ */
+enum class GridPlane {
+    Full3D,  ///< Full 3D grid (default).
+    XY,      ///< Grid restricted to XY plane (Z = 0).
+    XZ,      ///< Grid restricted to XZ plane (Y = 0).
+    YZ       ///< Grid restricted to YZ plane (X = 0).
+};
+
+/**
  * @class Grid
  * @brief Node representing a 3D grid with configurable ticks, spacing, colors, and rendering type.
  *
  * The Grid class provides a 3D grid for visualization, debugging, or reference in a scene.
- * It supports configuration of tick counts, spacing, colors, marker size, and rendering type.
- * Inherits from MeshNode, allowing transformation and integration into a scene graph.
+ * It supports configuration of tick counts, spacing, colors, marker size, rendering type,
+ * and plane restrictions. Inherits from MeshNode, allowing transformation and integration 
+ * into a scene graph.
  */
 class Grid : public MeshNode {
 private:
@@ -35,6 +47,7 @@ private:
     GLfloat m_lineColor[4]; ///< RGBA color for grid lines.
     GLfloat m_markerSize;   ///< Size of the grid markers.
     GridType m_gridType;    ///< Rendering type of the grid.
+    GridPlane m_gridPlane;  ///< Plane restriction for the grid.
 
 public:
     /**
@@ -116,6 +129,18 @@ public:
      * @return GridType The rendering type.
      */
     GridType type();
+
+    /**
+     * @brief Set the grid plane restriction.
+     * @param plane The plane restriction (Full3D, XY, XZ, YZ).
+     */
+    void setPlane(GridPlane plane);
+
+    /**
+     * @brief Get the current grid plane restriction.
+     * @return GridPlane The current plane restriction.
+     */
+    GridPlane plane() const;
 
     /**
      * @brief Set the color for grid ticks/markers.
@@ -226,6 +251,22 @@ protected:
      * @brief Called after drawing the grid node.
      */
     virtual void doPostDraw();
+
+private:
+    /**
+     * @brief Generate points mesh for the grid.
+     */
+    void generatePointsMesh();
+    
+    /**
+     * @brief Generate lines mesh for the grid.
+     */
+    void generateLinesMesh();
+    
+    /**
+     * @brief Generate markers mesh for the grid.
+     */
+    void generateMarkersMesh();
 };
 
 /**

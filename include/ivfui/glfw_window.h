@@ -270,6 +270,12 @@ public:
      */
     double elapsedTime() const;
 
+    /**
+     * @brief Get the UI renderer for this window.
+     * @return UiRendererPtr Shared pointer to the UI renderer.
+     */
+    UiRendererPtr uiRenderer() const { return m_uiRenderer; }
+
 public:
     /**
      * @brief Handle key events (override for custom behavior).
@@ -327,11 +333,14 @@ public:
      */
     virtual void doUpdateOtherUi();
 
+    virtual void doPreSetup();
     /**
      * @brief Perform setup operations for the window (override for custom behavior).
      * @return int Status code.
      */
     virtual int doSetup();
+
+    virtual void doPostSetup();
 
     /**
      * @brief Key event callback (calls doKey by default).

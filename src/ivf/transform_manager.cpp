@@ -44,6 +44,16 @@ glm::mat4 &ivf::TransformManager::viewMatrix()
     return m_viewMatrix;
 }
 
+glm::mat4 &ivf::TransformManager::modelMatrix()
+{
+    return m_modelMatrix;
+}
+
+glm::mat4 &ivf::TransformManager::projectionMatrix()
+{
+    return m_projectionMatrix;
+}
+
 // function to display 4x4 matrix
 void display_4x4(string tag, glm::mat4 m4)
 {

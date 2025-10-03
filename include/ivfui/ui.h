@@ -11,3 +11,4 @@
 #include <ivfui/ui_manager.h>
 #include <ivfui/ui_window.h>
 #include <ivfui/ui_menu.h>
+#include <ivfui/ui_input_dialog.h>

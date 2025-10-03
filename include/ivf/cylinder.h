@@ -73,6 +73,12 @@ public:
     void set(double radius = 1.0, double size = 1.0, int slices = 32, int segments = 8, double start = 0.0,
              double sweep = 2 * glm::pi<double>());
 
+    void setRadius(double radius);
+    double radius() const;
+
+    void setHeight(double size);
+    double height() const;
+
 protected:
     /**
      * @brief Internal setup method for initializing the cylinder geometry.

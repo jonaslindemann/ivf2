@@ -29,6 +29,28 @@ void ivf::Cylinder::set(double radius, double size, int slices, int segments, do
     this->refresh();
 }
 
+void ivf::Cylinder::setRadius(double radius)
+{
+    m_radius = radius;
+    this->refresh();
+}
+
+double ivf::Cylinder::radius() const
+{
+    return m_radius;
+}
+
+void ivf::Cylinder::setHeight(double size)
+{
+    m_size = size;
+    this->refresh();
+}
+
+double ivf::Cylinder::height() const
+{
+    return m_size;
+}
+
 void Cylinder::doSetup()
 {
     CylinderMesh cappedCylinder(m_radius, m_size, m_slices, m_segments, m_start, m_sweep);

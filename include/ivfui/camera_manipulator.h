@@ -51,6 +51,7 @@ private:
     double m_fov;                         ///< Field of view (degrees).
     double m_nearZ;                       ///< Near clipping plane.
     double m_farZ;                        ///< Far clipping plane.
+    bool m_manipulationBlocked;           ///< True if mouse manipulation should be blocked.
 
     // Multi-slot view storage
     struct ViewSlot {
@@ -61,7 +62,8 @@ private:
         double farZ;
         bool hasData;
 
-        ViewSlot() : position(0.0f), target(0.0f), fov(45.0), nearZ(1.0), farZ(100.0), hasData(false) {}
+        ViewSlot() : position(0.0f), target(0.0f), fov(45.0), nearZ(1.0), farZ(100.0), hasData(false)
+        {}
     };
     ViewSlot m_viewSlots[10]; ///< Storage for 10 view slots (0-9)
 
@@ -214,6 +216,20 @@ public:
      * @return bool True if slot has saved data.
      */
     bool hasSlotData(int slot) const;
+
+    /**
+     * @brief Set whether camera manipulation should be blocked.
+     * @param blocked True to block camera manipulation, false to allow.
+     */
+    void setManipulationBlocked(bool blocked);
+
+    /**
+     * @brief Check if camera manipulation is currently blocked.
+     * @return bool True if blocked.
+     */
+    bool isManipulationBlocked() const;
+
+    glm::vec3 computeMouseRay(int mouseX, int mouseY);
 };
 
 /**

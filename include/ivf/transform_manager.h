@@ -303,6 +303,18 @@ public:
      * @return glm::mat4& Reference to the view matrix.
      */
     glm::mat4 &viewMatrix();
+
+    /**
+     * @brief Get a reference to the current model matrix.
+     * @return glm::mat4& Reference to the model matrix.
+     */
+    glm::mat4 &modelMatrix();
+
+    /**
+     * @brief Get a reference to the current projection matrix.
+     * @return glm::mat4& Reference to the projection matrix.
+     */
+    glm::mat4 &projectionMatrix();
 };
 
 /**

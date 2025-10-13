@@ -50,8 +50,6 @@ private:
     ivf::FrameBufferPtr m_frameBuffer;           ///< Framebuffer for offscreen rendering.
     ivf::PostProcessorPtr m_postProcessor;       ///< Post-processing pipeline.
     ivfui::UiMainMenuPtr m_mainMenu;             ///< Main menu UI.
-    ivf::CursorPtr m_cursor;
-    ivf::SpherePtr m_sphere;
 
     SceneControlPanelPtr m_sceneControlPanel; ///< Scene control panel UI.
     CameraWindowPtr m_cameraWindow;           ///< Camera control window UI.
@@ -70,11 +68,11 @@ private:
 
     ivf::AxisPtr m_axis; ///< Axis overlay object.
     ivf::GridPtr m_grid; ///< Grid overlay object.
+    ivf::CursorPtr m_cursor;
 
     float m_gridSnapValue{0.1f}; ///< Grid snapping value.
     bool m_snapToGrid{false};    ///< Snap to grid enabled.
-
-    bool m_lockPosXZ{false}; ///< Lock position in XZ plane.
+    bool m_lockPosXZ{false};     ///< Lock position in XZ plane.
 
     glm::vec3 m_currentIntersectionPoint; ///< Current intersection point with the grid.
 
@@ -560,6 +558,7 @@ protected:
     virtual void doKey(int key, int scancode, int action, int mods) override;
 
     virtual void doMousePosition(double x, double y) override;
+    virtual void doMouseButton(int button, int action, int mods) override;
 };
 
 /**

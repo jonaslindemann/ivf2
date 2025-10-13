@@ -42,6 +42,8 @@ public:
      */
     void setVertex(GLuint idx, GLfloat x, GLfloat y, GLfloat z);
 
+    void setVertex(GLuint idx, const glm::vec3 &v);
+
     /**
      * @brief Get the coordinates of a vertex.
      * @param idx Index of the vertex.

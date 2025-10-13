@@ -18,7 +18,8 @@ GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title,
                                  GLFWwindow *shared)
     : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
       m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false), m_showAxis(false),
-      m_showGrid(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f)
+      m_showGrid(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f), m_snapToGrid(false), m_lockPosXZ(false),
+      m_gridSnapValue(0.1f), m_cursor(nullptr)
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());
@@ -500,19 +501,18 @@ int ivfui::GLFWSceneWindow::doSetup()
     m_axis = ivf::Axis::create();
     m_grid = ivf::Grid::create();
     m_cursor = ivf::Cursor::create(0.5f, 0.05f, true); // Make cursor larger: 0.5 size, 0.05 gap
-    m_sphere = ivf::Sphere::create(0.02f, 10, 10);     // Small sphere for intersection point
+    m_cursor->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+    m_cursor->refresh();
 
     this->add(m_axis);
     this->add(m_grid);
     this->add(m_cursor);
-    this->add(m_sphere);
 
     m_axis->setVisible(m_showAxis);
     m_grid->setVisible(m_showGrid);
+    m_cursor->setVisible(false); // Start with cursor hidden
 
     // Make cursor visible by default and position it at origin
-    m_cursor->setVisible(true);
-    m_cursor->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
 
 #ifdef IVF_DEBUG
     std::cout << "Cursor created and positioned at origin: " << m_cursor->pos().x << ", " << m_cursor->pos().y << ", "
@@ -982,7 +982,7 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
             // Update cursor position
             if (m_cursor)
             {
-                m_cursor->setPos(intersectionPoint);
+                m_cursor->updatePosition(intersectionPoint);
             }
 
             this->onMousePosition3D(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
@@ -1039,8 +1039,7 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
             // Update cursor position
             if (m_cursor)
             {
-                m_cursor->refresh();
-                m_cursor->setPos(intersectionPoint);
+                m_cursor->updatePosition(intersectionPoint);
             }
 
             this->onMousePosition3D(intersectionPoint.x, intersectionPoint.y, intersectionPoint.z);
@@ -1053,6 +1052,9 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
 #endif
     }
 }
+
+void ivfui::GLFWSceneWindow::doMouseButton(int button, int action, int mods)
+{}
 
 void ivfui::GLFWSceneWindow::onUpdateUi()
 {}

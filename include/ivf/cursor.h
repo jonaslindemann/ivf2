@@ -15,14 +15,19 @@ namespace ivf {
  */
 class Cursor : public MeshNode {
 private:
-    GLfloat m_size;                 ///< Length of each axis line.
-    GLfloat m_gap;                  ///< Gap between Y-axis line and ground projection line.
-    bool m_showGroundProjection;    ///< Whether to show the line extending to the XZ plane.
-    bool m_useCustomColors;         ///< Whether to use custom colors for axis lines.
-    GLfloat m_xAxisColor[4];        ///< RGBA color for X-axis line (default red).
-    GLfloat m_yAxisColor[4];        ///< RGBA color for Y-axis line (default green).
-    GLfloat m_zAxisColor[4];        ///< RGBA color for Z-axis line (default blue).
-    GLfloat m_groundLineColor[4];   ///< RGBA color for ground projection line (default gray).
+    GLfloat m_size;               ///< Length of each axis line.
+    GLfloat m_gap;                ///< Gap between Y-axis line and ground projection line.
+    bool m_showGroundProjection;  ///< Whether to show the line extending to the XZ plane.
+    bool m_useCustomColors;       ///< Whether to use custom colors for axis lines.
+    GLfloat m_xAxisColor[4];      ///< RGBA color for X-axis line (default red).
+    GLfloat m_yAxisColor[4];      ///< RGBA color for Y-axis line (default green).
+    GLfloat m_zAxisColor[4];      ///< RGBA color for Z-axis line (default blue).
+    GLfloat m_groundLineColor[4]; ///< RGBA color for ground projection line (default gray).
+
+    // Optimization: Track vertex indices for efficient updates
+    int m_groundProjectionStartIdx; ///< Vertex index for ground projection line start
+    int m_groundProjectionEndIdx;   ///< Vertex index for ground projection line end
+    bool m_needsFullRebuild;        ///< Flag indicating if full geometry rebuild is needed
 
 public:
     /**
@@ -90,8 +95,8 @@ public:
      * @param zColor RGBA color for Z-axis (blue by default).
      * @param groundColor RGBA color for ground projection (gray by default).
      */
-    void setAxisColors(const GLfloat xColor[4], const GLfloat yColor[4], 
-                      const GLfloat zColor[4], const GLfloat groundColor[4] = nullptr);
+    void setAxisColors(const GLfloat xColor[4], const GLfloat yColor[4], const GLfloat zColor[4],
+                       const GLfloat groundColor[4] = nullptr);
 
     /**
      * @brief Reset to default axis colors (X=red, Y=green, Z=blue, ground=gray).
@@ -110,6 +115,13 @@ public:
      */
     bool useCustomColors() const;
 
+    /**
+     * @brief Efficiently update cursor position without full geometry rebuild.
+     * This method only updates the ground projection line vertices.
+     * @param position New cursor position.
+     */
+    void updatePosition(const glm::vec3& position);
+
 protected:
     /**
      * @brief Internal setup method for initializing the cursor geometry.
@@ -125,6 +137,12 @@ protected:
      * @brief Called after drawing the cursor node.
      */
     virtual void doPostDraw() override;
+
+private:
+    /**
+     * @brief Update only the ground projection line vertices efficiently.
+     */
+    void updateGroundProjectionVertices();
 };
 
 /**

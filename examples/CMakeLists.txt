@@ -1,4 +1,3 @@
-add_subdirectory(beam_editor)
 add_subdirectory(hello_ivf)
 add_subdirectory(hello_pipeline)
 add_subdirectory(ui1)

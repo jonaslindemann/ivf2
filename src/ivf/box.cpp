@@ -1,4 +1,4 @@
-#include <ivf/box.h>
+﻿#include <ivf/box.h>
 
 #include <generator/BoxMesh.hpp>
 
@@ -120,8 +120,8 @@ void Box::doSetup()
     gml::ivec3 sg;
 
     si[0] = m_size.x;
-    si[1] = m_size.y;
-    si[2] = m_size.z;
+    si[1] = m_size.z; // ✅ Y assigned to index 1
+    si[2] = m_size.y; // ✅ Z assigned to index 2
 
     sg[0] = m_segments.x;
     sg[1] = m_segments.y;

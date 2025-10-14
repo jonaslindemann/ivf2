@@ -500,6 +500,7 @@ int ivfui::GLFWSceneWindow::doSetup()
 
     m_axis = ivf::Axis::create();
     m_grid = ivf::Grid::create();
+    m_grid->setPlane(ivf::GridPlane::XZ);
     m_cursor = ivf::Cursor::create(0.5f, 0.05f, true); // Make cursor larger: 0.5 size, 0.05 gap
     m_cursor->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
     m_cursor->refresh();

@@ -21,7 +21,6 @@
     "opengl",
     "stb",
     "zlib",
-    "bullet3"
-  ],
-  "builtin-baseline": "d62f3a49d61bcc1a25672f20e45f79afb5787ff7"
+    "reactphysics3d"
+  ]
 }

@@ -86,12 +86,12 @@ void RoundedBox::doSetup()
     gml::ivec3 sg;
 
     si[0] = m_size.x;
-    si[1] = m_size.z;
-    si[2] = m_size.y;
+    si[1] = m_size.y;
+    si[2] = m_size.z;
 
     sg[0] = m_segments.x;
-    sg[1] = m_segments.z;
-    sg[2] = m_segments.y;
+    sg[1] = m_segments.y;
+    sg[2] = m_segments.z;
 
     RoundedBoxMesh rbox(m_radius, si, m_slices, sg);
 

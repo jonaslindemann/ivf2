@@ -41,6 +41,8 @@ private:
     int m_totalContactsThisFrame = 0;
     bool m_hasLoggedContact = false;
 
+
+
 public:
     void onContact(const rp3d::CollisionCallback::CallbackData &callbackData) override
     {
@@ -99,9 +101,12 @@ private:
 
     PhysicsBoxPtr m_ground;
     BoxPtr m_groundVisual;
+    DirectionalLightPtr m_dirLight0;
 
     std::shared_ptr<ContactListener> m_contactListener;
     int m_frameCount = 0;
+
+    bool m_paused = false;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
@@ -153,6 +158,9 @@ public:
         std::cout << "  Friction: " << m_ground->getFriction() << std::endl;
 
         // Create falling boxes
+
+        /*
+
         std::cout << "\nCreating Dynamic Boxes:" << std::endl;
         for (int i = 0; i < 5; i++)
         {
@@ -173,6 +181,7 @@ public:
             std::cout << "  Box " << i << ": pos=(" << (-4.0f + i * 2.5f) << ", " << (5.0f + i * 1.5f)
                       << ", 0), mass=" << box->getMass() << " kg" << std::endl;
         }
+        */
 
         std::cout << "\n=== PHYSICS SETUP COMPLETE ===" << std::endl;
         std::cout << "Waiting for first contact...\n" << std::endl;
@@ -189,10 +198,13 @@ public:
 
         // Create visual ground (using Box instead of Cube for vec3 size support)
         m_groundVisual = Box::create(glm::vec3(20.0f, 0.01, 20.0f));
+        m_groundVisual->setPos(glm::vec3(0.0f, 0.0f, 0.0f));   
         m_groundVisual->setMaterial(groundMaterial);
         this->add(m_groundVisual);
 
         // Create visual boxes for each physics box
+
+        /*
         for (auto &physicsBox : m_physicsBoxes)
         {
             auto visualBox = Box::create(glm::vec3(1.0f, 1.0f, 1.0f)); // Full size (half-extents * 2)
@@ -200,13 +212,31 @@ public:
             m_visualBoxes.push_back(visualBox);
             this->add(visualBox);
         }
+        */
     }
 
     virtual int onSetup() override
     {
+        auto lightManager = LightManager::instance();
+        lightManager->clearLights();
+        lightManager->setUseShadows(true);
+        lightManager->setAutoCalcBBox(false);
+        lightManager->setSceneBoundingBox(glm::vec3(-20.0, -20.0, -20.0), glm::vec3(20.0, 20.0, 20.0));
+
+        m_dirLight0 = lightManager->addDirectionalLight();
+        m_dirLight0->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
+        m_dirLight0->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
+        m_dirLight0->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
+        m_dirLight0->setDirection(glm::vec3(-0.5, -1.0, -0.5));
+        m_dirLight0->setEnabled(true);
+        m_dirLight0->setCastShadows(true);
+        m_dirLight0->setShadowMapSize(4096, 4096);
+        m_dirLight0->setShadowStrength(0.3f); // Set shadow strength (0.0 to 1.0) for the directional light
+        lightManager->apply();
+
         this->setupPhysics();
 
-        this->enableHeadlight();
+        //this->enableHeadlight();
         this->setAxisVisible(true);
 
         // Setup camera
@@ -228,6 +258,10 @@ public:
     {
         // Update physics simulation
         float timeStep = 1.0f / 60.0f;
+
+        if (m_paused)
+            return;
+        
         m_world->update(timeStep);
 
         m_frameCount++;
@@ -235,7 +269,7 @@ public:
         // Update visual positions from physics
         m_ground->updateFromPhysics();
         glm::vec3 groundPos = m_ground->getPosition();
-        m_groundVisual->setPos(groundPos);
+        //m_groundVisual->setPos(groundPos);
 
         for (size_t i = 0; i < m_physicsBoxes.size(); i++)
         {
@@ -328,6 +362,59 @@ public:
         }
 
         std::cout << "Boxes reset. Waiting for first contact..." << std::endl;
+    }
+
+    void addBox()
+    {
+        auto axis = glm::vec3(0.0f, 0.2f, 1.0f);
+        axis = glm::normalize(axis);
+        auto quat = glm::angleAxis(static_cast<float>(2.0f * 3.14159f / 32.0f), axis);
+
+        auto box = PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(1.0f, 1.0f, 1.0f), // 1x1x1 box
+                                      glm::vec3(0.0, 10.0f, 0.0),    // Staggered positions
+                                      quat,
+                                      1.0f // 1 kg mass
+        );
+        box->setRestitution(0.6f);
+        box->setFriction(0.3f);
+
+        m_physicsBoxes.push_back(box);
+
+        auto boxMaterial = Material::create();
+        boxMaterial->setDiffuseColor(glm::vec4(0.8f, 0.3f, 0.2f, 1.0f));
+
+        auto visualBox = Box::create(glm::vec3(1.0f, 1.0f, 1.0f)); // Full size (half-extents * 2)
+        visualBox->setMaterial(boxMaterial);
+        m_visualBoxes.push_back(visualBox);
+        this->add(visualBox);
+
+    }
+
+    void onKey(int key, int scancode, int action, int mods)
+    {
+        if (key == GLFW_KEY_R && action == GLFW_PRESS)
+        {
+            this->resetScene();
+        }
+
+        if (key == GLFW_KEY_P && action == GLFW_PRESS)
+        {
+            m_paused = !m_paused;
+            if (m_paused)
+            {
+                std::cout << "Physics simulation PAUSED." << std::endl;
+            }
+            else
+            {
+                std::cout << "Physics simulation RESUMED." << std::endl;
+            }
+        }
+
+        if (key == GLFW_KEY_D && action == GLFW_PRESS)
+        {
+            this->addBox();
+        }
+        GLFWSceneWindow::onKey(key, scancode, action, mods);
     }
 
     void onExit()

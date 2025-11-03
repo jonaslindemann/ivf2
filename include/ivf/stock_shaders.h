@@ -509,7 +509,7 @@ float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap)
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(-dirLights[0].direction);
 
-    float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
+    float bias = max(0.002 * (1.0 - dot(norm, lightDir)), 0.001);
     
     // PCF (Percentage Closer Filtering) for softer shadows
 

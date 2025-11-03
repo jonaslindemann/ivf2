@@ -13,7 +13,7 @@ IF(MSVC)
   SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 ENDIF() 
 
-find_package(ZLIB REQUIRED)
+find_package(ZLIB REQUIRED) 
 find_package(PNG REQUIRED) 
 find_package(JPEG REQUIRED) 
 find_package(glew REQUIRED)

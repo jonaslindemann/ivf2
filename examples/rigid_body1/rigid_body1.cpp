@@ -117,14 +117,14 @@ public:
         return std::make_shared<ExampleWindow>(width, height, title);
     }
 
-    void setupPhysics()
+void setupPhysics()
     {
         std::cout << "\n=== PHYSICS SETUP ===" << std::endl;
 
         // Create a physics world with gravity
         rp3d::PhysicsWorld::WorldSettings settings;
-        settings.defaultVelocitySolverNbIterations = 20;
-        settings.defaultPositionSolverNbIterations = 20;
+        settings.defaultVelocitySolverNbIterations = 60;
+        settings.defaultPositionSolverNbIterations = 60;
         settings.gravity = rp3d::Vector3(0, -9.81, 0);
         settings.isSleepingEnabled = true;
 
@@ -141,51 +141,27 @@ public:
         std::cout << "  Sleeping Enabled: " << (m_world->isSleepingEnabled() ? "Yes" : "No") << std::endl;
 
         // Create ground plane (static box)
+        // CORRECTED: Position ground so top surface is at Y=0
         std::cout << "\nCreating Ground:" << std::endl;
-        m_ground =
-            PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(20.0f, 0.5f, 20.0f), // Half-extents: 20x1x20 box
-                               glm::vec3(0.0f, -0.5f, 0.0f),                            // Position
-                               glm::quat(1.0f, 0.0f, 0.0f, 0.0f),                       // No rotation
-                               0.0f                                                     // Mass = 0 means static
-            );
+        m_ground = PhysicsBox::create(m_world, m_physicsCommon,
+                                      glm::vec3(20.0f, 0.5f, 20.0f),     // Half-extents: thin ground plane
+                                      glm::vec3(0.0f, -0.5f, 0.0f),      // Position: center at Y=-0.5, top at Y=0
+                                      glm::quat(1.0f, 0.0f, 0.0f, 0.0f), // No rotation
+                                      0.0f                               // Mass = 0 means static
+        );
         m_ground->setRestitution(0.2f);
         m_ground->setFriction(0.5f);
 
         std::cout << "  Position: (0, -0.5, 0)" << std::endl;
-        std::cout << "  Half-extents: (10, 0.5, 10) -> Full size: (20, 1, 20)" << std::endl;
+        std::cout << "  Half-extents: (20, 0.5, 20) -> Full size: (40, 1, 40)" << std::endl;
+        std::cout << "  Top surface at Y = 0.0" << std::endl;
         std::cout << "  Mass: " << m_ground->getMass() << " (STATIC)" << std::endl;
         std::cout << "  Restitution: " << m_ground->getRestitution() << std::endl;
         std::cout << "  Friction: " << m_ground->getFriction() << std::endl;
 
-        // Create falling boxes
-
-        /*
-
-        std::cout << "\nCreating Dynamic Boxes:" << std::endl;
-        for (int i = 0; i < 5; i++)
-        {
-            auto axis = glm::vec3(0.0f, 0.2f, 1.0f);
-            axis = glm::normalize(axis);
-            auto quat = glm::angleAxis(static_cast<float>(2.0f * 3.14159f / 32.0f), axis);
-
-            auto box = PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(1.0f, 1.0f, 1.0f), // 1x1x1 box
-                                          glm::vec3(-4.0f + i * 2.5f, 5.0f + i * 1.5f, 0.0f),    // Staggered positions
-                                          quat,
-                                          1.0f // 1 kg mass
-            );
-            box->setRestitution(0.6f);
-            box->setFriction(0.3f);
-
-            m_physicsBoxes.push_back(box);
-
-            std::cout << "  Box " << i << ": pos=(" << (-4.0f + i * 2.5f) << ", " << (5.0f + i * 1.5f)
-                      << ", 0), mass=" << box->getMass() << " kg" << std::endl;
-        }
-        */
-
         std::cout << "\n=== PHYSICS SETUP COMPLETE ===" << std::endl;
-        std::cout << "Waiting for first contact...\n" << std::endl;
     }
+
 
     void setupVisuals()
     {
@@ -254,22 +230,24 @@ public:
         return 0;
     }
 
-    virtual void onUpdate() override
+virtual void onUpdate() override
     {
-        // Update physics simulation
-        float timeStep = 1.0f / 60.0f;
-
         if (m_paused)
             return;
-        
-        m_world->update(timeStep);
+
+        // Use multiple smaller time steps for better accuracy
+        const float fixedTimeStep = 1.0f / 120.0f; // 120 Hz instead of 60 Hz
+        const int numSteps = 2;                    // Run 2 sub-steps per frame
+
+        for (int i = 0; i < numSteps; ++i)
+        {
+            m_world->update(fixedTimeStep);
+        }
 
         m_frameCount++;
 
         // Update visual positions from physics
         m_ground->updateFromPhysics();
-        glm::vec3 groundPos = m_ground->getPosition();
-        //m_groundVisual->setPos(groundPos);
 
         for (size_t i = 0; i < m_physicsBoxes.size(); i++)
         {
@@ -354,9 +332,7 @@ public:
         // Reset box positions
         for (int i = 0; i < (int)m_physicsBoxes.size(); i++)
         {
-            auto quat = glm::angleAxis(static_cast<float>(2.0f * 3.14159f / 16.0f), glm::vec3(0.0f, 0.0f, 1.0f));
             m_physicsBoxes[i]->setPosition(glm::vec3(-4.0f + i * 2.5f, 5.0f + i * 1.5f, 0.0f));
-            m_physicsBoxes[i]->setRotation(quat);
             m_physicsBoxes[i]->setVelocity(glm::vec3(0.0f));
             m_physicsBoxes[i]->setAngularVelocity(glm::vec3(0.0f));
         }
@@ -364,31 +340,36 @@ public:
         std::cout << "Boxes reset. Waiting for first contact..." << std::endl;
     }
 
-    void addBox()
+void addBox()
     {
-        auto axis = glm::vec3(0.0f, 0.2f, 1.0f);
+        // Create a small random rotation for variety
+        auto axis = glm::vec3(random(-1.0f, 1.0f), random(-1.0f, 1.0f), random(-1.0f, 1.0f));
         axis = glm::normalize(axis);
-        auto quat = glm::angleAxis(static_cast<float>(2.0f * 3.14159f / 32.0f), axis);
+        auto quat = glm::angleAxis(random(0.0f, 0.5f), axis); // Small random rotation
 
-        auto box = PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(1.0f, 1.0f, 1.0f), // 1x1x1 box
-                                      glm::vec3(0.0, 10.0f, 0.0),    // Staggered positions
-                                      quat,
-                                      1.0f // 1 kg mass
+        // Create physics box with explicit parameters
+        auto box = PhysicsBox::create(m_world, m_physicsCommon,
+                                      glm::vec3(1.0f, 1.0f, 1.0f), // Half-extents (creates 2x2x2 box)
+                                      glm::vec3(random(-5.0f, 5.0f), 10.0f, random(-5.0f, 5.0f)), // Position
+                                      quat,                                                       // Rotation
+                                      1.0f                                                        // Mass (1 kg)
         );
+
         box->setRestitution(0.6f);
         box->setFriction(0.3f);
 
         m_physicsBoxes.push_back(box);
 
+        // Create visual box
         auto boxMaterial = Material::create();
         boxMaterial->setDiffuseColor(glm::vec4(0.8f, 0.3f, 0.2f, 1.0f));
 
-        auto visualBox = Box::create(glm::vec3(1.0f, 1.0f, 1.0f)); // Full size (half-extents * 2)
+        auto visualBox = Box::create(glm::vec3(1.0f, 1.0f, 1.0f)); // Full size (2x half-extents)
         visualBox->setMaterial(boxMaterial);
         m_visualBoxes.push_back(visualBox);
         this->add(visualBox);
-
     }
+
 
     void onKey(int key, int scancode, int action, int mods)
     {

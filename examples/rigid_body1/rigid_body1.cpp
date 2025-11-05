@@ -41,8 +41,6 @@ private:
     int m_totalContactsThisFrame = 0;
     bool m_hasLoggedContact = false;
 
-
-
 public:
     void onContact(const rp3d::CollisionCallback::CallbackData &callbackData) override
     {
@@ -123,10 +121,13 @@ public:
 
         // Create a physics world with gravity
         rp3d::PhysicsWorld::WorldSettings settings;
-        settings.defaultVelocitySolverNbIterations = 20;
-        settings.defaultPositionSolverNbIterations = 20;
+        settings.defaultVelocitySolverNbIterations = 20; // Reduced from 60
+        settings.defaultPositionSolverNbIterations = 10; // Reduced from 60
         settings.gravity = rp3d::Vector3(0, -9.81, 0);
         settings.isSleepingEnabled = true;
+        settings.defaultSleepLinearVelocity = 0.1f;  // Lower threshold for sleeping
+        settings.defaultSleepAngularVelocity = 0.2f; // Lower threshold for sleeping
+        settings.defaultTimeBeforeSleep = 0.5f;      // Time before body can sleep
 
         m_world = m_physicsCommon.createPhysicsWorld(settings);
 
@@ -142,46 +143,16 @@ public:
 
         // Create ground plane (static box)
         std::cout << "\nCreating Ground:" << std::endl;
-        m_ground =
-            PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(20.0f, 0.5f, 20.0f), // Half-extents: 20x1x20 box
-                               glm::vec3(0.0f, -0.5f, 0.0f),                            // Position
-                               glm::quat(1.0f, 0.0f, 0.0f, 0.0f),                       // No rotation
-                               0.0f                                                     // Mass = 0 means static
-            );
-        m_ground->setRestitution(0.2f);
-        m_ground->setFriction(0.5f);
+        m_ground = PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(20.0f, 0.5f, 20.0f),
+                                      glm::vec3(0.0f, -0.5f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 0.0f);
+        m_ground->setRestitution(0.0f);
+        m_ground->setFriction(1.0f);
 
         std::cout << "  Position: (0, -0.5, 0)" << std::endl;
-        std::cout << "  Half-extents: (10, 0.5, 10) -> Full size: (20, 1, 20)" << std::endl;
+        std::cout << "  Half-extents: (20, 0.5, 20) -> Full size: (40, 1, 40)" << std::endl;
         std::cout << "  Mass: " << m_ground->getMass() << " (STATIC)" << std::endl;
         std::cout << "  Restitution: " << m_ground->getRestitution() << std::endl;
         std::cout << "  Friction: " << m_ground->getFriction() << std::endl;
-
-        // Create falling boxes
-
-        /*
-
-        std::cout << "\nCreating Dynamic Boxes:" << std::endl;
-        for (int i = 0; i < 5; i++)
-        {
-            auto axis = glm::vec3(0.0f, 0.2f, 1.0f);
-            axis = glm::normalize(axis);
-            auto quat = glm::angleAxis(static_cast<float>(2.0f * 3.14159f / 32.0f), axis);
-
-            auto box = PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(1.0f, 1.0f, 1.0f), // 1x1x1 box
-                                          glm::vec3(-4.0f + i * 2.5f, 5.0f + i * 1.5f, 0.0f),    // Staggered positions
-                                          quat,
-                                          1.0f // 1 kg mass
-            );
-            box->setRestitution(0.6f);
-            box->setFriction(0.3f);
-
-            m_physicsBoxes.push_back(box);
-
-            std::cout << "  Box " << i << ": pos=(" << (-4.0f + i * 2.5f) << ", " << (5.0f + i * 1.5f)
-                      << ", 0), mass=" << box->getMass() << " kg" << std::endl;
-        }
-        */
 
         std::cout << "\n=== PHYSICS SETUP COMPLETE ===" << std::endl;
         std::cout << "Waiting for first contact...\n" << std::endl;
@@ -198,7 +169,7 @@ public:
 
         // Create visual ground (using Box instead of Cube for vec3 size support)
         m_groundVisual = Box::create(glm::vec3(20.0f, 0.01, 20.0f));
-        m_groundVisual->setPos(glm::vec3(0.0f, 0.0f, 0.0f));   
+        m_groundVisual->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
         m_groundVisual->setMaterial(groundMaterial);
         this->add(m_groundVisual);
 
@@ -236,7 +207,7 @@ public:
 
         this->setupPhysics();
 
-        //this->enableHeadlight();
+        // this->enableHeadlight();
         this->setAxisVisible(true);
 
         // Setup camera
@@ -256,20 +227,23 @@ public:
 
     virtual void onUpdate() override
     {
-        // Update physics simulation
-        float timeStep = 1.0f / 60.0f;
-
         if (m_paused)
             return;
-        
-        m_world->update(timeStep);
+
+        // Use smaller timesteps for better stability
+        const float frameTime = 1.0f / 60.0f;
+        const int numSubSteps = 2; // Subdivide each frame
+        const float subStepTime = frameTime / numSubSteps;
+
+        for (int i = 0; i < numSubSteps; i++)
+        {
+            m_world->update(subStepTime);
+        }
 
         m_frameCount++;
 
         // Update visual positions from physics
         m_ground->updateFromPhysics();
-        glm::vec3 groundPos = m_ground->getPosition();
-        //m_groundVisual->setPos(groundPos);
 
         for (size_t i = 0; i < m_physicsBoxes.size(); i++)
         {
@@ -366,16 +340,17 @@ public:
 
     void addBox()
     {
-        auto axis = glm::vec3(0.0f, 0.2f, 1.0f);
+        auto axis = glm::vec3(0.0f, 1.0f, 0.0f);
         axis = glm::normalize(axis);
-        auto quat = glm::angleAxis(static_cast<float>(2.0f * 3.14159f / 32.0f), axis);
+        auto quat = glm::angleAxis(static_cast<float>(0.0f), axis);
 
-        auto box = PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(1.0f, 1.0f, 1.0f), // 1x1x1 box
-                                      glm::vec3(0.0, 10.0f, 0.0),    // Staggered positions
-                                      quat,
-                                      1.0f // 1 kg mass
+        auto box = PhysicsBox::create(
+            m_world, m_physicsCommon, glm::vec3(1.0f, 1.0f, 1.0f),                // 1x1x1 box
+            glm::vec3(ivf::random(-10.0, 10.0), 10.0f, ivf::random(-10.0, 10.0)), // Staggered positions
+            quat,
+            10.0f // 1 kg mass
         );
-        box->setRestitution(0.6f);
+        box->setRestitution(0.1f);
         box->setFriction(0.3f);
 
         m_physicsBoxes.push_back(box);
@@ -387,7 +362,6 @@ public:
         visualBox->setMaterial(boxMaterial);
         m_visualBoxes.push_back(visualBox);
         this->add(visualBox);
-
     }
 
     void onKey(int key, int scancode, int action, int mods)

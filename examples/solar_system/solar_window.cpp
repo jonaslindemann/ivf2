@@ -6,7 +6,7 @@ using namespace ivf;
 using namespace std;
 using namespace solar;
 
-SolarWindow::SolarWindow(int width, int height, std::string title) : ivfui::GLFWWindow(width, height, title)
+SolarWindow::SolarWindow(int width, int height, std::string title) : ivfui::GLFWSceneWindow(width, height, title)
 {}
 
 std::shared_ptr<SolarWindow> SolarWindow::create(int width, int height, std::string title)
@@ -51,13 +51,8 @@ int SolarWindow::onSetup()
     }
 
     m_lightMgr = LightManager::create();
+    m_lightMgr->clearLights();
     m_lightMgr->enableLighting();
-
-    auto dirLight = m_lightMgr->addDirectionalLight();
-    dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    dirLight->setDirection(glm::vec3(-1.0, -1.0, -1.0));
-    dirLight->setEnabled(false);
-    m_lightMgr->apply();
 
     auto pointLight = m_lightMgr->addPointLight();
     pointLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
@@ -70,12 +65,6 @@ int SolarWindow::onSetup()
 
     m_fpsWindow = FpsWindow::create();
 
-    m_scene = CompositeNode::create();
-
-    AxisPtr axis = Axis::create();
-
-    m_scene->add(axis);
-
     m_planetMaterial = Material::create();
     m_planetMaterial->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
 
@@ -87,15 +76,14 @@ int SolarWindow::onSetup()
     m_planets = CompositeNode::create();
     m_suns = CompositeNode::create();
 
-    m_scene->add(m_planets);
-    m_scene->add(m_suns);
+    this->add(m_planets);
+    this->add(m_suns);
 
-    m_camManip = ivfui::CameraManipulator::create(this->ref());
-    m_camManip->setCameraPosition(glm::vec3(0.0, 20.0, 100.0));
-    m_camManip->setCameraTarget(glm::vec3(0.0, 0.0, 0.0));
-    m_camManip->setFarZ(1000.0);
-    m_camManip->setFov(45.0);
-    m_camManip->setMouseScaling(0.1, 0.1);
+    this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, 20.0, 100.0));
+    this->cameraManipulator()->setCameraTarget(glm::vec3(0.0, 0.0, 0.0));
+    this->cameraManipulator()->setFarZ(1000.0);
+    this->cameraManipulator()->setFov(45.0);
+    this->cameraManipulator()->setMouseScaling(0.1, 0.1);
 
     m_solarSystem->init();
 
@@ -103,32 +91,20 @@ int SolarWindow::onSetup()
     m_solarPanel->setSolarSystem(m_solarSystem);
     m_solarPanel->update();
 
+    this->addUiWindow(m_solarPanel);
+    this->addUiWindow(m_pointLightWindow);
+    this->addUiWindow(m_fpsWindow);
+
     return 0;
 }
 
-void SolarWindow::onDraw()
+void solar_ui::SolarWindow::onUpdate()
 {
-    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    m_solarSystem->update(1.0 / 60.0);
 
     if ((m_pointLightWindow->isDirty()))
         m_lightMgr->apply();
 
-    m_scene->draw();
-}
-
-void solar_ui::SolarWindow::onDrawUi()
-{
-    m_pointLightWindow->draw();
-    m_solarPanel->draw();
-    m_fpsWindow->draw();
-}
-
-void SolarWindow::onUpdateOtherUi()
-{
-    m_camManip->update();
+    m_solarSystem->update(1.0 / 60.0);
 }
 
 void solar_ui::SolarWindow::onClearPlanets()

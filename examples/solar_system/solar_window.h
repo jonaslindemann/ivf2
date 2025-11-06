@@ -14,7 +14,7 @@
 
 namespace solar_ui {
 
-class SolarWindow : public ivfui::GLFWWindow {
+class SolarWindow : public ivfui::GLFWSceneWindow {
 private:
     ivf::CompositeNodePtr m_scene;
     ivfui::CameraManipulatorPtr m_camManip;
@@ -44,10 +44,8 @@ public:
 
     static std::shared_ptr<SolarWindow> create(int width, int height, std::string title);
  
-    int onSetup();
-    void onDraw();
-    void onDrawUi();
-    void onUpdateOtherUi();
+    virtual int onSetup() override;
+    virtual void onUpdate() override;
 
     void onClearPlanets();
     void onClearSuns();

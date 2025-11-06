@@ -659,6 +659,7 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
 
     viewMenu->addSeparator();
 
+    /*
     viewMenu->addItem(UiMenuItem::create(
         "Camera control", "V", [this]() { this->showCameraWindow(); },
         [this]() {
@@ -675,6 +676,8 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
         [this]() {
             return m_effectInspector->visible(); // Enable/disable based on visibility
         }));
+
+    */
 
     this->onAddMenuItems(viewMenu.get());
 

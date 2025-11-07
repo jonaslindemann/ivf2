@@ -60,3 +60,8 @@ double Sun::mass() const
 {
     return m_mass;
 }
+
+double* Sun::massPtr()
+{
+    return &m_mass;
+}

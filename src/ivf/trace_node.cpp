@@ -36,7 +36,11 @@ void ivf::TraceNode::doPreDraw()
     auto nodePos = m_node->pos();
 
     this->add(nodePos);
+
+    LineTrace::doPreDraw();
 }
 
 void ivf::TraceNode::doPostDraw()
-{}
+{
+    LineTrace::doPostDraw();
+}

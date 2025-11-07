@@ -11,7 +11,8 @@ using namespace solar;
 SolarSystem::SolarSystem(int n, int m)
     : Base(), m_nPlanets(n), m_nSuns(m), m_planetRadiusMin(30.0), m_planetRadiusMax(100.0), m_planetSpeedMin(10.0),
       m_planetSpeedMax(20.0), m_planetMassMin(0.1), m_planetMassMax(2.0), m_createPlanetFunc(nullptr),
-      m_createSunFunc(nullptr), m_updatePlanetPosFunc(nullptr), m_clearPlanetsFunc(nullptr), m_clearSunsFunc(nullptr)
+      m_createSunFunc(nullptr), m_updatePlanetPosFunc(nullptr), m_clearPlanetsFunc(nullptr), m_clearSunsFunc(nullptr),
+      m_running(true)
 {}
 
 SolarSystem::~SolarSystem()
@@ -73,6 +74,9 @@ void SolarSystem::clear()
 
 void SolarSystem::update(double dt)
 {
+    if (!m_running)
+        return;
+
     size_t i = 0;
 
     for (auto &planet : m_planets)
@@ -189,6 +193,21 @@ double SolarSystem::planetMassMax() const
 double SolarSystem::planetMassMin() const
 {
     return m_planetMassMin;
+}
+
+bool solar::SolarSystem::isRunning() const
+{
+    return m_running;
+}
+
+void solar::SolarSystem::run()
+{
+    m_running = true;
+}
+
+void solar::SolarSystem::pause()
+{
+    m_running = false;
 }
 
 void solar::SolarSystem::assignClearPlanetsFunc(ClearPlanetsFunc &clearPlanetsFunc)

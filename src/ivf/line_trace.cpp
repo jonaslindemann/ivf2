@@ -1,6 +1,7 @@
 #include <ivf/line_trace.h>
 
 #include <ivf/light_manager.h>
+#include <ivf/shader_manager.h>
 
 using namespace ivf;
 
@@ -129,6 +130,8 @@ void ivf::LineTrace::doSetup()
 
 void LineTrace::doPreDraw()
 {
+    MeshNode::doPreDraw();
+
     LightManager::instance()->saveState();
     LightManager::instance()->disableLighting();
 }
@@ -136,4 +139,6 @@ void LineTrace::doPreDraw()
 void LineTrace::doPostDraw()
 {
     LightManager::instance()->restoreState();
+
+    MeshNode::doPostDraw();
 }

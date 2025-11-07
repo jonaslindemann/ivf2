@@ -45,6 +45,11 @@ double Planet::mass() const
     return m_mass;
 }
 
+double* Planet::massPtr()
+{
+    return &m_mass;
+}
+
 void Planet::applyForce(const Vec3d &force)
 {
     Vec3d a = force / m_mass;

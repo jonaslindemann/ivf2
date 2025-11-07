@@ -27,6 +27,7 @@ public:
     Vec3d location();
 
     double mass() const;
+    double* massPtr();
 
 };
 

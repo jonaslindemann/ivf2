@@ -21,8 +21,10 @@ private:
 
     ivf::MaterialPtr m_planetMaterial;
     ivf::MaterialPtr m_sunMaterial;
+    ivf::MaterialPtr m_tracerMaterial;
 
     ivf::CompositeNodePtr m_planets;
+    ivf::CompositeNodePtr m_tracers;
     ivf::CompositeNodePtr m_suns;
     ivf::LightManagerPtr m_lightMgr;
 

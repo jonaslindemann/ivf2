@@ -16,8 +16,13 @@ std::shared_ptr<SolarWindow> SolarWindow::create(int width, int height, std::str
 
 int SolarWindow::onSetup()
 {
+
+    // Create solar system simulation object.
+
     m_solarSystem = SolarSystem::create();
     m_solarSystem->setSize(200, 2);
+
+    // Define simulation callbacks.
 
     using namespace std::placeholders;
 
@@ -36,19 +41,8 @@ int SolarWindow::onSetup()
     m_updatePlanetPosFunc = std::bind(&SolarWindow::onUpdatePlanetPos, this, _1, _2, _3, _4);
     m_solarSystem->assignUpdatePlanetPosFunc(m_updatePlanetPosFunc);
 
-    glEnable(GL_DEPTH_TEST);
 
-    auto fontMgr = FontManager::create();
-    fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
-
-    ShaderManagerPtr shaderMgr = ShaderManager::create();
-    shaderMgr->loadBasicShader();
-
-    if (shaderMgr->compileLinkErrors())
-    {
-        cout << "Couldn't compile shaders, exiting..." << endl;
-        return -1;
-    }
+    // Setup lighting
 
     m_lightMgr = LightManager::create();
     m_lightMgr->clearLights();
@@ -60,10 +54,7 @@ int SolarWindow::onSetup()
     pointLight->setEnabled(true);
     m_lightMgr->apply();
 
-    m_pointLightWindow = PointLightWindow::create(pointLight, "Point Light");
-    m_pointLightWindow->setVisible(true);
-
-    m_fpsWindow = FpsWindow::create();
+    // Create scene
 
     m_planetMaterial = Material::create();
     m_planetMaterial->setDiffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
@@ -73,11 +64,21 @@ int SolarWindow::onSetup()
     m_sunMaterial->setAmbientColor(glm::vec4(1.0, 1.0, 0.0, 1.0));
     m_sunMaterial->setUseLighting(false);
 
+    m_tracerMaterial = Material::create();
+    m_tracerMaterial->setDiffuseColor(glm::vec4(0.0, 1.0, 1.0, 1.0));
+    m_tracerMaterial->setUseLighting(false);
+
+    // Create composite nodes to contain our planets:
+
     m_planets = CompositeNode::create();
     m_suns = CompositeNode::create();
+    m_tracers = CompositeNode::create();
 
     this->add(m_planets);
     this->add(m_suns);
+    this->add(m_tracers);
+
+    // Setup camera
 
     this->cameraManipulator()->setCameraPosition(glm::vec3(0.0, 20.0, 100.0));
     this->cameraManipulator()->setCameraTarget(glm::vec3(0.0, 0.0, 0.0));
@@ -85,11 +86,25 @@ int SolarWindow::onSetup()
     this->cameraManipulator()->setFov(45.0);
     this->cameraManipulator()->setMouseScaling(0.1, 0.1);
 
-    m_solarSystem->init();
+    // Setup UI
 
     m_solarPanel = SolarPanel::create("Solar system settings");
     m_solarPanel->setSolarSystem(m_solarSystem);
+    m_solarPanel->setPlanetMaterial(m_planetMaterial);
+    m_solarPanel->setSunMaterial(m_sunMaterial);
+    m_solarPanel->setTracerMaterial(m_tracerMaterial);
+    m_solarPanel->setShowTracers(true);
+    m_solarPanel->setTracersPerPlanet(100);
     m_solarPanel->update();
+
+    // Initialise solar system -> Calls callbacks to create planets and suns.
+
+    m_solarSystem->init();
+
+    m_pointLightWindow = PointLightWindow::create(pointLight, "Point Light");
+    m_pointLightWindow->setVisible(true);
+
+    m_fpsWindow = FpsWindow::create();
 
     this->addUiWindow(m_solarPanel);
     this->addUiWindow(m_pointLightWindow);
@@ -104,12 +119,15 @@ void solar_ui::SolarWindow::onUpdate()
     if ((m_pointLightWindow->isDirty()))
         m_lightMgr->apply();
 
+    m_tracers->setVisible(m_solarPanel->showTracers());
+
     m_solarSystem->update(1.0 / 60.0);
 }
 
 void solar_ui::SolarWindow::onClearPlanets()
 {
     m_planets->clear();
+    m_tracers->clear();
 }
 
 void solar_ui::SolarWindow::onClearSuns()
@@ -123,6 +141,15 @@ void solar_ui::SolarWindow::onCreatePlanet(size_t idx, double x, double y, doubl
     planet->setMaterial(m_planetMaterial);
     planet->setPos(glm::vec3(x, y, z));
     m_planets->add(planet);
+
+    // Create tracer for planet
+
+    auto tracer = TraceNode::create(m_solarPanel->tracersPerPlanet());
+    tracer->setNode(planet);
+    tracer->setMaterial(m_tracerMaterial);
+    tracer->setUseColor(false);
+    tracer->refresh();
+    m_tracers->add(tracer);
 }
 
 void solar_ui::SolarWindow::onCreateSun(size_t idx, double x, double y, double z, double m)

@@ -30,6 +30,8 @@ private:
     double m_planetMassMin;
     double m_planetMassMax;
 
+    bool m_running;
+
     CreatePlanetFunc m_createPlanetFunc;
     CreateSunFunc m_createSunFunc;
     UpdatePlanetPosFunc m_updatePlanetPosFunc;
@@ -70,6 +72,10 @@ public:
     double planetSpeedMin() const;
     double planetMassMax() const;
     double planetMassMin() const;
+
+    bool isRunning() const;
+    void run();
+    void pause();
 
     void assignClearPlanetsFunc(ClearPlanetsFunc &clearPlanetsFunc);
     void assignClearSunsFunc(ClearSunsFunc &clearSunsFunc);

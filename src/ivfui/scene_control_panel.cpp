@@ -15,19 +15,6 @@ ivfui::SceneControlPanel::SceneControlPanel(std::string caption, GLFWSceneWindow
     {
         throw std::runtime_error("SceneControlPanel requires a valid GLFWSceneWindow pointer.");
     }
-
-    // Initialize the scene inspector if needed
-
-    m_sceneInspector = ivfui::SceneInspector::create("Scene Inspector");
-    m_sceneInspector->setVisible(false);
-
-    if (m_sceneInspector == nullptr)
-    {
-        throw std::runtime_error("SceneControlPanel requires a valid SceneInspector in the GLFWSceneWindow.");
-    }
-
-    m_sceneInspector->setRootNode(m_sceneWindow->scene());
-    sceneWindow->addUiWindow(m_sceneInspector);
 }
 
 std::shared_ptr<SceneControlPanel> ivfui::SceneControlPanel::create(std::string caption, GLFWSceneWindow *sceneWindow)

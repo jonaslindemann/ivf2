@@ -4,7 +4,7 @@
 
 using namespace ivf;
 
-TraceNode::TraceNode(int numVertices) : LineTrace(numVertices)
+TraceNode::TraceNode(int numVertices, bool useColor) : LineTrace(numVertices, useColor)
 {
     this->doSetup();
     this->setName("TraceNode");
@@ -13,9 +13,9 @@ TraceNode::TraceNode(int numVertices) : LineTrace(numVertices)
 TraceNode::~TraceNode()
 {}
 
-std::shared_ptr<TraceNode> ivf::TraceNode::create(int numVertices)
+std::shared_ptr<TraceNode> ivf::TraceNode::create(int numVertices, bool useColor)
 {
-    return std::make_shared<TraceNode>(numVertices);
+    return std::make_shared<TraceNode>(numVertices, useColor);
 }
 
 void ivf::TraceNode::setNode(TransformNodePtr node)

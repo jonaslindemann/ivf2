@@ -41,7 +41,6 @@ int SolarWindow::onSetup()
     m_updatePlanetPosFunc = std::bind(&SolarWindow::onUpdatePlanetPos, this, _1, _2, _3, _4);
     m_solarSystem->assignUpdatePlanetPosFunc(m_updatePlanetPosFunc);
 
-
     // Setup lighting
 
     m_lightMgr = LightManager::create();
@@ -144,10 +143,9 @@ void solar_ui::SolarWindow::onCreatePlanet(size_t idx, double x, double y, doubl
 
     // Create tracer for planet
 
-    auto tracer = TraceNode::create(m_solarPanel->tracersPerPlanet());
+    auto tracer = TraceNode::create(m_solarPanel->tracersPerPlanet(), false);
     tracer->setNode(planet);
     tracer->setMaterial(m_tracerMaterial);
-    tracer->setUseColor(false);
     tracer->refresh();
     m_tracers->add(tracer);
 }

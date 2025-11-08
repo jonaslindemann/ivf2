@@ -5,8 +5,8 @@
 
 using namespace ivf;
 
-LineTrace::LineTrace(int numVertices)
-    : MeshNode(), m_useColor(true), m_color{1.0, 1.0, 1.0, 1.0}, m_numVertices(numVertices), m_firstAdd(true)
+LineTrace::LineTrace(int numVertices, bool useColor)
+    : MeshNode(), m_useColor(useColor), m_color{1.0, 1.0, 1.0, 1.0}, m_numVertices(numVertices), m_firstAdd(true)
 {
     this->doSetup();
 }
@@ -14,9 +14,9 @@ LineTrace::LineTrace(int numVertices)
 LineTrace::~LineTrace()
 {}
 
-std::shared_ptr<LineTrace> ivf::LineTrace::create(int numVertices)
+std::shared_ptr<LineTrace> ivf::LineTrace::create(int numVertices, bool useColor)
 {
-    return std::make_shared<LineTrace>(numVertices);
+    return std::make_shared<LineTrace>(numVertices, useColor);
 }
 
 void ivf::LineTrace::setColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
@@ -131,14 +131,9 @@ void ivf::LineTrace::doSetup()
 void LineTrace::doPreDraw()
 {
     MeshNode::doPreDraw();
-
-    LightManager::instance()->saveState();
-    LightManager::instance()->disableLighting();
 }
 
 void LineTrace::doPostDraw()
 {
-    LightManager::instance()->restoreState();
-
     MeshNode::doPostDraw();
 }

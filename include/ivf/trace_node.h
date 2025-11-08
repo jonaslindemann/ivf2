@@ -22,7 +22,7 @@ public:
      * @brief Constructor.
      * @param numVertices Number of vertices in the trace.
      */
-    TraceNode(int numVertices);
+    TraceNode(int numVertices, bool useColor);
 
     /**
      * @brief Destructor.
@@ -34,7 +34,7 @@ public:
      * @param numVertices Number of vertices in the trace.
      * @return std::shared_ptr<TraceNode> New TraceNode instance.
      */
-    static std::shared_ptr<TraceNode> create(int numVertices);
+    static std::shared_ptr<TraceNode> create(int numVertices, bool useColor);
 
     /**
      * @brief Set the node to trace.

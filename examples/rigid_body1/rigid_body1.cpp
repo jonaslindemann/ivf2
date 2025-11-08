@@ -232,7 +232,7 @@ public:
 
         // Use smaller timesteps for better stability
         const float frameTime = 1.0f / 60.0f;
-        const int numSubSteps = 2; // Subdivide each frame
+        const int numSubSteps = 8; // Subdivide each frame
         const float subStepTime = frameTime / numSubSteps;
 
         for (int i = 0; i < numSubSteps; i++)

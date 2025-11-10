@@ -152,8 +152,8 @@ public:
 
         // Create line traces to visualize the animation paths of the sphere and cube
 
-        m_trace1 = LineTrace::create(300);
-        m_trace2 = LineTrace::create(300);
+        m_trace1 = LineTrace::create(300, true);
+        m_trace2 = LineTrace::create(300, true);
 
         // Add all objects to the scene
         this->add(m_sphere);

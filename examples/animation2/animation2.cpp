@@ -101,7 +101,7 @@ public:
 
         // Create the line trace for the Lissajous curve
 
-        m_trace = LineTrace::create(300);
+        m_trace = LineTrace::create(300, true);
 
         // Set initial Lissajous parameters for the animation
 

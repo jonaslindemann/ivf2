@@ -34,6 +34,94 @@ void CappedTube::set(double radius, double innerRadius, double size, int slices,
     this->refresh();
 }
 
+void CappedTube::setRadius(double radius)
+{
+    m_radius = radius;
+    this->refresh();
+}
+
+void CappedTube::setInnerRadius(double innerRadius)
+{
+    m_innerRadius = innerRadius;
+    this->refresh();
+}
+
+void CappedTube::setHeight(double size)
+{
+    m_size = size;
+    this->refresh();
+}
+
+void CappedTube::setSlices(int slices)
+{
+    m_slices = slices;
+    this->refresh();
+}
+
+void CappedTube::setSegments(int segments)
+{
+    m_segments = segments;
+    this->refresh();
+}
+
+void CappedTube::setRings(int rings)
+{
+    m_rings = rings;
+    this->refresh();
+}
+
+void CappedTube::setStartAngle(double start)
+{
+    m_start = start;
+    this->refresh();
+}
+
+void CappedTube::setSweepAngle(double sweep)
+{
+    m_sweep = sweep;
+    this->refresh();
+}
+
+double CappedTube::radius() const
+{
+    return m_radius;
+}
+
+double CappedTube::innerRadius() const
+{
+    return m_innerRadius;
+}
+
+double CappedTube::height() const
+{
+    return m_size;
+}
+
+int CappedTube::slices() const
+{
+    return m_slices;
+}
+
+int CappedTube::segments() const
+{
+    return m_segments;
+}
+
+int CappedTube::rings() const
+{
+    return m_rings;
+}
+
+double CappedTube::startAngle() const
+{
+    return m_start;
+}
+
+double CappedTube::sweepAngle() const
+{
+    return m_sweep;
+}
+
 void CappedTube::doSetup()
 {
     CappedTubeMesh cappedCylinder(m_radius, m_innerRadius, m_size / 2.0, m_slices, m_segments, m_rings, m_start,

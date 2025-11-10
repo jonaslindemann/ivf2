@@ -82,8 +82,8 @@ public:
         // Create a deformable rounded box primitive
 
         m_deformableCube = DeformablePrimitive<RoundedBox>::create();
-        m_deformableCube->primitive()->setSize(glm::vec3(1.0f, 4.0f, 1.0f));
-        m_deformableCube->primitive()->setSegments(glm::uvec3(10, 40, 10));
+        m_deformableCube->primitive()->setSize(glm::vec3(1.0f, 1.0f, 4.0f));
+        m_deformableCube->primitive()->setSegments(glm::uvec3(10, 10, 40));
         m_deformableCube->refresh(); // Update geometry and deformer setup
         m_deformableCube->setMaterial(whiteMaterial);
         m_deformableCube->setWireframe(true);

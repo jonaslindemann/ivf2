@@ -25,6 +25,39 @@ void ivf::Dodecahedron::set(double radius, int segments, int rings)
     this->refresh();
 }
 
+void ivf::Dodecahedron::setRadius(double radius)
+{
+    m_radius = radius;
+    this->refresh();
+}
+
+void ivf::Dodecahedron::setSegments(int segments)
+{
+    m_segments = segments;
+    this->refresh();
+}
+
+void ivf::Dodecahedron::setRings(int rings)
+{
+    m_rings = rings;
+    this->refresh();
+}
+
+double ivf::Dodecahedron::radius() const
+{
+    return m_radius;
+}
+
+int ivf::Dodecahedron::segments() const
+{
+    return m_segments;
+}
+
+int ivf::Dodecahedron::rings() const
+{
+    return m_rings;
+}
+
 void Dodecahedron::doSetup()
 {
     DodecahedronMesh dodecahedron(m_radius, m_segments, m_rings);

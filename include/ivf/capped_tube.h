@@ -83,6 +83,23 @@ public:
     void set(double radius = 1.0, double innerRadius = 0.75, double size = 1.0, int slices = 32, int segments = 8,
              int rings = 1, double start = 0.0, double sweep = 2 * glm::pi<double>());
 
+    void setRadius(double radius);
+    void setInnerRadius(double innerRadius);
+    void setHeight(double size);
+    void setSlices(int slices);
+    void setSegments(int segments);
+    void setRings(int rings);
+    void setStartAngle(double start);
+    void setSweepAngle(double sweep);
+    double radius() const;
+    double innerRadius() const;
+    double height() const;
+    int slices() const;
+    int segments() const;
+    int rings() const;
+    double startAngle() const;
+    double sweepAngle() const;
+
 protected:
     /**
      * @brief Internal setup method for initializing the capped tube geometry.

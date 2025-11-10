@@ -52,6 +52,14 @@ public:
      */
     void set(double radius = 1.0, int segments = 1, int rings = 1);
 
+    void setRadius(double radius);
+    void setSegments(int segments);
+    void setRings(int rings);
+
+    double radius() const;
+    int segments() const;
+    int rings() const;
+
 protected:
     /**
      * @brief Internal setup method for initializing the dodecahedron geometry.

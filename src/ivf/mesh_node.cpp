@@ -105,7 +105,7 @@ void ivf::MeshNode::createFromGenerator(generator::AnyGenerator<generator::MeshV
     }
 
     mesh()->end();
-    
+
     // Automatically update the local bounding box after mesh creation
     updateBoundingBox();
 }
@@ -241,11 +241,11 @@ void ivf::MeshNode::updateBoundingBox()
     // Only update if auto-update is enabled
     if (!autoUpdateBoundingBox())
         return;
-        
+
     BoundingBox combinedBbox;
     int totalVertices = 0;
-    
-    for (const auto& mesh : m_meshes)
+
+    for (const auto &mesh : m_meshes)
     {
         if (mesh && mesh->vertices())
         {
@@ -258,19 +258,21 @@ void ivf::MeshNode::updateBoundingBox()
             }
         }
     }
-    
+
     // Automatically set the computed bounding box on the TransformNode
     setLocalBoundingBox(combinedBbox);
-    
+
     // Debug output
-    std::cout << "    updateBoundingBox: Processed " << totalVertices << " vertices" << std::endl;
+    // std::cout << "    updateBoundingBox: Processed " << totalVertices << " vertices" << std::endl;
     if (combinedBbox.isValid())
     {
-        std::cout << "    Computed bbox: Min(" << combinedBbox.min().x << ", " << combinedBbox.min().y << ", " << combinedBbox.min().z 
-                  << ") Max(" << combinedBbox.max().x << ", " << combinedBbox.max().y << ", " << combinedBbox.max().z << ")" << std::endl;
+        //    std::cout << "    Computed bbox: Min(" << combinedBbox.min().x << ", " << combinedBbox.min().y << ", " <<
+        //    combinedBbox.min().z
+        //              << ") Max(" << combinedBbox.max().x << ", " << combinedBbox.max().y << ", " <<
+        //              combinedBbox.max().z << ")" << std::endl;
     }
     else
     {
-        std::cout << "    Warning: Computed bbox is invalid!" << std::endl;
+        //    std::cout << "    Warning: Computed bbox is invalid!" << std::endl;
     }
 }

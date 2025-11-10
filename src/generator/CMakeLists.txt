@@ -143,6 +143,9 @@ set(GENERATOR_SOURCES
 )
 
 add_library(generator STATIC ${GENERATOR_SOURCES} ${GENERATOR_HEADERS})
-set_target_properties(generator PROPERTIES FOLDER "depends")
+set_target_properties(generator PROPERTIES 
+    FOLDER "depends"
+    DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
+)
 
 

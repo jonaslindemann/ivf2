@@ -49,3 +49,7 @@ docs/doxygen/latex/
 _CMakePresets.json
 /docs/site
 /docs/docs/doxygen/html/
+/bin/Release
+/bin/Debug
+/bin/Debug
+/bin/Debug

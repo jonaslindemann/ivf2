@@ -1,3 +1,21 @@
+# Create a custom target that copies all shared assets once to Debug and Release directories
+# This is more efficient than copying for each example individually
+add_custom_target(copy_example_assets ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/bin/shaders ${PROJECT_SOURCE_DIR}/bin/Debug/shaders
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/bin/fonts ${PROJECT_SOURCE_DIR}/bin/Debug/fonts
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/bin/assets ${PROJECT_SOURCE_DIR}/bin/Debug/assets
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/bin/shaders ${PROJECT_SOURCE_DIR}/bin/Release/shaders
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/bin/fonts ${PROJECT_SOURCE_DIR}/bin/Release/fonts
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/bin/assets ${PROJECT_SOURCE_DIR}/bin/Release/assets
+    COMMENT "Copying shared assets (shaders, fonts, assets) to bin/Debug and bin/Release directories"
+)
+
 # Helper function to create ivf2 examples with simplified dependency management
 function(add_ivf2_example name)
     cmake_parse_arguments(ARG "" "" "SOURCES;EXTRA_LIBS" ${ARGN})
@@ -8,28 +26,11 @@ function(add_ivf2_example name)
     
     add_executable(${name} ${ARG_SOURCES})
     target_link_libraries(${name} PRIVATE ivf2::ivf2 ${ARG_EXTRA_LIBS})
-    set_target_properties(${name} PROPERTIES FOLDER "examples")
-    add_dependencies(${name} glad generator ivf ivfui)
-    
-    # Automatically copy shared assets to the executable directory after build
-    # This ensures shaders, fonts, and other assets are available at runtime
-    add_custom_command(TARGET ${name} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/shaders $<TARGET_FILE_DIR:${name}>/shaders
-        COMMENT "Copying shaders to ${name} output directory"
+    set_target_properties(${name} PROPERTIES 
+        FOLDER "examples"
+        DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
     )
-    
-    add_custom_command(TARGET ${name} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/fonts $<TARGET_FILE_DIR:${name}>/fonts
-        COMMENT "Copying fonts to ${name} output directory"
-    )
-    
-    add_custom_command(TARGET ${name} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/assets $<TARGET_FILE_DIR:${name}>/assets
-        COMMENT "Copying assets to ${name} output directory"
-    )
+    add_dependencies(${name} glad generator ivf ivfui copy_example_assets)
 endfunction()
 
 add_subdirectory(hello_ivf)

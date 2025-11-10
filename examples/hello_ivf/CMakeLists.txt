@@ -1,16 +1,3 @@
-file(GLOB SOURCE_FILES *.cpp)
-file(GLOB INCLUDE_FILES *.h)
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_executable(hello_ivfd hello_ivf.cpp)
-    target_link_libraries(hello_ivfd PRIVATE ivfuid ivfd ivfmathd generatord glfw gladd imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL)
-    target_include_directories(hello_ivfd PRIVATE ${Stb_INCLUDE_DIR})
-    add_dependencies(hello_ivfd gladd generatord ivfd ivfuid)
-    set_target_properties(hello_ivfd PROPERTIES FOLDER "examples")
-else()
-    add_executable(hello_ivf hello_ivf.cpp)
-    target_link_libraries(hello_ivf PRIVATE ivfui ivf ivfmath generator glfw glad imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL)
-    target_include_directories(hello_ivf PRIVATE ${Stb_INCLUDE_DIR})
-    add_dependencies(hello_ivf glad generator ivf ivfui  )
-    set_target_properties(hello_ivf PROPERTIES FOLDER "examples")
-endif() 
+# Using the simplified add_ivf2_example helper function
+add_ivf2_example(hello_ivf SOURCES hello_ivf.cpp)
+ 

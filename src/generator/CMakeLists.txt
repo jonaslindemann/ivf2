@@ -142,11 +142,7 @@ set(GENERATOR_SOURCES
 	TubeMesh.cpp
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-	add_library(generatord STATIC ${GENERATOR_SOURCES} ${GENERATOR_HEADERS})
-	set_target_properties(generatord PROPERTIES FOLDER "depends")
-else()
-	add_library(generator STATIC ${GENERATOR_SOURCES} ${GENERATOR_HEADERS})
-	set_target_properties(generator PROPERTIES FOLDER "depends")
-endif()
+add_library(generator STATIC ${GENERATOR_SOURCES} ${GENERATOR_HEADERS})
+set_target_properties(generator PROPERTIES FOLDER "depends")
+
 

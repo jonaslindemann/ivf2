@@ -1,18 +1,4 @@
-file(GLOB SOURCE_FILES *.cpp)
-file(GLOB INCLUDE_FILES *.h)
+add_ivf2_example(extrusions1 SOURCES extrusions1.cpp)
 
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_executable(extrusions1d extrusions1.cpp)
-    target_link_libraries(extrusions1d PRIVATE ivfuid ivfd ivfmathd generatord glfw gladd imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL Freetype::Freetype) 
-    target_include_directories(extrusions1d PRIVATE ${Stb_INCLUDE_DIR})
-    add_dependencies(extrusions1d gladd generatord ivfd ivfuid)
-    set_target_properties(extrusions1d PROPERTIES FOLDER "examples")
-else()
-    add_executable(extrusions1 extrusions1.cpp)
-    target_link_libraries(extrusions1 PRIVATE ivfui ivf ivfmath generator glfw glad imgui::imgui PNG::PNG JPEG::JPEG ZLIB::ZLIB glfw GLEW::GLEW OpenGL::GL Freetype::Freetype) 
-    target_include_directories(extrusions1 PRIVATE ${Stb_INCLUDE_DIR})
-    add_dependencies(extrusions1 glad generator ivf ivfui)
-    set_target_properties(extrusions1 PROPERTIES FOLDER "examples")
-endif()
 
 

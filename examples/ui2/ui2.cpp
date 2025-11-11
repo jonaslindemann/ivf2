@@ -174,8 +174,6 @@ public:
         m_scene->add(m_cone);
         m_scene->add(m_cappedTube);
 
-        // Setup variables for dodecahedron controls
-
         // Create the camera manipulator for scene navigation.
 
         m_camManip = CameraManipulator::create(this->ref());

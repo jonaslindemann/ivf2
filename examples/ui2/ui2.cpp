@@ -184,6 +184,8 @@ public:
 
         // Setup ImGui
 
+        this->scaleAllSizes(2.0f);
+
         m_window1 = true;
 
         return 0;

@@ -1,6 +1,7 @@
 {
   "name": "ivf2",
   "version": "0",
+  "builtin-baseline": "8fbf295ab5283313932f65a597a2c1f09a73fafd",
   "dependencies": [
     "assimp",
     "freetype",

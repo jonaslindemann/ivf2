@@ -99,3 +99,8 @@ bool UiRenderer::wantCaptureKeyboard()
     ImGuiIO &io = ImGui::GetIO();
     return io.WantCaptureKeyboard;
 }
+
+void ivfui::UiRenderer::scaleAllSizes(float scale)
+{
+    ImGui::GetStyle().ScaleAllSizes(scale);
+}

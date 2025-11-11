@@ -292,6 +292,11 @@ void ivfui::GLFWWindow::drawScene()
     this->doDraw();
 }
 
+void ivfui::GLFWWindow::scaleAllSizes(double scale)
+{
+    m_uiRenderer->scaleAllSizes(float(scale));
+}
+
 void GLFWWindow::doKey(int key, int scancode, int action, int mods)
 {
     m_shiftDown = false;

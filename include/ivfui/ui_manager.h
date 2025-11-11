@@ -71,6 +71,8 @@ public:
      * @return bool True if ImGui wants to capture keyboard input.
      */
     bool wantCaptureKeyboard();
+
+    void scaleAllSizes(float scale);
 };
 
 /**

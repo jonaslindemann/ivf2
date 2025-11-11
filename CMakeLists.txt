@@ -1,42 +1,54 @@
 cmake_minimum_required(VERSION 3.24)
 
-# Auto-detect vcpkg toolchain file if not already set
-if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+# Auto-detect vcpkg toolchain file, preferring standalone installations over VS bundled vcpkg
+# Check if Visual Studio's bundled vcpkg is being used and override with local installations
+set(_VS_VCPKG_DETECTED FALSE)
+if(DEFINED CMAKE_TOOLCHAIN_FILE)
+    string(FIND "${CMAKE_TOOLCHAIN_FILE}" "Microsoft Visual Studio" _VS_VCPKG_POS)
+    if(NOT _VS_VCPKG_POS EQUAL -1)
+        set(_VS_VCPKG_DETECTED TRUE)
+        message(STATUS "Visual Studio bundled vcpkg detected, checking for local installations...")
+    endif()
+endif()
+
+if(NOT DEFINED CMAKE_TOOLCHAIN_FILE OR _VS_VCPKG_DETECTED)
     # Check for VCPKG_ROOT environment variable first
     if(DEFINED ENV{VCPKG_ROOT})
         set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" 
-            CACHE STRING "Vcpkg toolchain file")
+            CACHE STRING "Vcpkg toolchain file" FORCE)
         message(STATUS "Using vcpkg from VCPKG_ROOT: $ENV{VCPKG_ROOT}")
     # Try common vcpkg installation locations
     elseif(WIN32)
         if(EXISTS "c:/vcpkg/scripts/buildsystems/vcpkg.cmake")
             set(CMAKE_TOOLCHAIN_FILE "c:/vcpkg/scripts/buildsystems/vcpkg.cmake" 
-                CACHE STRING "Vcpkg toolchain file")
-            message(STATUS "Found vcpkg at: c:/vcpkg")
+                CACHE STRING "Vcpkg toolchain file" FORCE)
+            message(STATUS "Found and using vcpkg at: c:/vcpkg")
         elseif(EXISTS "e:/vcpkg/scripts/buildsystems/vcpkg.cmake")
             set(CMAKE_TOOLCHAIN_FILE "e:/vcpkg/scripts/buildsystems/vcpkg.cmake" 
-                CACHE STRING "Vcpkg toolchain file")
-            message(STATUS "Found vcpkg at: e:/vcpkg")
+                CACHE STRING "Vcpkg toolchain file" FORCE)
+            message(STATUS "Found and using vcpkg at: e:/vcpkg")
+        elseif(_VS_VCPKG_DETECTED)
+            message(STATUS "No local vcpkg found, using Visual Studio bundled vcpkg: ${CMAKE_TOOLCHAIN_FILE}")
         endif()
     elseif(UNIX AND NOT APPLE)
         if(EXISTS "$ENV{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake")
             set(CMAKE_TOOLCHAIN_FILE "$ENV{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake" 
-                CACHE STRING "Vcpkg toolchain file")
-            message(STATUS "Found vcpkg at: $ENV{HOME}/vcpkg")
+                CACHE STRING "Vcpkg toolchain file" FORCE)
+            message(STATUS "Found and using vcpkg at: $ENV{HOME}/vcpkg")
         elseif(EXISTS "/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake")
             set(CMAKE_TOOLCHAIN_FILE "/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake" 
-                CACHE STRING "Vcpkg toolchain file")
-            message(STATUS "Found vcpkg at: /usr/local/vcpkg")
+                CACHE STRING "Vcpkg toolchain file" FORCE)
+            message(STATUS "Found and using vcpkg at: /usr/local/vcpkg")
         endif()
     elseif(APPLE)
         if(EXISTS "$ENV{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake")
             set(CMAKE_TOOLCHAIN_FILE "$ENV{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake" 
-                CACHE STRING "Vcpkg toolchain file")
-            message(STATUS "Found vcpkg at: $ENV{HOME}/vcpkg")
+                CACHE STRING "Vcpkg toolchain file" FORCE)
+            message(STATUS "Found and using vcpkg at: $ENV{HOME}/vcpkg")
         elseif(EXISTS "/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake")
             set(CMAKE_TOOLCHAIN_FILE "/usr/local/vcpkg/scripts/buildsystems/vcpkg.cmake" 
-                CACHE STRING "Vcpkg toolchain file")
-            message(STATUS "Found vcpkg at: /usr/local/vcpkg")
+                CACHE STRING "Vcpkg toolchain file" FORCE)
+            message(STATUS "Found and using vcpkg at: /usr/local/vcpkg")
         endif()
     endif()
     
@@ -44,6 +56,10 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
         message(WARNING "vcpkg toolchain file not found. Please set VCPKG_ROOT environment variable or CMAKE_TOOLCHAIN_FILE.")
     endif()
 endif()
+
+# Share vcpkg installed packages across all build directories to save disk space
+# This puts vcpkg_installed/ in the project root instead of each build directory
+set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_installed" CACHE PATH "vcpkg installed directory")
 
 project(ivf2) 
 

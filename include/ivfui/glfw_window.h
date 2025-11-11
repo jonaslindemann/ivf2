@@ -163,6 +163,8 @@ public:
      */
     void drawScene();
 
+    void scaleAllSizes(double scale);
+
     /**
      * @brief Get the native GLFWwindow pointer.
      * @return GLFWwindow* Native window handle.

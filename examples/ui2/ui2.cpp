@@ -51,12 +51,11 @@ private:
     double m_minHeight = 0.1;
     double m_maxHeight = 5.0;
 
-    bool m_window = true;
-    bool m_window1 = true;
-    bool m_window2 = true;
-    bool m_window3 = true;
-    bool m_window4 = true;
-    bool m_window5 = true;
+    bool m_window1 = false;
+    bool m_window2 = false;
+    bool m_window3 = false;
+    bool m_window4 = false;
+    bool m_window5 = false;
 
     float m_cubePos[3] = {-3.0f, 0.0f, 0.0f};
     float m_spherePos[3] = {3.0f, 0.0f, 0.0f};
@@ -186,8 +185,6 @@ public:
 
         this->scaleAllSizes(2.0f);
 
-        m_window1 = true;
-
         return 0;
     }
 
@@ -211,6 +208,7 @@ public:
     {
         ImGui::Begin("A first window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
         ImGui::Text("Hello from window1!");
+        ImGui::Text("Use the number 1-5 to open the example windows.");
         ImGui::End();
 
         ImGui::Begin("A second window", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
@@ -236,9 +234,9 @@ public:
             ImGui::End();
         }
 
-        if (m_window5)
+        if (m_window3)
         {
-            ImGui::Begin("CappedTube controls", &m_window5, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Begin("CappedTube controls", &m_window3, ImGuiWindowFlags_AlwaysAutoResize);
 
             if (ImGui::InputScalar("Radius", ImGuiDataType_Double, &m_radius))
                 m_cappedTube->setRadius(m_radius);
@@ -258,9 +256,9 @@ public:
             ImGui::End();
         }
 
-        if (m_window3)
+        if (m_window4)
         {
-            ImGui::Begin("Another window", &m_window3, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Begin("Another window", &m_window4, ImGuiWindowFlags_AlwaysAutoResize);
 
             ImGui::SeparatorText("Transform Controls");
 
@@ -368,9 +366,9 @@ public:
             ImGui::End();
         }
 
-        if (m_window4)
+        if (m_window5)
         {
-            ImGui::Begin("Yet another window", &m_window4, ImGuiWindowFlags_AlwaysAutoResize);
+            ImGui::Begin("Yet another window", &m_window5, ImGuiWindowFlags_AlwaysAutoResize);
 
             if (ImGui::BeginTabBar("MyTabBar"))
             {
@@ -449,6 +447,18 @@ public:
     {
         if ((key == GLFW_KEY_1) && (action == GLFW_PRESS))
             m_window1 = !m_window1;
+
+        if ((key == GLFW_KEY_2) && (action == GLFW_PRESS))
+            m_window2 = !m_window2;
+
+        if ((key == GLFW_KEY_3) && (action == GLFW_PRESS))
+            m_window3 = !m_window3; 
+
+        if ((key == GLFW_KEY_4) && (action == GLFW_PRESS))
+            m_window4 = !m_window4;
+
+        if ((key == GLFW_KEY_5) && (action == GLFW_PRESS))
+            m_window5 = !m_window5;
     }
 
     void onResize(int width, int height)

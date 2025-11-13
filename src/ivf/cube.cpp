@@ -45,6 +45,9 @@ void Cube::doSetup()
 
     double n = m_size / 2.0;
 
+    // Set bounding box for the cube
+    setLocalBoundingBox(BoundingBox(glm::vec3(-n, -n, -n), glm::vec3(n, n, n)));
+
     mesh()->begin(GL_TRIANGLES);
     mesh()->vertex3d(-n, -n, n);
     mesh()->color3f(1.0f, 0.0f, 0.0f);

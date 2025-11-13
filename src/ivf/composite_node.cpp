@@ -131,10 +131,12 @@ BoundingBox CompositeNode::computeChildrenBoundingBox(bool includeInvisible) con
         auto transformChild = std::dynamic_pointer_cast<TransformNode>(child);
         if (transformChild)
         {
+            // Get the child's local bounding box
             BoundingBox childBbox = transformChild->localBoundingBox();
             if (childBbox.isValid())
             {
-                // Transform the child's bounding box to this node's space
+                // Transform the child's bounding box by the child's local transform
+                // to bring it into this parent's coordinate space
                 BoundingBox transformedChildBbox = childBbox.transform(transformChild->localTransform());
                 aggregateBbox.add(transformedChildBbox);
             }

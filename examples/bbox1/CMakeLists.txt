@@ -1,0 +1,1 @@
+add_ivf2_example(bbox1 SOURCES bbox1.cpp)

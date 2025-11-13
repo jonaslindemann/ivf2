@@ -36,6 +36,11 @@ void Cone::doSetup()
     AnyGenerator<Triangle> triangles = cone.triangles();
 
     this->createFromGenerator(vertices, triangles);
+
+    // Set bounding box for the cone (axis-aligned along Y, base at bottom)
+    double halfHeight = m_size * 0.5;
+    setLocalBoundingBox(BoundingBox(glm::vec3(-m_radius, -halfHeight, -m_radius),
+                                    glm::vec3(m_radius, halfHeight, m_radius)));
 }
 
 void ivf::Cone::setupProperties()

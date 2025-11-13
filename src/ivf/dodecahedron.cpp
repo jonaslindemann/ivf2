@@ -66,6 +66,10 @@ void Dodecahedron::doSetup()
     AnyGenerator<Triangle> triangles = dodecahedron.triangles();
 
     this->createFromGenerator(vertices, triangles);
+
+    // Set bounding box for the dodecahedron (approximated as sphere)
+    setLocalBoundingBox(BoundingBox(glm::vec3(-m_radius, -m_radius, -m_radius),
+                                    glm::vec3(m_radius, m_radius, m_radius)));
 }
 
 void ivf::Dodecahedron::setupProperties()

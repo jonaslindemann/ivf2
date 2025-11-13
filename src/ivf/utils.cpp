@@ -174,3 +174,13 @@ double ivf::random(double a, double b)
     double r = (double)rand() / (double)RAND_MAX;
     return a + (b - a) * r;
 }
+
+void ivf::randomSeed(unsigned int seed)
+{
+    srand(seed);
+}
+
+void ivf::randomSeed()
+{
+    srand((unsigned int)time(NULL));
+}

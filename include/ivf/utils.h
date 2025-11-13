@@ -129,6 +129,11 @@ float random(float a, float b);
  */
 double random(double a, double b);
 
+void randomSeed(unsigned int seed);
+
+void randomSeed();
+
+
 /**
  * @brief Get the global TransformManager instance.
  * @return Pointer to the TransformManager.

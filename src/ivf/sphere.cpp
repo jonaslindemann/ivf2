@@ -28,6 +28,10 @@ void Sphere::doSetup()
     AnyGenerator<Triangle> triangles = sphere.triangles();
 
     this->createFromGenerator(vertices, triangles);
+
+    // Set bounding box for the sphere
+    setLocalBoundingBox(BoundingBox(glm::vec3(-m_radius, -m_radius, -m_radius),
+                                    glm::vec3(m_radius, m_radius, m_radius)));
 }
 
 void ivf::Sphere::setupProperties()

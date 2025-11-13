@@ -34,6 +34,12 @@ void Plane::doSetup()
     AnyGenerator<Triangle> triangles = planeMesh.triangles();
 
     this->createFromGenerator(vertices, triangles);
+    
+    // Set bounding box for the plane (flat on XZ plane)
+    double halfWidth = m_width * 0.5;
+    double halfDepth = m_depth * 0.5;
+    setLocalBoundingBox(BoundingBox(glm::vec3(-halfWidth, 0.0, -halfDepth), 
+                                    glm::vec3(halfWidth, 0.0, halfDepth)));
 }
 
 void ivf::Plane::setupProperties()

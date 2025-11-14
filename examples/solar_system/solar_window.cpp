@@ -87,8 +87,6 @@ int SolarWindow::onSetup()
 
     // Setup UI
 
-    this->scaleAllSizes(2.0f);
-
     m_solarPanel = SolarPanel::create("Solar system settings");
     m_solarPanel->setSolarSystem(m_solarSystem);
     m_solarPanel->setPlanetMaterial(m_planetMaterial);

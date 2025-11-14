@@ -25,6 +25,7 @@
 #include <ivf/spline_animation.h>
 #include <ivf/keyframe_animation.h>
 #include <ivf/model_loader.h>
+#include <ivf/logger.h>
 
 #include <ivfmath/spline.h>
 
@@ -115,6 +116,7 @@ public:
                     {
                         this->clear(); // Clear previous models if needed
                         this->add(model);
+
                         std::cout << "Loaded model: " << filename << std::endl;
 
                         auto wbbox = model->worldBoundingBox();

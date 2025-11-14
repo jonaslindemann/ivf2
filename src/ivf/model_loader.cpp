@@ -1,5 +1,7 @@
 #include <ivf/model_loader.h>
 #include <ivf/composite_node.h>
+#include <ivf/logger.h>
+
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <stdexcept>
@@ -19,9 +21,9 @@ void ModelLoader::processNode(const aiScene *scene, aiNode *node, std::shared_pt
     aiQuaternion rotation;
     nodeTransform.Decompose(scaling, rotation, translation);
 
-    std::cout << "Node: " << node->mName.C_Str() << " - Translation: (" << translation.x << ", " << translation.y
-              << ", " << translation.z << ")"
-              << " - Scale: (" << scaling.x << ", " << scaling.y << ", " << scaling.z << ")" << std::endl;
+    logInfofc("ModelLoader",
+               "Processing node: %s | Translation: (%.2f, %.2f, %.2f) | Scale: (%.2f, %.2f, %.2f)",
+               node->mName.C_Str(), translation.x, translation.y, translation.z, scaling.x, scaling.y, scaling.z);
 
     // Process meshes in current node
     if (node->mNumMeshes > 0)
@@ -92,9 +94,11 @@ void ModelLoader::processNode(const aiScene *scene, aiNode *node, std::shared_pt
 }
 void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode)
 {
-    std::cout << "Processing mesh:" << std::endl;
-    std::cout << "  Vertices: " << aiMesh->mNumVertices << std::endl;
-    std::cout << "  Faces: " << aiMesh->mNumFaces << std::endl;
+    logInfo("Processing aiMesh...", "ModelLoader");
+    logInfofc("ModelLoader", "  Mesh name: {}", aiMesh->mName.C_Str());
+    logInfofc("ModelLoader", "  Material index: {}", aiMesh->mMaterialIndex);
+    logInfofc("ModelLoader", "  Vertices: {}", aiMesh->mNumVertices);
+    logInfofc("ModelLoader", "  Faces: {}", aiMesh->mNumFaces);
 
     // Count triangles
     unsigned int triangleCount = 0;
@@ -115,7 +119,8 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
         }
     }
 
-    std::cout << "  Triangle count after conversion: " << triangleCount << std::endl;
+    logInfofc("ModelLoader", "  Original face count: {}", aiMesh->mNumFaces);
+    logInfofc("ModelLoader", "  Triangle count after conversion: {}", triangleCount);
 
     // Create mesh
     meshNode->newMesh(aiMesh->mNumVertices, triangleCount);
@@ -123,7 +128,7 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
 
     if (!mesh)
     {
-        std::cout << "Error: Failed to create mesh!" << std::endl;
+        logError("Failed to create mesh!", "ModelLoader");
         return;
     }
 
@@ -134,11 +139,11 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
 
     if (useAssimpNormals)
     {
-        std::cout << "  Using original normals from file" << std::endl;
+        logInfo("  Using original normals from file", "ModelLoader");
     }
     else
     {
-        std::cout << "  Regenerating normals with your mesh system" << std::endl;
+        logInfo("  No normals found or regenerating normals", "ModelLoader");
     }
 
     mesh->begin(GL_TRIANGLES);
@@ -226,13 +231,14 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
     auto localBbox = meshNode->localBoundingBox();
     if (localBbox.isValid())
     {
-        std::cout << "  Local bounding box: Min(" << localBbox.min().x << ", " << localBbox.min().y << ", " << localBbox.min().z 
-                  << ") Max(" << localBbox.max().x << ", " << localBbox.max().y << ", " << localBbox.max().z << ")" << std::endl;
-        std::cout << "  Size: " << localBbox.size().x << " x " << localBbox.size().y << " x " << localBbox.size().z << std::endl;
+        logInfo("  Local bounding box:", "ModelLoader");
+        logInfofc("ModelLoader", "    Min: ({}, {}, {})", localBbox.min().x, localBbox.min().y, localBbox.min().z);
+        logInfofc("ModelLoader", "    Max: ({}, {}, {})", localBbox.max().x, localBbox.max().y, localBbox.max().z);
+        logInfofc("ModelLoader", "    Size: ({}, {}, {})", localBbox.size().x, localBbox.size().y, localBbox.size().z);
     }
     else
     {
-        std::cout << "  Warning: Local bounding box is invalid!" << std::endl;
+        logWarning("  Local bounding box is invalid!", "ModelLoader");
     }
 
     // Process materials (simplified to avoid potential issues)
@@ -245,12 +251,12 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
             // meshNode->setShowNormals(true, 0.1f); // Enable normal visualization with a length of 0.1
         } catch (const std::exception &e)
         {
-            std::cout << "Warning: Failed to process material: " << e.what() << std::endl;
+            logWarningfc("Failed to process material: {}", e.what(), "ModelLoader");
         }
     }
 
-    std::cout << "Mesh processed successfully with " << mesh->vertPos() << " vertices and " << mesh->indexPos()
-              << " indices." << std::endl;
+    logInfofc("ModelLoader", "  Mesh processed successfully with {} vertices and {} indices.", mesh->vertPos(),
+              mesh->indexPos());
 }
 
 void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node)
@@ -268,13 +274,15 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> n
     aiMat->Get(AI_MATKEY_OPACITY, opacity);
 
     // Debug output with higher precision
-    std::cout << "Material - Diffuse: (" << std::fixed << std::setprecision(6) << diffuse.r << ", " << diffuse.g << ", "
-              << diffuse.b << "), Opacity: " << opacity << std::endl;
-    std::cout << "  Ambient: (" << ambient.r << ", " << ambient.g << ", " << ambient.b << ")" << std::endl;
-    std::cout << "  Specular: (" << specular.r << ", " << specular.g << ", " << specular.b << ")" << std::endl;
 
-    std::cout << "  Shininess: " << shininess << std::endl;
-    std::cout << "  Opacity: " << opacity << std::endl;
+    logInfofc("ModelLoader",
+               "Material - Diffuse: ({:.6f}, {:.6f}, {:.6f}), Opacity: {:.6f}", diffuse.r, diffuse.g,
+              diffuse.b, opacity);
+
+    logInfofc("ModelLoader", "  Ambient: ({:.6f}, {:.6f}, {:.6f})", ambient.r, ambient.g, ambient.b);
+    logInfofc("ModelLoader", "  Specular: ({:.6f}, {:.6f}, {:.6f})", specular.r, specular.g, specular.b);
+    logInfofc("ModelLoader", "  Shininess: {:.6f}", shininess);
+    logInfofc("ModelLoader", "  Opacity: {:.6f}", opacity);
 
     try
     {
@@ -304,12 +312,13 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> n
 
             // Ensure material is properly enabled
             // Debug: Check if colors are being clamped or quantized
-            std::cout << "  Set diffuse: (" << diffuseColor.r << ", " << diffuseColor.g << ", " << diffuseColor.b
-                      << ", " << diffuseColor.a << ")" << std::endl;
+
+            logInfofc("ModelLoader", "  Set diffuse: ({:.6f}, {:.6f}, {:.6f}, {:.6f})", diffuseColor.r, diffuseColor.g,
+                      diffuseColor.b, diffuseColor.a);
         }
     } catch (const std::exception &e)
     {
-        std::cout << "Warning: Material creation failed: " << e.what() << std::endl;
+        logWarningfc("Material creation failed: {}", e.what(), "ModelLoader");  
     }
 }
 
@@ -328,8 +337,10 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
     aiMat->Get(AI_MATKEY_OPACITY, opacity);
 
     // Debug output with higher precision
-    std::cout << "Material - Diffuse: (" << std::fixed << std::setprecision(6) << diffuse.r << ", " << diffuse.g << ", "
-              << diffuse.b << "), Opacity: " << opacity << std::endl;
+
+    logInfofc("ModelLoader",
+               "Material - Diffuse: ({:.6f}, {:.6f}, {:.6f}), Opacity: {:.6f}", diffuse.r, diffuse.g,
+              diffuse.b, opacity);
 
     try
     {
@@ -354,12 +365,13 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
 
             // Ensure material is properly enabled
             // Debug: Check if colors are being clamped or quantized
-            std::cout << "  Set diffuse: (" << diffuseColor.r << ", " << diffuseColor.g << ", " << diffuseColor.b
-                      << ", " << diffuseColor.a << ")" << std::endl;
+
+            logInfofc("ModelLoader", "  Set ambient: ({:.6f}, {:.6f}, {:.6f}, {:.6f})", ambientColor.r, ambientColor.g,
+                      ambientColor.b, ambientColor.a);
         }
     } catch (const std::exception &e)
     {
-        std::cout << "Warning: Material creation failed: " << e.what() << std::endl;
+        logWarningfc("Material creation failed: {}", e.what(), "ModelLoader");
     }
 }
 
@@ -379,14 +391,14 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
         throw std::runtime_error("Failed to load model '" + path + "': " + std::string(importer.GetErrorString()));
     }
 
-    std::cout << "Loaded model: " << path << std::endl;
-    std::cout << "  Meshes: " << scene->mNumMeshes << std::endl;
-    std::cout << "  Materials: " << scene->mNumMaterials << std::endl;
+    logInfofc("ModelLoader", "Successfully loaded model: {}", path);
+    logInfofc("ModelLoader", "  Meshes: {}", scene->mNumMeshes);
+    logInfofc("ModelLoader", "  Materials: {}", scene->mNumMaterials);
 
     auto compositeNode = CompositeNode::create();
     processNode(scene, scene->mRootNode, compositeNode, aiMatrix4x4());
 
-    std::cout << "Model loading complete. CompositeNode has " << compositeNode->count() << " children." << std::endl;
+    logInfofc("ModelLoader", "Model loading complete. CompositeNode has {} children.", compositeNode->count());
 
     // If the top-level composite only has one child and that child is also a composite,
     // return the child directly to eliminate unnecessary nesting
@@ -395,7 +407,7 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
         auto firstChild = std::dynamic_pointer_cast<CompositeNode>(compositeNode->at(0));
         if (firstChild)
         {
-            std::cout << "Eliminating top-level composite wrapper" << std::endl;
+            logInfo("Eliminating top-level composite wrapper", "ModelLoader");
             return firstChild;
         }
     }

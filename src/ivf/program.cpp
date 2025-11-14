@@ -6,6 +6,7 @@ using namespace ivf;
 #include <algorithm> // std::max
 
 #include <ivf/utils.h>
+#include <ivf/logger.h>
 
 using namespace std;
 
@@ -44,7 +45,7 @@ bool Program::link()
         glDeleteProgram(m_id);
 
     // Link the program
-    fprintf(stdout, "Linking program\n");
+    logInfofc("Program", "Linking program: {}", m_name);
     m_id = glCreateProgram();
 
     for (int i = 0; i < (int)m_shaders.size(); i++)
@@ -62,7 +63,7 @@ bool Program::link()
     {
         std::vector<char> programErrorMessage(std::max(infoLogLength, int(1)));
         glGetProgramInfoLog(m_id, infoLogLength, NULL, &programErrorMessage[0]);
-        fprintf(stdout, "%s\n", &programErrorMessage[0]);
+        logErrorfc("Program", "Program link error in {}: {}", m_name, std::string(&programErrorMessage[0]));
         return false;
     }
     else
@@ -73,7 +74,7 @@ void Program::use()
 {
     if (m_id == -1)
     {
-        fprintf(stderr, "Program not linked yet, cannot use it.\n");
+        logError("Program not linked yet, cannot use it.", "Program");
         return;
     }
 
@@ -107,9 +108,7 @@ GLint Program::attribId(const std::string name)
 
 GLint Program::uniformLoc(const std::string name)
 {
-#ifdef IVF_DEBUG
-    std::cout << "Getting uniform location for " << name << " in " << this->name() << std::endl;
-#endif
+    logDebugfc("Getting uniform location for {} in {}", name, this->name(), "Program");
 
     GL_ERR(GLint id = glGetUniformLocation(m_id, name.c_str()));
     return id;
@@ -236,7 +235,8 @@ void ivf::Program::printAttribs()
 {
     int nrAttributes;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
-    std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
+
+    logInfofc("Program", "Maximum nr of vertex attributes supported: {}", nrAttributes);
 
     GLint maxLength, nAttribs;
     glGetProgramiv(m_id, GL_ACTIVE_ATTRIBUTES, &nAttribs);
@@ -247,13 +247,14 @@ void ivf::Program::printAttribs()
     GLint written, size, location;
     GLenum type;
 
-    printf(" Index | Name\n");
-    printf("------------------------------------------------\n");
+    logInfo("Index | Name", "Program");
+    logInfo("------------------------------------------------", "Program");
     for (int i = 0; i < nAttribs; i++)
     {
         glGetActiveAttrib(m_id, i, maxLength, &written, &size, &type, name);
         location = glGetAttribLocation(m_id, name);
-        printf(" %-5d | %s\n", location, name);
+
+        logInfofc("Program", " {}    | {}", location, name);
     }
 
     free(name);

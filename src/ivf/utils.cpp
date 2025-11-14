@@ -13,6 +13,8 @@ using namespace std;
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <ivf/logger.h>
+
 float ivf::smoothStep(float edge0, float edge1, float x)
 {
     float t = glm::clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
@@ -124,16 +126,21 @@ GLenum ivf::checkPrintError(const std::string context, const std::string file, c
     case GL_NO_ERROR:
         break;
     case GL_INVALID_ENUM:
-        cout << file << ", line " << line << " - " << context
-             << " - Error : An unacceptable value is specified for an enumerated argument. (GL_INVALID_ENUM)" << endl;
+        logErrorfc("OpenGL",
+                   "{}, line {} - {} - Error : An unacceptable value is specified for an enumerated argument. "
+                   "(GL_INVALID_ENUM)",
+                   file, line, context);
         break;
     case GL_INVALID_VALUE:
-        cout << file << ", line " << line << " - " << context
-             << " - Error: A numeric argument is out of range. (GL_INVALID_VALUE)" << endl;
+        logErrorfc("OpenGL",
+                   "{}, line {} - {} - Error : A numeric argument is out of range. (GL_INVALID_VALUE)", file,
+                   line, context);
         break;
     case GL_INVALID_OPERATION:
-        cout << file << ", line " << line << " - " << context
-             << " - Error: The specified operation is not allowed in the current state. (GL_INVALID_OPERATION)" << endl;
+        logErrorfc("OpenGL",
+                   "{}, line {} - {} - Error : The specified operation is not allowed in the current state. "
+                   "(GL_INVALID_OPERATION)",
+                   file, line, context);
         break;
     /*
     case GL_STACK_OVERFLOW:
@@ -147,11 +154,13 @@ GLenum ivf::checkPrintError(const std::string context, const std::string file, c
     (GL_TABLE_TOO_LARGE)" << endl; break;
     */
     case GL_OUT_OF_MEMORY:
-        cout << file << ", line " << line << " - " << context
-             << " - Error: There is not enough memory left to execute the command. (GL_OUT_OF_MEMORY)" << endl;
+        logErrorfc("OpenGL",
+                   "{}, line {} - {} - Error : There is not enough memory left to execute the command. "
+                   "(GL_OUT_OF_MEMORY)",
+                   file, line, context);
         break;
     default:
-        cout << file << ", line " << line << " - " << context << " - Error: Unknown error code." << endl;
+        logErrorfc("OpenGL", "{}, line {} - {} - Error : Unknown error code. (GLenum: {})", file, line, context, err);
         break;
     }
 

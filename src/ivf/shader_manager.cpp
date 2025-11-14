@@ -22,12 +22,12 @@ ShaderManager *ShaderManager::m_instance = nullptr;
 ShaderManager::ShaderManager()
     : m_currentProgram(nullptr), m_linkErrors(false), m_vertexCompileErrors(false), m_fragCompileErrors(false)
 {
-    logInfo("ShaderManager: Created.");
+    logDebug("ShaderManager Constructor", "ShaderManager");
 }
 
 ShaderManager::~ShaderManager()
 {
-    logInfo("ShaderManager: Destroyed.");
+    logDebug("ShaderManager Destructor", "ShaderManager");
     // Clean up any remaining programs
     m_programs.clear();
 }
@@ -56,9 +56,9 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
                                                              const std::string fragmentSource, const std::string name,
                                                              bool makeCurrent)
 {
-    logInfo("ShaderManager: Loading shaders.");
-    logInfo("\tVertex shader = " + vertexSource);
-    logInfo("\tFragment shader = " + fragmentSource);
+    logInfo("Loading shaders.", "ShaderManager");
+    logInfo("\tVertex shader = " + vertexSource, "ShaderManager");
+    logInfo("\tFragment shader = " + fragmentSource, "ShaderManager");
 
     auto vertexShader = std::make_shared<VertexShader>(vertexSource);
     m_vertexCompileErrors = !vertexShader->compile();
@@ -98,7 +98,7 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
                                                                const std::string fragmentShaderSource,
                                                                const std::string name, bool makeCurrent)
 {
-    logInfo("ShaderManager: Loading shader " + name + " from string.");
+    logInfo("Loading shader " + name + " from string.", "ShaderManager");
 
     auto vertexShader = std::make_shared<VertexShader>();
     vertexShader->setSource(vertexShaderSource);
@@ -140,13 +140,13 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
 
 std::shared_ptr<Program> ivf::ShaderManager::loadBasicShader()
 {
-    logInfo("ShaderManager: Loading basic shader.");
+    logInfo("Loading basic shader.", "ShaderManager");
     return loadProgramFromStrings(ivf::basic_vert_shader_source, ivf::basic_frag_shader_source, "basic");
 }
 
 ProgramPtr ivf::ShaderManager::loadRenderToTextureShader()
 {
-    logInfo("ShaderManager: Loading render to texture shader.");
+    logInfo("Loading render to texture shader.", "ShaderManager");
     return loadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
                                   ivf::render_to_texture_frag_shader_source_330, "render_to_texture");
 }

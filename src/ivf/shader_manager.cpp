@@ -5,16 +5,14 @@
 #include <ivf/stock_shaders.h>
 #include <ivf/post_shaders.h>
 #include <ivf/vertex_shader.h>
+#include <ivf/logger.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-
-#include <iostream>
 
 using namespace ivf;
 using namespace std;
@@ -24,12 +22,12 @@ ShaderManager *ShaderManager::m_instance = nullptr;
 ShaderManager::ShaderManager()
     : m_currentProgram(nullptr), m_linkErrors(false), m_vertexCompileErrors(false), m_fragCompileErrors(false)
 {
-    cout << "ShaderManager: Created." << endl;
+    logInfo("ShaderManager: Created.");
 }
 
 ShaderManager::~ShaderManager()
 {
-    cout << "ShaderManager: Destroyed." << endl;
+    logInfo("ShaderManager: Destroyed.");
     // Clean up any remaining programs
     m_programs.clear();
 }
@@ -58,9 +56,9 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
                                                              const std::string fragmentSource, const std::string name,
                                                              bool makeCurrent)
 {
-    cout << "ShaderManager: Loading shaders." << endl;
-    cout << "\tVertex shader = " << vertexSource << endl;
-    cout << "\tFragment shader = " << fragmentSource << endl;
+    logInfo("ShaderManager: Loading shaders.");
+    logInfo("\tVertex shader = " + vertexSource);
+    logInfo("\tFragment shader = " + fragmentSource);
 
     auto vertexShader = std::make_shared<VertexShader>(vertexSource);
     m_vertexCompileErrors = !vertexShader->compile();
@@ -100,7 +98,7 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
                                                                const std::string fragmentShaderSource,
                                                                const std::string name, bool makeCurrent)
 {
-    cout << "ShaderManager: Loading shader " << name << " from string." << endl;
+    logInfo("ShaderManager: Loading shader " + name + " from string.");
 
     auto vertexShader = std::make_shared<VertexShader>();
     vertexShader->setSource(vertexShaderSource);
@@ -142,13 +140,13 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
 
 std::shared_ptr<Program> ivf::ShaderManager::loadBasicShader()
 {
-    cout << "ShaderManager: Loading basic shader." << endl;
+    logInfo("ShaderManager: Loading basic shader.");
     return loadProgramFromStrings(ivf::basic_vert_shader_source, ivf::basic_frag_shader_source, "basic");
 }
 
 ProgramPtr ivf::ShaderManager::loadRenderToTextureShader()
 {
-    cout << "ShaderManager: Loading basic shader." << endl;
+    logInfo("ShaderManager: Loading render to texture shader.");
     return loadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
                                   ivf::render_to_texture_frag_shader_source_330, "render_to_texture");
 }

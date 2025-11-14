@@ -179,10 +179,6 @@ public:
         m_camManip = CameraManipulator::create(this->ref());
         m_camManip->setCameraPosition(glm::vec3(0.0, 5.0, 10.0));
 
-        // Setup ImGui
-
-        this->scaleAllSizes(2.0f);
-
         return 0;
     }
 

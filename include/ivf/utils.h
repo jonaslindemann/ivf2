@@ -7,6 +7,7 @@
 
 #include <glad/glad.h>
 #include <string>
+#include <source_location>
 #include <ivf/transform_manager.h>
 
 namespace ivf {
@@ -100,20 +101,6 @@ public:
 };
 
 /**
- * @brief Clear all OpenGL errors.
- */
-void clearError();
-
-/**
- * @brief Check for OpenGL errors and print them with context information.
- * @param context Description of the operation or statement.
- * @param file Source file name (optional).
- * @param line Source line number (optional).
- * @return GLenum Error code (GL_NO_ERROR if none).
- */
-GLenum checkPrintError(const std::string context, const std::string file = "", const long line = 0);
-
-/**
  * @brief Generate a random float in the range [a, b].
  * @param a Lower bound.
  * @param b Upper bound.
@@ -156,33 +143,138 @@ glm::mat4 createRotationMatrixTowards(glm::vec3 currentDirection, glm::vec3 targ
  */
 void vectorToEuler(const glm::vec3 &unitVector, float &ax, float &ay);
 
-}; // namespace ivf
+// ============================================================================
+// Modern C++20 Error Handling API
+// ============================================================================
+
+/**
+ * @brief Clear all OpenGL errors.
+ */
+void clearError();
+
+/**
+ * @brief Check for OpenGL errors and print them with context information.
+ * @param context Description of the operation or statement.
+ * @param file Source file name (optional).
+ * @param line Source line number (optional).
+ * @return GLenum Error code (GL_NO_ERROR if none).
+ */
+GLenum checkPrintError(const std::string context, const std::string file = "", const long line = 0);
 
 #ifdef _DEBUG
+
+/**
+ * @brief Execute a callable and check for OpenGL errors with automatic source location tracking.
+ * @tparam F Callable type (lambda, function pointer, functor).
+ * @param func Callable to execute.
+ * @param location Source location (automatically captured).
+ * 
+ * @example
+ * ivf::checkError([&]{ 
+ *     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+ *     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+ * });
+ */
+template <typename F>
+inline void checkError(F&& func, const std::source_location& location = std::source_location::current()) {
+    clearError();
+    func();
+    checkPrintError("OpenGL call", location.file_name(), location.line());
+}
+
+/**
+ * @brief Begin an OpenGL error checking block.
+ * 
+ * @example
+ * ivf::errorBegin();
+ * glBindTexture(GL_TEXTURE_2D, texId);
+ * glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+ * ivf::errorEnd("Texture setup");
+ */
+inline void checkErrorBegin() {
+    clearError();
+}
+
+/**
+ * @brief End an OpenGL error checking block and report errors.
+ * @param name Name or description of the block.
+ * @param location Source location (automatically captured).
+ */
+inline void checkErrorEnd(const std::string& name, const std::source_location& location = std::source_location::current()) {
+    checkPrintError(name, location.file_name(), location.line());
+}
+
+#else
+
+// Release mode: inline no-op implementations
+template <typename F>
+inline void checkError(F&& func, const std::source_location& = std::source_location::current()) {
+    func();
+}
+
+inline void checkErrorBegin() {}
+
+inline void checkErrorEnd(const std::string&, const std::source_location& = std::source_location::current()) {}
+
+#endif
+
+}; // namespace ivf
+
+// ============================================================================
+// Legacy Macro Compatibility Layer
+// ============================================================================
+
+#ifdef _DEBUG
+
 /**
  * @def GL_ERR(stmt)
- * @brief Macro to execute an OpenGL statement and check for errors in debug builds.
+ * @brief Legacy macro to execute an OpenGL statement and check for errors in debug builds.
  * @param stmt OpenGL statement to execute.
+ * @deprecated Use ivf::checkError() with a lambda instead for better type safety.
+ * 
+ * @example
+ * // Old (still works):
+ * GL_ERR(glBindBuffer(GL_ARRAY_BUFFER, vbo));
+ * 
+ * // New (preferred):
+ * ivf::checkError([&]{ glBindBuffer(GL_ARRAY_BUFFER, vbo); });
  */
-#define GL_ERR(stmt)                                                                                                   \
-    ivf::clearError();                                                                                                 \
-    stmt;                                                                                                              \
+#define GL_ERR(stmt)                                                           \
+    ivf::clearError();                                                         \
+    stmt;                                                                      \
     ivf::checkPrintError(#stmt, __FILE__, __LINE__);
 
 /**
  * @def GL_ERR_BEGIN
- * @brief Macro to clear OpenGL errors before a block of statements in debug builds.
+ * @brief Legacy macro to clear OpenGL errors before a block of statements in debug builds.
+ * @deprecated Use ivf::checkErrorBegin() instead.
+ *
+ * @example
+ * // Old (still works):
+ * GL_ERR_BEGIN
+ * glBindBuffer(GL_ARRAY_BUFFER, vbo);
+ * GL_ERR_END("Buffer setup");
+ * 
+ * // New (preferred):
+ * ivf::errorBegin();
+ * glBindBuffer(GL_ARRAY_BUFFER, vbo);
+ * ivf::errorEnd("Buffer setup");
  */
-#define GL_ERR_BEGIN ivf::clearError();
+#define GL_ERR_BEGIN ivf::checkErrorBegin();
 
 /**
  * @def GL_ERR_END(name)
- * @brief Macro to check and print OpenGL errors after a block of statements in debug builds.
+ * @brief Legacy macro to check and print OpenGL errors after a block of statements in debug builds.
  * @param name Name or description of the block.
+ * @deprecated Use ivf::errorEnd() instead for automatic source location tracking.
  */
-#define GL_ERR_END(name) ivf::checkPrintError(name, __FILE__, __LINE__);
+#define GL_ERR_END(name) ivf::checkErrorEnd(name);
+
 #else
+
+// Release mode: macros become no-ops
 #define GL_ERR(stmt) stmt;
 #define GL_ERR_BEGIN
 #define GL_ERR_END(name)
+
 #endif

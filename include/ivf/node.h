@@ -11,6 +11,7 @@
 #include <ivf/property_inspectable.h>
 
 #include <memory>
+#include <vector>
 
 namespace ivf {
 
@@ -22,13 +23,17 @@ namespace ivf {
  * A node can have a material and a texture, be visible or invisible, and be drawn in
  * normal or selected state. Nodes support hierarchical relationships (parent/child),
  * object IDs for selection, and property inspection for editor integration.
+ * 
+ * Supports both single texture (backward compatible) and multitexturing (up to 8 textures).
  */
 class Node : public GLBase, public std::enable_shared_from_this<Node>, public PropertyInspectable {
 private:
     std::shared_ptr<Material> m_material{nullptr}; ///< Material associated with the node.
-    std::shared_ptr<Texture> m_texture{nullptr};   ///< Texture associated with the node.
+    std::shared_ptr<Texture> m_texture{nullptr};   ///< Primary texture (backward compatibility).
+    std::vector<std::shared_ptr<Texture>> m_textures; ///< Multiple textures for multitexturing.
     bool m_useMaterial{true};                      ///< Whether to use the material for rendering.
     bool m_useTexture{false};                      ///< Whether to use the texture for rendering.
+    bool m_useMultiTexturing{false};               ///< Whether to use multitexturing.
     bool m_visible{true};                          ///< Whether the node is visible.
     uint32_t m_objectId{0};                        ///< Object ID for selection.
     std::weak_ptr<Node> m_parent{};                ///< Parent node (for hierarchy).
@@ -70,7 +75,7 @@ public:
     std::shared_ptr<Material> material();
 
     /**
-     * @brief Set the texture for the node.
+     * @brief Set the texture for the node (single texture, backward compatible).
      * @param texture Shared pointer to the texture.
      */
     void setTexture(std::shared_ptr<Texture> texture);
@@ -80,6 +85,63 @@ public:
      * @return std::shared_ptr<Texture> Texture pointer.
      */
     std::shared_ptr<Texture> texture();
+    
+    // Multitexturing methods
+    
+    /**
+     * @brief Add a texture to the multitexture stack.
+     * @param texture Shared pointer to the texture to add.
+     */
+    void addTexture(std::shared_ptr<Texture> texture);
+    
+    /**
+     * @brief Set texture at a specific index.
+     * @param index Texture index (0-7).
+     * @param texture Shared pointer to the texture.
+     */
+    void setTexture(size_t index, std::shared_ptr<Texture> texture);
+    
+    /**
+     * @brief Remove texture at a specific index.
+     * @param index Texture index to remove.
+     */
+    void removeTexture(size_t index);
+    
+    /**
+     * @brief Clear all textures.
+     */
+    void clearTextures();
+    
+    /**
+     * @brief Get texture at a specific index.
+     * @param index Texture index.
+     * @return std::shared_ptr<Texture> Texture pointer or nullptr.
+     */
+    std::shared_ptr<Texture> getTexture(size_t index);
+    
+    /**
+     * @brief Get the number of active textures.
+     * @return size_t Number of textures.
+     */
+    size_t textureCount() const;
+    
+    /**
+     * @brief Get all textures.
+     * @return const std::vector<std::shared_ptr<Texture>>& Reference to texture vector.
+     */
+    const std::vector<std::shared_ptr<Texture>>& textures() const;
+    
+    /**
+     * @brief Enable or disable multitexturing.
+     * @param flag True to enable multitexturing, false for single texture mode.
+     */
+    void setUseMultiTexturing(bool flag);
+    
+    /**
+     * @brief Check if multitexturing is enabled.
+     * @return bool True if multitexturing is enabled.
+     */
+    bool useMultiTexturing() const;
 
     /**
      * @brief Enable or disable the use of the material for rendering.
@@ -155,6 +217,11 @@ public:
     virtual void accept(NodeVisitor *visitor);
 
 protected:
+    /**
+     * @brief Bind textures to OpenGL (single or multi).
+     */
+    void bindTextures();
+
     /**
      * @brief Called before drawing the node. Override to perform actions before drawing.
      */

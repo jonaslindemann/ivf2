@@ -1,6 +1,7 @@
 #include <ivf/node.h>
 
 #include <ivf/selection_manager.h>
+#include <ivf/shader_manager.h>
 
 using namespace ivf;
 
@@ -45,6 +46,14 @@ void ivf::Node::setUseMaterial(bool flag)
 void Node::setTexture(std::shared_ptr<Texture> texture)
 {
     m_texture = texture;
+    
+    // Backward compatibility: also set as first texture in multitexture array
+    if (m_textures.empty()) {
+        m_textures.push_back(texture);
+    } else {
+        m_textures[0] = texture;
+    }
+    
     if (m_material != nullptr)
         m_material->setUseTexture(true);
 
@@ -54,6 +63,136 @@ void Node::setTexture(std::shared_ptr<Texture> texture)
 std::shared_ptr<Texture> ivf::Node::texture()
 {
     return m_texture;
+}
+
+void ivf::Node::addTexture(std::shared_ptr<Texture> texture)
+{
+    if (m_textures.size() >= 8) {
+        // Maximum of 8 textures supported - silently ignore
+        return;
+    }
+    m_textures.push_back(texture);
+    
+    // Keep the primary texture pointer in sync with first texture for backward compatibility
+    if (m_textures.size() == 1) {
+        m_texture = texture;
+    }
+    
+    m_useMultiTexturing = m_textures.size() > 1;
+    m_useTexture = true;
+}
+
+void ivf::Node::setTexture(size_t index, std::shared_ptr<Texture> texture)
+{
+    if (index >= 8) {
+        // Texture index exceeds maximum - silently ignore
+        return;
+    }
+    
+    if (index >= m_textures.size()) {
+        m_textures.resize(index + 1);
+    }
+    m_textures[index] = texture;
+    
+    // Update primary texture if index 0
+    if (index == 0) {
+        m_texture = texture;
+    }
+    
+    m_useMultiTexturing = m_textures.size() > 1;
+    m_useTexture = true;
+}
+
+void ivf::Node::removeTexture(size_t index)
+{
+    if (index < m_textures.size()) {
+        m_textures.erase(m_textures.begin() + index);
+        m_useMultiTexturing = m_textures.size() > 1;
+        
+        // Update primary texture if we removed index 0
+        if (index == 0 && !m_textures.empty()) {
+            m_texture = m_textures[0];
+        } else if (m_textures.empty()) {
+            m_texture = nullptr;
+            m_useTexture = false;
+        }
+    }
+}
+
+void ivf::Node::clearTextures()
+{
+    m_textures.clear();
+    m_texture = nullptr;
+    m_useMultiTexturing = false;
+    m_useTexture = false;
+}
+
+std::shared_ptr<Texture> ivf::Node::getTexture(size_t index)
+{
+    if (index < m_textures.size()) {
+        return m_textures[index];
+    }
+    return nullptr;
+}
+
+size_t ivf::Node::textureCount() const
+{
+    return m_textures.size();
+}
+
+const std::vector<std::shared_ptr<Texture>>& ivf::Node::textures() const
+{
+    return m_textures;
+}
+
+void ivf::Node::setUseMultiTexturing(bool flag)
+{
+    m_useMultiTexturing = flag;
+}
+
+bool ivf::Node::useMultiTexturing() const
+{
+    return m_useMultiTexturing;
+}
+
+void ivf::Node::bindTextures()
+{
+    auto program = ShaderManager::instance()->currentProgram();
+    
+    if (m_useMultiTexturing && m_textures.size() > 1) {
+        // Multitexture path
+        program->uniformBool("useMultiTexturing", true);
+        program->uniformInt("activeTextureCount", static_cast<int>(m_textures.size()));
+        
+        for (size_t i = 0; i < m_textures.size() && i < 8; ++i) {
+            if (m_textures[i]) {
+                m_textures[i]->setTexUnit(static_cast<GLint>(i));
+                m_textures[i]->bind();
+                
+                // Set per-texture blend mode and factor using array uniforms
+                std::string indexStr = std::to_string(i);
+                program->uniformInt("textureBlendModes[" + indexStr + "]", 
+                                   static_cast<int>(m_textures[i]->blendMode()));
+                program->uniformFloat("textureBlendFactors[" + indexStr + "]", 
+                                     m_textures[i]->blendFactor());
+            }
+        }
+        
+        // Bind texture array samplers
+        for (size_t i = 0; i < m_textures.size() && i < 8; ++i) {
+            std::string samplerName = "textures[" + std::to_string(i) + "]";
+            program->uniformInt(samplerName, static_cast<int>(i));
+        }
+    } else {
+        // Single texture path (backward compatible)
+        program->uniformBool("useMultiTexturing", false);
+        program->uniformInt("activeTextureCount", 1);
+        
+        if (m_texture) {
+            m_texture->bind();
+            program->uniformInt("texture0", 0);
+        }
+    }
 }
 
 bool ivf::Node::useMaterial()
@@ -117,8 +256,10 @@ void Node::doPreDraw()
 
     if ((m_material != nullptr) && (m_useMaterial))
         m_material->apply();
-    if ((m_texture != nullptr) && (m_useTexture))
-        m_texture->bind();
+    
+    // Use bindTextures instead of single texture bind
+    if (m_useTexture)
+        bindTextures();
 }
 
 void ivf::Node::doDraw()
@@ -126,7 +267,18 @@ void ivf::Node::doDraw()
 
 void ivf::Node::doPostDraw()
 {
-    m_texture->unbind();
+    // Unbind textures
+    if (m_useTexture) {
+        if (m_useMultiTexturing && m_textures.size() > 1) {
+            for (auto& tex : m_textures) {
+                if (tex) {
+                    tex->unbind();
+                }
+            }
+        } else if (m_texture) {
+            m_texture->unbind();
+        }
+    }
 }
 
 void ivf::Node::doDrawSelection()
@@ -147,4 +299,5 @@ void ivf::Node::setupProperties()
     addProperty("Visible", &m_visible, "Node");
     addProperty("Use Material", &m_useMaterial, "Node");
     addProperty("Use Texture", &m_useTexture, "Node");
+    addProperty("Use MultiTexturing", &m_useMultiTexturing, "Node");
 }

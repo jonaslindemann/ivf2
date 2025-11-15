@@ -10,7 +10,7 @@ TextureManager *TextureManager::m_instance = 0;
 
 TextureManager::TextureManager()
     : m_textureBlendMode(TextureBlendMode::Normal), m_blendFactor(1.0), m_useTexture(true), m_textureBlendModeId(-1),
-      m_blendFactorId(-1), m_useTextureId(-1)
+      m_blendFactorId(-1), m_useTextureId(-1), m_globalMultitexturingEnabled(true)
 {
     m_textureBlendModeId = ShaderManager::instance()->currentProgram()->uniformLoc("blendMode");
     m_blendFactorId = ShaderManager::instance()->currentProgram()->uniformLoc("blendFactor");
@@ -48,6 +48,16 @@ GLfloat ivf::TextureManager::blendFactor()
 GLboolean ivf::TextureManager::useTexture()
 {
     return m_useTexture;
+}
+
+void ivf::TextureManager::setGlobalMultitexturingEnabled(bool flag)
+{
+    m_globalMultitexturingEnabled = flag;
+}
+
+bool ivf::TextureManager::globalMultitexturingEnabled() const
+{
+    return m_globalMultitexturingEnabled;
 }
 
 void ivf::TextureManager::apply()

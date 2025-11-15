@@ -2,10 +2,6 @@
 
 #include <string>
 
-#pragma once
-
-#include <string>
-
 namespace ivf {
 
 /**
@@ -77,6 +73,9 @@ inline const std::string basic_frag_shader_source = R"(
 #define TEX_BLEND_SCREEN 3
 #define TEX_BLEND_OVERLAY 4
 #define TEX_BLEND_DECAL 5
+
+// Multitexturing support
+#define MAX_TEXTURES 8
 
 out vec4 fragColor;
 
@@ -165,6 +164,13 @@ uniform int spotLightCount = 0;
 
 uniform sampler2D texture0;
 
+// Multitexturing uniforms
+uniform bool useMultiTexturing = false;
+uniform int activeTextureCount = 1;
+uniform sampler2D textures[MAX_TEXTURES];
+uniform int textureBlendModes[MAX_TEXTURES];
+uniform float textureBlendFactors[MAX_TEXTURES];
+
 #define NR_POINT_LIGHTS 8
 #define NR_DIR_LIGHTS 8
 #define NR_SPOT_LIGHTS 8
@@ -176,12 +182,10 @@ uniform SpotLight spotLights[NR_SPOT_LIGHTS];
 uniform Material material;
 
 uniform int blendMode = TEX_BLEND_MULTIPLY;
-uniform float blendFactor = 0.5; // Controls the strength of the blend [0,1]
+uniform float blendFactor = 0.5;
 
 uniform bool selectionRendering = false;
 uniform uint objectId;
-
-// Shadow mapping
 
 uniform bool shadowPass = false;
 uniform sampler2D shadowMap;
@@ -193,6 +197,7 @@ uniform sampler2D shadowMaps[NR_DIR_LIGHTS];
 uniform mat4 lightSpaceMatrices[NR_DIR_LIGHTS];
 
 vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
+vec4 applyTexBlendModeIndexed(vec4 textureColor, vec4 baseColor, int mode, float factor);
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
@@ -206,8 +211,6 @@ void main()
 {	
     if (shadowPass) 
     {
-        // For shadow pass, we don't need to output a color
-        // The depth is automatically written to the depth buffer
         return;
     }
 
@@ -219,40 +222,27 @@ void main()
     
         float closestDepth = texture(shadowMap, projCoords.xy).r;
         float currentDepth = projCoords.z;
-    
-        // Different debug visualizations
 
         if (debugShadow == 1) 
         {
-            // Raw depth map
-
             fragColor = vec4(vec3(closestDepth), 1.0);
             return;
         } 
         else if (debugShadow == 2) 
         {
-            // Raw shadow test result (red = in shadow, green = not in shadow)
-
             float shadow = currentDepth - 0.05 > closestDepth ? 1.0 : 0.0;
             fragColor = vec4(shadow, 1.0-shadow, 0.0, 1.0);
             return;
         } 
         else if (debugShadow == 3) 
         {
-            // Show projection coordinates
-        
             fragColor = vec4(projCoords, 1.0);
             return;
         }
         else if (debugShadow == 4) 
         {
-            // Show both depth values for comparison
-        
             float closestDepth = texture(shadowMap, projCoords.xy).r;
             float currentDepth = projCoords.z;
-    
-            // Show current depth in red channel, shadow map depth in green channel
-        
             fragColor = vec4(currentDepth, closestDepth, 0.0, 1.0);
             return;
         }
@@ -284,7 +274,7 @@ void main()
 
     if (selectionRendering) 
     {
-        uint mask = uint(255);  // 0xFF
+        uint mask = uint(255);
         uint r = objectId & mask;
         uint g = (objectId >> uint(8)) & mask;
         uint b = (objectId >> uint(16)) & mask;
@@ -307,20 +297,39 @@ void main()
                     if (useFixedTextColor) 
                     {
                         vec4 texSample = vec4(textColor.rgb, texture(texture0, texCoord).r);
-                        // fragColor = applyTexBlendMode(texSample, baseColor);
                         fragColor = texSample;
                     }
                     else 
                     {
                         vec4 texSample = vec4(result.rgb, texture(texture0, texCoord).r);
-                        //fragColor = applyTexBlendMode(texSample, baseColor);
                         fragColor = texSample;
                     }
                 } 
                 else 
                 {
-                    vec4 texSample = texture(texture0, texCoord);
-                    fragColor = applyTexBlendMode(texSample, baseColor);
+                    vec4 finalTexColor;
+                    
+                    if (useMultiTexturing && activeTextureCount > 1)
+                    {
+                        finalTexColor = texture(textures[0], texCoord);
+                        
+                        for(int i = 1; i < activeTextureCount && i < MAX_TEXTURES; i++)
+                        {
+                            vec4 texSample = texture(textures[i], texCoord);
+                            finalTexColor = applyTexBlendModeIndexed(
+                                texSample, 
+                                finalTexColor, 
+                                textureBlendModes[i],
+                                textureBlendFactors[i]
+                            );
+                        }
+                    }
+                    else
+                    {
+                        finalTexColor = texture(texture0, texCoord);
+                    }
+                    
+                    fragColor = applyTexBlendMode(finalTexColor, baseColor);
                 }
             } 
             else 
@@ -342,29 +351,20 @@ void main()
     }
 } 
 
-// -----------------------------------------------------------------------------
-
-// calculates the color when using a directional light.
-
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap)
 {
     vec3 norm = normalize(normal);
     
-    // For two-sided rendering, always use the normal that faces toward the viewer
     norm = dot(norm, viewDir) < -0.1 ? -norm : norm;
     
     vec3 lightDir = normalize(-light.direction);
     
-    // Continue with existing lighting calculation using 'norm'
     float diff = max(dot(norm, lightDir), 0.0);
-    // specular shading
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // combine results
     vec3 ambient = light.ambientColor * material.ambientColor;
     vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
-    // If shadows are enabled and this light casts shadows
     float shadow = 0.0;
     if(useShadows && light.castShadows)
     {
@@ -372,29 +372,22 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, samp
         shadow = calculateShadow(fragPosLightSpace, sMap);
     }
     
-    // Final color with shadows
     return (ambient + (1.0 - shadow * light.shadowStrength) * (diffuse + specular));
 }
 
-// calculates the color when using a point light.
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 norm = normalize(normal);
     
-    // For two-sided rendering, always use the normal that faces toward the viewer
     norm = dot(norm, viewDir) < -0.1 ? -norm : norm;
     
     vec3 lightDir = normalize(light.position - fragPos);
  
-    // diffuse shading
     float diff = max(dot(norm, lightDir), 0.0);
-    // specular shading
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // combine results
     vec3 ambient = light.ambientColor * material.ambientColor;
     vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
@@ -404,29 +397,22 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     return (ambient + diffuse + specular);
 }
 
-// calculates the color when using a spot light.
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
     vec3 norm = normalize(normal);
     
-    // For two-sided rendering, always use the normal that faces toward the viewer
     norm = dot(norm, viewDir) < -0.1 ? -norm : norm;
     
     vec3 lightDir = normalize(light.position - fragPos);
     
-    // diffuse shading
     float diff = max(dot(norm, lightDir), 0.0);
-    // specular shading
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    // attenuation
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    // spotlight intensity
     float theta = dot(lightDir, normalize(-light.direction)); 
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    // combine results
     vec3 ambient = light.ambientColor * material.ambientColor;
     vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
@@ -478,41 +464,69 @@ vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor)
     return mix(baseColor, result, blendFactor);
 }
 
+vec4 applyTexBlendModeIndexed(vec4 textureColor, vec4 baseColor, int mode, float factor) 
+{
+    vec4 result;
+    
+    switch(mode) {
+        case TEX_BLEND_MULTIPLY:
+            result = textureColor * baseColor;
+            break;
+            
+        case TEX_BLEND_ADD:
+            result = min(textureColor + baseColor, vec4(1.0));
+            break;
+            
+        case TEX_BLEND_SCREEN:
+            result = vec4(1.0) - (vec4(1.0) - textureColor) * (vec4(1.0) - baseColor);
+            break;
+            
+        case TEX_BLEND_OVERLAY:
+            result = vec4(
+                baseColor.r < 0.5 ? (2.0 * baseColor.r * textureColor.r) : (1.0 - 2.0 * (1.0 - baseColor.r) * (1.0 - textureColor.r)),
+                baseColor.g < 0.5 ? (2.0 * baseColor.g * textureColor.g) : (1.0 - 2.0 * (1.0 - baseColor.g) * (1.0 - textureColor.g)),
+                baseColor.b < 0.5 ? (2.0 * baseColor.b * textureColor.b) : (1.0 - 2.0 * (1.0 - baseColor.b) * (1.0 - textureColor.b)),
+                baseColor.a
+            );
+            break;
+            
+        case TEX_BLEND_DECAL:
+            result = vec4(
+                mix(baseColor.rgb, textureColor.rgb, textureColor.a),
+                baseColor.a
+            );
+            break;
+            
+        case TEX_BLEND_NORMAL:
+        default:
+            result = textureColor;
+            break;
+    }
+    
+    return mix(baseColor, result, factor);
+}
+
 float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap)
 {
-    // Perform perspective divide
-
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
     
-    // Transform to [0,1] range
-
     projCoords = projCoords * 0.5 + 0.5;
     
-    // Check if fragment is outside shadow map
-
     if(projCoords.x < 0.0 || projCoords.x > 1.0 || 
        projCoords.y < 0.0 || projCoords.y > 1.0 ||
        projCoords.z < 0.0 || projCoords.z > 1.0) {
-        return 0.0; // Not in shadow if outside shadow map
+        return 0.0;
     }
     
-    // Get closest depth value from light's perspective
-
     float closestDepth = texture(sMap, projCoords.xy).r; 
     
-    // Get depth of current fragment from light's perspective
-
     float currentDepth = projCoords.z;
     
-    // Calculate bias based on depth slope
-
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(-dirLights[0].direction);
 
     float bias = max(0.002 * (1.0 - dot(norm, lightDir)), 0.001);
     
-    // PCF (Percentage Closer Filtering) for softer shadows
-
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(sMap, 0);
     for(int x = -1; x <= 1; ++x) {

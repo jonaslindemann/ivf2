@@ -45,6 +45,9 @@ private:
     GLboolean m_savedUseTexture; ///< Saved texture usage state.
     GLint m_useTextureId;        ///< Shader uniform location for texture usage.
 
+    // Multitexturing support
+    bool m_globalMultitexturingEnabled{true}; ///< Global enable/disable for multitexturing.
+
     TextureManager();                  ///< Private constructor for singleton pattern.
     static TextureManager *m_instance; ///< Singleton instance pointer.
 
@@ -114,6 +117,18 @@ public:
      * @return GLboolean 1 if enabled, 0 otherwise.
      */
     GLboolean useTexture();
+
+    /**
+     * @brief Enable or disable global multitexturing support.
+     * @param flag True to enable, false to disable.
+     */
+    void setGlobalMultitexturingEnabled(bool flag);
+
+    /**
+     * @brief Check if global multitexturing is enabled.
+     * @return bool True if enabled.
+     */
+    bool globalMultitexturingEnabled() const;
 
     /**
      * @brief Apply the texture parameters to the rendering context or shader.

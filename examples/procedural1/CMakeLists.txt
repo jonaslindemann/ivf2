@@ -1,0 +1,1 @@
+add_ivf2_example(procedural1)

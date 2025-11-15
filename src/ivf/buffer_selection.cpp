@@ -2,6 +2,8 @@
 #include <ivf/node_visitor.h>
 #include <ivf/selection_manager.h>
 
+#include <ivf/logger.h>
+
 #include <iostream>
 
 using namespace ivf;
@@ -49,7 +51,7 @@ void BufferSelection::initialize(int width, int height)
     m_scene->accept(&mapVisitor);
     m_nodeMap = mapVisitor.takeMap();
 
-    std::cout << "BufferSelection::initialize: " << m_nodeMap.size() << " nodes in scene" << std::endl;
+    logInfofc("BufferSelection", "BufferSelection::initialize: {} nodes in scene", m_nodeMap.size());
 
     glGenFramebuffers(1, &m_fbo);
     glGenTextures(1, &m_colorTexture);

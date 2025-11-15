@@ -1,5 +1,7 @@
 #include <ivf/font_manager.h>
 
+#include <ivf/logger.h>
+
 #include <iostream>
 
 
@@ -13,13 +15,13 @@ FontManager::FontManager()
     :m_currentFace(nullptr),
      m_freetype(nullptr)
 {
-    cout << "FontManager: Created." << endl;
+    logInfo("Creating FontManager singleton instance", "FontManager");
 
     // Initialise FreeType
 
     if (FT_Init_FreeType(&m_freetype))
     {
-        std::cout << "FontManager: Could not init FreeType Library" << std::endl;
+        logError("Could not init FreeType Library", "FontManager");
         m_freetype = nullptr;
     }
 }
@@ -35,7 +37,7 @@ void ivf::FontManager::loadFace(const std::string filename, const std::string na
     FT_Face face;
     if (FT_New_Face(m_freetype, filename.c_str(), 0, &face)) 
     {
-        std::cout << "FontManager: Failed to load font" << std::endl;
+        logError("Could not load font: " + filename, "FontManager");
     }
     else
     {
@@ -53,7 +55,7 @@ void ivf::FontManager::loadFace(const std::string filename, const std::string na
             m_currentFace = face;
         }
 
-        std::cout << "FontManager: Loaded font " << filename << " as " << name << std::endl;
+        logInfo("Loaded font: " + filename + " as " + name, "FontManager");
     }
 }
 

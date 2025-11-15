@@ -1,5 +1,7 @@
 #include <ivfui/glfw_application.h>
 
+#include <ivf/logger.h>
+
 #include <glad/glad.h>
 
 #include <iostream>
@@ -7,6 +9,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+using namespace ivf;
 using namespace ivfui;
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -41,15 +44,19 @@ static void window_resize_callback(GLFWwindow *window, int width, int height)
 
 GLFWApplication::GLFWApplication()
 {
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
+    logInfo("Initializing GLFW", "GLFWApplication");
 
-    // if (!gladLoadGL())
-    //     exit(EXIT_FAILURE);
+    if (!glfwInit())
+    {
+        logError("Failed to initialize GLFW", "GLFWApplication");
+        exit(EXIT_FAILURE);
+    }
 }
 
 GLFWApplication::~GLFWApplication()
 {
+    logInfo("Terminating GLFW", "GLFWApplication");
+
     for (auto window : m_windows)
         window->destroy();
 
@@ -63,7 +70,11 @@ std::shared_ptr<GLFWApplication> GLFWApplication::create()
 
 void GLFWApplication::addWindow(GLFWWindowPtr window)
 {
+    logInfo("Adding GLFW window to application", "GLFWApplication");
+
     m_windows.push_back(window);
+
+    logInfo("Setting GLFW callbacks for window", "GLFWApplication");
 
     glfwSetKeyCallback(window->ref(), key_callback);
     glfwSetMouseButtonCallback(window->ref(), mouse_callback);
@@ -77,6 +88,8 @@ void GLFWApplication::addWindow(GLFWWindowPtr window)
 
 int GLFWApplication::loop()
 {
+    logInfo("Starting main application loop", "GLFWApplication");
+
     bool shouldClose = false;
 
     int anyError = 0;

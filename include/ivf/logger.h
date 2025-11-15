@@ -3,8 +3,8 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <sstream>
 #include <string>
+#include <format>
 
 namespace ivf {
 
@@ -28,35 +28,15 @@ private:
     std::ofstream m_logFile;
     bool m_showTimestamp;
     bool m_showContext;
+    
+    // Field width configuration
+    int m_timestampWidth;
+    int m_levelWidth;
+    int m_contextWidth;
 
     std::string levelToString(LogLevel level) const;
     std::string getTimestamp() const;
     void writeLog(LogLevel level, const std::string &message, const std::string &context = "");
-    
-    // Helper function to build formatted strings
-    template<typename... Args>
-    std::string formatMessage(const std::string& format, Args... args) const {
-        std::ostringstream oss;
-        formatMessageImpl(oss, format, args...);
-        return oss.str();
-    }
-    
-    // Base case for recursion
-    void formatMessageImpl(std::ostringstream& oss, const std::string& format) const {
-        oss << format;
-    }
-    
-    // Recursive case - replace {} with argument
-    template<typename T, typename... Args>
-    void formatMessageImpl(std::ostringstream& oss, const std::string& format, T value, Args... args) const {
-        size_t pos = format.find("{}");
-        if (pos != std::string::npos) {
-            oss << format.substr(0, pos) << value;
-            formatMessageImpl(oss, format.substr(pos + 2), args...);
-        } else {
-            oss << format;
-        }
-    }
 
 public:
     virtual ~Logger();
@@ -75,6 +55,15 @@ public:
     bool showTimestamp() const;
     void setShowContext(bool enable);
     bool showContext() const;
+    
+    // Field width configuration methods
+    void setTimestampWidth(int width);
+    int timestampWidth() const;
+    void setLevelWidth(int width);
+    int levelWidth() const;
+    void setContextWidth(int width);
+    int contextWidth() const;
+    void setFieldWidths(int timestampWidth, int levelWidth, int contextWidth);
 
     void debug(const std::string &message, const std::string &context = "");
     void info(const std::string &message, const std::string &context = "");
@@ -83,44 +72,44 @@ public:
     
     // Formatted logging methods (without context)
     template<typename... Args>
-    void debugf(const std::string& format, Args... args) {
-        writeLog(LogLevel::Debug, formatMessage(format, args...), "");
+    void debugf(std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Debug, std::format(fmt, std::forward<Args>(args)...), "");
     }
     
     template<typename... Args>
-    void infof(const std::string& format, Args... args) {
-        writeLog(LogLevel::Info, formatMessage(format, args...), "");
+    void infof(std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Info, std::format(fmt, std::forward<Args>(args)...), "");
     }
     
     template<typename... Args>
-    void warningf(const std::string& format, Args... args) {
-        writeLog(LogLevel::Warning, formatMessage(format, args...), "");
+    void warningf(std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Warning, std::format(fmt, std::forward<Args>(args)...), "");
     }
     
     template<typename... Args>
-    void errorf(const std::string& format, Args... args) {
-        writeLog(LogLevel::Error, formatMessage(format, args...), "");
+    void errorf(std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Error, std::format(fmt, std::forward<Args>(args)...), "");
     }
     
-    // Formatted logging methods with context (using 'c' suffix for clarity)
+    // Formatted logging methods with context (context FIRST - recommended API)
     template<typename... Args>
-    void debugfc(const std::string& context, const std::string& format, Args... args) {
-        writeLog(LogLevel::Debug, formatMessage(format, args...), context);
-    }
-    
-    template<typename... Args>
-    void infofc(const std::string& context, const std::string& format, Args... args) {
-        writeLog(LogLevel::Info, formatMessage(format, args...), context);
+    void debugfc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Debug, std::format(fmt, std::forward<Args>(args)...), context);
     }
     
     template<typename... Args>
-    void warningfc(const std::string& context, const std::string& format, Args... args) {
-        writeLog(LogLevel::Warning, formatMessage(format, args...), context);
+    void infofc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Info, std::format(fmt, std::forward<Args>(args)...), context);
     }
     
     template<typename... Args>
-    void errorfc(const std::string& context, const std::string& format, Args... args) {
-        writeLog(LogLevel::Error, formatMessage(format, args...), context);
+    void warningfc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Warning, std::format(fmt, std::forward<Args>(args)...), context);
+    }
+    
+    template<typename... Args>
+    void errorfc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+        writeLog(LogLevel::Error, std::format(fmt, std::forward<Args>(args)...), context);
     }
 };
 
@@ -133,44 +122,44 @@ void logError(const std::string &message, const std::string &context = "");
 
 // Formatted global logging functions (without context)
 template<typename... Args>
-void logDebugf(const std::string& format, Args... args) {
-    Logger::instance()->debugf(format, args...);
+void logDebugf(std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->debugf(fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-void logInfof(const std::string& format, Args... args) {
-    Logger::instance()->infof(format, args...);
+void logInfof(std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->infof(fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-void logWarningf(const std::string& format, Args... args) {
-    Logger::instance()->warningf(format, args...);
+void logWarningf(std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->warningf(fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-void logErrorf(const std::string& format, Args... args) {
-    Logger::instance()->errorf(format, args...);
+void logErrorf(std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->errorf(fmt, std::forward<Args>(args)...);
 }
 
-// Formatted global logging functions with context
+// Formatted global logging functions with context (context FIRST - recommended API)
 template<typename... Args>
-void logDebugfc(const std::string& context, const std::string& format, Args... args) {
-    Logger::instance()->debugfc(context, format, args...);
-}
-
-template<typename... Args>
-void logInfofc(const std::string& context, const std::string& format, Args... args) {
-    Logger::instance()->infofc(context, format, args...);
+void logDebugfc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->debugfc(context, fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-void logWarningfc(const std::string& context, const std::string& format, Args... args) {
-    Logger::instance()->warningfc(context, format, args...);
+void logInfofc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->infofc(context, fmt, std::forward<Args>(args)...);
 }
 
 template<typename... Args>
-void logErrorfc(const std::string& context, const std::string& format, Args... args) {
-    Logger::instance()->errorfc(context, format, args...);
+void logWarningfc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->warningfc(context, fmt, std::forward<Args>(args)...);
+}
+
+template<typename... Args>
+void logErrorfc(const std::string& context, std::format_string<Args...> fmt, Args&&... args) {
+    Logger::instance()->errorfc(context, fmt, std::forward<Args>(args)...);
 }
 
 void setLogLevel(LogLevel level);
@@ -179,6 +168,12 @@ bool setFileOutput(const std::string &filePath);
 void disableFileOutput();
 void setShowTimestamp(bool enable);
 void setShowContext(bool enable);
+
+// Field width configuration functions
+void setTimestampWidth(int width);
+void setLevelWidth(int width);
+void setContextWidth(int width);
+void setFieldWidths(int timestampWidth, int levelWidth, int contextWidth);
 
 } // namespace ivf
 

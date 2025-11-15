@@ -251,7 +251,7 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
             // meshNode->setShowNormals(true, 0.1f); // Enable normal visualization with a length of 0.1
         } catch (const std::exception &e)
         {
-            logWarningfc("Failed to process material: {}", e.what(), "ModelLoader");
+            logWarningfc("ModelLoader", "Failed to process material: {}", e.what());
         }
     }
 
@@ -318,7 +318,7 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> n
         }
     } catch (const std::exception &e)
     {
-        logWarningfc("Material creation failed: {}", e.what(), "ModelLoader");  
+        logWarningfc("ModelLoader", "Material creation failed: {}", e.what());
     }
 }
 
@@ -371,7 +371,7 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
         }
     } catch (const std::exception &e)
     {
-        logWarningfc("Material creation failed: {}", e.what(), "ModelLoader");
+        logWarningfc("ModelLoader", "Material creation failed: {}", e.what());
     }
 }
 

@@ -8,7 +8,16 @@ using namespace std;
 
 Logger *Logger::m_instance = nullptr;
 
-Logger::Logger() : m_logLevel(LogLevel::Info), m_consoleOutput(true), m_fileOutput(false), m_showTimestamp(true), m_showContext(true) {}
+Logger::Logger() 
+    : m_logLevel(LogLevel::Info), 
+      m_consoleOutput(true), 
+      m_fileOutput(false), 
+      m_showTimestamp(true), 
+      m_showContext(true),
+      m_timestampWidth(23),  // Default: "[2025-11-15 18:36:41.078]" = 23 chars
+      m_levelWidth(7),       // Default: "[WARNING]" = 9 chars, but "WARNING" = 7 chars
+      m_contextWidth(20)     // Default: 20 chars for context
+{}
 
 Logger::~Logger() { 
     if (m_logFile.is_open()) 
@@ -54,6 +63,19 @@ bool Logger::showTimestamp() const { return m_showTimestamp; }
 void Logger::setShowContext(bool enable) { m_showContext = enable; }
 bool Logger::showContext() const { return m_showContext; }
 
+// Field width configuration methods
+void Logger::setTimestampWidth(int width) { m_timestampWidth = width; }
+int Logger::timestampWidth() const { return m_timestampWidth; }
+void Logger::setLevelWidth(int width) { m_levelWidth = width; }
+int Logger::levelWidth() const { return m_levelWidth; }
+void Logger::setContextWidth(int width) { m_contextWidth = width; }
+int Logger::contextWidth() const { return m_contextWidth; }
+void Logger::setFieldWidths(int timestampWidth, int levelWidth, int contextWidth) {
+    m_timestampWidth = timestampWidth;
+    m_levelWidth = levelWidth;
+    m_contextWidth = contextWidth;
+}
+
 std::string Logger::levelToString(LogLevel level) const { 
     switch (level) { 
         case LogLevel::Debug: return "DEBUG"; 
@@ -78,18 +100,23 @@ std::string Logger::getTimestamp() const {
 void Logger::writeLog(LogLevel level, const std::string &message, const std::string &context) { 
     if (m_logLevel == LogLevel::None || level < m_logLevel) 
         return; 
-        
-    std::stringstream logMessage; 
-    if (m_showTimestamp) 
-        logMessage << "[" << getTimestamp() << "] "; 
-        
-    logMessage << "[" << levelToString(level) << "] ";
     
-    if (m_showContext && !context.empty())
-        logMessage << "[" << context << "] ";
+    std::string finalMessage;
     
-    logMessage << message; 
-    std::string finalMessage = logMessage.str(); 
+    // Build the log message with proper field widths using std::format
+    if (m_showTimestamp) {
+        std::string timestamp = getTimestamp();
+        finalMessage += std::format("[ {:<{}} ] ", timestamp, m_timestampWidth);
+    }
+    
+    std::string levelStr = levelToString(level);
+    finalMessage += std::format("[ {:<{}} ] ", levelStr, m_levelWidth);
+    
+    if (m_showContext && !context.empty()) {
+        finalMessage += std::format("[ {:<{}} ] ", context, m_contextWidth);
+    }
+    
+    finalMessage += message;
     
     if (m_consoleOutput) { 
         if (level == LogLevel::Error) 
@@ -119,3 +146,11 @@ bool ivf::setFileOutput(const std::string &filePath) { return Logger::instance()
 void ivf::disableFileOutput() { Logger::instance()->disableFileOutput(); }
 void ivf::setShowTimestamp(bool enable) { Logger::instance()->setShowTimestamp(enable); }
 void ivf::setShowContext(bool enable) { Logger::instance()->setShowContext(enable); }
+
+// Field width configuration functions
+void ivf::setTimestampWidth(int width) { Logger::instance()->setTimestampWidth(width); }
+void ivf::setLevelWidth(int width) { Logger::instance()->setLevelWidth(width); }
+void ivf::setContextWidth(int width) { Logger::instance()->setContextWidth(width); }
+void ivf::setFieldWidths(int timestampWidth, int levelWidth, int contextWidth) { 
+    Logger::instance()->setFieldWidths(timestampWidth, levelWidth, contextWidth); 
+}

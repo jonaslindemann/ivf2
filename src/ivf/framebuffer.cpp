@@ -1,6 +1,7 @@
 #include <ivf/framebuffer.h>
 
 #include <ivf/texture.h>
+#include <ivf/logger.h>
 
 #include <iostream>
 
@@ -191,7 +192,7 @@ void FrameBuffer::checkStatus()
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        std::cout << "Framebuffer status: " << status << std::endl;
+        logErrorfc("FrameBuffer", "Framebuffer is not complete!");
     }
 }
 

@@ -1,5 +1,7 @@
 #include <ivf/shadow_map.h>
 
+#include <ivf/logger.h>
+
 #include <iostream>
 
 using namespace ivf;
@@ -45,7 +47,7 @@ void ShadowMap::initialize()
 
     // Check framebuffer status
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "Error: Shadow map framebuffer is not complete!" << std::endl;
+        logErrorfc("ShadowMap", "Shadow map framebuffer is not complete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -1,5 +1,7 @@
 #include <ivf/fragment_shader.h>
 
+#include <ivf/logger.h>
+
 using namespace ivf;
 
 #include <iostream>
@@ -46,10 +48,12 @@ bool FragmentShader::compile()
     glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
     if (infoLogLength!=0)
     {
-        cout << "Fragment shader compilation errors:" << endl;
+        logErrorfc("FragmentShader", "Fragment shader compilation errors:");
+
         std::vector<char> fragmentShaderErrorMessage(infoLogLength);
         glGetShaderInfoLog(m_id, infoLogLength, NULL, &fragmentShaderErrorMessage[0]);
-        fprintf(stdout, "%s\n", &fragmentShaderErrorMessage[0]);
+
+        logErrorfc("FragmentShader", "{}", &fragmentShaderErrorMessage[0]);
         return false;
     }
     else

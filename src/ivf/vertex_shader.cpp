@@ -1,5 +1,7 @@
 #include <ivf/vertex_shader.h>
 
+#include <ivf/logger.h>
+
 using namespace ivf;
 
 #include <iostream>
@@ -44,10 +46,13 @@ bool VertexShader::compile()
     glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
     if (infoLogLength != 0)
     {
-        std::cout << "Vertex shader compilation errors:" << std::endl;
+        logErrorfc("VertexShader", "Vertex shader compilation errors:");
+
         std::vector<char> vertexShaderErrorMessage(infoLogLength);
         glGetShaderInfoLog(m_id, infoLogLength, NULL, &vertexShaderErrorMessage[0]);
-        fprintf(stdout, "%s\n", &vertexShaderErrorMessage[0]);
+
+        logErrorfc("VertexShader", "{}", &vertexShaderErrorMessage[0]);
+
         return false;
     }
     else

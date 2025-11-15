@@ -1,5 +1,7 @@
 #include <ivf/shader.h>
 
+#include <ivf/logger.h>
+
 using namespace ivf;
 
 #include <fstream>
@@ -57,7 +59,7 @@ bool Shader::read()
     }
     else
     {
-        std::cout << "Shader: Couldn't read " << m_filename.c_str() << std::endl;
+        logErrorfc("Shader", "Couldn't read {}", m_filename.c_str());
         return false;
     }
 }

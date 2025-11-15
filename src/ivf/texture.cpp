@@ -2,6 +2,7 @@
 
 #include <ivf/shader_manager.h>
 #include <ivf/utils.h>
+#include <ivf/logger.h>
 
 #include <iostream>
 
@@ -45,13 +46,14 @@ void Texture::bind()
 
 bool Texture::load(const std::string filename)
 {
+    logInfofc("Texture", "Loading texture from file: {}", filename);
+
     int width, height, nrChannels;
     unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
 
-    cout << "Image channels: " << nrChannels << endl;
-
     if (data)
     {
+        logInfofc("Texture", "Loaded texture: {} ({}x{}, {} channels)", filename, width, height, nrChannels);
         this->bind();
         GL_ERR_BEGIN;
         glTexImage2D(GL_TEXTURE_2D, m_level, m_format, width, height, 0, m_intFormat, m_type, data);
@@ -62,7 +64,7 @@ bool Texture::load(const std::string filename)
     else
     {
         stbi_image_free(data);
-        std::cout << "Failed to load texture" << std::endl;
+        logErrorfc("Texture", "Failed to load texture from file: {}", filename);
         return false;
     }
     stbi_image_free(data);

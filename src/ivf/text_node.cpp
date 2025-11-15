@@ -4,6 +4,7 @@
 #include <ivf/shader_manager.h>
 
 #include <ivf/utils.h>
+#include <ivf/logger.h>
 
 #include <iostream>
 #include <utility>
@@ -131,7 +132,7 @@ void ivf::TextNode::updateCharMap()
     {
         if (FT_Load_Char(face, c, FT_LOAD_RENDER))
         {
-            std::cout << "TextNode: Failed to load Glyph" << std::endl;
+            logErrorfc("TextNode", "Failed to load Glyph {}", c);
             continue;
         }
 

@@ -108,7 +108,7 @@ GLint Program::attribId(const std::string name)
 
 GLint Program::uniformLoc(const std::string name)
 {
-    logDebugfc("Getting uniform location for {} in {}", name, this->name(), "Program");
+    logDebugfc("Program", "Getting uniform location for {} in {}", name, this->name());
 
     GL_ERR(GLint id = glGetUniformLocation(m_id, name.c_str()));
     return id;

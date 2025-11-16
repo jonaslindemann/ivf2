@@ -114,7 +114,7 @@ public:
         
         // Create and configure the TextureManager to enable textures globally
         TextureManagerPtr texMgr = TextureManager::create();
-        texMgr->setUseTexture(true);
+        //texMgr->setUseTexture(true);
         texMgr->setTextureBlendMode(TextureBlendMode::Multiply);
         texMgr->setBlendFactor(1.0f);
         texMgr->apply();
@@ -314,18 +314,6 @@ public:
 
         // Update procedural textures with animation
         updateProceduralTextures(static_cast<float>(this->frameTime()));
-
-        // Rotate boxes for better viewing
-        /*
-        static float rotation = 0.0f;
-        rotation += static_cast<float>(this->frameTime()) * 20.0f;
-        m_checkerBox->setRotAngle(rotation);
-        m_checkerBox->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
-        m_noiseBox->setRotAngle(rotation);
-        m_noiseBox->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
-        m_gradientBox->setRotAngle(rotation);
-        m_gradientBox->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
-        */
 
         // Draw the scene graph
         m_scene->draw();

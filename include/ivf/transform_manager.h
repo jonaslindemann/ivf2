@@ -2,7 +2,6 @@
 
 #include <ivf/glbase.h>
 #include <ivf/shader.h>
-#include <ivf/smartptr.h>
 
 #include <string>
 #include <vector>

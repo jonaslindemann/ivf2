@@ -9,5 +9,5 @@ install_targets(/lib ivf)
 set_target_properties(ivf PROPERTIES 
     FOLDER "ivf" 
     DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
-)
+)   
       

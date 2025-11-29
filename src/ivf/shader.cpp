@@ -24,7 +24,7 @@ std::shared_ptr<Shader> ivf::Shader::create(const std::string filename)
     return std::make_shared<Shader>(filename);
 }
 
-void Shader::setFilename(const std::string filename)
+void Shader::setFilename(std::string_view filename)
 {
     m_filename = filename;
 }
@@ -34,7 +34,7 @@ const std::string Shader::filename()
     return m_filename;
 }
 
-void ivf::Shader::setSource(const std::string source)
+void ivf::Shader::setSource(std::string_view source)
 {
     m_shaderCode = source;
 }

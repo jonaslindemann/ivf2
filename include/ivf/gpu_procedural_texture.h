@@ -112,12 +112,6 @@ protected:
 };
 
 /**
- * @typedef GPUProceduralTexturePtr
- * @brief Shared pointer type for GPUProceduralTexture.
- */
-typedef std::shared_ptr<GPUProceduralTexture> GPUProceduralTexturePtr;
-
-/**
  * @class GPUCheckerboardTexture
  * @brief GPU-generated checkerboard pattern texture.
  */
@@ -155,12 +149,6 @@ public:
      */
     void setCheckerSize(float size);
 };
-
-/**
- * @typedef GPUCheckerboardTexturePtr
- * @brief Shared pointer type for GPUCheckerboardTexture.
- */
-typedef std::shared_ptr<GPUCheckerboardTexture> GPUCheckerboardTexturePtr;
 
 /**
  * @class GPUNoiseTexture
@@ -223,12 +211,6 @@ public:
 };
 
 /**
- * @typedef GPUNoiseTexturePtr
- * @brief Shared pointer type for GPUNoiseTexture.
- */
-typedef std::shared_ptr<GPUNoiseTexture> GPUNoiseTexturePtr;
-
-/**
  * @class GPUGradientTexture
  * @brief GPU-generated gradient texture.
  */
@@ -285,9 +267,27 @@ public:
 };
 
 /**
+ * @typedef GPUProceduralTexturePtr
+ * @brief Shared pointer type for GPUProceduralTexture.
+ */
+using GPUProceduralTexturePtr = std::shared_ptr<GPUProceduralTexture>;
+
+/**
+ * @typedef GPUCheckerboardTexturePtr
+ * @brief Shared pointer type for GPUCheckerboardTexture.
+ */
+using GPUCheckerboardTexturePtr = std::shared_ptr<GPUCheckerboardTexture>;
+
+/**
+ * @typedef GPUNoiseTexturePtr
+ * @brief Shared pointer type for GPUNoiseTexture.
+ */
+using GPUNoiseTexturePtr = std::shared_ptr<GPUNoiseTexture>;
+
+/**
  * @typedef GPUGradientTexturePtr
  * @brief Shared pointer type for GPUGradientTexture.
  */
-typedef std::shared_ptr<GPUGradientTexture> GPUGradientTexturePtr;
+using GPUGradientTexturePtr = std::shared_ptr<GPUGradientTexture>;
 
 } // namespace ivf

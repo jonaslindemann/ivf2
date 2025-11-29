@@ -3,6 +3,7 @@
 #include <ivf/glbase.h>
 
 #include <string>
+#include <string_view>
 
 namespace ivf {
 
@@ -44,7 +45,7 @@ public:
      * @brief Set the filename for the shader source.
      * @param filename Shader source filename.
      */
-    void setFilename(const std::string filename);
+    void setFilename(std::string_view filename);
 
     /**
      * @brief Get the filename of the shader source.
@@ -56,7 +57,7 @@ public:
      * @brief Set the shader source code directly.
      * @param source Shader source code.
      */
-    void setSource(const std::string source);
+    void setSource(std::string_view source);
 
     /**
      * @brief Get the shader source code.
@@ -87,6 +88,6 @@ public:
  * @typedef ShaderPtr
  * @brief Shared pointer type for Shader.
  */
-typedef std::shared_ptr<Shader> ShaderPtr;
+using ShaderPtr = std::shared_ptr<Shader>;
 
 }; // namespace ivf

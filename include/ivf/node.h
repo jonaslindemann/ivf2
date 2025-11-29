@@ -11,9 +11,16 @@
 #include <ivf/property_inspectable.h>
 
 #include <memory>
+#include <string>
+#include <string_view>
 #include <vector>
+#include <span>
+#include <type_traits>
 
 namespace ivf {
+
+template <typename T>
+concept ValidNodeType = std::is_base_of_v<Node, T>;
 
 /**
  * @class Node
@@ -44,7 +51,7 @@ public:
      * @brief Get the parent node.
      * @return std::shared_ptr<Node> Parent node pointer.
      */
-    std::shared_ptr<Node> parent() const;
+    [[nodiscard]] std::shared_ptr<Node> parent() const;
 
     /**
      * @brief Set the parent node.
@@ -72,7 +79,7 @@ public:
      * @brief Get the current material for the node.
      * @return std::shared_ptr<Material> Material pointer.
      */
-    std::shared_ptr<Material> material();
+    [[nodiscard]] std::shared_ptr<Material> material();
 
     /**
      * @brief Set the texture for the node (single texture, backward compatible).
@@ -84,7 +91,7 @@ public:
      * @brief Get the current texture for the node.
      * @return std::shared_ptr<Texture> Texture pointer.
      */
-    std::shared_ptr<Texture> texture();
+    [[nodiscard]] std::shared_ptr<Texture> texture();
     
     // Multitexturing methods
     
@@ -117,98 +124,118 @@ public:
      * @param index Texture index.
      * @return std::shared_ptr<Texture> Texture pointer or nullptr.
      */
-    std::shared_ptr<Texture> getTexture(size_t index);
+    [[nodiscard]] std::shared_ptr<Texture> getTexture(size_t index);
     
     /**
      * @brief Get the number of active textures.
      * @return size_t Number of textures.
      */
-    size_t textureCount() const;
+    [[nodiscard]] inline size_t textureCount() const noexcept { return m_textures.size(); }
     
     /**
-     * @brief Get all textures.
-     * @return const std::vector<std::shared_ptr<Texture>>& Reference to texture vector.
+     * @brief Get all textures as a span (modern C++20 interface).
+     * @return std::span<const std::shared_ptr<Texture>> Read-only span of textures.
+     * 
+     * Example usage:
+     * @code
+     * for (const auto& tex : node->textures()) {
+     *     if (tex) tex->bind();
+     * }
+     * @endcode
      */
-    const std::vector<std::shared_ptr<Texture>>& textures() const;
+    [[nodiscard]] inline std::span<const std::shared_ptr<Texture>> textures() const noexcept { 
+        return std::span<const std::shared_ptr<Texture>>(m_textures); 
+    }
+    
+    /**
+     * @brief Get all textures as a mutable span (modern C++20 interface).
+     * @return std::span<std::shared_ptr<Texture>> Mutable span of textures.
+     * 
+     * @note Use with caution. Modifying the underlying vector structure 
+     * (e.g., adding/removing elements) will invalidate the span.
+     */
+    [[nodiscard]] inline std::span<std::shared_ptr<Texture>> texturesMutable() noexcept { 
+        return std::span<std::shared_ptr<Texture>>(m_textures); 
+    }
     
     /**
      * @brief Enable or disable multitexturing.
      * @param flag True to enable multitexturing, false for single texture mode.
      */
-    void setUseMultiTexturing(bool flag);
+    inline void setUseMultiTexturing(bool flag) noexcept { m_useMultiTexturing = flag; }
     
     /**
      * @brief Check if multitexturing is enabled.
      * @return bool True if multitexturing is enabled.
      */
-    bool useMultiTexturing() const;
+    [[nodiscard]] inline bool useMultiTexturing() const noexcept { return m_useMultiTexturing; }
 
     /**
      * @brief Enable or disable the use of the material for rendering.
      * @param flag True to use the material, false otherwise.
      */
-    void setUseMaterial(bool flag);
+    inline void setUseMaterial(bool flag) noexcept { m_useMaterial = flag; }
 
     /**
      * @brief Check if the material is used for rendering.
      * @return bool True if the material is used.
      */
-    bool useMaterial();
+    [[nodiscard]] inline bool useMaterial() const noexcept { return m_useMaterial; }
 
     /**
      * @brief Enable or disable the use of the texture for rendering.
      * @param flag True to use the texture, false otherwise.
      */
-    void setUseTexture(bool flag);
+    inline void setUseTexture(bool flag) noexcept { m_useTexture = flag; }
 
     /**
      * @brief Check if the texture is used for rendering.
      * @return bool True if the texture is used.
      */
-    bool useTexture();
+    [[nodiscard]] inline bool useTexture() const noexcept { return m_useTexture; }
 
     /**
      * @brief Set the visibility of the node.
      * @param flag True to make visible, false to hide.
      */
-    void setVisible(bool flag);
+    inline void setVisible(bool flag) noexcept { m_visible = flag; }
 
     /**
      * @brief Check if the node is visible.
      * @return bool True if visible.
      */
-    bool visible() const;
+    [[nodiscard]] inline bool visible() const noexcept { return m_visible; }
 
     /**
      * @brief Set the object ID for the node (used for selection).
      * @param objectId Object ID value.
      */
-    void setObjectId(uint32_t objectId);
+    inline void setObjectId(uint32_t objectId) noexcept { m_objectId = objectId; }
 
     /**
      * @brief Get the current object ID for the node.
      * @return uint32_t Object ID value.
      */
-    uint32_t objectId() const;
+    [[nodiscard]] inline uint32_t objectId() const noexcept { return m_objectId; }
 
     /**
      * @brief Set the name of the node.
      * @param name Name string.
      */
-    void setName(const std::string &name);
+    void setName(std::string_view name);
 
     /**
      * @brief Get the name of the node.
      * @return std::string Name of the node.
      */
-    std::string name() const;
+    [[nodiscard]] std::string name() const;
 
     /**
      * @brief Enumerate and assign the next object ID for the node (used for selection).
      * @param startId Starting object ID.
      * @return uint32_t Next available object ID.
      */
-    uint32_t enumerateIds(uint32_t startId);
+    [[nodiscard]] uint32_t enumerateIds(uint32_t startId);
 
     /**
      * @brief Accept a visitor for traversal or processing (visitor pattern).
@@ -265,6 +292,6 @@ protected:
  * @typedef NodePtr
  * @brief Shared pointer type for Node.
  */
-typedef std::shared_ptr<Node> NodePtr;
+using NodePtr = std::shared_ptr<Node>;
 
 } // namespace ivf

@@ -63,11 +63,6 @@ NodePtr ivf::CompositeNode::at(size_t index)
     return nodes().at(index);
 }
 
-size_t ivf::CompositeNode::count()
-{
-    return m_nodes.size();
-}
-
 void ivf::CompositeNode::storeChildrenPos()
 {
     for (auto node : m_nodes)

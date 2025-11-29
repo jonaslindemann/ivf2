@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 
 #include <ivf/glbase.h>
 #include <ivf/field.h>
@@ -63,7 +64,7 @@ public:
      * @param filename Path to the image file.
      * @return bool True if loading succeeded.
      */
-    bool load(const std::string filename);
+    bool load(std::string_view filename);
 
     /**
      * @brief Unbind the texture from the current OpenGL context.
@@ -74,109 +75,109 @@ public:
      * @brief Set the internal format of the texture.
      * @param format Internal format (e.g., GL_RGBA).
      */
-    void setIntFormat(GLint format);
+    inline void setIntFormat(GLint format) noexcept { m_intFormat = format; }
 
     /**
      * @brief Set the format of the pixel data.
      * @param format Format (e.g., GL_RGBA).
      */
-    void setFormat(GLenum format);
+    inline void setFormat(GLenum format) noexcept { m_format = format; }
 
     /**
      * @brief Set the data type of the pixel data.
      * @param type Data type (e.g., GL_UNSIGNED_BYTE).
      */
-    void setType(GLenum type);
+    inline void setType(GLenum type) noexcept { m_type = type; }
 
     /**
      * @brief Set the mipmap level.
      * @param level Mipmap level.
      */
-    void setLevel(GLint level);
+    inline void setLevel(GLint level) noexcept { m_level = level; }
 
     /**
      * @brief Set the texture unit.
      * @param unit Texture unit index.
      */
-    void setTexUnit(GLint unit);
+    inline void setTexUnit(GLint unit) noexcept { m_texUnit = unit; }
 
     /**
      * @brief Enable or disable the use of a local blend mode.
      * @param flag True to use local blend mode, false otherwise.
      */
-    void setUseLocalBlendMode(bool flag);
+    inline void setUseLocalBlendMode(bool flag) noexcept { m_useLocalBlendMode = flag; }
 
     /**
      * @brief Set the blend mode for this texture.
      * @param blendMode Blend mode value.
      */
-    void setBlendMode(TextureBlendMode blendMode);
+    inline void setBlendMode(TextureBlendMode blendMode) noexcept { m_blendMode = blendMode; }
 
     /**
      * @brief Set the blend factor for this texture.
      * @param blendFactor Blend factor value.
      */
-    void setBlendFactor(float blendFactor);
+    inline void setBlendFactor(float blendFactor) noexcept { m_blendFactor = blendFactor; }
 
     /**
      * @brief Set the texture wrapping mode for the T coordinate.
      * @param wrapT Wrapping mode (e.g., GL_REPEAT).
      */
-    void setWrapT(GLint wrapT);
+    inline void setWrapT(GLint wrapT) noexcept { m_wrapT = wrapT; }
 
     /**
      * @brief Set the texture wrapping mode for the S coordinate.
      * @param wrapS Wrapping mode (e.g., GL_REPEAT).
      */
-    void setWrapS(GLint wrapS);
+    inline void setWrapS(GLint wrapS) noexcept { m_wrapS = wrapS; }
 
     /**
      * @brief Set the minification filter.
      * @param minFilter Minification filter (e.g., GL_LINEAR).
      */
-    void setMinFilter(GLint minFilter);
+    inline void setMinFilter(GLint minFilter) noexcept { m_minFilter = minFilter; }
 
     /**
      * @brief Set the magnification filter.
      * @param magFilter Magnification filter (e.g., GL_LINEAR).
      */
-    void setMagFilter(GLint magFilter);
+    inline void setMagFilter(GLint magFilter) noexcept { m_magFilter = magFilter; }
 
     /**
      * @brief Get whether a local blend mode is used.
      * @return GLint 1 if local blend mode is used, 0 otherwise.
      */
-    GLint useLocalBlendMode();
+    [[nodiscard]] inline GLint useLocalBlendMode() const noexcept { return m_useLocalBlendMode ? 1 : 0; }
 
     /**
      * @brief Get the blend mode for this texture.
      * @return TextureBlendMode Blend mode value.
      */
-    TextureBlendMode blendMode();
+    [[nodiscard]] inline TextureBlendMode blendMode() const noexcept { return m_blendMode; }
 
     /**
      * @brief Get the blend factor for this texture.
      * @return float Blend factor value.
      */
-    float blendFactor();
+    [[nodiscard]] inline float blendFactor() const noexcept { return m_blendFactor; }
 
     /**
      * @brief Get the texture unit index.
      * @return GLint Texture unit index.
      */
-    GLint texUnit();
+    [[nodiscard]] inline GLint texUnit() const noexcept { return m_texUnit; }
 
     /**
      * @brief Get the OpenGL texture object ID.
      * @return GLuint Texture object ID.
      */
-    GLuint id();
+    [[nodiscard]] inline GLuint id() const noexcept { return m_id; }
 };
 
 /**
  * @typedef TexturePtr
  * @brief Shared pointer type for Texture.
  */
-typedef std::shared_ptr<Texture> TexturePtr;
+using TexturePtr = std::shared_ptr<Texture>;
 
 }; // namespace ivf

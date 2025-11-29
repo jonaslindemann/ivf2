@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <string_view>
 #include <vector>
 #include <functional>
 #include <memory>
@@ -97,68 +98,68 @@ protected:
     /**
      * @brief Register a double property for inspection.
      */
-    void addProperty(const std::string &name, double *value, const std::string &category = "General");
-    void addProperty(const std::string &name, double *value, double min, double max,
-                     const std::string &category = "General");
+    void addProperty(std::string_view name, double *value, std::string_view category = "General");
+    void addProperty(std::string_view name, double *value, double min, double max,
+                     std::string_view category = "General");
 
     /**
      * @brief Register an int property for inspection.
      */
-    void addProperty(const std::string &name, int *value, const std::string &category = "General");
-    void addProperty(const std::string &name, int *value, double min, double max,
-                     const std::string &category = "General");
+    void addProperty(std::string_view name, int *value, std::string_view category = "General");
+    void addProperty(std::string_view name, int *value, double min, double max,
+                     std::string_view category = "General");
 
     /**
      * @brief Register a bool property for inspection.
      */
-    void addProperty(const std::string &name, bool *value, const std::string &category = "General");
+    void addProperty(std::string_view name, bool *value, std::string_view category = "General");
 
     /**
      * @brief Register a string property for inspection.
      */
-    void addProperty(const std::string &name, std::string *value, const std::string &category = "General");
+    void addProperty(std::string_view name, std::string *value, std::string_view category = "General");
 
     /**
      * @brief Register a float property for inspection.
      */
-    void addProperty(const std::string &name, float *value, const std::string &category = "General");
-    void addProperty(const std::string &name, float *value, double min, double max,
-                     const std::string &category = "General");
+    void addProperty(std::string_view name, float *value, std::string_view category = "General");
+    void addProperty(std::string_view name, float *value, double min, double max,
+                     std::string_view category = "General");
 
     /**
      * @brief Register a glm::vec3 property for inspection.
      */
-    void addProperty(const std::string &name, glm::vec3 *value, const std::string &category = "General");
-    void addPropertyWithRange(const std::string &name, glm::vec3 *value, double minVal, double maxVal,
-                              const std::string &category = "General");
+    void addProperty(std::string_view name, glm::vec3 *value, std::string_view category = "General");
+    void addPropertyWithRange(std::string_view name, glm::vec3 *value, double minVal, double maxVal,
+                              std::string_view category = "General");
 
     /**
      * @brief Register a glm::vec4 property for inspection.
      */
-    void addProperty(const std::string &name, glm::vec4 *value, const std::string &category = "General");
-    void addPropertyWithRange(const std::string &name, glm::vec4 *value, double minVal, double maxVal,
-                              const std::string &category = "General");
+    void addProperty(std::string_view name, glm::vec4 *value, std::string_view category = "General");
+    void addPropertyWithRange(std::string_view name, glm::vec4 *value, double minVal, double maxVal,
+                              std::string_view category = "General");
 
     /**
      * @brief Register a glm::uint property for inspection.
      */
-    void addProperty(const std::string &name, glm::uint *value, const std::string &category = "General");
-    void addProperty(const std::string &name, glm::uint *value, double min, double max,
-                     const std::string &category = "General");
+    void addProperty(std::string_view name, glm::uint *value, std::string_view category = "General");
+    void addProperty(std::string_view name, glm::uint *value, double min, double max,
+                     std::string_view category = "General");
 
     /**
      * @brief Register a glm::uvec3 property for inspection.
      */
-    void addProperty(const std::string &name, glm::uvec3 *value, const std::string &category = "General");
-    void addPropertyWithRange(const std::string &name, glm::uvec3 *value, double minVal, double maxVal,
-                              const std::string &category = "General");
+    void addProperty(std::string_view name, glm::uvec3 *value, std::string_view category = "General");
+    void addPropertyWithRange(std::string_view name, glm::uvec3 *value, double minVal, double maxVal,
+                              std::string_view category = "General");
 
     /**
      * @brief Register a glm::uvec4 property for inspection.
      */
-    void addProperty(const std::string &name, glm::uvec4 *value, const std::string &category = "General");
-    void addPropertyWithRange(const std::string &name, glm::uvec4 *value, double minVal, double maxVal,
-                              const std::string &category = "General");
+    void addProperty(std::string_view name, glm::uvec4 *value, std::string_view category = "General");
+    void addPropertyWithRange(std::string_view name, glm::uvec4 *value, double minVal, double maxVal,
+                              std::string_view category = "General");
 
     /**
      * @brief Add a read-only property for inspection.
@@ -166,7 +167,7 @@ protected:
      * @param value Property value pointer.
      * @param category Category name.
      */
-    void addReadOnlyProperty(const std::string &name, PropertyValue value, const std::string &category = "General");
+    void addReadOnlyProperty(std::string_view name, PropertyValue value, std::string_view category = "General");
 
     /**
      * @brief Called when properties are first requested - override to register properties.

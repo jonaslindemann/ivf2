@@ -42,97 +42,97 @@ public:
      * @brief Set the diffuse color.
      * @param color Diffuse color (RGBA).
      */
-    void setDiffuseColor(glm::vec4 color);
+    inline void setDiffuseColor(glm::vec4 color) noexcept { m_diffuseColor = color; }
 
     /**
      * @brief Set the specular color.
      * @param color Specular color (RGBA).
      */
-    void setSpecularColor(glm::vec4 color);
+    inline void setSpecularColor(glm::vec4 color) noexcept { m_specularColor = color; }
 
     /**
      * @brief Set the ambient color.
      * @param color Ambient color (RGBA).
      */
-    void setAmbientColor(glm::vec4 color);
+    inline void setAmbientColor(glm::vec4 color) noexcept { m_ambientColor = color; }
 
     /**
      * @brief Enable or disable texture mapping.
      * @param flag True to enable, false to disable.
      */
-    void setUseTexture(bool flag);
+    inline void setUseTexture(bool flag) noexcept { m_useTexture = flag; }
 
     /**
      * @brief Enable or disable per-vertex color.
      * @param flag True to enable, false to disable.
      */
-    void setUseVertexColor(bool flag);
+    inline void setUseVertexColor(bool flag) noexcept { m_useVertexColor = flag; }
 
     /**
      * @brief Set the shininess (specular exponent).
      * @param shininess Shininess value.
      */
-    void setShininess(float shininess);
+    inline void setShininess(float shininess) noexcept { m_shininess = shininess; }
 
     /**
      * @brief Enable or disable lighting.
      * @param flag True to enable, false to disable.
      */
-    void setUseLighting(bool flag);
+    inline void setUseLighting(bool flag) noexcept { m_useLighting = flag; }
 
     /**
      * @brief Set the alpha (opacity) value.
      * @param alpha Alpha value.
      */
-    void setAlpha(float alpha);
+    inline void setAlpha(float alpha) noexcept { m_alpha = alpha; }
 
     /**
      * @brief Check if lighting is enabled.
      * @return bool True if lighting is enabled.
      */
-    bool useLighting() const;
+    [[nodiscard]] inline bool useLighting() const noexcept { return m_useLighting; }
 
     /**
      * @brief Check if texture mapping is enabled.
      * @return bool True if texture mapping is enabled.
      */
-    bool useTexture() const;
+    [[nodiscard]] inline bool useTexture() const noexcept { return m_useTexture; }
 
     /**
      * @brief Check if per-vertex color is enabled.
      * @return bool True if per-vertex color is enabled.
      */
-    bool useVertexColor() const;
+    [[nodiscard]] inline bool useVertexColor() const noexcept { return m_useVertexColor; }
 
     /**
      * @brief Get the diffuse color.
      * @return glm::vec4 Diffuse color (RGBA).
      */
-    glm::vec4 diffuseColor() const;
+    [[nodiscard]] inline glm::vec4 diffuseColor() const noexcept { return m_diffuseColor; }
 
     /**
      * @brief Get the specular color.
      * @return glm::vec4 Specular color (RGBA).
      */
-    glm::vec4 specularColor() const;
+    [[nodiscard]] inline glm::vec4 specularColor() const noexcept { return m_specularColor; }
 
     /**
      * @brief Get the ambient color.
      * @return glm::vec4 Ambient color (RGBA).
      */
-    glm::vec4 ambientColor() const;
+    [[nodiscard]] inline glm::vec4 ambientColor() const noexcept { return m_ambientColor; }
 
     /**
      * @brief Get the shininess value.
      * @return float Shininess.
      */
-    float shininess() const;
+    [[nodiscard]] inline float shininess() const noexcept { return m_shininess; }
 
     /**
      * @brief Get the alpha (opacity) value.
      * @return float Alpha value.
      */
-    float alpha() const;
+    [[nodiscard]] inline float alpha() const noexcept { return m_alpha; }
 
     /**
      * @brief Apply the material properties to the rendering context or shader.
@@ -144,6 +144,6 @@ public:
  * @typedef MaterialPtr
  * @brief Shared pointer type for Material.
  */
-typedef std::shared_ptr<Material> MaterialPtr;
+using MaterialPtr = std::shared_ptr<Material>;
 
 } // namespace ivf

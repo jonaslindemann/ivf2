@@ -45,7 +45,7 @@ void BufferSelection::initialize(int width, int height)
     m_width = width;
     m_height = height;
 
-    m_scene->enumerateIds(0);
+    auto startIdx = m_scene->enumerateIds(0);
 
     MapVisitor mapVisitor;
     m_scene->accept(&mapVisitor);

@@ -134,6 +134,6 @@ protected:
  * @typedef ArrowPtr
  * @brief Shared pointer type for Arrow.
  */
-typedef std::shared_ptr<Arrow> ArrowPtr;
+using ArrowPtr = std::shared_ptr<Arrow>;
 
 } // namespace ivf

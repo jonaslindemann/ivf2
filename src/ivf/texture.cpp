@@ -5,6 +5,7 @@
 #include <ivf/logger.h>
 
 #include <iostream>
+#include <string_view>
 
 using namespace ivf;
 using namespace std;
@@ -44,12 +45,12 @@ void Texture::bind()
     GL_ERR_END("Texture::bind()");
 }
 
-bool Texture::load(const std::string filename)
+bool Texture::load(const std::string_view filename)
 {
     logInfofc("Texture", "Loading texture from file: {}", filename);
 
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(std::string(filename).c_str(), &width, &height, &nrChannels, 0);
 
     if (data)
     {
@@ -77,89 +78,4 @@ void Texture::unbind()
     if (m_useLocalBlendMode)
         TextureManager::instance()->restoreState();
     GL_ERR(glBindTexture(GL_TEXTURE_2D, 0));
-}
-
-void ivf::Texture::setIntFormat(GLint format)
-{
-    m_intFormat = format;
-}
-
-void ivf::Texture::setFormat(GLenum format)
-{
-    m_format = format;
-}
-
-void ivf::Texture::setType(GLenum type)
-{
-    m_type = type;
-}
-
-void ivf::Texture::setLevel(GLint level)
-{
-    m_level = level;
-}
-
-void ivf::Texture::setTexUnit(GLint unit)
-{
-    m_texUnit = unit;
-}
-
-void ivf::Texture::setUseLocalBlendMode(bool flag)
-{
-    m_useLocalBlendMode = flag;
-}
-
-void ivf::Texture::setBlendMode(TextureBlendMode blendMode)
-{
-    m_blendMode = blendMode;
-}
-
-void ivf::Texture::setBlendFactor(float blendFactor)
-{
-    m_blendFactor = blendFactor;
-}
-
-void ivf::Texture::setWrapT(GLint wrapT)
-{
-    m_wrapT = wrapT;
-}
-
-void ivf::Texture::setWrapS(GLint wrapS)
-{
-    m_wrapS = wrapS;
-}
-
-void ivf::Texture::setMinFilter(GLint minFilter)
-{
-    m_minFilter = minFilter;
-}
-
-void ivf::Texture::setMagFilter(GLint magFilter)
-{
-    m_magFilter = magFilter;
-}
-
-GLint ivf::Texture::useLocalBlendMode()
-{
-    return m_useLocalBlendMode;
-}
-
-TextureBlendMode ivf::Texture::blendMode()
-{
-    return m_blendMode;
-}
-
-float ivf::Texture::blendFactor()
-{
-    return m_blendFactor;
-}
-
-GLint ivf::Texture::texUnit()
-{
-    return m_texUnit;
-}
-
-GLuint ivf::Texture::id()
-{
-    return m_id;
 }

@@ -47,6 +47,6 @@ private:
                           float t) const;
 };
 
-typedef std::shared_ptr<Spline> SplinePtr;
+using SplinePtr = std::shared_ptr<Spline>;
 
 } // namespace ivfmath

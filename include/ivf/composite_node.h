@@ -44,10 +44,17 @@ public:
     void add(std::shared_ptr<Node> node);
 
     /**
+     * @brief Add a child node of type T to the composite node (type-safe template wrapper).
+     * @param node Node to add.
+     */
+    template <ValidNodeType T> 
+    void add(std::shared_ptr<T> node);
+
+    /**
      * @brief Get the list of child nodes.
      * @return std::vector<std::shared_ptr<Node>> Vector of child nodes.
      */
-    std::vector<std::shared_ptr<Node>> nodes();
+    [[nodiscard]] std::vector<std::shared_ptr<Node>> nodes();
 
     /**
      * @brief Remove all child nodes from the composite node.
@@ -65,13 +72,13 @@ public:
      * @param index Index of the child node.
      * @return NodePtr Shared pointer to the child node.
      */
-    NodePtr at(size_t index);
+    [[nodiscard]] NodePtr at(size_t index);
 
     /**
      * @brief Get the number of child nodes.
      * @return size_t Number of child nodes.
      */
-    size_t count();
+    [[nodiscard]] inline size_t count() const noexcept { return m_nodes.size(); }
 
     /**
      * @brief Store the current positions of all child nodes.
@@ -88,13 +95,13 @@ public:
      * @param includeInvisible Whether to include invisible nodes in the computation.
      * @return BoundingBox The aggregate bounding box in this node's local space.
      */
-    BoundingBox computeChildrenBoundingBox(bool includeInvisible = false) const;
+    [[nodiscard]] BoundingBox computeChildrenBoundingBox(bool includeInvisible = false) const;
 
     /**
      * @brief Get the local bounding box, including children.
      * @return BoundingBox The local bounding box including all children.
      */
-    virtual BoundingBox localBoundingBox() const override;
+    [[nodiscard]] virtual BoundingBox localBoundingBox() const override;
 
     /**
      * @brief Get all TransformNode-derived children recursively.
@@ -108,13 +115,13 @@ public:
      * @param includeInvisible Whether to include invisible nodes.
      * @return std::vector<glm::vec3> Vector of world positions.
      */
-    std::vector<glm::vec3> getChildWorldPositions(bool includeInvisible = false) const;
+    [[nodiscard]] std::vector<glm::vec3> getChildWorldPositions(bool includeInvisible = false) const;
 
     /**
      * @brief Get the world-space bounding box of this composite node, including all children.
      * @return BoundingBox The world-space bounding box including children.
      */
-    virtual BoundingBox worldBoundingBox() const override;
+    [[nodiscard]] virtual BoundingBox worldBoundingBox() const override;
 
     /**
      * @brief Accept a node visitor for traversal or processing.
@@ -131,54 +138,39 @@ public:
      * @brief Get iterator to the beginning of the child node list.
      * @return iterator Iterator to the first child node.
      */
-    iterator begin()
-    {
-        return m_nodes.begin();
-    }
+    [[nodiscard]] iterator begin() noexcept { return m_nodes.begin(); }
+    
     /**
      * @brief Get iterator to the end of the child node list.
      * @return iterator Iterator to one past the last child node.
      */
-    iterator end()
-    {
-        return m_nodes.end();
-    }
+    [[nodiscard]] iterator end() noexcept { return m_nodes.end(); }
 
     // Const iterator methods
     /**
      * @brief Get const iterator to the beginning of the child node list.
      * @return const_iterator Const iterator to the first child node.
      */
-    const_iterator begin() const
-    {
-        return m_nodes.begin();
-    }
+    [[nodiscard]] const_iterator begin() const noexcept { return m_nodes.begin(); }
+    
     /**
      * @brief Get const iterator to the end of the child node list.
      * @return const_iterator Const iterator to one past the last child node.
      */
-    const_iterator end() const
-    {
-        return m_nodes.end();
-    }
+    [[nodiscard]] const_iterator end() const noexcept { return m_nodes.end(); }
 
     // Optional: cbegin/cend for explicit const iteration
     /**
      * @brief Get const iterator to the beginning of the child node list.
      * @return const_iterator Const iterator to the first child node.
      */
-    const_iterator cbegin() const
-    {
-        return m_nodes.cbegin();
-    }
+    [[nodiscard]] const_iterator cbegin() const noexcept { return m_nodes.cbegin(); }
+    
     /**
      * @brief Get const iterator to the end of the child node list.
      * @return const_iterator Const iterator to one past the last child node.
      */
-    const_iterator cend() const
-    {
-        return m_nodes.cend();
-    }
+    [[nodiscard]] const_iterator cend() const noexcept { return m_nodes.cend(); }
 
 protected:
     /**
@@ -194,9 +186,16 @@ protected:
     virtual uint32_t doEnumerateIds(uint32_t startId);
 };
 
+// Template method implementation (must be in header)
+template <ValidNodeType T> 
+void CompositeNode::add(std::shared_ptr<T> node)
+{
+    add(std::static_pointer_cast<Node>(node));
+}
+
 /**
  * @typedef CompositeNodePtr
  * @brief Shared pointer type for CompositeNode.
  */
-typedef std::shared_ptr<CompositeNode> CompositeNodePtr;
+using CompositeNodePtr = std::shared_ptr<CompositeNode>;
 } // namespace ivf

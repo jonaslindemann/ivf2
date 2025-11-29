@@ -53,114 +53,114 @@ std::vector<std::string> PropertyInspectable::getCategories() const
     return categories;
 }
 
-void PropertyInspectable::addProperty(const std::string &name, double *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, double *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addProperty(const std::string &name, double *value, double min, double max,
-                                      const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, double *value, double min, double max,
+                                      std::string_view category)
 {
-    m_properties.emplace_back(name, value, min, max, category);
+    m_properties.emplace_back(std::string(name), value, min, max, std::string(category));
 }
 
-void PropertyInspectable::addProperty(const std::string &name, int *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, int *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addProperty(const std::string &name, int *value, double min, double max,
-                                      const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, int *value, double min, double max,
+                                      std::string_view category)
 {
-    Property prop(name, value, min, max, category);
+    Property prop(std::string(name), value, min, max, std::string(category));
     m_properties.push_back(prop);
 }
 
-void PropertyInspectable::addProperty(const std::string &name, bool *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, bool *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addProperty(const std::string &name, std::string *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, std::string *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addProperty(const std::string &name, float *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, float *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addProperty(const std::string &name, float *value, double min, double max,
-                                      const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, float *value, double min, double max,
+                                      std::string_view category)
 {
-    Property prop(name, value, min, max, category);
+    Property prop(std::string(name), value, min, max, std::string(category));
     m_properties.push_back(prop);
 }
 
-void PropertyInspectable::addProperty(const std::string &name, glm::vec3 *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, glm::vec3 *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::vec3 *value, double minVal, double maxVal,
-                                               const std::string &category)
+void PropertyInspectable::addPropertyWithRange(std::string_view name, glm::vec3 *value, double minVal, double maxVal,
+                                               std::string_view category)
 {
-    Property prop(name, value, minVal, maxVal, category);
+    Property prop(std::string(name), value, minVal, maxVal, std::string(category));
     m_properties.push_back(prop);
 }
 
-void PropertyInspectable::addProperty(const std::string &name, glm::vec4 *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, glm::vec4 *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::vec4 *value, double minVal, double maxVal,
-                                               const std::string &category)
+void PropertyInspectable::addPropertyWithRange(std::string_view name, glm::vec4 *value, double minVal, double maxVal,
+                                               std::string_view category)
 {
-    Property prop(name, value, minVal, maxVal, category);
+    Property prop(std::string(name), value, minVal, maxVal, std::string(category));
     m_properties.push_back(prop);
 }
 
-void PropertyInspectable::addProperty(const std::string &name, glm::uint *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, glm::uint *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addProperty(const std::string &name, glm::uint *value, double min, double max,
-                                      const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, glm::uint *value, double min, double max,
+                                      std::string_view category)
 {
-    Property prop(name, value, min, max, category);
+    Property prop(std::string(name), value, min, max, std::string(category));
     m_properties.push_back(prop);
 }
 
-void PropertyInspectable::addProperty(const std::string &name, glm::uvec3 *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, glm::uvec3 *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::uvec3 *value, double minVal, double maxVal,
-                                               const std::string &category)
+void PropertyInspectable::addPropertyWithRange(std::string_view name, glm::uvec3 *value, double minVal, double maxVal,
+                                               std::string_view category)
 {
-    Property prop(name, value, minVal, maxVal, category);
+    Property prop(std::string(name), value, minVal, maxVal, std::string(category));
     m_properties.push_back(prop);
 }
 
-void PropertyInspectable::addProperty(const std::string &name, glm::uvec4 *value, const std::string &category)
+void PropertyInspectable::addProperty(std::string_view name, glm::uvec4 *value, std::string_view category)
 {
-    m_properties.emplace_back(name, value, category);
+    m_properties.emplace_back(std::string(name), value, std::string(category));
 }
 
-void PropertyInspectable::addPropertyWithRange(const std::string &name, glm::uvec4 *value, double minVal, double maxVal,
-                                               const std::string &category)
+void PropertyInspectable::addPropertyWithRange(std::string_view name, glm::uvec4 *value, double minVal, double maxVal,
+                                               std::string_view category)
 {
-    Property prop(name, value, minVal, maxVal, category);
+    Property prop(std::string(name), value, minVal, maxVal, std::string(category));
     m_properties.push_back(prop);
 }
 
-void PropertyInspectable::addReadOnlyProperty(const std::string &name, PropertyValue value, const std::string &category)
+void PropertyInspectable::addReadOnlyProperty(std::string_view name, PropertyValue value, std::string_view category)
 {
-    Property prop(name, value, category);
+    Property prop(std::string(name), value, std::string(category));
     prop.readOnly = true;
     m_properties.push_back(prop);
 }

@@ -95,26 +95,26 @@ void ivf::Program::setEnabled(bool enabled)
     m_enabled = enabled;
 }
 
-void ivf::Program::bindAttribLoc(GLuint idx, const std::string name)
+void ivf::Program::bindAttribLoc(GLuint idx, std::string_view name)
 {
-    GL_ERR(glBindAttribLocation(m_id, idx, name.c_str()));
+    GL_ERR(glBindAttribLocation(m_id, idx, name.data()));
 }
 
-GLint Program::attribId(const std::string name)
+GLint Program::attribId(std::string_view name)
 {
-    GL_ERR(GLint id = glGetAttribLocation(m_id, name.c_str()));
+    GL_ERR(GLint id = glGetAttribLocation(m_id, name.data()));
     return id;
 }
 
-GLint Program::uniformLoc(const std::string name)
+GLint Program::uniformLoc(std::string_view name)
 {
     logDebugfc("Program", "Getting uniform location for {} in {}", name, this->name());
 
-    GL_ERR(GLint id = glGetUniformLocation(m_id, name.c_str()));
+    GL_ERR(GLint id = glGetUniformLocation(m_id, name.data()));
     return id;
 }
 
-void Program::uniformMatrix4(const std::string name, glm::mat4 matrix)
+void Program::uniformMatrix4(std::string_view name, glm::mat4 matrix)
 {
     GL_ERR(glUniformMatrix4fv(uniformLoc(name), 1, GL_FALSE, glm::value_ptr(matrix)));
 }
@@ -124,7 +124,7 @@ void ivf::Program::uniformMatrix4(GLint id, glm::mat4 matrix)
     GL_ERR(glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix)));
 }
 
-void Program::uniformBool(const std::string name, bool flag)
+void Program::uniformBool(std::string_view name, bool flag)
 {
     GL_ERR(glUniform1i(uniformLoc(name), flag));
 }
@@ -134,7 +134,7 @@ void ivf::Program::uniformBool(GLint id, bool flag)
     GL_ERR(glUniform1i(id, flag));
 }
 
-void Program::uniformInt(const std::string name, int value)
+void Program::uniformInt(std::string_view name, int value)
 {
     GL_ERR(glUniform1i(uniformLoc(name), value));
 }
@@ -144,7 +144,7 @@ void ivf::Program::uniformInt(GLint id, int value)
     GL_ERR(glUniform1i(id, value));
 }
 
-void ivf::Program::uniformUInt(const std::string name, int value)
+void ivf::Program::uniformUInt(std::string_view name, int value)
 {
     GL_ERR(glUniform1ui(uniformLoc(name), value));
 }
@@ -154,7 +154,7 @@ void ivf::Program::uniformUInt(GLint id, int value)
     GL_ERR(glUniform1ui(id, value));
 }
 
-void ivf::Program::uniformFloat(const std::string name, float value)
+void ivf::Program::uniformFloat(std::string_view name, float value)
 {
     GL_ERR(glUniform1f(uniformLoc(name), value));
 }
@@ -164,7 +164,7 @@ void ivf::Program::uniformFloat(GLint id, float value)
     GL_ERR(glUniform1f(id, value));
 }
 
-void ivf::Program::uniformVec4f(const std::string name, float v0, float v1, float v2, float v3)
+void ivf::Program::uniformVec4f(std::string_view name, float v0, float v1, float v2, float v3)
 {
     GL_ERR(glUniform4f(uniformLoc(name), v0, v1, v2, v3));
 }
@@ -174,7 +174,7 @@ void ivf::Program::uniformVec4f(GLint id, float v0, float v1, float v2, float v3
     GL_ERR(glUniform4f(id, v0, v1, v2, v3));
 }
 
-void ivf::Program::uniformVec3f(const std::string name, float v0, float v1, float v2)
+void ivf::Program::uniformVec3f(std::string_view name, float v0, float v1, float v2)
 {
     GL_ERR(glUniform3f(uniformLoc(name), v0, v1, v2));
 }
@@ -184,7 +184,7 @@ void ivf::Program::uniformVec3f(GLint id, float v0, float v1, float v2)
     GL_ERR(glUniform3f(id, v0, v1, v2));
 }
 
-void ivf::Program::uniformVec3(const std::string name, const glm::vec3 v)
+void ivf::Program::uniformVec3(std::string_view name, const glm::vec3 v)
 {
     GL_ERR(glUniform3f(uniformLoc(name), v.x, v.y, v.z));
 }
@@ -194,7 +194,7 @@ void ivf::Program::uniformVec3(GLint id, const glm::vec3 v)
     GL_ERR(glUniform3f(id, v.x, v.y, v.z));
 }
 
-void ivf::Program::uniformVec4(const std::string name, const glm::vec4 v)
+void ivf::Program::uniformVec4(std::string_view name, const glm::vec4 v)
 {
     GL_ERR(glUniform4f(uniformLoc(name), v.x, v.y, v.z, v.w));
 }
@@ -204,7 +204,7 @@ void ivf::Program::uniformVec4(GLint id, const glm::vec4 v)
     GL_ERR(glUniform4f(id, v.x, v.y, v.z, v.w));
 }
 
-void ivf::Program::uniformMat4(const std::string name, const glm::mat4 matrix)
+void ivf::Program::uniformMat4(std::string_view name, const glm::mat4 matrix)
 {
     GL_ERR(glUniformMatrix4fv(uniformLoc(name), 1, GL_FALSE, glm::value_ptr(matrix)));
 }
@@ -214,20 +214,20 @@ void ivf::Program::uniformMat4(GLint id, const glm::mat4 matrix)
     GL_ERR(glUniformMatrix4fv(id, 1, GL_FALSE, glm::value_ptr(matrix)));
 }
 
-void ivf::Program::uniformIntArray(const std::string name, int count, const int *values)
+void ivf::Program::uniformIntArray(std::string_view name, int count, const int *values)
 {
-    GLint location = glGetUniformLocation(m_id, name.c_str());
+    GLint location = glGetUniformLocation(m_id, name.data());
     if (location != -1)
     {
         glUniform1iv(location, count, values);
     }
 }
 
-void ivf::Program::uniformMatrix4Array(const std::string name, int count, const glm::mat4 *matrices)
+void ivf::Program::uniformMatrix4Array(std::string_view name, int count, const glm::mat4 *matrices)
 {
     for (int i = 0; i < count; i++)
     {
-        uniformMatrix4(name + "[" + std::to_string(i) + "]", matrices[i]);
+        uniformMatrix4(std::string(name) + "[" + std::to_string(i) + "]", matrices[i]);
     }
 }
 
@@ -270,7 +270,7 @@ std::string ivf::Program::name()
     return m_name;
 }
 
-void ivf::Program::setName(std::string name)
+void ivf::Program::setName(std::string_view name)
 {
     m_name = name;
 }

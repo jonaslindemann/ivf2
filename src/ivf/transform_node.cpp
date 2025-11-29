@@ -12,54 +12,9 @@ TransformNode::TransformNode()
     m_rotAxis.y = 1.0f;
 }
 
-void TransformNode::setPos(glm::vec3 pos)
-{
-    m_pos = pos;
-}
-
-glm::vec3 TransformNode::pos() const
-{
-    return m_pos;
-}
-
-void ivf::TransformNode::setUseTransform(bool flag)
-{
-    m_useTransform = flag;
-}
-
-bool ivf::TransformNode::useTransform() const
-{
-    return m_useTransform;
-}
-
-void ivf::TransformNode::setRotAxis(glm::vec3 axis)
-{
-    m_rotAxis = axis;
-}
-
-glm::vec3 ivf::TransformNode::rotAxis() const
-{
-    return m_rotAxis;
-}
-
-void ivf::TransformNode::setRotAngle(float angle)
-{
-    m_rotAngle = angle;
-}
-
-float ivf::TransformNode::rotAngle() const
-{
-    return m_rotAngle;
-}
-
 void ivf::TransformNode::setEulerAngles(float ax, float ay, float az)
 {
     m_eulerAngles = glm::vec3(ax, ay, az);
-}
-
-void ivf::TransformNode::setEulerAngles(glm::vec3 angles)
-{
-    m_eulerAngles = angles;
 }
 
 void ivf::TransformNode::rotateTowards(glm::vec3 target)
@@ -79,31 +34,6 @@ void ivf::TransformNode::alignWithAxisAngle(glm::vec3 axis, float angle)
 void ivf::TransformNode::rotateToVector(glm::vec3 v)
 {
     m_vecRot = v;
-}
-
-void ivf::TransformNode::storePos()
-{
-    m_storedPos = m_pos;
-}
-
-void ivf::TransformNode::restorePos()
-{
-    m_pos = m_storedPos;
-}
-
-glm::vec3 ivf::TransformNode::storedPos() const
-{
-    return m_storedPos;
-}
-
-void ivf::TransformNode::setScale(glm::vec3 scale)
-{
-    m_scale = scale;
-}
-
-glm::vec3 ivf::TransformNode::scale() const
-{
-    return m_scale;
 }
 
 glm::mat4 ivf::TransformNode::localTransform() const
@@ -216,24 +146,4 @@ BoundingBox TransformNode::worldBoundingBox() const
         return BoundingBox();
         
     return m_localBbox.transform(globalTransform());
-}
-
-void TransformNode::setLocalBoundingBox(const BoundingBox& bbox)
-{
-    m_localBbox = bbox;
-}
-
-bool TransformNode::hasValidBoundingBox() const
-{
-    return m_localBbox.isValid();
-}
-
-void TransformNode::setAutoUpdateBoundingBox(bool autoUpdate)
-{
-    m_autoUpdateBoundingBox = autoUpdate;
-}
-
-bool TransformNode::autoUpdateBoundingBox() const
-{
-    return m_autoUpdateBoundingBox;
 }

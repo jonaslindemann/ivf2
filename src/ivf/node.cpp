@@ -9,6 +9,7 @@ std::shared_ptr<Node> Node::parent() const
 {
     return m_parent.lock();
 }
+
 void Node::setParent(std::shared_ptr<Node> parent)
 {
     m_parent = parent;
@@ -36,11 +37,6 @@ void ivf::Node::setMaterial(std::shared_ptr<Material> material)
 std::shared_ptr<Material> ivf::Node::material()
 {
     return m_material;
-}
-
-void ivf::Node::setUseMaterial(bool flag)
-{
-    m_useMaterial = flag;
 }
 
 void Node::setTexture(std::shared_ptr<Texture> texture)
@@ -135,51 +131,34 @@ std::shared_ptr<Texture> ivf::Node::getTexture(size_t index)
     return nullptr;
 }
 
-size_t ivf::Node::textureCount() const
-{
-    return m_textures.size();
-}
-
-const std::vector<std::shared_ptr<Texture>>& ivf::Node::textures() const
-{
-    return m_textures;
-}
-
-void ivf::Node::setUseMultiTexturing(bool flag)
-{
-    m_useMultiTexturing = flag;
-}
-
-bool ivf::Node::useMultiTexturing() const
-{
-    return m_useMultiTexturing;
-}
-
 void ivf::Node::bindTextures()
 {
     auto program = ShaderManager::instance()->currentProgram();
     
     if (m_useMultiTexturing && m_textures.size() > 1) {
-        // Multitexture path
+        // Multitexture path - using span for safe access
         program->uniformBool("useMultiTexturing", true);
         program->uniformInt("activeTextureCount", static_cast<int>(m_textures.size()));
         
-        for (size_t i = 0; i < m_textures.size() && i < 8; ++i) {
-            if (m_textures[i]) {
-                m_textures[i]->setTexUnit(static_cast<GLint>(i));
-                m_textures[i]->bind();
+        auto textureSpan = textures();
+        const size_t maxTextures = std::min(textureSpan.size(), size_t(8));
+        
+        for (size_t i = 0; i < maxTextures; ++i) {
+            if (textureSpan[i]) {
+                textureSpan[i]->setTexUnit(static_cast<GLint>(i));
+                textureSpan[i]->bind();
                 
                 // Set per-texture blend mode and factor using array uniforms
                 std::string indexStr = std::to_string(i);
                 program->uniformInt("textureBlendModes[" + indexStr + "]", 
-                                   static_cast<int>(m_textures[i]->blendMode()));
+                                   static_cast<int>(textureSpan[i]->blendMode()));
                 program->uniformFloat("textureBlendFactors[" + indexStr + "]", 
-                                     m_textures[i]->blendFactor());
+                                     textureSpan[i]->blendFactor());
             }
         }
         
         // Bind texture array samplers
-        for (size_t i = 0; i < m_textures.size() && i < 8; ++i) {
+        for (size_t i = 0; i < maxTextures; ++i) {
             std::string samplerName = "textures[" + std::to_string(i) + "]";
             program->uniformInt(samplerName, static_cast<int>(i));
         }
@@ -195,42 +174,7 @@ void ivf::Node::bindTextures()
     }
 }
 
-bool ivf::Node::useMaterial()
-{
-    return m_useMaterial;
-}
-
-void ivf::Node::setUseTexture(bool flag)
-{
-    m_useTexture = flag;
-}
-
-bool ivf::Node::useTexture()
-{
-    return m_useTexture;
-}
-
-void ivf::Node::setVisible(bool flag)
-{
-    m_visible = flag;
-}
-
-bool ivf::Node::visible() const
-{
-    return m_visible;
-}
-
-void ivf::Node::setObjectId(uint32_t objectId)
-{
-    m_objectId = objectId;
-}
-
-uint32_t ivf::Node::objectId() const
-{
-    return m_objectId;
-}
-
-void ivf::Node::setName(const std::string &name)
+void ivf::Node::setName(std::string_view name)
 {
     m_name = name;
 }
@@ -267,10 +211,11 @@ void ivf::Node::doDraw()
 
 void ivf::Node::doPostDraw()
 {
-    // Unbind textures
+    // Unbind textures - using span for safe iteration
     if (m_useTexture) {
         if (m_useMultiTexturing && m_textures.size() > 1) {
-            for (auto& tex : m_textures) {
+            // Use span view for safe iteration
+            for (const auto& tex : textures()) {
                 if (tex) {
                     tex->unbind();
                 }

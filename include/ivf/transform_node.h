@@ -37,49 +37,49 @@ public:
      * @brief Set the position of the node.
      * @param pos The new position as a glm::vec3.
      */
-    void setPos(glm::vec3 pos);
+    inline void setPos(glm::vec3 pos) noexcept { m_pos = pos; }
 
     /**
      * @brief Get the position of the node.
      * @return The current position as a glm::vec3.
      */
-    glm::vec3 pos() const;
+    [[nodiscard]] inline glm::vec3 pos() const noexcept { return m_pos; }
 
     /**
      * @brief Enable or disable the use of transformation.
      * @param flag True to enable, false to disable.
      */
-    void setUseTransform(bool flag);
+    inline void setUseTransform(bool flag) noexcept { m_useTransform = flag; }
 
     /**
      * @brief Check if transformation is enabled.
      * @return True if enabled, false otherwise.
      */
-    bool useTransform() const;
+    [[nodiscard]] inline bool useTransform() const noexcept { return m_useTransform; }
 
     /**
      * @brief Set the axis of rotation.
      * @param axis The rotation axis as a glm::vec3.
      */
-    void setRotAxis(glm::vec3 axis);
+    inline void setRotAxis(glm::vec3 axis) noexcept { m_rotAxis = axis; }
 
     /**
      * @brief Get the axis of rotation.
      * @return The rotation axis as a glm::vec3.
      */
-    glm::vec3 rotAxis() const;
+    [[nodiscard]] inline glm::vec3 rotAxis() const noexcept { return m_rotAxis; }
 
     /**
      * @brief Set the rotation angle.
      * @param angle The rotation angle.
      */
-    void setRotAngle(float angle);
+    inline void setRotAngle(float angle) noexcept { m_rotAngle = angle; }
 
     /**
      * @brief Get the rotation angle.
      * @return The rotation angle.
      */
-    float rotAngle() const;
+    [[nodiscard]] inline float rotAngle() const noexcept { return m_rotAngle; }
 
     /**
      * @brief Set the Euler angles for rotation.
@@ -93,7 +93,7 @@ public:
      * @brief Set the Euler angles for rotation.
      * @param angles The Euler angles as a glm::vec3.
      */
-    void setEulerAngles(glm::vec3 angles);
+    inline void setEulerAngles(glm::vec3 angles) noexcept { m_eulerAngles = angles; }
 
     /**
      * @brief Rotate the node to face a target point.
@@ -117,84 +117,84 @@ public:
     /**
      * @brief Store the current position of the node.
      */
-    void storePos();
+    inline void storePos() noexcept { m_storedPos = m_pos; }
 
     /**
      * @brief Restore the previously stored position of the node.
      */
-    void restorePos();
+    inline void restorePos() noexcept { m_pos = m_storedPos; }
 
     /**
      * @brief Get the stored position.
      * @return The stored position as a glm::vec3.
      */
-    glm::vec3 storedPos() const;
+    [[nodiscard]] inline glm::vec3 storedPos() const noexcept { return m_storedPos; }
 
     /**
      * @brief Set the scale of the node.
      * @param scale The scale factors as a glm::vec3.
      */
-    void setScale(glm::vec3 scale);
+    inline void setScale(glm::vec3 scale) noexcept { m_scale = scale; }
 
     /**
      * @brief Get the scale of the node.
      * @return The scale factors as a glm::vec3.
      */
-    glm::vec3 scale() const;
+    [[nodiscard]] inline glm::vec3 scale() const noexcept { return m_scale; }
 
     /**
      * @brief Get the local transformation matrix.
      * @return The local transformation as a glm::mat4.
      */
-    glm::mat4 localTransform() const;
+    [[nodiscard]] glm::mat4 localTransform() const;
 
     /**
      * @brief Get the global transformation matrix.
      * @return The global transformation as a glm::mat4.
      */
-    glm::mat4 globalTransform() const;
+    [[nodiscard]] glm::mat4 globalTransform() const;
 
     /**
      * @brief Get the world position of the node.
      * @return glm::vec3 The world position.
      */
-    glm::vec3 worldPos() const;
+    [[nodiscard]] glm::vec3 worldPos() const;
 
     /**
      * @brief Get the local bounding box of this node.
      * @return BoundingBox The local bounding box.
      */
-    virtual BoundingBox localBoundingBox() const;
+    [[nodiscard]] virtual BoundingBox localBoundingBox() const;
 
     /**
      * @brief Get the world-space bounding box of this node.
      * @return BoundingBox The world-space bounding box.
      */
-    virtual BoundingBox worldBoundingBox() const;
+    [[nodiscard]] virtual BoundingBox worldBoundingBox() const;
 
     /**
      * @brief Set the local bounding box for this node.
      * @param bbox The local bounding box.
      */
-    void setLocalBoundingBox(const BoundingBox& bbox);
+    inline void setLocalBoundingBox(const BoundingBox& bbox) noexcept { m_localBbox = bbox; }
 
     /**
      * @brief Check if this node has a valid local bounding box.
      * @return bool True if the node has a valid bounding box.
      */
-    bool hasValidBoundingBox() const;
+    [[nodiscard]] inline bool hasValidBoundingBox() const noexcept { return m_localBbox.isValid(); }
 
     /**
      * @brief Enable or disable automatic bounding box updates.
      * @param autoUpdate True to enable automatic updates, false to disable.
      */
-    void setAutoUpdateBoundingBox(bool autoUpdate);
+    inline void setAutoUpdateBoundingBox(bool autoUpdate) noexcept { m_autoUpdateBoundingBox = autoUpdate; }
 
     /**
      * @brief Check if automatic bounding box updates are enabled.
      * @return bool True if auto-update is enabled.
      */
-    bool autoUpdateBoundingBox() const;
+    [[nodiscard]] inline bool autoUpdateBoundingBox() const noexcept { return m_autoUpdateBoundingBox; }
 
 protected:
     /**
@@ -217,6 +217,6 @@ protected:
  * @typedef TransformNodePtr
  * @brief Shared pointer to a TransformNode.
  */
-typedef std::shared_ptr<TransformNode> TransformNodePtr;
+using TransformNodePtr = std::shared_ptr<TransformNode>;
 
 }; // namespace ivf

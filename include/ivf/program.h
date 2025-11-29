@@ -5,6 +5,7 @@
 
 #include <memory>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include <glad/glad.h>
@@ -93,28 +94,28 @@ public:
      * @param idx Attribute index.
      * @param name Attribute variable name.
      */
-    void bindAttribLoc(GLuint idx, const std::string name);
+    void bindAttribLoc(GLuint idx, std::string_view name);
 
     /**
      * @brief Get the attribute location for a named variable.
      * @param name Attribute variable name.
      * @return GLint Attribute location.
      */
-    GLint attribId(const std::string name);
+    GLint attribId(std::string_view name);
 
     /**
      * @brief Get the uniform location for a named variable.
      * @param name Uniform variable name.
      * @return GLint Uniform location.
      */
-    GLint uniformLoc(const std::string name);
+    GLint uniformLoc(std::string_view name);
 
     /**
      * @brief Set a mat4 uniform by name.
      * @param name Uniform variable name.
      * @param matrix Matrix value.
      */
-    void uniformMatrix4(const std::string name, glm::mat4 matrix);
+    void uniformMatrix4(std::string_view name, glm::mat4 matrix);
 
     /**
      * @brief Set a mat4 uniform by location.
@@ -128,7 +129,7 @@ public:
      * @param name Uniform variable name.
      * @param flag Boolean value.
      */
-    void uniformBool(const std::string name, bool flag);
+    void uniformBool(std::string_view name, bool flag);
 
     /**
      * @brief Set a bool uniform by location.
@@ -142,7 +143,7 @@ public:
      * @param name Uniform variable name.
      * @param value Integer value.
      */
-    void uniformInt(const std::string name, int value);
+    void uniformInt(std::string_view name, int value);
 
     /**
      * @brief Set an int uniform by location.
@@ -156,7 +157,7 @@ public:
      * @param name Uniform variable name.
      * @param value Unsigned integer value.
      */
-    void uniformUInt(const std::string name, int value);
+    void uniformUInt(std::string_view name, int value);
 
     /**
      * @brief Set a uint uniform by location.
@@ -170,7 +171,7 @@ public:
      * @param name Uniform variable name.
      * @param value Float value.
      */
-    void uniformFloat(const std::string name, float value);
+    void uniformFloat(std::string_view name, float value);
 
     /**
      * @brief Set a float uniform by location.
@@ -187,7 +188,7 @@ public:
      * @param v2 Third component.
      * @param v3 Fourth component.
      */
-    void uniformVec4f(const std::string name, float v0, float v1, float v2, float v3);
+    void uniformVec4f(std::string_view name, float v0, float v1, float v2, float v3);
 
     /**
      * @brief Set a vec4 uniform by location.
@@ -206,7 +207,7 @@ public:
      * @param v1 Second component.
      * @param v2 Third component.
      */
-    void uniformVec3f(const std::string name, float v0, float v1, float v2);
+    void uniformVec3f(std::string_view name, float v0, float v1, float v2);
 
     /**
      * @brief Set a vec3 uniform by location.
@@ -222,7 +223,7 @@ public:
      * @param name Uniform variable name.
      * @param v Vector value.
      */
-    void uniformVec3(const std::string name, const glm::vec3 v);
+    void uniformVec3(std::string_view name, const glm::vec3 v);
 
     /**
      * @brief Set a vec3 uniform by location using a glm::vec3.
@@ -236,7 +237,7 @@ public:
      * @param name Uniform variable name.
      * @param v Vector value.
      */
-    void uniformVec4(const std::string name, const glm::vec4 v);
+    void uniformVec4(std::string_view name, const glm::vec4 v);
 
     /**
      * @brief Set a vec4 uniform by location using a glm::vec4.
@@ -250,7 +251,7 @@ public:
      * @param name Uniform variable name.
      * @param matrix Matrix value.
      */
-    void uniformMat4(const std::string name, const glm::mat4 matrix);
+    void uniformMat4(std::string_view name, const glm::mat4 matrix);
 
     /**
      * @brief Set a mat4 uniform by location using a glm::mat4.
@@ -265,7 +266,7 @@ public:
      * @param count Number of elements.
      * @param values Pointer to the int array.
      */
-    void uniformIntArray(const std::string name, int count, const int *values);
+    void uniformIntArray(std::string_view name, int count, const int *values);
 
     /**
      * @brief Set a mat4 array uniform by name.
@@ -273,7 +274,7 @@ public:
      * @param count Number of matrices.
      * @param matrices Pointer to the array of glm::mat4.
      */
-    void uniformMatrix4Array(const std::string name, int count, const glm::mat4 *matrices);
+    void uniformMatrix4Array(std::string_view name, int count, const glm::mat4 *matrices);
 
     /**
      * @brief Print all active attribute locations and names.
@@ -296,7 +297,7 @@ public:
      * @brief Set the name of the program.
      * @param name Program name.
      */
-    void setName(std::string name);
+    void setName(std::string_view name);
 
 protected:
     /**
@@ -309,6 +310,6 @@ protected:
  * @typedef ProgramPtr
  * @brief Shared pointer type for Program.
  */
-typedef std::shared_ptr<Program> ProgramPtr;
+using ProgramPtr = std::shared_ptr<Program>;
 
 }; // namespace ivf

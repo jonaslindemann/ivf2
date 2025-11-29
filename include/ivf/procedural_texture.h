@@ -106,7 +106,7 @@ public:
  * @typedef ProceduralTexturePtr
  * @brief Shared pointer type for ProceduralTexture.
  */
-typedef std::shared_ptr<ProceduralTexture> ProceduralTexturePtr;
+using ProceduralTexturePtr = std::shared_ptr<ProceduralTexture>;
 
 // ============================================================================
 // Specific Procedural Texture Implementations
@@ -156,7 +156,7 @@ public:
  * @typedef CheckerboardTexturePtr
  * @brief Shared pointer type for CheckerboardTexture.
  */
-typedef std::shared_ptr<CheckerboardTexture> CheckerboardTexturePtr;
+using CheckerboardTexturePtr = std::shared_ptr<CheckerboardTexture>;
 
 /**
  * @class PerlinNoiseTexture
@@ -223,7 +223,7 @@ public:
  * @typedef PerlinNoiseTexturePtr
  * @brief Shared pointer type for PerlinNoiseTexture.
  */
-typedef std::shared_ptr<PerlinNoiseTexture> PerlinNoiseTexturePtr;
+using PerlinNoiseTexturePtr = std::shared_ptr<PerlinNoiseTexture>;
 
 /**
  * @class GradientTexture
@@ -289,7 +289,7 @@ public:
  * @typedef GradientTexturePtr
  * @brief Shared pointer type for GradientTexture.
  */
-typedef std::shared_ptr<GradientTexture> GradientTexturePtr;
+using GradientTexturePtr = std::shared_ptr<GradientTexture>;
 
 /**
  * @class MarbleTexture
@@ -342,7 +342,7 @@ public:
  * @typedef MarbleTexturePtr
  * @brief Shared pointer type for MarbleTexture.
  */
-typedef std::shared_ptr<MarbleTexture> MarbleTexturePtr;
+using MarbleTexturePtr = std::shared_ptr<MarbleTexture>;
 
 /**
  * @class WoodTexture
@@ -395,6 +395,6 @@ public:
  * @typedef WoodTexturePtr
  * @brief Shared pointer type for WoodTexture.
  */
-typedef std::shared_ptr<WoodTexture> WoodTexturePtr;
+using WoodTexturePtr = std::shared_ptr<WoodTexture>;
 
 } // namespace ivf

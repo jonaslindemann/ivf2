@@ -141,6 +141,6 @@ public:
  * @typedef SplineAnimationPtr
  * @brief Shared pointer type for SplineAnimation.
  */
-typedef std::shared_ptr<SplineAnimation> SplineAnimationPtr;
+using SplineAnimationPtr = std::shared_ptr<SplineAnimation>;
 
 }; // namespace ivf

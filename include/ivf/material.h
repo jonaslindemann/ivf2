@@ -6,6 +6,17 @@
 
 namespace ivf {
 
+struct MaterialProps {
+    glm::vec4 diffuseColor{1.0f, 1.0f, 1.0f, 1.0f};
+    glm::vec4 specularColor{1.0f, 1.0f, 1.0f, 1.0f};
+    glm::vec4 ambientColor{0.2f, 0.2f, 0.2f, 1.0f};
+    float alpha{1.0f};
+    float shininess{32.0f};
+    bool useLighting{true};
+    bool useTexture{false};
+    bool useVertexColor{false};
+};
+
 /**
  * @class Material
  * @brief Represents material properties for rendering, including color, lighting, and texture options.
@@ -30,13 +41,13 @@ public:
     /**
      * @brief Default constructor.
      */
-    Material();
+    Material(MaterialProps props = MaterialProps{});
 
     /**
      * @brief Factory method to create a shared pointer to a Material instance.
      * @return std::shared_ptr<Material> New Material instance.
      */
-    static std::shared_ptr<Material> create();
+    static std::shared_ptr<Material> create(MaterialProps props = MaterialProps{});
 
     /**
      * @brief Set the diffuse color.

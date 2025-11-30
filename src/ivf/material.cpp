@@ -4,15 +4,16 @@
 
 using namespace ivf;
 
-Material::Material()
-    : m_diffuseColor(glm::vec4(1.0, 1.0, 0.0, 1.0)), m_ambientColor(glm::vec4(0.2, 0.2, 0.2, 1.0)),
-      m_specularColor(glm::vec4(1.0, 1.0, 1.0, 1.0)), m_useLighting(true), m_useVertexColor(false), m_useTexture(false),
-      m_shininess(70.0), m_alpha(1.0)
+Material::Material(MaterialProps props)
+    : m_diffuseColor(props.diffuseColor), m_ambientColor(props.ambientColor),
+      m_specularColor(props.specularColor), m_useLighting(props.useLighting),
+      m_useVertexColor(props.useVertexColor), m_useTexture(props.useTexture),
+      m_shininess(props.shininess), m_alpha(props.alpha)
 {}
 
-std::shared_ptr<Material> ivf::Material::create()
+std::shared_ptr<Material> ivf::Material::create(MaterialProps props)
 {
-    return std::make_shared<Material>();
+    return std::make_shared<Material>(props);
 }
 
 void ivf::Material::apply()

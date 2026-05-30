@@ -3,6 +3,7 @@
 #include <ivf/fragment_shader.h>
 #include <ivf/program.h>
 #include <ivf/stock_shaders.h>
+#include <ivf/pbr_shaders.h>
 #include <ivf/post_shaders.h>
 #include <ivf/vertex_shader.h>
 #include <ivf/logger.h>
@@ -144,6 +145,12 @@ std::shared_ptr<Program> ivf::ShaderManager::loadBasicShader()
     return loadProgramFromStrings(ivf::basic_vert_shader_source, ivf::basic_frag_shader_source, "basic");
 }
 
+std::shared_ptr<Program> ivf::ShaderManager::loadPBRShader()
+{
+    logInfo("Loading PBR shader.", "ShaderManager");
+    return loadProgramFromStrings(ivf::pbr_vert_shader_source, ivf::pbr_frag_shader_source, "pbr", false);
+}
+
 ProgramPtr ivf::ShaderManager::loadRenderToTextureShader()
 {
     logInfo("Loading render to texture shader.", "ShaderManager");
@@ -212,6 +219,11 @@ ProgramPtr ivf::smLoadProgramFromStrings(const std::string vertexShaderSource, c
 ProgramPtr ivf::smLoadBasicShader()
 {
     return ShaderManager::instance()->loadBasicShader();
+}
+
+ProgramPtr ivf::smLoadPBRShader()
+{
+    return ShaderManager::instance()->loadPBRShader();
 }
 
 ProgramPtr ivf::smLoadRenderToTextureShader()

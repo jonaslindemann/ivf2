@@ -475,3 +475,18 @@ void LightManager::restoreState()
     m_useLighting = m_savedState;
     this->setUseLighting(m_useLighting);
 }
+
+void LightManager::refreshForProgram()
+{
+    auto prog = ShaderManager::instance()->currentProgram();
+    m_useLightingId = prog->uniformLoc("useLighting");
+    m_useVertexColorsId = prog->uniformLoc("useVertexColors");
+    m_pointLightCountId = prog->uniformLoc("pointLightCount");
+    m_directionalLightCountId = prog->uniformLoc("dirLightCount");
+    m_spotLightCountId = prog->uniformLoc("spotLightCount");
+    m_diffuseColorId = prog->uniformLoc("material.diffuseColor");
+    m_specularColorId = prog->uniformLoc("material.specularColor");
+    m_ambientColorId = prog->uniformLoc("material.ambientColor");
+    m_shininessId = prog->uniformLoc("material.shininess");
+    m_alphaId = prog->uniformLoc("material.alpha");
+}

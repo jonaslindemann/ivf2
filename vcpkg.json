@@ -21,6 +21,7 @@
     "opengl",
     "stb",
     "zlib",
-    "reactphysics3d"
+    "reactphysics3d",
+    "miniaudio"
   ]
 }

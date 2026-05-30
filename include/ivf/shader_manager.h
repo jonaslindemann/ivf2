@@ -92,6 +92,13 @@ public:
     ProgramPtr loadBasicShader();
 
     /**
+     * @brief Load the PBR (physically-based rendering) shader program.
+     * Registered under the name "pbr". Does not change the current program.
+     * @return ProgramPtr Shared pointer to the PBR shader program.
+     */
+    ProgramPtr loadPBRShader();
+
+    /**
      * @brief Load a shader program for rendering to a texture.
      * @return ProgramPtr Shared pointer to the render-to-texture shader program.
      */
@@ -157,6 +164,11 @@ ProgramPtr smLoadProgramFromStrings(const std::string vertexShaderSource, const 
  * @brief Load a basic default shader program using the global ShaderManager.
  */
 ProgramPtr smLoadBasicShader();
+
+/**
+ * @brief Load the PBR shader program using the global ShaderManager.
+ */
+ProgramPtr smLoadPBRShader();
 
 /**
  * @brief Load a render-to-texture shader program using the global ShaderManager.

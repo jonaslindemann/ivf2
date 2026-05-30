@@ -112,6 +112,7 @@ void PhysicsObject::setPosition(const glm::vec3 &position)
         rp3d::Transform transform = m_body->getTransform();
         transform.setPosition(toRp3dVec3(position));
         m_body->setTransform(transform);
+        m_body->setIsActive(true);
     }
 }
 
@@ -123,6 +124,7 @@ void PhysicsObject::setRotation(const glm::quat &rotation)
         rp3d::Transform transform = m_body->getTransform();
         transform.setOrientation(toRp3dQuat(rotation));
         m_body->setTransform(transform);
+        m_body->setIsActive(true);
     }
 }
 
@@ -160,6 +162,7 @@ void PhysicsObject::setVelocity(const glm::vec3 &velocity)
     if (m_body && !m_isStatic)
     {
         m_body->setLinearVelocity(toRp3dVec3(velocity));
+        m_body->setIsActive(true);
     }
 }
 
@@ -177,6 +180,7 @@ void PhysicsObject::setAngularVelocity(const glm::vec3 &angularVelocity)
     if (m_body && !m_isStatic)
     {
         m_body->setAngularVelocity(toRp3dVec3(angularVelocity));
+        m_body->setIsActive(true);
     }
 }
 

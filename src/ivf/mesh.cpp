@@ -325,6 +325,7 @@ void Mesh::end()
     }
 
     GLenum err;
+    ivf::clearError(); // flush any accumulated GL errors from before mesh setup
     m_VAO = std::make_unique<VertexArray>();
     m_VAO->bind();
 

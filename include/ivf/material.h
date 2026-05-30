@@ -148,7 +148,14 @@ public:
     /**
      * @brief Apply the material properties to the rendering context or shader.
      */
-    void apply();
+    virtual void apply();
+
+    /**
+     * @brief Undo any per-node state set by apply() (e.g., restore a previous shader program).
+     * The default implementation is a no-op. Override in materials (e.g., PBRMaterial) that
+     * need to restore global state after a node has been drawn.
+     */
+    virtual void unapply() {}
 };
 
 /**

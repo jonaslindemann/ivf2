@@ -36,6 +36,7 @@ private:
     bool m_useLocalBlendMode;     ///< Whether to use a local blend mode.
     TextureBlendMode m_blendMode; ///< Blend mode for this texture.
     float m_blendFactor;          ///< Blend factor for blending.
+    float m_anisotropy{0.0f};     ///< Max anisotropy level (0 = disabled).
 
 public:
     /**
@@ -166,6 +167,20 @@ public:
      * @return GLint Texture unit index.
      */
     [[nodiscard]] inline GLint texUnit() const noexcept { return m_texUnit; }
+
+    /**
+     * @brief Enable anisotropic filtering.
+     * @param level Desired anisotropy level. Clamped to GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT.
+     *              Pass 0 to disable (default). Pass a large value (e.g. 16) for maximum.
+     */
+    void setAnisotropicFiltering(float level);
+
+    /**
+     * @brief Load an HDR (floating-point) image. Result stored as GL_RGB16F.
+     * @param filename Path to a Radiance .hdr or other float-capable image.
+     * @return bool True if loading succeeded.
+     */
+    bool loadHDR(std::string_view filename);
 
     /**
      * @brief Get the OpenGL texture object ID.

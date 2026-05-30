@@ -9,10 +9,30 @@ using namespace ivfui;
 #include <ivf/font_manager.h>
 
 #include <ivf/stock_shaders.h>
+#include <ivf/tween.h>
+#include <ivf/timer_manager.h>
+#include <ivf/debug_draw.h>
+#include <ivf/shader_watcher.h>
+#include <ivf/transform_manager.h>
+#include <ivf/composite_node.h>
 
+#include <cmath>
+#include <vector>
 #include <glm/gtx/intersect.hpp>
 
 using namespace ivf;
+
+// Recursively update behaviors on all nodes in the scene graph.
+static void updateSceneBehaviors(ivf::CompositeNode* composite, float dt)
+{
+    for (size_t i = 0; i < composite->count(); ++i) {
+        auto child = composite->at(i);
+        if (!child) continue;
+        child->updateBehaviors(child.get(), dt);
+        if (auto* sub = dynamic_cast<ivf::CompositeNode*>(child.get()))
+            updateSceneBehaviors(sub, dt);
+    }
+}
 
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
@@ -70,6 +90,10 @@ void ivfui::GLFWSceneWindow::clear()
 void ivfui::GLFWSceneWindow::setSelectionEnabled(bool enabled)
 {
     m_selectionEnabled = enabled;
+    // If called after doSetup() (e.g. from onSetup()), the FBO hasn't been
+    // initialized yet because doSetup() checks the flag before onSetup() runs.
+    if (enabled && width() > 0 && height() > 0)
+        m_bufferSelection->initialize(width(), height());
 }
 
 bool ivfui::GLFWSceneWindow::selectionEnabled()
@@ -479,6 +503,7 @@ int ivfui::GLFWSceneWindow::doSetup()
     auto shaderMgr = ivf::ShaderManager::create();
     shaderMgr->loadRenderToTextureShader();
     shaderMgr->loadBasicShader();
+    shaderMgr->loadPBRShader();
     shaderMgr->apply();
 
     if (shaderMgr->compileLinkErrors())
@@ -710,8 +735,28 @@ void GLFWSceneWindow::doResize(int width, int height)
     GLFWWindow::doResize(width, height);
 }
 
+void GLFWSceneWindow::doUpdate()
+{
+    float dt = static_cast<float>(frameTime());
+    TweenManager::instance()->update(dt);
+    TimerManager::instance()->update(dt);
+    ShaderWatcher::instance()->update(dt);
+    updateSceneBehaviors(m_scene.get(), dt);
+    GLFWWindow::doUpdate();  // calls onUpdate()
+}
+
+void GLFWSceneWindow::doPostSetup()
+{
+    // Rebuild the selection node map after onSetup() has added all nodes.
+    // initialize() ran before onSetup(), so user nodes were not yet in the scene.
+    if (m_selectionEnabled)
+        m_bufferSelection->refresh();
+    GLFWWindow::doPostSetup();
+}
+
 void GLFWSceneWindow::doUpdateOtherUi()
 {
+    // Camera manipulator stays here so orbit/pan doesn't activate while clicking ImGui.
     m_camManip->update();
     GLFWWindow::doUpdateOtherUi();
 }
@@ -735,6 +780,13 @@ void GLFWSceneWindow::doDraw()
 
         LightManager::instance()->renderShadowMaps(m_scene);
         m_scene->draw();
+
+        {
+            auto& xfm = *TransformManager::instance();
+            glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
+            DebugDraw::instance()->flush(vp, {0,0,float(width()),float(height())},
+                                         float(frameTime()));
+        }
 
         m_frameBuffer->end();
 
@@ -766,6 +818,13 @@ void GLFWSceneWindow::doDraw()
 
         LightManager::instance()->renderShadowMaps(m_scene);
         m_scene->draw();
+
+        {
+            auto& xfm = *TransformManager::instance();
+            glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
+            DebugDraw::instance()->flush(vp, {0,0,float(width()),float(height())},
+                                         float(frameTime()));
+        }
     }
 
     for (auto &uiWindow : m_uiWindows)
@@ -783,6 +842,19 @@ void ivfui::GLFWSceneWindow::doDrawUi()
 
     for (auto uiWindow : m_uiWindows)
         uiWindow->draw();
+
+    // Draw rubber-band selection rectangle
+    if (m_boxSelecting) {
+        float x0 = float(m_boxStartX),   y0 = float(m_boxStartY);
+        float x1 = float(m_boxCurrentX), y1 = float(m_boxCurrentY);
+        ImDrawList* dl = ImGui::GetForegroundDrawList();
+        dl->AddRect(ImVec2(x0, y0), ImVec2(x1, y1),
+                    IM_COL32(100, 180, 255, 200), 0.0f, 0, 1.5f);
+        dl->AddRectFilled(ImVec2(x0, y0), ImVec2(x1, y1),
+                          IM_COL32(100, 180, 255, 30));
+    }
+
+    DebugDraw::instance()->drawUi();
 
     GLFWWindow::doDrawUi();
     this->doUpdateUi();
@@ -936,6 +1008,11 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
 {
     GLFWWindow::doMousePosition(x, y);
 
+    if (m_boxSelecting) {
+        m_boxCurrentX = x;
+        m_boxCurrentY = y;
+    }
+
     // Only update cursor if it exists and is visible
     if (!m_cursor || !m_cursor->visible())
     {
@@ -1058,6 +1135,37 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
 }
 
 void ivfui::GLFWSceneWindow::doMouseButton(int button, int action, int mods)
+{
+    if (action == GLFW_PRESS && m_currentNode)
+        m_currentNode->notifyClick(m_currentNode, button);
+
+    if (m_boxSelectEnabled && button == GLFW_MOUSE_BUTTON_LEFT) {
+        if (action == GLFW_PRESS) {
+            m_boxSelecting = true;
+            double cx, cy;
+            glfwGetCursorPos(ref(), &cx, &cy);
+            m_boxStartX = cx; m_boxStartY = cy;
+            m_boxCurrentX = cx; m_boxCurrentY = cy;
+        } else if (action == GLFW_RELEASE && m_boxSelecting) {
+            m_boxSelecting = false;
+            double dx = m_boxCurrentX - m_boxStartX;
+            double dy = m_boxCurrentY - m_boxStartY;
+            if (std::sqrt(dx*dx + dy*dy) >= k_boxSelectMinDrag && m_selectionEnabled) {
+                m_selectionRendering = true;
+                m_bufferSelection->begin();
+                this->drawScene();
+                auto nodes = m_bufferSelection->nodesInRegion(
+                    int(m_boxStartX), int(m_boxStartY),
+                    int(m_boxCurrentX), int(m_boxCurrentY));
+                m_bufferSelection->end();
+                m_selectionRendering = false;
+                this->onBoxSelect(nodes);
+            }
+        }
+    }
+}
+
+void ivfui::GLFWSceneWindow::onBoxSelect(std::vector<ivf::Node*> /*nodes*/)
 {}
 
 void ivfui::GLFWSceneWindow::onUpdateUi()
@@ -1083,6 +1191,7 @@ void ivfui::GLFWSceneWindow::onMousePosition3D(double x, double y, double z)
 
 void ivfui::GLFWSceneWindow::doEnterNode(ivf::Node *node)
 {
+    if (node) node->notifyMouseEnter(node);
     this->onEnterNode(node);
 }
 
@@ -1093,6 +1202,7 @@ void ivfui::GLFWSceneWindow::doOverNode(ivf::Node *node)
 
 void ivfui::GLFWSceneWindow::doLeaveNode(ivf::Node *node)
 {
+    if (node) node->notifyMouseLeave(node);
     this->onLeaveNode(node);
 }
 

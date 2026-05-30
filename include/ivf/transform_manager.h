@@ -314,6 +314,19 @@ public:
      * @return glm::mat4& Reference to the projection matrix.
      */
     glm::mat4 &projectionMatrix();
+
+    /**
+     * @brief Re-fetch all cached uniform locations from the current shader program.
+     * Call this after switching to a different shader program (e.g., PBR) so that
+     * subsequent matrix uploads target the correct uniform locations.
+     */
+    void refreshForProgram();
+
+    /**
+     * @brief Get the current view position.
+     * @return glm::vec3 View position.
+     */
+    glm::vec3 viewPos() const;
 };
 
 /**

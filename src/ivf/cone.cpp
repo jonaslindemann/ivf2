@@ -30,7 +30,7 @@ void ivf::Cone::set(double radius, double size, int slices, int segments, double
 
 void Cone::doSetup()
 {
-    ConeMesh cone(m_radius, m_size, m_slices, m_segments, m_start, m_sweep);
+    ConeMesh cone(m_radius, m_size / 2.0, m_slices, m_segments, m_start, m_sweep);
 
     AnyGenerator<MeshVertex> vertices = cone.vertices();
     AnyGenerator<Triangle> triangles = cone.triangles();

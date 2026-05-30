@@ -56,3 +56,10 @@ void SelectionManager::restoreState()
     m_selectionRendering = m_savedSelectionRendering;
     apply();
 }
+
+void SelectionManager::refreshForProgram()
+{
+    auto prog = ShaderManager::instance()->currentProgram();
+    m_objectIdId = prog->uniformLoc("objectId");
+    m_selectionRenderingId = prog->uniformLoc("selectionRendering");
+}

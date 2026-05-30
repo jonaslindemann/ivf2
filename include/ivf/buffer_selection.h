@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 
 #include <ivf/glbase.h>
 #include <ivf/node.h>
@@ -96,9 +97,27 @@ public:
     Node *nodeAtPixel(int x, int y);
 
     /**
+     * @brief Collect all nodes whose ID appears within a screen-space rectangle.
+     * Must be called between begin() and end().
+     * @param x0 Left pixel (inclusive), in screen/window coordinates.
+     * @param y0 Top pixel (inclusive).
+     * @param x1 Right pixel (inclusive).
+     * @param y1 Bottom pixel (inclusive).
+     * @return Vector of unique Node* found inside the rectangle (no nullptrs).
+     */
+    std::vector<Node*> nodesInRegion(int x0, int y0, int x1, int y1);
+
+    /**
      * @brief End selection rendering. Unbinds the framebuffer.
      */
     void end();
+
+    /**
+     * @brief Rebuild the node-ID map from the current scene graph.
+     * Call this after adding or removing nodes from the scene, without
+     * recreating the GPU framebuffer.
+     */
+    void refresh();
 
     /**
      * @brief Clear the selection buffer and internal mappings.

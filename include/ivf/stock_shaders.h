@@ -196,6 +196,10 @@ uniform int debugShadow = 0;
 uniform sampler2D shadowMaps[NR_DIR_LIGHTS];
 uniform mat4 lightSpaceMatrices[NR_DIR_LIGHTS];
 
+uniform samplerCube envMap;
+uniform bool useEnvMap = false;
+uniform float envReflectivity = 0.0;
+
 vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
 vec4 applyTexBlendModeIndexed(vec4 textureColor, vec4 baseColor, int mode, float factor);
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap);
@@ -343,13 +347,19 @@ void main()
             {
                 fragColor = color;
             } 
-            else 
+            else
             {
                 fragColor = vec4(material.diffuseColor, material.alpha);
             }
         }
+
+        if (useEnvMap && envReflectivity > 0.0) {
+            vec3 I = normalize(fragPos - viewPos);
+            vec3 R = reflect(I, normalize(normal));
+            fragColor.rgb = mix(fragColor.rgb, texture(envMap, R).rgb, envReflectivity);
+        }
     }
-} 
+}
 
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap)
 {

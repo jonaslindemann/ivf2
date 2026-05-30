@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"e:\\\\Users\\\\Jonas\\\\Development\\\\ivf2\" -Force)",
+      "Bash(Select-Object Name, FullName)",
+      "PowerShell(Head -40)",
+      "Bash(Get-ChildItem -Path \"e:\\\\Users\\\\Jonas\\\\Development\\\\ivf2\" -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Select-Object Name)",
+      "Bash(cd /d \"e:\\\\Users\\\\Jonas\\\\Development\\\\ivf2\")",
+      "Bash(dir /B)",
+      "Bash(xargs grep -l \"lineTrace\\\\|picking\\\\|raycast\")"
+    ]
+  }
+}

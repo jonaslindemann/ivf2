@@ -3,10 +3,15 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 #undef GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
 
+#include <filesystem>
 #include <iostream>
+#include <vector>
 #include <ivfui/glfw_window.h>
 
 using namespace std;
@@ -22,7 +27,10 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonit
     : m_width(width), m_height(height), m_title(title), m_mouseButton(-1), m_mouseAction(-1), m_mouseMods(-1),
       m_mouseX(-1), m_mouseY(-1), m_currentKey(-1), m_altDown(false), m_ctrlDown(false), m_shiftDown(false),
       m_escQuit(true), m_enabled(true), m_runSetup(true), m_lastError(0), m_frameCount(0), m_frameTime(0.0), m_t0(0.0),
-      m_t1(0.0), m_monitor(monitor), m_sharedWindow(shared)
+      m_t1(0.0), m_lastFrameTime(0.0), m_monitor(monitor), m_sharedWindow(shared),
+      m_scrollX(0.0), m_scrollY(0.0),
+      m_prevMouseX(-1.0), m_prevMouseY(-1.0), m_isDragging(false),
+      m_lastClickTime(-1.0), m_lastClickButton(-1)
 {
     m_window = glfwCreateWindow(width, height, title.c_str(), monitor, shared);
 
@@ -222,6 +230,13 @@ void GLFWWindow::draw()
 
     this->makeCurrent();
 
+    // Compute wall-clock frame delta time (time since the previous call to draw()).
+    // This gives a real dt for animations regardless of how fast onDraw() runs.
+    double now = glfwGetTime();
+    if (m_lastFrameTime > 0.0)
+        m_frameTime = now - m_lastFrameTime;
+    m_lastFrameTime = now;
+
     auto result = 0;
 
     if (m_runSetup)
@@ -285,6 +300,18 @@ void GLFWWindow::draw()
     // Swap buffers
 
     this->swapBuffers();
+
+    // Recording: capture after swap so the frame is complete
+    if (m_recording) {
+        double interval = (m_recordFps > 0) ? 1.0 / m_recordFps : 0.0;
+        m_recordAccum += m_frameTime;
+        while (m_recording && interval > 0.0 && m_recordAccum >= interval) {
+            char name[64];
+            std::snprintf(name, sizeof(name), "/frame_%06d.png", m_recordFrameIdx++);
+            captureFrame(m_recordPath + name);
+            m_recordAccum -= interval;
+        }
+    }
 }
 
 void ivfui::GLFWWindow::drawScene()
@@ -317,9 +344,17 @@ void GLFWWindow::doKey(int key, int scancode, int action, int mods)
 
 void GLFWWindow::doMousePosition(double x, double y)
 {
+    double dx = (m_prevMouseX >= 0.0) ? x - m_prevMouseX : 0.0;
+    double dy = (m_prevMouseY >= 0.0) ? y - m_prevMouseY : 0.0;
+    m_prevMouseX = x;
+    m_prevMouseY = y;
+
     m_mouseX = int(x);
     m_mouseY = int(y);
     onMousePosition(x, y);
+
+    if (m_isDragging && (dx != 0.0 || dy != 0.0))
+        onMouseDrag(x, y, dx, dy, m_mouseButton);
 }
 
 void GLFWWindow::doMouseButton(int button, int action, int mods)
@@ -327,6 +362,19 @@ void GLFWWindow::doMouseButton(int button, int action, int mods)
     m_mouseButton = button;
     m_mouseAction = action;
     m_mouseMods = mods;
+
+    if (action == GLFW_PRESS) {
+        m_isDragging = true;
+
+        double now = glfwGetTime();
+        if (button == m_lastClickButton && (now - m_lastClickTime) <= k_doubleClickInterval)
+            onDoubleClick(button, mods);
+        m_lastClickTime = now;
+        m_lastClickButton = button;
+    } else if (action == GLFW_RELEASE) {
+        m_isDragging = false;
+    }
+
     onMouseButton(button, action, mods);
 }
 
@@ -361,7 +409,6 @@ void GLFWWindow::doDraw()
     onDraw();
     m_t1 = glfwGetTime();
     m_frameCount++;
-    m_frameTime = m_t1 - m_t0;
 }
 
 void ivfui::GLFWWindow::doDrawUi()
@@ -450,7 +497,59 @@ void ivfui::GLFWWindow::onDrawComplete()
 void ivfui::GLFWWindow::onUpdateOtherUi()
 {}
 
+void GLFWWindow::doScroll(double xoffset, double yoffset)
+{
+    m_scrollX = xoffset;
+    m_scrollY = yoffset;
+    onScroll(xoffset, yoffset);
+}
+
+void ivfui::GLFWWindow::onScroll(double /*xoffset*/, double /*yoffset*/)
+{}
+
+void ivfui::GLFWWindow::onMouseDrag(double /*x*/, double /*y*/, double /*dx*/, double /*dy*/, int /*button*/)
+{}
+
+void ivfui::GLFWWindow::onDoubleClick(int /*button*/, int /*mods*/)
+{}
+
 int GLFWWindow::onSetup()
 {
     return 0;
+}
+
+void GLFWWindow::captureFrame(const std::string& path)
+{
+    int w, h;
+    getSize(w, h);
+    if (w <= 0 || h <= 0) return;
+
+    std::vector<unsigned char> pixels(w * h * 3);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+    // stb_image_write uses top-left origin; OpenGL uses bottom-left.
+    // Negative stride flips rows automatically.
+    stbi_write_png(path.c_str(), w, h, 3,
+                   pixels.data() + (h - 1) * w * 3,
+                   -w * 3);
+}
+
+void GLFWWindow::saveScreenshot(const std::string& path)
+{
+    captureFrame(path);
+}
+
+void GLFWWindow::startRecording(const std::string& directory, int fps)
+{
+    m_recordPath      = directory;
+    m_recordFps       = fps;
+    m_recordFrameIdx  = 0;
+    m_recordAccum     = 0.0;
+    m_recording       = true;
+}
+
+void GLFWWindow::stopRecording()
+{
+    m_recording = false;
 }

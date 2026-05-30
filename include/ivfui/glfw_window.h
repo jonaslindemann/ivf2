@@ -47,10 +47,34 @@ private:
     std::mutex m_mutex;         ///< Mutex for thread safety.
     double m_t0;                ///< Start time for frame timing.
     double m_t1;                ///< End time for frame timing.
-    double m_frameTime;         ///< Last frame time in seconds.
+    double m_frameTime;         ///< Last frame time in seconds (wall-clock delta between frames).
+    double m_lastFrameTime;     ///< glfwGetTime() at the start of the previous frame.
     int m_frameCount;           ///< Number of frames rendered.
     int m_lastError;            ///< Last error code.
     UiRendererPtr m_uiRenderer; ///< UI renderer for this window.
+
+    // Scroll
+    double m_scrollX;           ///< Last scroll X offset.
+    double m_scrollY;           ///< Last scroll Y offset.
+
+    // Drag tracking
+    double m_prevMouseX;        ///< Mouse X on previous position event.
+    double m_prevMouseY;        ///< Mouse Y on previous position event.
+    bool m_isDragging;          ///< True while a button is held and mouse moves.
+
+    // Double-click detection
+    double m_lastClickTime;     ///< glfwGetTime() of the most recent button press.
+    int m_lastClickButton;      ///< Button code of the most recent click.
+    static constexpr double k_doubleClickInterval = 0.3; ///< Max seconds between two clicks.
+
+    // Screenshot / recording
+    bool        m_recording{false};
+    std::string m_recordPath;
+    int         m_recordFps{60};
+    int         m_recordFrameIdx{0};
+    double      m_recordAccum{0.0};
+
+    void captureFrame(const std::string& path);
 
 public:
     /**
@@ -278,6 +302,29 @@ public:
      */
     UiRendererPtr uiRenderer() const { return m_uiRenderer; }
 
+    /**
+     * @brief Save a PNG screenshot of the current framebuffer.
+     * @param path Output file path (should end in .png).
+     */
+    void saveScreenshot(const std::string& path);
+
+    /**
+     * @brief Start saving sequential PNG frames to a directory.
+     * @param directory Output directory (must exist). Frames named frame_000000.png, etc.
+     * @param fps Target capture rate (frames per second of captured content).
+     */
+    void startRecording(const std::string& directory, int fps = 60);
+
+    /**
+     * @brief Stop recording frames.
+     */
+    void stopRecording();
+
+    /**
+     * @brief Check if recording is active.
+     */
+    bool isRecording() const { return m_recording; }
+
 public:
     /**
      * @brief Handle key events (override for custom behavior).
@@ -286,6 +333,7 @@ public:
      * @param action Key action.
      * @param mods Modifier flags.
      */
+    virtual void doScroll(double xoffset, double yoffset);
     virtual void doKey(int key, int scancode, int action, int mods);
 
     /**
@@ -351,6 +399,18 @@ public:
      * @param action Key action.
      * @param mods Modifier flags.
      */
+    /** Scroll wheel event. xoffset/yoffset are the scroll deltas. */
+    virtual void onScroll(double xoffset, double yoffset);
+
+    /**
+     * Mouse drag event — fired every frame the mouse moves while a button is held.
+     * dx/dy are the pixel deltas since the last position event.
+     */
+    virtual void onMouseDrag(double x, double y, double dx, double dy, int button);
+
+    /** Double-click event — fired when the same button is clicked twice within k_doubleClickInterval seconds. */
+    virtual void onDoubleClick(int button, int mods);
+
     virtual void onKey(int key, int scancode, int action, int mods);
 
     /**

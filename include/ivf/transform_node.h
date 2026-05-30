@@ -96,6 +96,12 @@ public:
     inline void setEulerAngles(glm::vec3 angles) noexcept { m_eulerAngles = angles; }
 
     /**
+     * @brief Get the Euler angles for rotation.
+     * @return The Euler angles as a glm::vec3.
+     */
+    [[nodiscard]] inline glm::vec3 eulerAngles() const noexcept { return m_eulerAngles; }
+
+    /**
      * @brief Rotate the node to face a target point.
      * @param target The target position as a glm::vec3.
      */

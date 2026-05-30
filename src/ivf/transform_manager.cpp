@@ -105,7 +105,7 @@ void TransformManager::popMatrix()
         {
             m_projectionMatrix = m_projectionStack.back();
             m_projectionStack.pop_back();
-            ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_modelMatrix);
+            ShaderManager::instance()->currentProgram()->uniformMatrix4(m_projectionId, m_projectionMatrix);
         }
     }
     else
@@ -114,7 +114,7 @@ void TransformManager::popMatrix()
         {
             m_viewMatrix = m_viewStack.back();
             m_viewStack.pop_back();
-            ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_modelMatrix);
+            ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
         }
     }
 }
@@ -289,4 +289,19 @@ void TransformManager::identity()
         m_viewMatrix = m;
         ShaderManager::instance()->currentProgram()->uniformMatrix4(m_viewId, m_viewMatrix);
     }
+}
+
+void TransformManager::refreshForProgram()
+{
+    auto prog = ShaderManager::instance()->currentProgram();
+    m_modelId = prog->uniformLoc("model");
+    m_viewId = prog->uniformLoc("view");
+    m_projectionId = prog->uniformLoc("projection");
+    m_viewPosId = prog->uniformLoc("viewPos");
+    updateShaderMvpMatrix();
+}
+
+glm::vec3 TransformManager::viewPos() const
+{
+    return m_viewPos;
 }

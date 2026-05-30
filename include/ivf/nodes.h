@@ -34,3 +34,14 @@
 #include <ivf/utils.h>
 #include <ivf/line_trace.h>
 #include <ivf/trace_node.h>
+#include <ivf/dynamic_mesh.h>
+#include <ivf/particle_system.h>
+#include <ivf/cubemap.h>
+#include <ivf/skybox.h>
+#include <ivf/billboard.h>
+#include <ivf/behaviors.h>
+#include <ivf/math_utils.h>
+#include <ivf/palette.h>
+#include <ivf/pbr_material.h>
+#include <ivf/pbr_mesh_node.h>
+#include <ivf/scene_serializer.h>

@@ -4,6 +4,7 @@ FILE(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/ivfmath/*.h)
 
 add_library(ivfmath ${INCLUDE_FILES} ${SOURCE_FILES})
 target_include_directories(ivfmath PRIVATE ${GLM_INCLUDE_DIRS})
+target_precompile_headers(ivfmath PRIVATE pch.h)
 install_targets(/lib ivfmath)
 set_target_properties(ivfmath PROPERTIES 
     FOLDER "ivf"

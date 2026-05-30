@@ -1,0 +1,1 @@
+add_ivf2_example(serialization1 SOURCES serialization1.cpp)

@@ -101,6 +101,13 @@ public:
      * @brief Restore the previously saved selection state.
      */
     void restoreState();
+
+    /**
+     * @brief Re-fetch all cached uniform locations from the current shader program.
+     * Call this after switching to a different shader program (e.g., PBR) so that
+     * apply() writes to the correct uniform locations.
+     */
+    void refreshForProgram();
 };
 
 /**

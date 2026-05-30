@@ -53,7 +53,7 @@ double ivf::Cylinder::height() const
 
 void Cylinder::doSetup()
 {
-    CylinderMesh cappedCylinder(m_radius, m_size, m_slices, m_segments, m_start, m_sweep);
+    CylinderMesh cappedCylinder(m_radius, m_size / 2.0, m_slices, m_segments, m_start, m_sweep);
 
     AnyGenerator<MeshVertex> vertices = cappedCylinder.vertices();
     AnyGenerator<Triangle> triangles = cappedCylinder.triangles();

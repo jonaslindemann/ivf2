@@ -9,6 +9,7 @@
 #include <ivf/texture.h>
 #include <ivf/node_visitor.h>
 #include <ivf/property_inspectable.h>
+#include <ivf/behavior.h>
 
 #include <memory>
 #include <string>
@@ -33,7 +34,7 @@ concept ValidNodeType = std::is_base_of_v<Node, T>;
  * 
  * Supports both single texture (backward compatible) and multitexturing (up to 8 textures).
  */
-class Node : public GLBase, public std::enable_shared_from_this<Node>, public PropertyInspectable {
+class Node : public GLBase, public std::enable_shared_from_this<Node>, public PropertyInspectable, public BehaviorHost {
 private:
     std::shared_ptr<Material> m_material{nullptr}; ///< Material associated with the node.
     std::shared_ptr<Texture> m_texture{nullptr};   ///< Primary texture (backward compatibility).
@@ -263,6 +264,12 @@ protected:
      * @brief Called after drawing the node. Override to perform actions after drawing.
      */
     virtual void doPostDraw();
+
+    /**
+     * @brief Called at the very end of doPostDraw(). Override in subclasses that need
+     * to perform cleanup after textures are unbound (e.g., restore a different shader program).
+     */
+    virtual void onPostDraw() {}
 
     /**
      * @brief Called to perform the actual drawing of the node in a selected state.

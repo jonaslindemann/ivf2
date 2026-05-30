@@ -166,7 +166,7 @@ void ivf::Node::bindTextures()
         // Single texture path (backward compatible)
         program->uniformBool("useMultiTexturing", false);
         program->uniformInt("activeTextureCount", 1);
-        
+
         if (m_texture) {
             m_texture->bind();
             program->uniformInt("texture0", 0);
@@ -224,6 +224,9 @@ void ivf::Node::doPostDraw()
             m_texture->unbind();
         }
     }
+    if (m_material && m_useMaterial)
+        m_material->unapply();
+    onPostDraw();
 }
 
 void ivf::Node::doDrawSelection()

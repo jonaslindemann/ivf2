@@ -111,7 +111,7 @@ void TransformNode::doPreDraw()
             xfmMgr()->rotateToVector(m_vecRot);
         if (m_rotAngle != 0.0)
             xfmMgr()->rotateDeg(m_rotAxis.x, m_rotAxis.y, m_rotAxis.z, m_rotAngle);
-        if (!(m_scale.x == 1.0f) && (m_scale.y == 1.0f) && (m_scale.z == 1.0f))
+        if (!(m_scale.x == 1.0f && m_scale.y == 1.0f && m_scale.z == 1.0f))
             xfmMgr()->scale(m_scale.x, m_scale.y, m_scale.z);
     }
 }
@@ -120,6 +120,7 @@ void TransformNode::doPostDraw()
 {
     if (m_useTransform)
         xfmMgr()->popMatrix();
+    Node::doPostDraw();
 }
 
 void ivf::TransformNode::setupProperties()

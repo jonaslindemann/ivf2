@@ -91,6 +91,22 @@ public:
 
 class ExampleWindow : public GLFWSceneWindow {
 private:
+    static void applyPhysicsTransform(const PhysicsBoxPtr &physicsBox, const BoxPtr &visualBox)
+    {
+        visualBox->setPos(physicsBox->getPosition());
+
+        glm::quat rot = glm::normalize(physicsBox->getRotation());
+        float angle = glm::degrees(glm::angle(rot));
+        glm::vec3 axis = glm::axis(rot);
+
+        if (!std::isfinite(axis.x) || !std::isfinite(axis.y) || !std::isfinite(axis.z))
+            axis = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        visualBox->setEulerAngles(glm::vec3(0.0f));
+        visualBox->setRotAxis(axis);
+        visualBox->setRotAngle(angle);
+    }
+
     rp3d::PhysicsCommon m_physicsCommon;
     rp3d::PhysicsWorld *m_world;
 
@@ -143,7 +159,8 @@ public:
 
         // Create ground plane (static box)
         std::cout << "\nCreating Ground:" << std::endl;
-        m_ground = PhysicsBox::create(m_world, m_physicsCommon, glm::vec3(20.0f, 0.5f, 20.0f),
+        const glm::vec3 groundHalfExtents(20.0f, 0.5f, 20.0f);
+        m_ground = PhysicsBox::create(m_world, m_physicsCommon, groundHalfExtents,
                                       glm::vec3(0.0f, -0.5f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 0.0f);
         m_ground->setRestitution(0.0f);
         m_ground->setFriction(1.0f);
@@ -168,8 +185,8 @@ public:
         groundMaterial->setDiffuseColor(glm::vec4(0.3f, 0.6f, 0.3f, 1.0f));
 
         // Create visual ground (using Box instead of Cube for vec3 size support)
-        m_groundVisual = Box::create(glm::vec3(20.0f, 0.01, 20.0f));
-        m_groundVisual->setPos(glm::vec3(0.0f, 0.0f, 0.0f));
+        m_groundVisual = Box::create(m_ground->getSize());
+        m_groundVisual->setPos(m_ground->getPosition());
         m_groundVisual->setMaterial(groundMaterial);
         this->add(m_groundVisual);
 
@@ -248,14 +265,7 @@ public:
         for (size_t i = 0; i < m_physicsBoxes.size(); i++)
         {
             m_physicsBoxes[i]->updateFromPhysics();
-
-            glm::vec3 pos = m_physicsBoxes[i]->getPosition();
-            glm::quat rot = m_physicsBoxes[i]->getRotation();
-            glm::vec3 euler = glm::eulerAngles(rot);
-            euler = glm::degrees(euler);
-
-            m_visualBoxes[i]->setPos(pos);
-            m_visualBoxes[i]->setEulerAngles(euler);
+            applyPhysicsTransform(m_physicsBoxes[i], m_visualBoxes[i]);
         }
     }
 
@@ -344,12 +354,11 @@ public:
         axis = glm::normalize(axis);
         auto quat = glm::angleAxis(static_cast<float>(0.0f), axis);
 
-        auto box = PhysicsBox::create(
-            m_world, m_physicsCommon, glm::vec3(1.0f, 1.0f, 1.0f),                // 1x1x1 box
-            glm::vec3(ivf::random(-10.0, 10.0), 10.0f, ivf::random(-10.0, 10.0)), // Staggered positions
-            quat,
-            10.0f // 1 kg mass
-        );
+        const glm::vec3 boxHalfExtents(1.0f, 1.0f, 1.0f);
+        auto box = PhysicsBox::create(m_world, m_physicsCommon, boxHalfExtents, // 2x2x2 box
+                                      glm::vec3(ivf::random(-10.0, 10.0), 10.0f,
+                                                ivf::random(-10.0, 10.0)),
+                                      quat, 1.0f);
         box->setRestitution(0.1f);
         box->setFriction(0.3f);
 
@@ -358,8 +367,9 @@ public:
         auto boxMaterial = Material::create();
         boxMaterial->setDiffuseColor(glm::vec4(0.8f, 0.3f, 0.2f, 1.0f));
 
-        auto visualBox = Box::create(glm::vec3(1.0f, 1.0f, 1.0f)); // Full size (half-extents * 2)
+        auto visualBox = Box::create(boxHalfExtents);
         visualBox->setMaterial(boxMaterial);
+        applyPhysicsTransform(box, visualBox);
         m_visualBoxes.push_back(visualBox);
         this->add(visualBox);
     }

@@ -357,6 +357,13 @@ public:
      * @brief Restore the previously saved lighting state.
      */
     void restoreState();
+
+    /**
+     * @brief Re-fetch all cached uniform locations from the current shader program.
+     * Call this after switching to a different shader program (e.g., PBR) so that
+     * subsequent apply() calls target the correct uniform locations.
+     */
+    void refreshForProgram();
 };
 
 /**

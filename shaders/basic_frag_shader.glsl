@@ -98,6 +98,13 @@ uniform int spotLightCount = 0;
 
 uniform sampler2D texture0;
 
+// Multitexturing (up to 8 layers)
+uniform bool useMultiTexturing = false;
+uniform int  activeTextureCount = 1;
+uniform sampler2D textures[8];
+uniform int   textureBlendModes[8];
+uniform float textureBlendFactors[8];
+
 #define NR_POINT_LIGHTS 8
 #define NR_DIR_LIGHTS 8
 #define NR_SPOT_LIGHTS 8
@@ -242,30 +249,47 @@ void main()
         {
             vec4 baseColor = vec4(result, 1.0);
     
-            if (useTexture) 
+            if (useTexture)
             {
-                if (textRendering) 
+                if (textRendering)
                 {
-                    if (useFixedTextColor) 
+                    if (useFixedTextColor)
                     {
                         vec4 texSample = vec4(textColor.rgb, texture(texture0, texCoord).r);
-                        // fragColor = applyTexBlendMode(texSample, baseColor);
                         fragColor = texSample;
                     }
-                    else 
+                    else
                     {
                         vec4 texSample = vec4(result.rgb, texture(texture0, texCoord).r);
-                        //fragColor = applyTexBlendMode(texSample, baseColor);
                         fragColor = texSample;
                     }
-                } 
-                else 
+                }
+                else if (useMultiTexturing && activeTextureCount > 1)
+                {
+                    // Blend all active texture layers in order
+                    vec4 acc = baseColor;
+                    for (int i = 0; i < activeTextureCount && i < 8; ++i)
+                    {
+                        vec4 texSample = texture(textures[i], texCoord);
+                        int  bm = textureBlendModes[i];
+                        float bf = textureBlendFactors[i];
+                        vec4 blended;
+                        if      (bm == TEX_BLEND_MULTIPLY) blended = texSample * acc;
+                        else if (bm == TEX_BLEND_ADD)      blended = min(texSample + acc, vec4(1.0));
+                        else if (bm == TEX_BLEND_SCREEN)   blended = vec4(1.0) - (vec4(1.0) - texSample) * (vec4(1.0) - acc);
+                        else if (bm == TEX_BLEND_DECAL)    blended = vec4(mix(acc.rgb, texSample.rgb, texSample.a), acc.a);
+                        else                               blended = texSample; // NORMAL / default
+                        acc = mix(acc, blended, bf);
+                    }
+                    fragColor = acc;
+                }
+                else
                 {
                     vec4 texSample = texture(texture0, texCoord);
                     fragColor = applyTexBlendMode(texSample, baseColor);
                 }
-            } 
-            else 
+            }
+            else
             {
                 fragColor = baseColor;
             }

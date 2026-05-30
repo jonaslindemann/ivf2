@@ -60,6 +60,13 @@ private:
     ivf::Node *m_lastNode;          ///< Last node under the cursor.
     ivf::Node *m_currentNode;       ///< Current node under the cursor.
 
+    // Box selection
+    bool m_boxSelectEnabled{false};
+    bool m_boxSelecting{false};
+    double m_boxStartX{0}, m_boxStartY{0};
+    double m_boxCurrentX{0}, m_boxCurrentY{0};
+    static constexpr double k_boxSelectMinDrag = 5.0; ///< Min pixels to initiate box select.
+
     bool m_renderToTexture{false};    ///< Render to texture enabled.
     bool m_selectionRendering{false}; ///< Selection rendering in progress.
     bool m_showAxis{false};           ///< Show axis overlay.
@@ -484,6 +491,24 @@ public:
 
     virtual void onMousePosition3D(double x, double y, double z);
 
+    /**
+     * @brief Enable or disable rubber-band (box) selection.
+     * When enabled, holding left mouse button and dragging draws a selection rect.
+     * @param enabled True to enable box selection.
+     */
+    void setBoxSelectionEnabled(bool enabled) { m_boxSelectEnabled = enabled; }
+
+    /**
+     * @brief Check if box selection is enabled.
+     */
+    bool boxSelectionEnabled() const { return m_boxSelectEnabled; }
+
+    /**
+     * @brief Called when a box selection completes. Override to handle selected nodes.
+     * @param nodes All nodes fully inside the rubber-band rectangle.
+     */
+    virtual void onBoxSelect(std::vector<ivf::Node*> nodes);
+
 protected:
     /**
      * @brief Internal handler for mouse entering a node.
@@ -502,6 +527,18 @@ protected:
      * @param node Pointer to the node left.
      */
     virtual void doLeaveNode(ivf::Node *node);
+
+    /**
+     * @brief Per-frame update (always runs, even when ImGui captures mouse).
+     * Runs animation systems (tweens, timers, behaviors) then the user's onUpdate().
+     */
+    virtual void doUpdate() override;
+
+    /**
+     * @brief Called after onSetup(). Rebuilds the selection node map so nodes
+     * added during onSetup() are visible to the picker.
+     */
+    virtual void doPostSetup() override;
 
     /**
      * @brief Internal handler for UI updates.

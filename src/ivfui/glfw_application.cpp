@@ -42,6 +42,12 @@ static void window_resize_callback(GLFWwindow *window, int width, int height)
     win->doResize(width, height);
 }
 
+static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
+{
+    auto win = GLFWWindowTracker::instance()->get(window);
+    win->doScroll(xoffset, yoffset);
+}
+
 GLFWApplication::GLFWApplication()
 {
     logInfo("Initializing GLFW", "GLFWApplication");
@@ -80,6 +86,7 @@ void GLFWApplication::addWindow(GLFWWindowPtr window)
     glfwSetMouseButtonCallback(window->ref(), mouse_callback);
     glfwSetCursorPosCallback(window->ref(), mouse_pos_callback);
     glfwSetWindowSizeCallback(window->ref(), window_resize_callback);
+    glfwSetScrollCallback(window->ref(), scroll_callback);
 
     ImGui_ImplGlfw_InstallCallbacks(window->ref());
 

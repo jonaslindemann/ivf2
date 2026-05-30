@@ -4,6 +4,7 @@
 #include <ivf/program.h>
 #include <ivf/stock_shaders.h>
 #include <ivf/pbr_shaders.h>
+#include <ivf/bump_shaders.h>
 #include <ivf/post_shaders.h>
 #include <ivf/vertex_shader.h>
 #include <ivf/logger.h>
@@ -151,6 +152,12 @@ std::shared_ptr<Program> ivf::ShaderManager::loadPBRShader()
     return loadProgramFromStrings(ivf::pbr_vert_shader_source, ivf::pbr_frag_shader_source, "pbr", false);
 }
 
+std::shared_ptr<Program> ivf::ShaderManager::loadBumpShader()
+{
+    logInfo("Loading bump shader.", "ShaderManager");
+    return loadProgramFromStrings(ivf::bump_vert_shader_source, ivf::bump_frag_shader_source, "bump", false);
+}
+
 ProgramPtr ivf::ShaderManager::loadRenderToTextureShader()
 {
     logInfo("Loading render to texture shader.", "ShaderManager");
@@ -224,6 +231,11 @@ ProgramPtr ivf::smLoadBasicShader()
 ProgramPtr ivf::smLoadPBRShader()
 {
     return ShaderManager::instance()->loadPBRShader();
+}
+
+ProgramPtr ivf::smLoadBumpShader()
+{
+    return ShaderManager::instance()->loadBumpShader();
 }
 
 ProgramPtr ivf::smLoadRenderToTextureShader()

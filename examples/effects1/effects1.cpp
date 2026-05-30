@@ -1,13 +1,14 @@
 /**
  * @file effects1.cpp
- * @brief Deformer example
+ * @brief Post-processing effects example
  * @author Jonas Lindemann
  * @example effects1.cpp
  * @ingroup effect_examples
  *
  * This example demonstrates the use of various post-processing effects
  * including blur, tint, film grain, chromatic aberration, vignette,
- * bloom, dithering, and pixelation.
+ * bloom, dithering, pixelation, wave distortion, swirl, kaleidoscope,
+ * glitch, scanline, posterize, color grading, and night vision.
  */
 
 #include <cmath>
@@ -33,6 +34,14 @@
 #include <ivf/bloom_effect.h>
 #include <ivf/dithering_effect.h>
 #include <ivf/pixelation_effect.h>
+#include <ivf/wave_distortion_effect.h>
+#include <ivf/swirl_effect.h>
+#include <ivf/kaleidoscope_effect.h>
+#include <ivf/glitch_effect.h>
+#include <ivf/scanline_effect.h>
+#include <ivf/posterize_effect.h>
+#include <ivf/color_grading_effect.h>
+#include <ivf/night_vision_effect.h>
 
 #include <ivfmath/spline.h>
 
@@ -239,16 +248,86 @@ public:
         pixelationEffect->setPixelSize(4.0);
         pixelationEffect->load();
 
+        // Wave distortion effect
+
+        auto waveDistortionEffect = WaveDistortionEffect::create();
+        waveDistortionEffect->setFrequency(10.0f);
+        waveDistortionEffect->setAmplitude(0.01f);
+        waveDistortionEffect->setSpeed(1.0f);
+        waveDistortionEffect->load();
+
+        // Swirl effect
+
+        auto swirlEffect = SwirlEffect::create();
+        swirlEffect->setRadius(0.5f);
+        swirlEffect->setAngle(3.14159f);
+        swirlEffect->load();
+
+        // Kaleidoscope effect
+
+        auto kaleidoscopeEffect = KaleidoscopeEffect::create();
+        kaleidoscopeEffect->setSegments(6.0f);
+        kaleidoscopeEffect->setRotation(0.0f);
+        kaleidoscopeEffect->load();
+
+        // Glitch effect
+
+        auto glitchEffect = GlitchEffect::create();
+        glitchEffect->setIntensity(0.05f);
+        glitchEffect->setBlockSize(0.05f);
+        glitchEffect->setSpeed(4.0f);
+        glitchEffect->load();
+
+        // Scanline effect
+
+        auto scanlineEffect = ScanlineEffect::create();
+        scanlineEffect->setLineSpacing(4.0f);
+        scanlineEffect->setLineIntensity(0.4f);
+        scanlineEffect->setScrollSpeed(0.0f);
+        scanlineEffect->load();
+
+        // Posterize effect
+
+        auto posterizeEffect = PosterizeEffect::create();
+        posterizeEffect->setLevels(4.0f);
+        posterizeEffect->load();
+
+        // Color grading effect
+
+        auto colorGradingEffect = ColorGradingEffect::create();
+        colorGradingEffect->setShadows(glm::vec3(0.6f, 0.5f, 0.5f));
+        colorGradingEffect->setMidtones(glm::vec3(0.5f, 0.5f, 0.5f));
+        colorGradingEffect->setHighlights(glm::vec3(0.5f, 0.5f, 0.6f));
+        colorGradingEffect->setContrast(1.1f);
+        colorGradingEffect->setSaturation(1.2f);
+        colorGradingEffect->load();
+
+        // Night vision effect
+
+        auto nightVisionEffect = NightVisionEffect::create();
+        nightVisionEffect->setNoiseIntensity(0.05f);
+        nightVisionEffect->setGlowStrength(0.3f);
+        nightVisionEffect->setPhosphorColor(glm::vec3(0.1f, 1.0f, 0.1f));
+        nightVisionEffect->load();
+
         // Add effects to the window (order matters for compositing)
 
-        this->addEffect(blurEffect);       // 0
-        this->addEffect(tintEffect);       // 1
-        this->addEffect(chromaticEffect);  // 2
-        this->addEffect(ditheringEffect);  // 3
-        this->addEffect(bloomEffect);      // 4
-        this->addEffect(pixelationEffect); // 5
-        this->addEffect(vignetteEffect);   // 6
-        this->addEffect(filmgrainEffect);  // 7
+        this->addEffect(blurEffect);            //  0
+        this->addEffect(tintEffect);            //  1
+        this->addEffect(chromaticEffect);       //  2
+        this->addEffect(ditheringEffect);       //  3
+        this->addEffect(bloomEffect);           //  4
+        this->addEffect(pixelationEffect);      //  5
+        this->addEffect(vignetteEffect);        //  6
+        this->addEffect(filmgrainEffect);       //  7
+        this->addEffect(waveDistortionEffect);  //  8
+        this->addEffect(swirlEffect);           //  9
+        this->addEffect(kaleidoscopeEffect);    // 10
+        this->addEffect(glitchEffect);          // 11
+        this->addEffect(scanlineEffect);        // 12
+        this->addEffect(posterizeEffect);       // 13
+        this->addEffect(colorGradingEffect);    // 14
+        this->addEffect(nightVisionEffect);     // 15
 
         // Disable all effects by default
 

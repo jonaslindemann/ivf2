@@ -40,3 +40,4 @@
 #include <ivf/cubemap.h>
 #include <ivf/skybox.h>
 #include <ivf/billboard.h>
+#include <ivf/bump_material.h>

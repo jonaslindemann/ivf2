@@ -99,6 +99,13 @@ public:
     ProgramPtr loadPBRShader();
 
     /**
+     * @brief Load the bump-mapping (normal-map Phong) shader program.
+     * Registered under the name "bump". Does not change the current program.
+     * @return ProgramPtr Shared pointer to the bump shader program.
+     */
+    ProgramPtr loadBumpShader();
+
+    /**
      * @brief Load a shader program for rendering to a texture.
      * @return ProgramPtr Shared pointer to the render-to-texture shader program.
      */
@@ -169,6 +176,11 @@ ProgramPtr smLoadBasicShader();
  * @brief Load the PBR shader program using the global ShaderManager.
  */
 ProgramPtr smLoadPBRShader();
+
+/**
+ * @brief Load the bump-mapping shader program using the global ShaderManager.
+ */
+ProgramPtr smLoadBumpShader();
 
 /**
  * @brief Load a render-to-texture shader program using the global ShaderManager.

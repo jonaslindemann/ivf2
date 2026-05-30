@@ -290,4 +290,210 @@ void main()
     FragColor = vec4(col, 1.0);
 })";
 
+inline const std::string wave_distortion_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform float frequency;
+uniform float amplitude;
+uniform float speed;
+
+void main()
+{
+    vec2 uv = TexCoords;
+    uv.x += sin(TexCoords.y * frequency + time * speed) * amplitude;
+    uv.y += sin(TexCoords.x * frequency + time * speed) * amplitude;
+    vec3 col = texture(screenTexture, uv).rgb;
+    FragColor = vec4(col, 1.0);
+})";
+
+inline const std::string swirl_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform float radius;
+uniform float angle;
+
+void main()
+{
+    vec2 center = vec2(0.5, 0.5);
+    vec2 delta = TexCoords - center;
+    float dist = length(delta);
+    float theta = atan(delta.y, delta.x) + angle * smoothstep(radius, 0.0, dist);
+    vec2 swirled = center + dist * vec2(cos(theta), sin(theta));
+    vec3 col = texture(screenTexture, swirled).rgb;
+    FragColor = vec4(col, 1.0);
+})";
+
+inline const std::string kaleidoscope_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform float segments;
+uniform float rotation;
+
+#define PI 3.14159265358979
+
+void main()
+{
+    vec2 uv = TexCoords - 0.5;
+    float dist = length(uv);
+    float a = atan(uv.y, uv.x) + rotation;
+    float slice = 2.0 * PI / segments;
+    a = mod(a, slice);
+    if (a > slice * 0.5)
+        a = slice - a;
+    vec2 mirrored = dist * vec2(cos(a), sin(a)) + 0.5;
+    vec3 col = texture(screenTexture, mirrored).rgb;
+    FragColor = vec4(col, 1.0);
+})";
+
+inline const std::string glitch_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform float intensity;
+uniform float blockSize;
+uniform float speed;
+
+float rand(vec2 co) {
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main()
+{
+    vec2 uv = TexCoords;
+    float t = floor(time * speed);
+    float row = floor(uv.y / blockSize);
+    float rnd = rand(vec2(row, t));
+    if (rnd > 0.9) {
+        uv.x += (rand(vec2(row * t, 1.0)) - 0.5) * intensity;
+    }
+    float shift = rand(vec2(t, row)) * intensity * 0.5;
+    float r = texture(screenTexture, uv + vec2(shift, 0.0)).r;
+    float g = texture(screenTexture, uv).g;
+    float b = texture(screenTexture, uv - vec2(shift, 0.0)).b;
+    FragColor = vec4(r, g, b, 1.0);
+})";
+
+inline const std::string scanline_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform float lineSpacing;
+uniform float lineIntensity;
+uniform float scrollSpeed;
+
+void main()
+{
+    vec3 col = texture(screenTexture, TexCoords).rgb;
+    float scanline = sin((gl_FragCoord.y / lineSpacing + time * scrollSpeed) * 3.14159) * 0.5 + 0.5;
+    col *= 1.0 - lineIntensity * (1.0 - scanline);
+    FragColor = vec4(col, 1.0);
+})";
+
+inline const std::string posterize_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform float levels;
+
+void main()
+{
+    vec3 col = texture(screenTexture, TexCoords).rgb;
+    col = floor(col * levels) / levels;
+    FragColor = vec4(col, 1.0);
+})";
+
+inline const std::string color_grading_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform vec3 shadows;
+uniform vec3 midtones;
+uniform vec3 highlights;
+uniform float contrast;
+uniform float saturation;
+
+void main()
+{
+    vec3 col = texture(screenTexture, TexCoords).rgb;
+
+    // Contrast
+    col = (col - 0.5) * contrast + 0.5;
+
+    // Saturation
+    float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+    col = mix(vec3(lum), col, saturation);
+
+    // Zone-based color lift
+    float s = clamp(1.0 - lum * 2.0, 0.0, 1.0);       // shadows zone
+    float h = clamp((lum - 0.5) * 2.0, 0.0, 1.0);      // highlights zone
+    float m = 1.0 - s - h;                               // midtones zone
+    col += s * (shadows - 0.5) * 0.5
+         + m * (midtones - 0.5) * 0.5
+         + h * (highlights - 0.5) * 0.5;
+
+    FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+})";
+
+inline const std::string night_vision_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float time;
+uniform float noiseIntensity;
+uniform float glowStrength;
+uniform vec3 phosphorColor;
+
+float rand(vec2 co) {
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+void main()
+{
+    vec3 col = texture(screenTexture, TexCoords).rgb;
+    float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+
+    // Animated noise
+    float noise = rand(TexCoords + fract(time * 0.1)) * noiseIntensity;
+    lum = clamp(lum + noise, 0.0, 1.0);
+
+    // Phosphor tint
+    vec3 tinted = lum * phosphorColor;
+
+    // Soft glow
+    tinted += phosphorColor * lum * lum * glowStrength;
+
+    // Radial vignette
+    vec2 pos = (TexCoords - 0.5) * 2.0;
+    float vignette = smoothstep(1.4, 0.6, length(pos));
+    tinted *= vignette;
+
+    FragColor = vec4(clamp(tinted, 0.0, 1.0), 1.0);
+})";
+
 } // namespace ivf

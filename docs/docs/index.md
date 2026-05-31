@@ -8,14 +8,17 @@ The goal of Ivf2 is to provide a more modern and flexible framework for graphics
 
 ## Features
 
-- Modern, object-oriented C++ design
+- Modern, object-oriented C++ design (C++20, shared_ptr throughout)
 - Powerful scene graph management
 - Extensive set of 3D primitives
 - Flexible material system
 - Dynamic lighting system
-- Animation capabilities
-- Post-processing effects
-- ImGui-based user interface
+- Keyframe and spline animation
+- Spline-based cinematic camera animation with shake effects
+- Global time control — pause, slow-motion, and time scaling across the whole scene
+- Curl-noise flow fields for organic, fluid-like particle animation
+- Post-processing effects (blur, bloom, chromatic, film grain, vignette, edge detection)
+- ImGui-based user interface with composable panels
 - Model loading via Assimp
 - Shadow mapping
 - And more!

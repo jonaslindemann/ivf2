@@ -13,6 +13,7 @@ using namespace ivfui;
 #include <ivf/timer_manager.h>
 #include <ivf/debug_draw.h>
 #include <ivf/shader_watcher.h>
+#include <ivf/time_controller.h>
 #include <ivf/transform_manager.h>
 #include <ivf/composite_node.h>
 
@@ -741,6 +742,7 @@ void GLFWSceneWindow::doUpdate()
     TweenManager::instance()->update(dt);
     TimerManager::instance()->update(dt);
     ShaderWatcher::instance()->update(dt);
+    TimeController::instance()->update(frameTime());
     updateSceneBehaviors(m_scene.get(), dt);
     GLFWWindow::doUpdate();  // calls onUpdate()
 }

@@ -40,11 +40,35 @@ object->setRotAngle(m_angle);
 object->setRotAngle(20.0 * elapsedTime());
 ```
 
+## Using TimeController
+
+For interactive applications — pause buttons, slow-motion, time scrubbing — replace raw `elapsedTime()` with `TimeController`:
+
+```cpp
+#include <ivf/time_controller.h>
+
+void onUpdate() override {
+    double t  = ivf::TimeController::instance()->elapsed();
+    double dt = ivf::TimeController::instance()->delta();
+
+    m_wave->setTime(static_cast<float>(t));
+    m_particles->update(static_cast<float>(dt));
+}
+
+void onKey(int key, int, int action, int) override {
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+        ivf::TimeController::instance()->togglePause();
+}
+```
+
+`GLFWSceneWindow` feeds the real frame delta into `TimeController` automatically each frame. `elapsed()` and `delta()` respect the current pause state and time scale. See [Time Control](../core/time_controller.md) for the full API.
+
 ## Animation Types
 
 ivf2 offers several built-in animation types:
 
-1. **Direct manipulation** - Updating properties each frame
+1. **Direct manipulation** - Updating properties each frame via `onUpdate()`
 2. **SplineAnimation** - Animation along a spline path
 3. **KeyframeAnimation** - Animation between key poses
-4. **Procedural animation** - Using mathematical functions
+4. **CameraAnimation** - Spline fly-through with optional shake (see [Camera Animation](camera_animation.md))
+5. **Procedural animation** - Using mathematical functions driven by `TimeController::elapsed()`

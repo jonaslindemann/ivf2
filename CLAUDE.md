@@ -129,6 +129,6 @@ GLSL shaders live in `shaders/` (source) and are copied to `bin/shaders/` at bui
 
 ## Documentation
 
-- User guide (MkDocs): `docs/docs/`
-- API reference (Doxygen): `Doxyfile` at repo root; generated output in `docs/site/`
-- Build docs: `.readthedocs.yaml` (Python 3.11, doxygen, graphviz required)
+- User guide (Zensical): `docs/docs/`, configured by `docs/zensical.toml`
+- API reference (Doxygen): `Doxyfile` at repo root; generated output in `docs/docs/doxygen/html/`
+- Build docs: `.readthedocs.yaml` (Python 3.11, doxygen, graphviz, zensical required)

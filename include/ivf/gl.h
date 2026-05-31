@@ -34,6 +34,8 @@
 #include <ivf/math_utils.h>
 #include <ivf/palette.h>
 #include <ivf/tween.h>
+#include <ivf/time_controller.h>
+#include <ivf/flow_field.h>
 #include <ivf/timer_manager.h>
 #include <ivf/debug_draw.h>
 #include <ivf/shader_watcher.h>

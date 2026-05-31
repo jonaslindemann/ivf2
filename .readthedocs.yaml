@@ -14,17 +14,13 @@ build:
     # Read the Docs allows specific pre-approved packages
     - doxygen
     - graphviz
-  jobs:
-    pre_build:
-      # Generate Doxygen documentation
-      - doxygen Doxyfile
-
-# Build documentation in the "docs/" directory with MkDocs
-mkdocs:
-  configuration: docs/mkdocs.yml
-  fail_on_warning: false
-
-# Python requirements
-python:
-  install:
-    - requirements: docs/requirements.txt
+  commands:
+    # Install the Zensical build dependency
+    - python -m pip install -r docs/requirements.txt
+    # Generate Doxygen documentation
+    - doxygen Doxyfile
+    # Build Zensical documentation
+    - python -m zensical build --clean --config-file docs/zensical.toml
+    # Publish the generated static site for Read the Docs
+    - mkdir --parents $READTHEDOCS_OUTPUT/html/
+    - cp --recursive docs/site/* $READTHEDOCS_OUTPUT/html/

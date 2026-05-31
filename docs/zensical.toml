@@ -1,0 +1,91 @@
+[project]
+site_name = "Interactive Visual Framework 2"
+site_description = "Documentation for the Ivf2 C++ graphics library"
+site_author = "Jonas Lindemann"
+site_url = "https://interactive-visualisation-framework-2.readthedocs.io/"
+repo_url = "https://github.com/jonaslindemann/ivf2"
+repo_name = "GitHub"
+docs_dir = "docs"
+site_dir = "site"
+extra_css = ["stylesheets/extra.css"]
+
+nav = [
+  { "Home" = "index.md" },
+  { "Getting Started" = [
+    { "Installation" = "getting_started/installation.md" },
+    { "Basic Concepts" = "getting_started/basic_concepts.md" },
+    { "Your first Application" = "getting_started/your_first_app.md" },
+  ] },
+  { "Core" = [
+    { "Nodes" = "core/nodes.md" },
+    { "Materials and Textures" = "core/materials_and_textures.md" },
+    { "Lighting" = "core/lighting.md" },
+    { "Time Control" = "core/time_controller.md" },
+  ] },
+  { "Primitives" = [
+    { "Basic Primitives" = "primitives/basic_primitives.md" },
+    { "Complex Primitives" = "primitives/complex_primitives.md" },
+  ] },
+  { "Animation" = [
+    { "Basic Animation" = "animation/basic_animation.md" },
+    { "Keyframe Animation" = "animation/keyframe_animation.md" },
+    { "Spline Animation" = "animation/spline_animation.md" },
+    { "Lissajous" = "animation/lissajous.md" },
+    { "Camera Animation" = "animation/camera_animation.md" },
+  ] },
+  { "Creative Programming" = [
+    { "Overview" = "creative/index.md" },
+    { "Flow Fields" = "creative/flow_field.md" },
+    { "Time-Driven Animation" = "creative/time_and_animation.md" },
+  ] },
+  { "UI" = [
+    { "UI Windows" = "ui/ui_windows.md" },
+    { "Scene Window" = "ui/scene_window.md" },
+    { "Time Control Panel" = "ui/time_control_panel.md" },
+  ] },
+  { "Examples" = [
+    { "Primitive Examples" = "examples/primitives_examples.md" },
+    { "Texture Examples" = "examples/texture_examples.md" },
+    { "Animation Examples" = "examples/animation_examples.md" },
+    { "Asset Examples" = "examples/asset_examples.md" },
+    { "Deformer Examples" = "examples/deformer_examples.md" },
+    { "Lighting Examples" = "examples/lighting_examples.md" },
+    { "Interaction Examples" = "examples/interaction_examples.md" },
+    { "Effects Examples" = "examples/effects_examples.md" },
+    { "UI Examples" = "examples/ui_examples.md" },
+    { "Time Control Examples" = "examples/time_control_examples.md" },
+    { "Flow Field Examples" = "examples/flow_field_examples.md" },
+    { "Camera Animation Examples" = "examples/camera_anim_examples.md" },
+  ] },
+  { "API Reference" = [
+    { "Overview" = "api/index.md" },
+  ] },
+]
+
+[project.theme]
+font = { text = "Barlow" }
+features = [
+  "navigation.tabs",
+  "navigation.expand",
+  "navigation.instant",
+  "navigation.tracking",
+  "content.code.copy",
+  "content.code.annotate",
+]
+
+[[project.theme.palette]]
+scheme = "slate"
+accent = "yellow"
+primary = "yellow"
+
+[project.markdown_extensions.pymdownx.highlight]
+[project.markdown_extensions.pymdownx.superfences]
+[project.markdown_extensions.pymdownx.inlinehilite]
+[project.markdown_extensions.pymdownx.tabbed]
+[project.markdown_extensions.pymdownx.arithmatex]
+[project.markdown_extensions.pymdownx.snippets]
+base_path = "../"
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.toc]
+permalink = true
+[project.markdown_extensions.attr_list]

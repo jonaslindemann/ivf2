@@ -1,0 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap');
+
+:root,
+[data-md-color-scheme="slate"] {
+  --md-text-font: "Barlow", sans-serif;
+  --md-default-bg-color: #191B1F;
+  --md-primary-fg-color: #FFD43B;
+  --md-primary-fg-color--light: #FFE066;
+  --md-primary-fg-color--dark: #F0C419;
+}
+
+body,
+.md-typeset {
+  font-family: "Barlow", sans-serif;
+}
+
+body,
+.md-main,
+.md-main__inner {
+  background-color: #191B1F;
+}
+
+.md-header,
+.md-tabs {
+  background-color: #FFD43B;
+  color: #191B1F;
+}
+
+.md-header a,
+.md-header button,
+.md-tabs a {
+  color: #191B1F;
+}
+
+.md-header__title,
+.md-header__topic,
+.md-header__topic span {
+  color: #000000;
+}
+
+.md-search__button {
+  background-color: #D9B800 !important;
+  color: #000000 !important;
+}
+
+.md-search__button:hover,
+.md-search__button:focus {
+  background-color: #C9AA00 !important;
+}
+
+.md-search__input {
+  color: #000000;
+}
+
+.md-header label[for="__search"],
+.md-header label[for="__search"] svg,
+.md-header label[for="__search"] svg * {
+  color: #000000 !important;
+  stroke: #000000 !important;
+}
+
+.md-search__input::placeholder,
+.md-search__icon,
+.md-search__icon svg,
+.md-search__icon svg * {
+  color: #000000 !important;
+  fill: #000000 !important;
+  stroke: #000000 !important;
+}
+
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  color: #FFD43B;
+}

@@ -13,3 +13,5 @@
 #include <ivfui/ui_window.h>
 #include <ivfui/ui_menu.h>
 #include <ivfui/ui_input_dialog.h>
+#include <ivfui/time_control_panel.h>
+#include <ivfui/camera_animation.h>

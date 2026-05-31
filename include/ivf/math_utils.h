@@ -240,4 +240,50 @@ inline float fbm(float x, float y, int octaves = 4, float lacunarity = 2.0f, flo
     return value;
 }
 
+// ---- Curl noise (divergence-free vector fields) --------------------------
+//
+// 2D curl noise: curl of a scalar potential sampled from 3D Perlin noise.
+// The result is divergence-free, making it ideal for fluid-like particle flow.
+// Parameter t animates the field over time.
+//
+inline glm::vec2 curlNoise2D(float x, float y, float t = 0.0f, float eps = 0.01f) noexcept
+{
+    // φ(x,y,t) = noise3d(x,y,t)
+    // curl_x = ∂φ/∂y,  curl_y = -∂φ/∂x
+    float dPhi_dy = (noise3d(x,       y + eps, t) - noise3d(x,       y - eps, t)) / (2.0f * eps);
+    float dPhi_dx = (noise3d(x + eps, y,       t) - noise3d(x - eps, y,       t)) / (2.0f * eps);
+    return glm::vec2(dPhi_dy, -dPhi_dx);
+}
+
+// 3D curl noise: curl of a vector potential (Ax, Ay, Az) built from three
+// independently decorrelated Perlin fields. Each field occupies its own
+// region of noise space (large coordinate offset) and evolves with t.
+//
+// curl.x = ∂Az/∂y - ∂Ay/∂z
+// curl.y = ∂Ax/∂z - ∂Az/∂x
+// curl.z = ∂Ay/∂x - ∂Ax/∂y
+//
+// Ax(x,y,z) = noise3d( x,          y,          z + t        )
+// Ay(x,y,z) = noise3d( x + kOff1,  y + kOff1,  z + kOff1+t  )
+// Az(x,y,z) = noise3d( x + kOff2,  y + kOff2,  z + kOff2+t  )
+//
+inline glm::vec3 curlNoise3D(float x, float y, float z, float t = 0.0f, float eps = 0.01f) noexcept
+{
+    constexpr float kOff1 = 100.0f, kOff2 = 200.0f;
+
+    // Ax partial derivatives
+    float dAx_dy = (noise3d(x,        y + eps,  z + t)        - noise3d(x,        y - eps,  z + t))        / (2.0f * eps);
+    float dAx_dz = (noise3d(x,        y,        z + eps + t)  - noise3d(x,        y,        z - eps + t))  / (2.0f * eps);
+
+    // Ay partial derivatives
+    float dAy_dx = (noise3d(x + eps + kOff1, y + kOff1, z + kOff1 + t) - noise3d(x - eps + kOff1, y + kOff1, z + kOff1 + t)) / (2.0f * eps);
+    float dAy_dz = (noise3d(x + kOff1, y + kOff1, z + eps + kOff1 + t) - noise3d(x + kOff1, y + kOff1, z - eps + kOff1 + t)) / (2.0f * eps);
+
+    // Az partial derivatives
+    float dAz_dx = (noise3d(x + eps + kOff2, y + kOff2, z + kOff2 + t) - noise3d(x - eps + kOff2, y + kOff2, z + kOff2 + t)) / (2.0f * eps);
+    float dAz_dy = (noise3d(x + kOff2, y + eps + kOff2, z + kOff2 + t) - noise3d(x + kOff2, y - eps + kOff2, z + kOff2 + t)) / (2.0f * eps);
+
+    return glm::vec3(dAz_dy - dAy_dz, dAx_dz - dAz_dx, dAy_dx - dAx_dy);
+}
+
 } // namespace ivf

@@ -1,107 +1,106 @@
 # Installation
 
-This guide will help you install and set up the ivf2 library for your project.
+This guide will help you install and set up the ivf2 library.
 
 ## Prerequisites
 
-- CMake 3.12+
-- C++17 compatible compiler
-- OpenGL 3.3+
-- GLFW3
-- GLEW
-- ImGui
-- Assimp (for model loading)
-- Freetype (for text rendering)
+- **CMake** 3.24 or higher
+- **vcpkg** package manager (handles all library dependencies automatically)
+- **Compiler**:
+  - Windows: Visual Studio 2022 (MSVC with C++20 support)
+  - Linux: GCC or Clang with C++20 support
+  - macOS: Xcode with C++20 support
+- **OpenGL** 3.3 or higher
 
-## Dependencies
+All library dependencies (GLFW3, GLEW, ImGui, Assimp, FreeType, stb, GLM, ReactPhysics3D, etc.) are managed automatically by vcpkg and do not need to be installed manually.
 
-The following dependencies are required to build ivf2:
+## 1. Clone the Repository
 
-- GLFW (window management)
-- GLEW (OpenGL extension loading)
-- GLM (mathematics)
-- ImGui (user interface)
-- Assimp (model loading)
-- Freetype (font rendering)
-- stb_image (image loading)
-
-## Install vcpkg
-
-Ivf2 uses vcpkg to manage its dependencies. Instruction on how to install vcpkg can be found [here](https://learn.microsoft.com/sv-se/vcpkg/get_started/overview)
-
-## Clone the Repository
-
-To get started, clone the ivf2 repository from GitHub:
-
-``` bash
+```bash
 git clone https://github.com/jonaslindemann/ivf2.git
 cd ivf2
 ```
 
-## Configuring the Library
+## 2. Install vcpkg
 
-To build the ivf2 library, follow these steps:
+ivf2 uses vcpkg for dependency management. Instructions for installing vcpkg can be found in the [vcpkg getting started guide](https://learn.microsoft.com/en-us/vcpkg/get_started/overview).
 
-In the ivf2 directory, run the following commands:
+The build system detects vcpkg automatically in the following locations (in order):
 
-```cmd
-python build-ivf.py --configure --build-type=Debug --preset=default
+1. `VCPKG_ROOT` environment variable *(recommended)*
+2. Windows: `c:/vcpkg` or `e:/vcpkg`
+3. Linux/macOS: `$HOME/vcpkg` or `/usr/local/vcpkg`
+
+Setting `VCPKG_ROOT` is the most portable approach:
+
+**Windows (PowerShell):**
+
+```powershell
+$env:VCPKG_ROOT = "C:\path\to\vcpkg"
 ```
 
-This command will check for the vcpkg.cmake toolchain file and configure the build system accordingly. It will also build the library in Debug mode.
-You can change the `--build-type` to `Release` for a release build.
-
-```cmd
-
---- Setting up toolchain file...
-
-Enter the path to the toolchain file (default: c:/vcpkg/scripts/buildsystems/vcpkg.cmake):
-```
-
-Press Enter to use the default path or provide a custom path to the vcpkg toolchain file.
-This will set up the vcpkg toolchain file for the build process. Next, the required package dependencies will be installed. This may take some time depending on your internet connection and system performance.
-
-When the configuration is complete, you will see a message indicating that the dependencies have been successfully installed.
-
-```cmd
--- Configuring done (20.8s)
--- Generating done (0.5s)
--- Build files have been written to: E:/Users/Jonas/Development/ivf2/build-debug
-```
-
-## Building the Library
-After configuring the library, you can build it using the following command:
+**Linux/macOS:**
 
 ```bash
-cmake --build build-debug --config Debug
+export VCPKG_ROOT=/path/to/vcpkg
 ```
 
-or
+If vcpkg is in a non-standard location you can also pass the toolchain file directly:
 
 ```bash
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
+```
+
+## 3. Configure and Build
+
+### Windows
+
+```powershell
+# Configure (creates both Debug and Release build trees)
+cmake -B build-debug   -S . -G "Visual Studio 17 2022"
+cmake -B build-release -S . -G "Visual Studio 17 2022"
+
+# Build
+cmake --build build-debug   --config Debug
 cmake --build build-release --config Release
 ```
-This will compile the library and create the necessary binaries. The output will be located in the `build-debug` or `build-release` directory, depending on the build type you chose.
 
-When the build is complete, you will see a message indicating that the build was successful (MSBUILD).
+### Linux / macOS
 
-```cmd
-  example_window_1.cpp
-  example_window_2.cpp
-  Generating Code...
-  ui1d.vcxproj -> E:\Users\Jonas\Development\ivf2\bin\Debug\ui1d.exe
-  Building Custom Rule E:/Users/Jonas/Development/ivf2/CMakeLists.txt
+```bash
+# Configure
+cmake -B build-debug   -S . -DCMAKE_BUILD_TYPE=Debug
+cmake -B build-release -S . -DCMAKE_BUILD_TYPE=Release
+
+# Build
+cmake --build build-debug
+cmake --build build-release
 ```
 
-On Windows executables will be located in the `bin/Debug` or `bin/Release` directory, depending on the build type you chose. On Linux, the executables will be located in the `bin` directory.
-On macOS, the executables will be located in the `bin` directory as well.
+vcpkg will download and compile all required dependencies on the first run. This may take several minutes depending on your internet connection and machine.
 
-Libraries will be located in the `lib/Debug` or `lib/Release` directory on Windows and `lib` on Linux and mac. Header files will be in the `include` directory.
+## Build Output
+
+| Artifact             | Location          |
+| -------------------- | ----------------- |
+| Libraries (Debug)    | `lib/Debug/`      |
+| Libraries (Release)  | `lib/Release/`    |
+| Executables (Debug)  | `bin/Debug/`      |
+| Executables (Release)| `bin/Release/`    |
+
+On Linux and macOS the libraries and executables land directly in `lib/` and `bin/` without a configuration subdirectory.
+
+Debug library names carry a `d` suffix (e.g. `ivfd.lib` vs `ivf.lib`).
+
+Shaders, fonts, and asset files from `bin/shaders/`, `bin/fonts/`, and `bin/assets/` are automatically copied to the output directory by CMake so examples work out of the box.
 
 ## Integrating with Your Project
 
-To integrate ivf2 into your project, follow these steps:
+ivf2 exposes a unified CMake target `ivf2::ivf2` that bundles all libraries and their transitive dependencies:
 
-1. Include the ivf2 headers in your project.
-2. Link against the ivf2 library.
-3. Set up the appropriate include paths.
+```cmake
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE ivf2::ivf2)
+```
+
+See [Your First App](your_first_app.md) for a complete getting-started example.

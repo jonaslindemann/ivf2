@@ -132,7 +132,7 @@ public:
 
         // Set up a grid layout for the objects (30x30 grid, spacing 1.2)
 
-        GridLayout layout(30, 1, 30, 1.2, 0.0, 1.2);
+        GridLayout layout(30, 30, 1, 1.2, 0.0, 1.2);
 
         // Create a rounded box geometry
 

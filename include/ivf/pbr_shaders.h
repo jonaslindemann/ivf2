@@ -15,7 +15,6 @@ layout (location = 3) in vec3 aNormal;
 
 out vec3 fragPos;
 out vec3 vNormal;
-out vec4 color;
 out vec2 texCoord;
 
 uniform mat4 model;
@@ -26,7 +25,6 @@ void main()
 {
     fragPos  = vec3(model * vec4(aPos, 1.0));
     vNormal  = mat3(model) * aNormal;
-    color    = aColor;
     texCoord = aTex;
     gl_Position = projection * view * vec4(fragPos, 1.0);
 }
@@ -44,7 +42,6 @@ out vec4 fragColor;
 // ---- Inputs ----------------------------------------------------------------
 in vec3 fragPos;
 in vec3 vNormal;
-in vec4 color;
 in vec2 texCoord;
 
 // ---- Light structs (identical names to basic shader so LightManager works) -

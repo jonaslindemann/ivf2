@@ -2,8 +2,7 @@
 
 using namespace ivf;
 
-GridLayout::GridLayout(size_t rows = 10, size_t layers = 10, size_t cols = 10, float xSpacing = 1.0,
-                       float ySpacing = 1.0, float zSpacing = 1.0)
+GridLayout::GridLayout(size_t rows, size_t cols, size_t layers, float xSpacing, float ySpacing, float zSpacing)
     : m_rows(rows), m_cols(cols), m_layers(layers), m_xSpacing(xSpacing), m_ySpacing(ySpacing), m_zSpacing(zSpacing)
 {}
 

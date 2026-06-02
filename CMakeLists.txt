@@ -61,7 +61,53 @@ endif()
 # This puts vcpkg_installed/ in the project root instead of each build directory
 set(VCPKG_INSTALLED_DIR "${CMAKE_SOURCE_DIR}/vcpkg_installed" CACHE PATH "vcpkg installed directory")
 
-project(ivf2) 
+# On macOS, verify the SDK has working std::format support.
+# Two known-broken cases:
+#   1. Older SDKs set _LIBCPP_HAS_NO_INCOMPLETE_FORMAT to disable <format> entirely.
+#   2. Xcode MacOSX14 SDK has a compilation bug in std::format with Apple Clang 15+.
+# In either case, fall back to the CommandLineTools SDK which has a correct implementation.
+if(APPLE AND NOT CMAKE_OSX_SYSROOT)
+    execute_process(
+        COMMAND xcrun --sdk macosx --show-sdk-path
+        OUTPUT_VARIABLE _IVF_CURRENT_SDK
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    set(_IVF_FORMAT_BROKEN FALSE)
+    if(_IVF_CURRENT_SDK AND EXISTS "${_IVF_CURRENT_SDK}/usr/include/c++/v1/__config")
+        file(READ "${_IVF_CURRENT_SDK}/usr/include/c++/v1/__config" _IVF_LIBCXX_CONFIG)
+        string(FIND "${_IVF_LIBCXX_CONFIG}" "_LIBCPP_HAS_NO_INCOMPLETE_FORMAT" _IVF_FORMAT_DISABLED)
+        if(NOT _IVF_FORMAT_DISABLED EQUAL -1)
+            set(_IVF_FORMAT_BROKEN TRUE)
+        endif()
+    endif()
+    # Xcode MacOSX14.x SDKs have a broken std::format ABI with Apple Clang 15+
+    string(FIND "${_IVF_CURRENT_SDK}" "MacOSX14" _IVF_SDK14_POS)
+    if(NOT _IVF_SDK14_POS EQUAL -1)
+        set(_IVF_FORMAT_BROKEN TRUE)
+    endif()
+    if(_IVF_FORMAT_BROKEN)
+        message(STATUS "SDK ${_IVF_CURRENT_SDK} has broken std::format — searching for a working CommandLineTools SDK")
+        foreach(_IVF_SDK_CANDIDATE
+            "/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk"
+            "/Library/Developer/CommandLineTools/SDKs/MacOSX15.sdk"
+            "/Library/Developer/CommandLineTools/SDKs/MacOSX26.2.sdk"
+            "/Library/Developer/CommandLineTools/SDKs/MacOSX26.sdk"
+        )
+            if(EXISTS "${_IVF_SDK_CANDIDATE}/usr/include/c++/v1/__config")
+                file(READ "${_IVF_SDK_CANDIDATE}/usr/include/c++/v1/__config" _IVF_CLT_CONFIG)
+                string(FIND "${_IVF_CLT_CONFIG}" "_LIBCPP_HAS_NO_INCOMPLETE_FORMAT" _IVF_CLT_DISABLED)
+                if(_IVF_CLT_DISABLED EQUAL -1)
+                    set(CMAKE_OSX_SYSROOT "${_IVF_SDK_CANDIDATE}" CACHE PATH "macOS SDK with std::format support" FORCE)
+                    message(STATUS "Using SDK: ${_IVF_SDK_CANDIDATE}")
+                    break()
+                endif()
+            endif()
+        endforeach()
+    endif()
+endif()
+
+project(ivf2)
 
 enable_language(CXX)
 enable_language(C)

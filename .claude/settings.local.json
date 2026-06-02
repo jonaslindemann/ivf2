@@ -9,7 +9,35 @@
       "Bash(Select-Object Name)",
       "Bash(cd /d \"e:\\\\Users\\\\Jonas\\\\Development\\\\ivf2\")",
       "Bash(dir /B)",
-      "Bash(xargs grep -l \"lineTrace\\\\|picking\\\\|raycast\")"
+      "Bash(xargs grep -l \"lineTrace\\\\|picking\\\\|raycast\")",
+      "Bash(cat /Users/lindemann/vcpkg/buildtrees/polyclipping/install-arm64-osx-dbg-out.log 2>/dev/null || echo \"Log file not found\")",
+      "Read(//Users/lindemann/vcpkg/buildtrees/polyclipping/**)",
+      "Bash(cat /Users/lindemann/vcpkg/ports/polyclipping/portfile.cmake)",
+      "Read(//Users/lindemann/vcpkg/ports/polyclipping/**)",
+      "Bash(mkdir -p /Users/lindemann/Development/ivf2/overlay-ports/polyclipping)",
+      "Bash(cp /Users/lindemann/vcpkg/ports/polyclipping/fix_targets.patch /Users/lindemann/Development/ivf2/overlay-ports/polyclipping/)",
+      "Bash(cp /Users/lindemann/vcpkg/ports/polyclipping/FindCLIPPER.cmake /Users/lindemann/Development/ivf2/overlay-ports/polyclipping/)",
+      "Bash(cp /Users/lindemann/vcpkg/ports/polyclipping/vcpkg-cmake-wrapper.cmake /Users/lindemann/Development/ivf2/overlay-ports/polyclipping/)",
+      "Bash(cp /Users/lindemann/vcpkg/ports/polyclipping/vcpkg.json /Users/lindemann/Development/ivf2/overlay-ports/polyclipping/)",
+      "Bash(rm -rf /Users/lindemann/vcpkg/buildtrees/polyclipping /Users/lindemann/vcpkg/packages/polyclipping_arm64-osx && echo \"Cleaned polyclipping build artifacts\")",
+      "Bash(cmake -B build-release -S . -DCMAKE_BUILD_TYPE=Release)",
+      "Bash(find /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1 -name \"*.h\" 2>/dev/null | xargs grep -l \"format_string\" 2>/dev/null | head -5)",
+      "Read(//Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/**)",
+      "Bash(ls /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/__format/ 2>/dev/null || echo \"No __format dir\")",
+      "Read(//Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1/__format/**)",
+      "Read(//Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/**)",
+      "Read(//Library/Developer/CommandLineTools/SDKs/**)",
+      "Bash(xcrun --sdk macosx --show-sdk-path)",
+      "Bash(xcrun --sdk macosx --show-sdk-version)",
+      "Bash(xcode-select -p)",
+      "Bash(cmake --build build-release --target ivf)",
+      "Bash(cmake -B build-release -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_SYSROOT=/Library/Developer/CommandLineTools/SDKs/MacOSX15.4.sdk)",
+      "Bash(brew list *)",
+      "Bash(echo \"exit: $?\")"
+    ],
+    "additionalDirectories": [
+      "/Users/lindemann/Development/ivf2/overlay-ports",
+      "/Users/lindemann/vcpkg/buildtrees/polyclipping"
     ]
   }
 }

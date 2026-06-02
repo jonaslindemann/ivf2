@@ -221,7 +221,6 @@ void ivf::LightManager::apply()
 
         ShaderManager::instance()->currentProgram()->uniformBool(prefix + "castsShadows", true);
         ShaderManager::instance()->currentProgram()->uniformBool("useShadows", true);
-        ShaderManager::instance()->currentProgram()->uniformInt("shadowMap", textureUnit);
 
         // Pass light space matrix
 

@@ -32,7 +32,7 @@ public:
      * @param ySpacing Spacing along Y axis.
      * @param zSpacing Spacing along Z axis.
      */
-    GridLayout(size_t rows, size_t cols, size_t layers, float xSpacing, float ySpacing, float zSpacing);
+    GridLayout(size_t rows = 10, size_t cols = 10, size_t layers = 10, float xSpacing = 1.0f, float ySpacing = 1.0f, float zSpacing = 1.0f);
 
     /**
      * @brief Destructor.

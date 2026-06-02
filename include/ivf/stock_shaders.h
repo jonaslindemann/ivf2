@@ -172,7 +172,7 @@ uniform int textureBlendModes[MAX_TEXTURES];
 uniform float textureBlendFactors[MAX_TEXTURES];
 
 #define NR_POINT_LIGHTS 8
-#define NR_DIR_LIGHTS 8
+#define NR_DIR_LIGHTS 4
 #define NR_SPOT_LIGHTS 8
 
 uniform PointLight pointLights[NR_POINT_LIGHTS];
@@ -188,7 +188,6 @@ uniform bool selectionRendering = false;
 uniform uint objectId;
 
 uniform bool shadowPass = false;
-uniform sampler2D shadowMap;
 uniform mat4 lightSpaceMatrix;
 uniform bool useShadows = false;
 uniform int debugShadow = 0;
@@ -224,7 +223,7 @@ void main()
         vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         projCoords = projCoords * 0.5 + 0.5;
     
-        float closestDepth = texture(shadowMap, projCoords.xy).r;
+        float closestDepth = texture(shadowMaps[0], projCoords.xy).r;
         float currentDepth = projCoords.z;
 
         if (debugShadow == 1) 
@@ -245,7 +244,7 @@ void main()
         }
         else if (debugShadow == 4) 
         {
-            float closestDepth = texture(shadowMap, projCoords.xy).r;
+            float closestDepth = texture(shadowMaps[0], projCoords.xy).r;
             float currentDepth = projCoords.z;
             fragColor = vec4(currentDepth, closestDepth, 0.0, 1.0);
             return;

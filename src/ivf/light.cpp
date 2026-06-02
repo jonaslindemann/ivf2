@@ -126,7 +126,7 @@ glm::vec3 ivf::Light::diffuseColor()
 
 glm::vec3 ivf::Light::specularColor()
 {
-    return m_diffuseColor;
+    return m_specularColor;
 }
 
 glm::vec3 ivf::Light::ambientColor()

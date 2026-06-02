@@ -21,6 +21,74 @@ using namespace std;
 
 ShaderManager *ShaderManager::m_instance = nullptr;
 
+namespace {
+
+constexpr GLuint kDefaultCubemapUnit = 15;
+
+void bindDefaultTexture2D(GLuint unit)
+{
+    static GLuint defaultTexture = 0;
+
+    GLint activeTexture = GL_TEXTURE0;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+
+    if (defaultTexture == 0)
+    {
+        const unsigned char pixel[] = {255, 255, 255, 255};
+
+        glGenTextures(1, &defaultTexture);
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, defaultTexture);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    else
+    {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, defaultTexture);
+    }
+
+    glActiveTexture(activeTexture);
+}
+
+void bindDefaultCubemap(GLuint unit)
+{
+    static GLuint defaultCubemap = 0;
+
+    GLint activeTexture = GL_TEXTURE0;
+    glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
+
+    if (defaultCubemap == 0)
+    {
+        const unsigned char pixel[] = {0, 0, 0, 255};
+
+        glGenTextures(1, &defaultCubemap);
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, defaultCubemap);
+
+        for (GLenum face = GL_TEXTURE_CUBE_MAP_POSITIVE_X; face <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z; ++face)
+            glTexImage2D(face, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
+    else
+    {
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, defaultCubemap);
+    }
+
+    glActiveTexture(activeTexture);
+}
+
+}
+
 ShaderManager::ShaderManager()
     : m_currentProgram(nullptr), m_linkErrors(false), m_vertexCompileErrors(false), m_fragCompileErrors(false)
 {
@@ -143,19 +211,62 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromStrings(const std::string
 std::shared_ptr<Program> ivf::ShaderManager::loadBasicShader()
 {
     logInfo("Loading basic shader.", "ShaderManager");
-    return loadProgramFromStrings(ivf::basic_vert_shader_source, ivf::basic_frag_shader_source, "basic");
+    auto program = loadProgramFromStrings(ivf::basic_vert_shader_source, ivf::basic_frag_shader_source, "basic");
+    bindDefaultTexture2D(0);
+    bindDefaultTexture2D(1);
+    bindDefaultTexture2D(2);
+    bindDefaultTexture2D(3);
+    bindDefaultTexture2D(4);
+    bindDefaultCubemap(kDefaultCubemapUnit);
+    program->uniformInt("texture0", 0);
+    program->uniformInt("envMap", kDefaultCubemapUnit);
+    return program;
 }
 
 std::shared_ptr<Program> ivf::ShaderManager::loadPBRShader()
 {
     logInfo("Loading PBR shader.", "ShaderManager");
-    return loadProgramFromStrings(ivf::pbr_vert_shader_source, ivf::pbr_frag_shader_source, "pbr", false);
+    auto previousProgram = m_currentProgram;
+    auto program = loadProgramFromStrings(ivf::pbr_vert_shader_source, ivf::pbr_frag_shader_source, "pbr", false);
+
+    bindDefaultTexture2D(0);
+    bindDefaultTexture2D(1);
+    bindDefaultTexture2D(2);
+    bindDefaultTexture2D(3);
+    bindDefaultTexture2D(4);
+    bindDefaultCubemap(kDefaultCubemapUnit);
+    program->use();
+    program->uniformInt("albedoMap", 0);
+    program->uniformInt("normalMap", 1);
+    program->uniformInt("roughnessMap", 2);
+    program->uniformInt("metallicMap", 3);
+    program->uniformInt("aoMap", 4);
+    program->uniformInt("envCubemap", kDefaultCubemapUnit);
+
+    if (previousProgram)
+        previousProgram->use();
+
+    return program;
 }
 
 std::shared_ptr<Program> ivf::ShaderManager::loadBumpShader()
 {
     logInfo("Loading bump shader.", "ShaderManager");
-    return loadProgramFromStrings(ivf::bump_vert_shader_source, ivf::bump_frag_shader_source, "bump", false);
+    auto previousProgram = m_currentProgram;
+    auto program = loadProgramFromStrings(ivf::bump_vert_shader_source, ivf::bump_frag_shader_source, "bump", false);
+
+    bindDefaultTexture2D(0);
+    bindDefaultTexture2D(1);
+    bindDefaultCubemap(kDefaultCubemapUnit);
+    program->use();
+    program->uniformInt("texture0", 0);
+    program->uniformInt("normalMap", 1);
+    program->uniformInt("envMap", kDefaultCubemapUnit);
+
+    if (previousProgram)
+        previousProgram->use();
+
+    return program;
 }
 
 ProgramPtr ivf::ShaderManager::loadRenderToTextureShader()

@@ -40,21 +40,31 @@ bool VertexShader::compile()
     // Check compilation status
 
     GLint result = GL_FALSE;
-    int infoLogLength;
+    int infoLogLength = 0;
 
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &result);
     glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
-    if (infoLogLength != 0)
+    if (infoLogLength > 1)
     {
-        logErrorfc("VertexShader", "Vertex shader compilation errors:");
-
         std::vector<char> vertexShaderErrorMessage(infoLogLength);
         glGetShaderInfoLog(m_id, infoLogLength, NULL, &vertexShaderErrorMessage[0]);
 
-        logErrorfc("VertexShader", "{}", &vertexShaderErrorMessage[0]);
+        if (result == GL_FALSE)
+            logErrorfc("VertexShader", "Vertex shader compilation errors:");
+        else
+            logWarningfc("VertexShader", "Vertex shader compilation warnings:");
 
-        return false;
+        if (vertexShaderErrorMessage[0] != '\0')
+        {
+            if (result == GL_FALSE)
+                logErrorfc("VertexShader", "{}", &vertexShaderErrorMessage[0]);
+            else
+                logWarningfc("VertexShader", "{}", &vertexShaderErrorMessage[0]);
+        }
     }
-    else
-        return true;
+
+    if (result == GL_FALSE)
+        return false;
+
+    return true;
 }

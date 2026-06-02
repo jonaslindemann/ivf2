@@ -42,20 +42,31 @@ bool FragmentShader::compile()
     // Check compilation status
     
     GLint result = GL_FALSE;
-    int infoLogLength;
+    int infoLogLength = 0;
     
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &result);
     glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
-    if (infoLogLength!=0)
+    if (infoLogLength > 1)
     {
-        logErrorfc("FragmentShader", "Fragment shader compilation errors:");
-
         std::vector<char> fragmentShaderErrorMessage(infoLogLength);
         glGetShaderInfoLog(m_id, infoLogLength, NULL, &fragmentShaderErrorMessage[0]);
 
-        logErrorfc("FragmentShader", "{}", &fragmentShaderErrorMessage[0]);
-        return false;
+        if (result == GL_FALSE)
+            logErrorfc("FragmentShader", "Fragment shader compilation errors:");
+        else
+            logWarningfc("FragmentShader", "Fragment shader compilation warnings:");
+
+        if (fragmentShaderErrorMessage[0] != '\0')
+        {
+            if (result == GL_FALSE)
+                logErrorfc("FragmentShader", "{}", &fragmentShaderErrorMessage[0]);
+            else
+                logWarningfc("FragmentShader", "{}", &fragmentShaderErrorMessage[0]);
+        }
     }
-    else
-        return true;
+
+    if (result == GL_FALSE)
+        return false;
+
+    return true;
 }

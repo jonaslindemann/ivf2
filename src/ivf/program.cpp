@@ -54,20 +54,23 @@ bool Program::link()
     glLinkProgram(m_id);
 
     GLint result = GL_FALSE;
-    int infoLogLength;
+    int infoLogLength = 0;
 
     // Check the program
     glGetProgramiv(m_id, GL_LINK_STATUS, &result);
     glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
-    if (infoLogLength != 0)
+    if (infoLogLength > 1)
     {
         std::vector<char> programErrorMessage(std::max(infoLogLength, int(1)));
         glGetProgramInfoLog(m_id, infoLogLength, NULL, &programErrorMessage[0]);
-        logErrorfc("Program", "Program link error in {}: {}", m_name, std::string(&programErrorMessage[0]));
-        return false;
+
+        if (result == GL_FALSE)
+            logErrorfc("Program", "Program link error in {}: {}", m_name, std::string(&programErrorMessage[0]));
+        else if (programErrorMessage[0] != '\0')
+            logWarningfc("Program", "Program link warning in {}: {}", m_name, std::string(&programErrorMessage[0]));
     }
-    else
-        return true;
+
+    return result == GL_TRUE;
 }
 
 void Program::use()

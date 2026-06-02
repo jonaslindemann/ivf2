@@ -13,6 +13,7 @@
 #include <iostream>
 #include <vector>
 #include <ivfui/glfw_window.h>
+#include <ivf/shader_manager.h>
 
 using namespace std;
 using namespace ivfui;
@@ -32,8 +33,9 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonit
       m_prevMouseX(-1.0), m_prevMouseY(-1.0), m_isDragging(false),
       m_lastClickTime(-1.0), m_lastClickButton(-1)
 {
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    // Stock and bump fragment shaders use GLSL 4.00 features.
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
     m_window = glfwCreateWindow(width, height, title.c_str(), monitor, shared);
@@ -278,7 +280,11 @@ void GLFWWindow::draw()
     // Render scene
 
     if (m_enabled && (result == 0))
+    {
+        if (auto shaderMgr = ivf::ShaderManager::instance(); shaderMgr->currentProgram())
+            shaderMgr->apply();
         this->doDraw();
+    }
 
     // Render user interfaec
 

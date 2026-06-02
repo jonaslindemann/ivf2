@@ -210,6 +210,14 @@ float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
 }
 
+vec3 safeNormalize(vec3 v, vec3 fallback)
+{
+    float len2 = dot(v, v);
+    if (len2 > 0.00000001)
+        return v * inversesqrt(len2);
+    return fallback;
+}
+
 void main()
 {	
     if (shadowPass) 
@@ -251,28 +259,34 @@ void main()
         }
     }
 
-    vec3 norm = normalize(normal);
-    vec3 lightDir = normalize(lightPos - fragPos);   
-    vec3 viewDir = normalize(viewPos - fragPos);
+    vec3 norm = safeNormalize(normal, vec3(0.0, 0.0, 1.0));
+    vec3 viewDir = safeNormalize(viewPos - fragPos, vec3(0.0, 0.0, 1.0));
 
-    vec3 result = vec3(0.0, 0.0, 0.0);
+    vec3 baseSurfaceColor = useVertexColors ? color.rgb : material.diffuseColor;
+    vec3 result = useLighting ? baseSurfaceColor * 0.15 : vec3(0.0);
 
-    for(int i = 0; i < pointLightCount; i++)
+    if (useLighting)
     {
-        if (pointLights[i].enabled)
-            result += calcPointLight(pointLights[i], norm, fragPos, viewDir);    
-    }
+        for(int i = 0; i < pointLightCount; i++)
+        {
+            if (pointLights[i].enabled)
+                result += calcPointLight(pointLights[i], norm, fragPos, viewDir);
+        }
 
-    for(int i = 0; i < dirLightCount; i++)
-    {
-        if (dirLights[i].enabled)
-            result += calcDirLight(dirLights[i], norm, viewDir, lightSpaceMatrices[i], shadowMaps[i]);    
-    }
+        if (dirLightCount > 0 && dirLights[0].enabled)
+            result += calcDirLight(dirLights[0], norm, viewDir, lightSpaceMatrices[0], shadowMaps[0]);
+        if (dirLightCount > 1 && dirLights[1].enabled)
+            result += calcDirLight(dirLights[1], norm, viewDir, lightSpaceMatrices[1], shadowMaps[1]);
+        if (dirLightCount > 2 && dirLights[2].enabled)
+            result += calcDirLight(dirLights[2], norm, viewDir, lightSpaceMatrices[2], shadowMaps[2]);
+        if (dirLightCount > 3 && dirLights[3].enabled)
+            result += calcDirLight(dirLights[3], norm, viewDir, lightSpaceMatrices[3], shadowMaps[3]);
 
-    for(int i = 0; i < spotLightCount; i++)
-    {
-        if (spotLights[i].enabled)
-            result += calcSpotLight(spotLights[i], norm, fragPos, viewDir);
+        for(int i = 0; i < spotLightCount; i++)
+        {
+            if (spotLights[i].enabled)
+                result += calcSpotLight(spotLights[i], norm, fragPos, viewDir);
+        }
     }
 
     if (selectionRendering) 
@@ -362,15 +376,16 @@ void main()
 
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap)
 {
-    vec3 norm = normalize(normal);
+    vec3 norm = safeNormalize(normal, vec3(0.0, 0.0, 1.0));
     
     norm = dot(norm, viewDir) < -0.1 ? -norm : norm;
     
-    vec3 lightDir = normalize(-light.direction);
+    vec3 lightDir = safeNormalize(-light.direction, vec3(0.0, 0.0, 1.0));
     
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float shininess = clamp(material.shininess, 1.0, 256.0);
+    float spec = pow(clamp(dot(viewDir, reflectDir), 0.0, 1.0), shininess);
     vec3 ambient = light.ambientColor * material.ambientColor;
     vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
@@ -386,15 +401,16 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, samp
 
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-    vec3 norm = normalize(normal);
+    vec3 norm = safeNormalize(normal, vec3(0.0, 0.0, 1.0));
     
     norm = dot(norm, viewDir) < -0.1 ? -norm : norm;
     
-    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 lightDir = safeNormalize(light.position - fragPos, vec3(0.0, 0.0, 1.0));
  
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float shininess = clamp(material.shininess, 1.0, 256.0);
+    float spec = pow(clamp(dot(viewDir, reflectDir), 0.0, 1.0), shininess);
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
     vec3 ambient = light.ambientColor * material.ambientColor;
@@ -408,18 +424,19 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
-    vec3 norm = normalize(normal);
+    vec3 norm = safeNormalize(normal, vec3(0.0, 0.0, 1.0));
     
     norm = dot(norm, viewDir) < -0.1 ? -norm : norm;
     
-    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 lightDir = safeNormalize(light.position - fragPos, vec3(0.0, 0.0, 1.0));
     
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    float shininess = clamp(material.shininess, 1.0, 256.0);
+    float spec = pow(clamp(dot(viewDir, reflectDir), 0.0, 1.0), shininess);
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    float theta = dot(lightDir, normalize(-light.direction)); 
+    float theta = dot(lightDir, safeNormalize(-light.direction, vec3(0.0, 0.0, 1.0)));
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     vec3 ambient = light.ambientColor * material.ambientColor;

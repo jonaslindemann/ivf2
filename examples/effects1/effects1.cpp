@@ -205,6 +205,7 @@ public:
         // Tint effect
 
         auto tintEffect = TintEffect::create();
+
         tintEffect->setTintColor(glm::vec3(1.2, 0.9, 0.7));
         tintEffect->setTintStrength(0.5);
         tintEffect->setGrayScaleWeights(glm::vec3(0.299, 0.587, 0.114));

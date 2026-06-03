@@ -40,7 +40,11 @@ GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title,
     : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
       m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false), m_showAxis(false),
       m_showGrid(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f), m_snapToGrid(false), m_lockPosXZ(false),
-      m_gridSnapValue(0.1f), m_cursor(nullptr)
+      m_gridSnapValue(0.1f), m_cursor(nullptr), m_axis(nullptr), m_grid(nullptr), m_sceneControlPanel(nullptr),
+      m_cameraWindow(nullptr), m_effectInspector(nullptr), m_sceneInspector(nullptr), m_showMainMenu(true),
+      m_mainMenu(nullptr), m_inputDialog(nullptr), m_frameBuffer(nullptr), m_postProcessor(nullptr),
+      m_bufferSelection(nullptr), m_camManip(nullptr), m_scene(nullptr), m_effects(), m_uiWindows(),
+      m_clearColor(0.07f, 0.13f, 0.17f, 1.0f)
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());
@@ -279,6 +283,16 @@ void ivfui::GLFWSceneWindow::enableHeadlight()
 void ivfui::GLFWSceneWindow::disableHeadlight()
 {
     m_camManip->setHeadlight(nullptr);
+}
+
+glm::vec4 ivfui::GLFWSceneWindow::clearColor() const
+{
+    return m_clearColor;
+}
+
+void ivfui::GLFWSceneWindow::setClearColor(const glm::vec4 &color)
+{
+    m_clearColor = color;
 }
 
 void ivfui::GLFWSceneWindow::enableAxis()
@@ -775,7 +789,8 @@ void GLFWSceneWindow::doDraw()
 
         m_frameBuffer->begin();
 
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        //glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         GLFWWindow::doDraw();
@@ -816,7 +831,8 @@ void GLFWSceneWindow::doDraw()
     {
         GLFWWindow::doDraw();
 
-        glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        //glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+        glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         smApplyProgram("basic");

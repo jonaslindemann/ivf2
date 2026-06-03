@@ -56,6 +56,8 @@ private:
     EffectInspectorPtr m_effectInspector;     ///< Effect inspector window UI.
     SceneInspectorPtr m_sceneInspector;       ///< Scene inspector for debugging.
 
+    glm::vec4 m_clearColor{0.07f, 0.13f, 0.17f, 1.0f}; ///< Clear color for the scene.
+
     bool m_selectionEnabled{false}; ///< Selection mode enabled.
     ivf::Node *m_lastNode;          ///< Last node under the cursor.
     ivf::Node *m_currentNode;       ///< Current node under the cursor.
@@ -230,6 +232,18 @@ public:
      * @return ivf::EffectPtr Shared pointer to the effect.
      */
     ivf::EffectPtr effect(int index);
+
+    /**
+     * @brief Get the clear color of the scene.
+     * @return glm::vec4 Clear color.
+     */
+    glm::vec4 clearColor() const;
+
+    /**
+     * @brief Set the clear color of the scene.
+     * @param color Clear color.
+     */
+    void setClearColor(const glm::vec4& color);
 
     /**
      * @brief Enable the headlight (camera-attached directional light).

@@ -15,3 +15,4 @@
 #include <ivfui/ui_input_dialog.h>
 #include <ivfui/time_control_panel.h>
 #include <ivfui/camera_animation.h>
+#include <ivfui/scene_timeline_player.h>

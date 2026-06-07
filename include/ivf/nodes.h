@@ -45,3 +45,4 @@
 #include <ivf/pbr_material.h>
 #include <ivf/pbr_mesh_node.h>
 #include <ivf/scene_serializer.h>
+#include <ivf/scene_timeline.h>

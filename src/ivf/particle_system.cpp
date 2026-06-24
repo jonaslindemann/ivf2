@@ -250,19 +250,27 @@ void ParticleSystem::update(float dt)
     for (auto& p : m_pool) {
         if (!p.alive) continue;
         p.life -= dt;
-        if (p.life <= 0.0f) { p.alive = false; continue; }
-        ++m_aliveCount;
+        bool expired = p.life <= 0.0f;
 
-        if (m_updateFn) {
-            m_updateFn(p, dt);
-        } else {
-            p.velocity += m_gravity * dt;
-            p.position += p.velocity * dt;
+        if (!expired) {
+            if (m_updateFn) {
+                m_updateFn(p, dt);
+            } else {
+                p.velocity += m_gravity * dt;
+                p.position += p.velocity * dt;
+            }
         }
 
-        float t = 1.0f - p.life / p.maxLife;
+        float t = glm::clamp(1.0f - p.life / p.maxLife, 0.0f, 1.0f);
         p.color = glm::mix(m_startColor, m_endColor, t);
         p.size  = glm::mix(m_startSize,  m_endSize,  t);
+
+        if (expired) {
+            p.alive = false;
+            continue;
+        }
+
+        ++m_aliveCount;
     }
 }
 

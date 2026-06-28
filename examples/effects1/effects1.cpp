@@ -8,7 +8,8 @@
  * This example demonstrates the use of various post-processing effects
  * including blur, tint, film grain, chromatic aberration, vignette,
  * bloom, dithering, pixelation, wave distortion, swirl, kaleidoscope,
- * glitch, scanline, posterize, color grading, and night vision.
+ * glitch, scanline, posterize, color grading, night vision, feedback/trails,
+ * motion blur, and halftone.
  */
 
 #include <cmath>
@@ -42,6 +43,9 @@
 #include <ivf/posterize_effect.h>
 #include <ivf/color_grading_effect.h>
 #include <ivf/night_vision_effect.h>
+#include <ivf/feedback_effect.h>
+#include <ivf/motion_blur_effect.h>
+#include <ivf/halftone_effect.h>
 
 #include <ivfmath/spline.h>
 
@@ -311,6 +315,29 @@ public:
         nightVisionEffect->setPhosphorColor(glm::vec3(0.1f, 1.0f, 0.1f));
         nightVisionEffect->load();
 
+        // Feedback / trails effect
+
+        auto feedbackEffect = FeedbackEffect::create();
+        feedbackEffect->setFeedbackAmount(0.9f);
+        feedbackEffect->setZoom(1.02f);
+        feedbackEffect->setRotation(0.01f);
+        feedbackEffect->setColorDecay(glm::vec3(0.98f));
+        feedbackEffect->load();
+
+        // Motion blur effect
+
+        auto motionBlurEffect = MotionBlurEffect::create();
+        motionBlurEffect->setBlendFactor(0.7f);
+        motionBlurEffect->load();
+
+        // Halftone effect
+
+        auto halftoneEffect = HalftoneEffect::create();
+        halftoneEffect->setDotSize(6.0f);
+        halftoneEffect->setAngle(0.0f);
+        halftoneEffect->setGrayscale(false);
+        halftoneEffect->load();
+
         // Add effects to the window (order matters for compositing)
 
         this->addEffect(blurEffect);            //  0
@@ -329,6 +356,9 @@ public:
         this->addEffect(posterizeEffect);       // 13
         this->addEffect(colorGradingEffect);    // 14
         this->addEffect(nightVisionEffect);     // 15
+        this->addEffect(feedbackEffect);        // 16
+        this->addEffect(motionBlurEffect);      // 17
+        this->addEffect(halftoneEffect);        // 18
 
         // Disable all effects by default
 

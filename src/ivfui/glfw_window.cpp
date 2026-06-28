@@ -27,7 +27,7 @@ std::shared_ptr<GLFWWindow> GLFWWindow::create(int width, int height, const std:
 GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonitor *monitor, GLFWwindow *shared)
     : m_width(width), m_height(height), m_title(title), m_mouseButton(-1), m_mouseAction(-1), m_mouseMods(-1),
       m_mouseX(-1), m_mouseY(-1), m_currentKey(-1), m_altDown(false), m_ctrlDown(false), m_shiftDown(false),
-      m_escQuit(true), m_enabled(true), m_runSetup(true), m_lastError(0), m_frameCount(0), m_frameTime(0.0), m_t0(0.0),
+      m_escQuit(true), m_enabled(true), m_runSetup(true), m_closeNotified(false), m_lastError(0), m_frameCount(0), m_frameTime(0.0), m_t0(0.0),
       m_t1(0.0), m_lastFrameTime(0.0), m_monitor(monitor), m_sharedWindow(shared),
       m_scrollX(0.0), m_scrollY(0.0),
       m_prevMouseX(-1.0), m_prevMouseY(-1.0), m_isDragging(false),
@@ -80,6 +80,12 @@ bool GLFWWindow::isClosing()
 void GLFWWindow::close()
 {
     glfwSetWindowShouldClose(m_window, GLFW_TRUE);
+
+    if (!m_closeNotified)
+    {
+        m_closeNotified = true;
+        doClose();
+    }
 }
 
 void GLFWWindow::swapBuffers()
@@ -398,6 +404,11 @@ void ivfui::GLFWWindow::doUpdate()
     onUpdate();
 }
 
+void GLFWWindow::doClose()
+{
+    onClose();
+}
+
 int ivfui::GLFWWindow::lastError() const
 {
     return m_lastError;
@@ -491,6 +502,9 @@ void GLFWWindow::onResize(int width, int height)
 {}
 
 void ivfui::GLFWWindow::onUpdate()
+{}
+
+void GLFWWindow::onClose()
 {}
 
 void GLFWWindow::onDraw()

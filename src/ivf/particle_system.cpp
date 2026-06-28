@@ -28,10 +28,15 @@ layout(location = 3) in vec4  iColor;
 
 out vec2  vUV;
 out vec4  vColor;
+out float vFog;
 
 uniform mat4 viewProj;
 uniform mat4 view;
 uniform bool billboard;
+
+uniform bool  fogEnabled;
+uniform float fogNear;
+uniform float fogFar;
 
 void main() {
     vUV    = aQuadPos + 0.5;
@@ -47,6 +52,10 @@ void main() {
         quadPos = iPos + vec3(aQuadPos, 0.0) * iSize;
     }
 
+    // Distance-based fade factor: 1 near the camera, 0 beyond fogFar.
+    float dist = length((view * vec4(quadPos, 1.0)).xyz);
+    vFog = fogEnabled ? clamp((fogFar - dist) / max(fogFar - fogNear, 1e-4), 0.0, 1.0) : 1.0;
+
     gl_Position = viewProj * vec4(quadPos, 1.0);
 }
 )";
@@ -55,12 +64,16 @@ static const char* k_particleFrag = R"(
 #version 330 core
 in vec2  vUV;
 in vec4  vColor;
+in float vFog;
 out vec4 fragColor;
 uniform sampler2D tex;
 uniform bool useTexture;
+uniform vec3 fogColor;
 void main() {
     vec4 c = vColor;
     if (useTexture) c *= texture(tex, vUV);
+    // Depth fade: vFog=1 leaves color unchanged, 0 pushes it to fogColor.
+    c.rgb = mix(fogColor, c.rgb, vFog);
     if (c.a < 0.01) discard;
     fragColor = c;
 }
@@ -310,6 +323,11 @@ void ParticleSystem::doDraw()
     glUniformMatrix4fv(glGetUniformLocation(m_program, "view"),     1, GL_FALSE, glm::value_ptr(xfm.viewMatrix()));
     glUniform1i(glGetUniformLocation(m_program, "billboard"), m_billboard ? 1 : 0);
     glUniform1i(glGetUniformLocation(m_program, "useTexture"), (m_texture ? 1 : 0));
+
+    glUniform1i(glGetUniformLocation(m_program, "fogEnabled"), m_fogEnabled ? 1 : 0);
+    glUniform1f(glGetUniformLocation(m_program, "fogNear"), m_fogNear);
+    glUniform1f(glGetUniformLocation(m_program, "fogFar"), m_fogFar);
+    glUniform3fv(glGetUniformLocation(m_program, "fogColor"), 1, glm::value_ptr(m_fogColor));
 
     if (m_texture) {
         glActiveTexture(GL_TEXTURE0);

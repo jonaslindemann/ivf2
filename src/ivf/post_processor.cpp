@@ -4,12 +4,13 @@
 
 #include <ivf/texture.h>
 #include <ivf/stock_shaders.h>
+#include <ivf/shader_manager.h>
 
 namespace ivf {
 
 PostProcessor::PostProcessor(int width, int height)
-    : m_width(width), m_height(height), m_fboA(0), m_fboB(0), m_textureA(0), m_textureB(0), m_quadVAO(0), m_quadVBO(0),
-      m_time(0.0f)
+    : m_width(width), m_height(height), m_fboA(0), m_fboB(0), m_textureA(0), m_textureB(0), m_historyFBO(0),
+      m_historyTex{0, 0}, m_historyIndex(0), m_quadVAO(0), m_quadVBO(0), m_time(0.0f)
 {}
 
 PostProcessor::~PostProcessor()
@@ -18,6 +19,8 @@ PostProcessor::~PostProcessor()
     glDeleteFramebuffers(1, &m_fboB);
     glDeleteTextures(1, &m_textureA);
     glDeleteTextures(1, &m_textureB);
+    glDeleteFramebuffers(1, &m_historyFBO);
+    glDeleteTextures(2, m_historyTex);
 }
 
 void PostProcessor::addEffect(ProgramPtr fxProgram)
@@ -51,6 +54,29 @@ void PostProcessor::initialize()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureB, 0);
 
+    // History framebuffer + double-buffered textures used to retain the previous
+    // frame's final composite (bound to unit 1 as "previousFrame" for temporal effects).
+
+    glGenFramebuffers(1, &m_historyFBO);
+    glGenTextures(2, m_historyTex);
+
+    for (int i = 0; i < 2; i++)
+    {
+        glBindTexture(GL_TEXTURE_2D, m_historyTex[i]);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_width, m_height, 0, GL_RGBA, GL_FLOAT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+        // Clear to black so the first frame has no garbage to feed back.
+        glBindFramebuffer(GL_FRAMEBUFFER, m_historyFBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_historyTex[i], 0);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
+
+    m_historyIndex = 0;
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     this->initQuad();
@@ -73,6 +99,8 @@ void PostProcessor::drop()
     glDeleteFramebuffers(1, &m_fboB);
     glDeleteTextures(1, &m_textureA);
     glDeleteTextures(1, &m_textureB);
+    glDeleteFramebuffers(1, &m_historyFBO);
+    glDeleteTextures(2, m_historyTex);
 }
 
 std::shared_ptr<PostProcessor> PostProcessor::create(int width, int height)
@@ -106,15 +134,40 @@ void PostProcessor::setTime(float time)
 
 void PostProcessor::apply(GLuint inputTexture)
 {
-    // Need two FBOs to ping-pong between effects
-    GLuint sourceTexture = inputTexture;
-    GLuint targetFBO;
+    // Only enabled effects participate in the chain. A disabled effect is skipped
+    // entirely (Program::use() is a no-op when disabled, so drawing it would re-run
+    // the previously bound shader and apply effects multiple times).
+    std::vector<ProgramPtr> active;
+    active.reserve(m_fxPrograms.size());
+    for (auto &program : m_fxPrograms)
+        if (program && program->enabled())
+            active.push_back(program);
 
-    // Apply each effect in sequence
-    for (size_t i = 0; i < m_fxPrograms.size(); i++)
+    // Nothing enabled: the scene was already drawn to the screen by the caller.
+    if (active.empty())
+        return;
+
+    GLuint sourceTexture = inputTexture;
+    GLuint targetFBO = m_fboA;
+
+    // The previous frame's composite (read) and where we write this frame's composite.
+    const int prev = m_historyIndex;
+    const int cur = 1 - m_historyIndex;
+
+    glDisable(GL_DEPTH_TEST);
+    glViewport(0, 0, m_width, m_height);
+
+    // Bind the previous frame to unit 1 for the whole chain. Effects that declare a
+    // "previousFrame" sampler (feedback, trails, motion blur) read from it; others ignore it.
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_historyTex[prev]);
+
+    // Apply each enabled effect in sequence
+    for (size_t i = 0; i < active.size(); i++)
     {
-        // For last effect, render to screen instead of FBO
-        bool isLastEffect = (i == m_fxPrograms.size() - 1);
+        // The final pass renders into the history FBO so we can both display it and
+        // retain it as the previous frame for the next call.
+        bool isLastEffect = (i == active.size() - 1);
 
         if (!isLastEffect)
         {
@@ -124,30 +177,26 @@ void PostProcessor::apply(GLuint inputTexture)
         }
         else
         {
-            // Final pass renders to screen
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            // Final pass renders into the history texture for this frame.
+            glBindFramebuffer(GL_FRAMEBUFFER, m_historyFBO);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_historyTex[cur], 0);
         }
 
         // Clear the target
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Use the current effect's shader
-        m_fxPrograms[i]->use();
+        active[i]->use();
 
         // Bind source texture and set uniforms
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sourceTexture);
 
-        if (m_fxPrograms[i]->enabled())
-        {
-            m_fxPrograms[i]->uniformInt("screenTexture", 0);
-            m_fxPrograms[i]->uniformFloat("time", m_time);
-        }
-
-        glDisable(GL_DEPTH_TEST);
+        active[i]->uniformInt("screenTexture", 0);
+        active[i]->uniformInt("previousFrame", 1);
+        active[i]->uniformFloat("time", m_time);
 
         // Draw full-screen quad
-        glViewport(0, 0, m_width, m_height);
         glBindVertexArray(m_quadVAO);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -157,6 +206,19 @@ void PostProcessor::apply(GLuint inputTexture)
             sourceTexture = (targetFBO == m_fboA) ? m_textureA : m_textureB;
         }
     }
+
+    // Blit this frame's composite (now in m_historyTex[cur]) to the screen.
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+    smApplyProgram("render_to_texture");
+    smCurrentProgram()->uniformInt("screenTexture", 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_historyTex[cur]);
+    glBindVertexArray(m_quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // The composite we just produced becomes next frame's previous frame.
+    m_historyIndex = cur;
 }
 
 } // namespace ivf

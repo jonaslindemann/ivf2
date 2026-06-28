@@ -71,6 +71,12 @@ private:
     bool m_playing{false};
     bool m_billboard{true};
 
+    // Depth-fog / distance attenuation cue
+    bool      m_fogEnabled{false};
+    float     m_fogNear{5.0f};
+    float     m_fogFar{40.0f};
+    glm::vec3 m_fogColor{0.0f, 0.0f, 0.0f};
+
     UpdateFn m_updateFn;
 
     // GPU resources
@@ -111,6 +117,16 @@ public:
     void setEndSize(float s)        { m_endSize     = s; }
     void setBillboard(bool b)       { m_billboard   = b; }
     void setTexture(std::shared_ptr<Texture> tex) { m_texture = tex; }
+
+    // ---- Depth fog (distance attenuation) ------------------------------
+
+    void setDepthFog(bool enabled)          { m_fogEnabled = enabled; }
+    void setFogRange(float near, float far) { m_fogNear = near; m_fogFar = far; }
+    void setFogColor(glm::vec3 c)           { m_fogColor = c; }
+    [[nodiscard]] bool      depthFog() const { return m_fogEnabled; }
+    [[nodiscard]] float     fogNear() const  { return m_fogNear; }
+    [[nodiscard]] float     fogFar() const   { return m_fogFar; }
+    [[nodiscard]] glm::vec3 fogColor() const { return m_fogColor; }
 
     // ---- Emitter shape -------------------------------------------------
 

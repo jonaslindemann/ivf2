@@ -186,6 +186,22 @@ void main()
     FragColor = vec4(col, 1.0);
 })";
 
+inline const std::string fade_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+uniform sampler2D screenTexture;
+uniform float time;
+uniform vec3 fadeColor;
+uniform float fadeAmount;
+
+void main()
+{
+    vec3 col = texture(screenTexture, TexCoords).rgb;
+    col = mix(col, fadeColor, clamp(fadeAmount, 0.0, 1.0));
+    FragColor = vec4(col, 1.0);
+})";
+
 inline const std::string bloom_frag_shader_source = R"(
 #version 330 core
 out vec4 FragColor;
@@ -494,6 +510,106 @@ void main()
     tinted *= vignette;
 
     FragColor = vec4(clamp(tinted, 0.0, 1.0), 1.0);
+})";
+
+inline const std::string feedback_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;   // current frame
+uniform sampler2D previousFrame;   // previous frame's final composite (unit 1)
+
+uniform float feedbackAmount;      // 0 = current only, 1 = previous only (trails persist)
+uniform float zoom;                // >1 zooms in, <1 zooms out per frame
+uniform float rotation;            // radians applied per frame
+uniform float offsetX;             // pan of the fed-back image
+uniform float offsetY;
+uniform vec3 colorDecay;           // per-channel multiplier on the fed-back color
+
+void main()
+{
+    vec3 current = texture(screenTexture, TexCoords).rgb;
+
+    // Transform the previous frame around the center: rotate, zoom, then offset.
+    vec2 uv = TexCoords - 0.5;
+    float s = sin(rotation);
+    float c = cos(rotation);
+    uv = mat2(c, -s, s, c) * uv;
+    uv /= zoom;
+    uv += 0.5 + vec2(offsetX, offsetY);
+
+    vec3 prev = texture(previousFrame, uv).rgb * colorDecay;
+
+    vec3 col = mix(current, prev, feedbackAmount);
+    FragColor = vec4(col, 1.0);
+})";
+
+inline const std::string motion_blur_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;   // current frame
+uniform sampler2D previousFrame;   // previous frame's final composite (unit 1)
+
+uniform float blendFactor;         // 0 = no blur, ->1 = longer trails
+
+void main()
+{
+    vec3 current = texture(screenTexture, TexCoords).rgb;
+    vec3 prev = texture(previousFrame, TexCoords).rgb;
+    FragColor = vec4(mix(current, prev, blendFactor), 1.0);
+})";
+
+inline const std::string halftone_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform float dotSize;     // cell size in pixels
+uniform float angle;       // screen rotation in radians
+uniform bool grayscale;    // monochrome dots vs per-channel
+
+float dotMask(vec2 coord, float value, float cell, float a)
+{
+    float s = sin(a);
+    float c = cos(a);
+    mat2 rot = mat2(c, -s, s, c);
+    vec2 rc = rot * coord;
+
+    // Center within the current cell and compare radius to the ink coverage.
+    vec2 cellCenter = (floor(rc / cell) + 0.5) * cell;
+    float dist = length(rc - cellCenter) / (cell * 0.5);
+
+    // Brighter source -> larger dot (dark areas stay dark).
+    float radius = sqrt(clamp(value, 0.0, 1.0));
+    return smoothstep(radius + 0.05, radius - 0.05, dist);
+}
+
+void main()
+{
+    vec2 coord = TexCoords * textureSize(screenTexture, 0);
+    float cell = max(dotSize, 1.0);
+    vec3 col = texture(screenTexture, TexCoords).rgb;
+
+    vec3 result;
+    if (grayscale)
+    {
+        float lum = dot(col, vec3(0.299, 0.587, 0.114));
+        float d = dotMask(coord, lum, cell, angle);
+        result = vec3(d);
+    }
+    else
+    {
+        // Slightly rotate each channel's screen, as in classic CMYK halftoning.
+        result.r = dotMask(coord, col.r, cell, angle + 0.2618);
+        result.g = dotMask(coord, col.g, cell, angle + 1.3090);
+        result.b = dotMask(coord, col.b, cell, angle + 0.7854);
+    }
+
+    FragColor = vec4(result, 1.0);
 })";
 
 } // namespace ivf

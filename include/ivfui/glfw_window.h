@@ -43,6 +43,7 @@ private:
     bool m_escQuit;             ///< ESC key closes window if true.
     bool m_enabled;             ///< Window enabled state.
     bool m_runSetup;            ///< True if setup should be run.
+    bool m_closeNotified;       ///< True after close callback has been dispatched.
     int m_currentKey;           ///< Last key event.
     std::mutex m_mutex;         ///< Mutex for thread safety.
     double m_t0;                ///< Start time for frame timing.
@@ -364,6 +365,11 @@ public:
     virtual void doUpdate();
 
     /**
+     * @brief Handle window close events (override for custom behavior).
+     */
+    virtual void doClose();
+
+    /**
      * @brief Draw the window contents (override for custom behavior).
      */
     virtual void doDraw();
@@ -439,6 +445,11 @@ public:
      * @brief Update callback (calls doUpdate by default).
      */
     virtual void onUpdate();
+
+    /**
+     * @brief Window close callback (calls doClose by default).
+     */
+    virtual void onClose();
 
     /**
      * @brief Draw callback (calls doDraw by default).

@@ -48,6 +48,13 @@ static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
     win->doScroll(xoffset, yoffset);
 }
 
+static void window_close_callback(GLFWwindow *window)
+{
+    auto win = GLFWWindowTracker::instance()->get(window);
+    if (win)
+        win->close();
+}
+
 GLFWApplication::GLFWApplication()
 {
     logInfo("Initializing GLFW", "GLFWApplication");
@@ -87,6 +94,7 @@ void GLFWApplication::addWindow(GLFWWindowPtr window)
     glfwSetCursorPosCallback(window->ref(), mouse_pos_callback);
     glfwSetWindowSizeCallback(window->ref(), window_resize_callback);
     glfwSetScrollCallback(window->ref(), scroll_callback);
+    glfwSetWindowCloseCallback(window->ref(), window_close_callback);
 
     ImGui_ImplGlfw_InstallCallbacks(window->ref());
 
@@ -97,22 +105,23 @@ int GLFWApplication::loop()
 {
     logInfo("Starting main application loop", "GLFWApplication");
 
-    bool shouldClose = false;
-
     int anyError = 0;
 
-    while (!shouldClose) {
+    while (true) {
+        bool hasOpenWindows = false;
+
         for (auto window : m_windows) {
             if (window->lastError() != 0)
                 anyError = window->lastError();
 
             if (!window->isClosing()) {
+                hasOpenWindows = true;
                 window->draw();
-                shouldClose = false;
             }
-            else
-                shouldClose = true;
         }
+
+        if (!hasOpenWindows)
+            break;
 
         this->pollEvents();
     }

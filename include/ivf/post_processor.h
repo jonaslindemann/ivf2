@@ -15,6 +15,12 @@ namespace ivf {
  * It manages framebuffer objects, textures, and a sequence of shader programs (effects) that can
  * be applied in order. The class supports initialization, resizing, effect management, and
  * rendering the final output.
+ *
+ * Texture unit conventions exposed to effect shaders:
+ *   - unit 0 : the current source image, sampled via `uniform sampler2D screenTexture`.
+ *   - unit 1 : the previous frame's final composite, sampled via `uniform sampler2D previousFrame`.
+ *              This is what enables temporal/feedback effects (feedback, trails, motion blur).
+ *              Effects that do not declare `previousFrame` simply ignore it.
  */
 class PostProcessor : public GLBase {
 private:
@@ -24,6 +30,10 @@ private:
 
     GLuint m_fboA, m_fboB;         ///< Framebuffer objects for ping-pong rendering.
     GLuint m_textureA, m_textureB; ///< Textures attached to the FBOs.
+
+    GLuint m_historyFBO;     ///< Framebuffer used to capture the final composite for the next frame.
+    GLuint m_historyTex[2];  ///< Double-buffered previous-frame textures (read one, write the other).
+    int m_historyIndex;      ///< Index of the texture holding the most recent composite.
 
     GLuint m_quadVAO; ///< Vertex array object for the screen quad.
     GLuint m_quadVBO; ///< Vertex buffer object for the screen quad.

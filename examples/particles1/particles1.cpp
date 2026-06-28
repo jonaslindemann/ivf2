@@ -27,6 +27,8 @@ private:
     float m_emitRate{200.0f};
     float m_gravity{-4.0f};
     float m_minLife{0.8f}, m_maxLife{2.5f};
+    bool m_fog{true};
+    float m_fogNear{8.0f}, m_fogFar{30.0f};
 
 public:
     ParticleWindow(int w, int h, std::string title) : GLFWSceneWindow(w, h, title) {}
@@ -50,6 +52,8 @@ public:
         m_ps->setEndSize(0.05f);
         m_ps->setBillboard(true);
         m_ps->setTexture(texture);
+        m_ps->setDepthFog(m_fog);
+        m_ps->setFogRange(m_fogNear, m_fogFar);
         m_ps->start();
         add(m_ps);
 
@@ -66,7 +70,7 @@ public:
 
     void onDrawUi() override
     {
-        ImGui::SetNextWindowSize({320, 220}, ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize({320, 320}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Particle Settings");
 
         if (ImGui::SliderFloat("Emit rate", &m_emitRate, 10, 1000)) {
@@ -78,6 +82,14 @@ public:
         if (ImGui::SliderFloat("Min life", &m_minLife, 0.1f, 5.0f) |
             ImGui::SliderFloat("Max life", &m_maxLife, 0.1f, 5.0f)) {
             m_ps->setLifetime(m_minLife, m_maxLife);
+        }
+        ImGui::Separator();
+        if (ImGui::Checkbox("Depth fog", &m_fog)) {
+            m_ps->setDepthFog(m_fog);
+        }
+        if (ImGui::SliderFloat("Fog near", &m_fogNear, 0.5f, 50.0f) |
+            ImGui::SliderFloat("Fog far", &m_fogFar, 1.0f, 80.0f)) {
+            m_ps->setFogRange(m_fogNear, m_fogFar);
         }
         ImGui::Separator();
         ImGui::Text("Alive: %d / %d", m_ps->aliveCount(), m_ps->maxParticles());

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ivf/composite_node.h>
+#include <ivf/property_inspectable.h>
 
 #include <functional>
 #include <limits>
@@ -37,7 +38,7 @@ struct TimelineCamera {
  * @class TimelineScene
  * @brief A named timeline clip with its own scene root, camera, effects, and callbacks.
  */
-class TimelineScene {
+class TimelineScene : public PropertyInspectable {
 public:
     using Callback = std::function<void()>;
     using UpdateCallback = std::function<void(double localTime, double deltaTime)>;

@@ -137,6 +137,7 @@ find_package(assimp CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED) 
 find_package(ReactPhysics3D REQUIRED)
 #  target_link_libraries(main PRIVATE ReactPhysics3D::ReactPhysics3D)
+find_package(RtMidi CONFIG REQUIRED)
 
 #if(WIN32)
 #    set(CMAKE_DEBUG_POSTFIX d)
@@ -167,10 +168,11 @@ target_link_libraries(ivf2 INTERFACE
     PNG::PNG 
     JPEG::JPEG 
     ZLIB::ZLIB 
-    glfw 
-    GLEW::GLEW 
-    OpenGL::GL 
+    glfw
+    GLEW::GLEW
+    OpenGL::GL
     Freetype::Freetype
+    RtMidi::rtmidi
 )
 
 target_include_directories(ivf2 INTERFACE 

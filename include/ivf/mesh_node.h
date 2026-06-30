@@ -6,6 +6,7 @@
 
 #include <ivf/mesh.h>
 #include <ivf/material.h>
+#include <ivf/extrusion_builder.h>
 
 #include <vector>
 
@@ -99,6 +100,16 @@ public:
      */
     void createFromGenerator(generator::AnyGenerator<generator::MeshVertex> &vertices,
                              generator::AnyGenerator<generator::Triangle> &triangles);
+
+    /**
+     * @brief Create an indexed triangle mesh from CPU-side mesh data.
+     *
+     * Replaces the node's current meshes with a single mesh built from @p data (as produced by
+     * ExtrusionBuilder). Vertex normals from @p data are used directly. The local bounding box is
+     * updated afterwards.
+     * @param data Indexed mesh data (positions, normals, texCoords, colors, indices).
+     */
+    void createFromMeshData(const MeshData &data);
 
     /**
      * @brief Create debug mesh data from a generator (vertices and triangles).

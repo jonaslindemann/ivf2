@@ -1,11 +1,12 @@
 #include <ivf/solid_line.h>
 
-#include <generator/SphereMesh.hpp>
+#include <ivf/extrusion_profile.h>
+#include <ivf/path_frames.h>
+#include <ivf/extrusion_builder.h>
 
 using namespace ivf;
-using namespace generator;
 
-SolidLine::SolidLine(glm::vec3 p0, glm::vec3 p1, double radius) : m_radius(radius), m_p0(p0), m_p1(p1)
+SolidLine::SolidLine(glm::vec3 p0, glm::vec3 p1, double radius) : m_p0(p0), m_p1(p1), m_radius(radius)
 {
     this->doSetup();
     this->setName("SolidLine");
@@ -18,19 +19,20 @@ std::shared_ptr<SolidLine> SolidLine::create(glm::vec3 p0, glm::vec3 p1, double 
 
 void SolidLine::doSetup()
 {
-    gml::dvec3 p0(m_p0.x, m_p0.z, m_p0.y);
-    gml::dvec3 p1(m_p1.x, m_p1.z, m_p1.y);
-    gml::dvec3 n(1.0, 0.0, 0.0);
+    this->clear();
 
-    LinePath line(p0, p1, n, 8);
-    CircleShape circle(m_radius, 32);
+    ExtrusionProfile profile = ExtrusionProfile::circle(float(m_radius), 32);
 
-    ExtrudeMesh<CircleShape, LinePath> extrudeMesh(circle, line);
+    std::vector<glm::vec3> spine = {m_p0, m_p1};
+    std::vector<PathFrame> frames =
+        buildPathFrames(spine, SpineInterp::Polyline, JoinStyle::Angle, 2, FrameMethod::RotationMinimizing);
 
-    AnyGenerator<MeshVertex> vertices = extrudeMesh.vertices();
-    AnyGenerator<Triangle> triangles = extrudeMesh.triangles();
+    ExtrusionOptions options;
+    options.capStart = true;
+    options.capEnd = true;
 
-    this->createFromGenerator(vertices, triangles);
+    MeshData data = ExtrusionBuilder::build(profile, frames, options);
+    this->createFromMeshData(data);
 }
 
 void SolidLine::setRadius(double radius)

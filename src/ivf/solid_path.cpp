@@ -1,11 +1,12 @@
 #include <ivf/solid_path.h>
 
-#include <ivf/point_path.h>
+#include <ivf/extrusion_profile.h>
+#include <ivf/path_frames.h>
+#include <ivf/extrusion_builder.h>
 
-#include <generator/SphereMesh.hpp>
+#include <algorithm>
 
 using namespace ivf;
-using namespace generator;
 
 SolidPath::SolidPath(double radius, int segments) : m_radius(radius), m_segments(segments)
 {
@@ -29,36 +30,23 @@ void ivf::SolidPath::clear()
 
 void SolidPath::doSetup()
 {
-    PointPath path(32, m_points);
+    MeshNode::clear();
 
-    CircleShape circle(m_radius, m_segments);
-    ExtrudeMesh<CircleShape, PointPath> extrudeMesh(circle, path);
+    if (m_points.size() < 2)
+        return;
 
-    AnyGenerator<MeshVertex> vertices = extrudeMesh.vertices();
-    AnyGenerator<Triangle> triangles = extrudeMesh.triangles();
+    ExtrusionProfile profile = ExtrusionProfile::circle(float(m_radius), m_segments);
 
-    this->createFromGenerator(vertices, triangles);
-    // this->debugFromGenerator(vertices, triangles);
+    int samples = std::max(64, int(m_points.size()) * 16);
+    std::vector<PathFrame> frames =
+        buildPathFrames(m_points, SpineInterp::CatmullRom, JoinStyle::Angle, samples, FrameMethod::RotationMinimizing);
 
-    /*
-     for (auto& p : m_points)
-     {
-         gml::dvec3 p0(m_p0.x, m_p0.y, m_p0.z);
-         gml::dvec3 p1(m_p1.x, m_p1.y, m_p1.z);
-         gml::dvec3 n(1.0, 0.0, 0.0);
+    ExtrusionOptions options;
+    options.capStart = true;
+    options.capEnd = true;
 
-     }
-
-     LinePath line(p0, p1, n, 8);
-     CircleShape circle(m_radius, 32);
-
-     ExtrudeMesh<CircleShape, LinePath> extrudeMesh(circle, line);
-
-     AnyGenerator<MeshVertex> vertices = extrudeMesh.vertices();
-     AnyGenerator<Triangle> triangles = extrudeMesh.triangles();
-
-     this->createFromGenerator(vertices, triangles);
-     */
+    MeshData data = ExtrusionBuilder::build(profile, frames, options);
+    this->createFromMeshData(data);
 }
 
 void SolidPath::setRadius(double radius)

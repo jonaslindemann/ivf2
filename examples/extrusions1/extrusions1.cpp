@@ -13,6 +13,9 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <cmath>
+
+#include <glm/gtc/constants.hpp>
 
 #include <ivf/gl.h>
 #include <ivf/nodes.h>
@@ -83,10 +86,8 @@ public:
         // Add axis and grid to the scene
 
         AxisPtr axis = Axis::create();
-        GridPtr grid = Grid::create();
 
         m_scene->add(axis);
-        m_scene->add(grid);
 
         // Create yellow and red materials
 
@@ -96,22 +97,117 @@ public:
         auto redMat = Material::create();
         redMat->setDiffuseColor(glm::vec4(1.0, 0.0, 0.0, 1.0));
 
+        auto greenMat = Material::create();
+        greenMat->setDiffuseColor(glm::vec4(0.2, 0.9, 0.3, 1.0));
+
+        auto blueMat = Material::create();
+        blueMat->setDiffuseColor(glm::vec4(0.3, 0.5, 1.0, 1.0));
+
         // Create a solid yellow line and add to the scene
 
-        auto line = SolidLine::create(glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 1.0, 0.0), 0.1);
+        auto line = SolidLine::create(glm::vec3(-6.0, -1.0, 0.0), glm::vec3(-6.0, 1.0, 0.0), 0.1);
         line->setMaterial(yellowMat);
-
-        // Create a solid yellow polyline extrusion and add to the scene
-
-        auto extrusion = SolidPolyLine::create(0.1);
-        extrusion->addPoint(gml::dvec3(0.5, -1.0, -1.0));
-        extrusion->addPoint(gml::dvec3(0.5, 1.0, 1.0));
-        extrusion->addPoint(gml::dvec3(0.5, 3.0, -1.0));
-        extrusion->refresh();
-        extrusion->setMaterial(yellowMat);
-
         m_scene->add(line);
-        m_scene->add(extrusion);
+
+        // Solid polyline tube (now twist-free thanks to rotation-minimizing frames)
+
+        auto poly = SolidPolyLine::create(0.1, 24);
+        poly->addPoint(gml::dvec3(-4.5, -1.0, -1.0));
+        poly->addPoint(gml::dvec3(-4.5, 1.0, 1.0));
+        poly->addPoint(gml::dvec3(-4.5, 3.0, -1.0));
+        poly->refresh();
+        poly->setMaterial(yellowMat);
+        m_scene->add(poly);
+
+        // Solid polyline but using the Extrusion class (now twist-free thanks to rotation-minimizing frames)
+
+        std::vector<glm::vec3> points;
+        points.push_back(glm::vec3(-5.0, -1.0, -1.0));
+        points.push_back(glm::vec3(-5.0, 1.0, 1.0));
+        points.push_back(glm::vec3(-5.0, 3.0, -1.0));
+
+        auto poly2 = Extrusion::create();
+        poly2->setProfile(ExtrusionProfile::circle(0.15f, 24));
+        poly2->setSpine(points, SpineInterp::Polyline, 3);
+        poly2->setCaps(true, true);
+        poly2->refresh();
+        poly2->setMaterial(greenMat);
+        m_scene->add(poly2);
+
+        // Helix: a circle swept along a smooth (Catmull-Rom) spine. Demonstrates the absence of
+        // twisting that the rotation-minimizing frames provide.
+
+        std::vector<glm::vec3> helixPts;
+        const int helixSamples = 48;
+        for (int i = 0; i <= helixSamples; ++i)
+        {
+            float t = float(i) / float(helixSamples);
+            float a = t * glm::two_pi<float>() * 2.0f;
+            helixPts.push_back(glm::vec3(-2.5f + 0.8f * std::cos(a), -1.0f + 3.0f * t, 0.8f * std::sin(a)));
+        }
+
+        auto helix = Extrusion::create();
+        helix->setProfile(ExtrusionProfile::circle(0.15f, 24));
+        helix->setSpine(helixPts, SpineInterp::CatmullRom, 160);
+        helix->setCaps(true, true);
+        helix->refresh();
+        helix->setMaterial(greenMat);
+        m_scene->add(helix);
+
+        // Rectangular profile swept along a wavy path with flat (facet) shading.
+
+        std::vector<glm::vec3> wavePts;
+        for (int i = 0; i <= 8; ++i)
+        {
+            float t = float(i) / 8.0f;
+            wavePts.push_back(glm::vec3(-0.5f + t * 3.0f, std::sin(t * glm::two_pi<float>()), 0.0f));
+        }
+
+        auto ribbon = Extrusion::create();
+        ribbon->setProfile(ExtrusionProfile::rectangle(0.5f, 0.15f));
+        ribbon->setSpine(wavePts, SpineInterp::CatmullRom, 120);
+        ribbon->setNormalStyle(NormalStyle::Facet);
+        ribbon->setCaps(true, true);
+        ribbon->refresh();
+        ribbon->setMaterial(redMat);
+        m_scene->add(ribbon);
+
+        // Closed loop (ring): circle profile swept along a closed circular spine. The seam should
+        // join without a twist/normal discontinuity.
+
+        std::vector<glm::vec3> ringPts;
+        const int ringCount = 32;
+        for (int i = 0; i < ringCount; ++i)
+        {
+            float a = glm::two_pi<float>() * float(i) / float(ringCount);
+            ringPts.push_back(glm::vec3(4.0f + 1.2f * std::cos(a), 0.0f, 1.2f * std::sin(a)));
+        }
+
+        auto ring = Extrusion::create();
+        ring->setProfile(ExtrusionProfile::circle(0.18f, 20));
+        ring->setSpine(ringPts, SpineInterp::Polyline);
+        ring->setClosedSpine(true);
+        ring->refresh();
+        ring->setMaterial(blueMat);
+        m_scene->add(ring);
+
+        // Tapered + twisted extrusion via a per-station section transform.
+
+        std::vector<glm::vec3> taperPts = {glm::vec3(7.0f, -1.5f, 0.0f), glm::vec3(7.0f, 1.5f, 0.0f)};
+        auto taper = Extrusion::create();
+        taper->setProfile(ExtrusionProfile::regularPolygon(5, 0.5f));
+        taper->setSpine(taperPts, SpineInterp::Polyline);
+        taper->setNormalStyle(NormalStyle::Facet);
+        taper->setSectionTransform([](float t) {
+            SectionTransform st;
+            float s = 1.0f - 0.7f * t;
+            st.scale = glm::vec2(s, s);
+            st.twist = t * glm::two_pi<float>();
+            return st;
+        });
+        taper->refresh();
+        taper->setMaterial(greenMat);
+        m_scene->add(taper);
 
         // Create camera manipulator for interactive view control
 

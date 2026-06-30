@@ -1,131 +1,9 @@
 #include <ivf/extrusion.h>
 
-#include <ivf/light_manager.h>
-#include <ivf/geometry.h>
-
-#include <glm/gtx/intersect.hpp>
-
-#include <iostream>
+#include <ivf/mesh_manager.h>
 
 using namespace ivf;
 using namespace std;
-
-void ivf::Extrusion::generateContours()
-{
-    m_contours.clear();
-    m_normals.clear();
-
-    if (m_path.size() < 1)
-        return;
-
-    transformFirstContour();
-    m_contours.push_back(this->m_contour);
-    m_normals.push_back(computeContourNormal(0));
-
-    for (auto i = 1; i < m_path.size(); ++i)
-    {
-        m_contours.push_back(projectContour(i - 1, i));
-        m_normals.push_back(computeContourNormal(i));
-    }
-}
-
-void ivf::Extrusion::transformFirstContour()
-{
-    int pathCount = (int)m_path.size();
-    int vertexCount = (int)m_contour.size();
-
-    glm::mat4 matrix(1.0f);
-    // Matrix4 matrix;
-
-    if (pathCount > 0)
-    {
-        // transform matrix
-        if (pathCount > 1)
-            matrix = lookAt(m_path[1] - m_path[0]);
-
-        glm::mat4 translate = glm::translate(m_path[0]);
-
-        matrix = matrix * translate;
-        // matrix.translate(path[0]);
-
-        // multiply matrix to the contour
-        // NOTE: the contour vertices are transformed here
-        //       MUST resubmit contour data if the path is resset to 0
-
-        glm::vec4 v;
-
-        for (int i = 0; i < vertexCount; ++i)
-        {
-            v = matrix * glm::vec4(m_contour[i], 1.0f);
-            m_contour[i].x = v.x;
-            m_contour[i].y = v.y;
-            m_contour[i].z = v.z;
-        }
-    }
-}
-
-std::vector<glm::vec3> ivf::Extrusion::projectContour(int fromIndex, int toIndex)
-{
-    glm::vec3 dir1, dir2, normal;
-    Line line;
-
-    dir1 = m_path[toIndex] - m_path[fromIndex];
-
-    if (toIndex == int(m_path.size()) - 1)
-        dir2 = dir1;
-    else
-        dir2 = m_path[toIndex + 1] - m_path[toIndex];
-
-    normal = dir1 + dir2; // normal vector of plane at toIndex
-
-    Plane plane(normal, m_path[toIndex]);
-
-    // project each vertex of contour to the plane
-
-    std::vector<glm::vec3> &fromContour = m_contours[fromIndex];
-    std::vector<glm::vec3> toContour;
-
-    for (auto i = 0; i < int(fromContour.size()); ++i)
-    {
-        line.set(dir1, fromContour[i]);
-        toContour.push_back(plane.intersect(line));
-    }
-
-    return toContour;
-}
-
-std::vector<glm::vec3> ivf::Extrusion::computeContourNormal(int pathIndex)
-{
-    // get current contour and center point
-    std::vector<glm::vec3> &contour = m_contours[pathIndex];
-    glm::vec3 center = m_path[pathIndex];
-
-    std::vector<glm::vec3> contourNormal;
-    glm::vec3 normal;
-    for (int i = 0; i < (int)m_contour.size(); ++i)
-    {
-        normal = glm::normalize(contour[i] - center);
-        contourNormal.push_back(normal);
-    }
-
-    return contourNormal;
-}
-
-glm::vec3 ivf::Extrusion::intersectPlane(glm::vec3 &pos, glm::vec3 &dir, glm::vec3 &planePos, glm::vec3 &planeDir)
-{
-    float d;
-    bool intersects = glm::intersectRayPlane(pos, dir, planePos, planeDir, d);
-
-    if (intersects)
-    {
-        glm::vec3 planePoint = pos + d * dir;
-        return planePoint;
-    }
-    else
-    {
-        return glm::vec3(0.0, 0.0, 0.0);
-    }
-}
 
 ivf::Extrusion::Extrusion()
 {
@@ -139,102 +17,168 @@ std::shared_ptr<Extrusion> ivf::Extrusion::create()
     return std::make_shared<Extrusion>();
 }
 
+void ivf::Extrusion::setProfile(const ExtrusionProfile &profile)
+{
+    m_profile = profile;
+    m_profileExplicit = true;
+}
+
+const ExtrusionProfile &ivf::Extrusion::profile() const
+{
+    return m_profile;
+}
+
+void ivf::Extrusion::setSpine(const std::vector<glm::vec3> &points, SpineInterp interp, int samples)
+{
+    m_spinePoints = points;
+    m_spineInterp = static_cast<int>(interp);
+    m_samples = samples;
+}
+
+void ivf::Extrusion::setClosedSpine(bool closed)
+{
+    m_closedSpine = closed;
+}
+
+void ivf::Extrusion::setCaps(bool start, bool end)
+{
+    m_capStart = start;
+    m_capEnd = end;
+}
+
+void ivf::Extrusion::setJoinStyle(JoinStyle style)
+{
+    m_joinStyle = static_cast<int>(style);
+}
+
+void ivf::Extrusion::setFrameMethod(FrameMethod method)
+{
+    m_frameMethod = static_cast<int>(method);
+}
+
+void ivf::Extrusion::setSpineInterp(SpineInterp interp)
+{
+    m_spineInterp = static_cast<int>(interp);
+}
+
+void ivf::Extrusion::setNormalStyle(NormalStyle style)
+{
+    m_normalStyle = static_cast<int>(style);
+}
+
+void ivf::Extrusion::setTexMode(TexMode mode)
+{
+    m_texMode = static_cast<int>(mode);
+}
+
+void ivf::Extrusion::setUpVector(const glm::vec3 &up)
+{
+    m_upVector = up;
+}
+
+void ivf::Extrusion::setCornerRadius(double radius)
+{
+    m_cornerRadius = radius;
+}
+
+void ivf::Extrusion::setCornerSegments(int segments)
+{
+    m_cornerSegments = segments;
+}
+
+void ivf::Extrusion::setSamples(int samples)
+{
+    m_samples = samples;
+}
+
+void ivf::Extrusion::setSectionTransform(std::function<SectionTransform(float)> fn)
+{
+    m_sectionFn = std::move(fn);
+}
+
 void ivf::Extrusion::addPathPoint(glm::vec3 p)
 {
-    m_path.push_back(p);
+    m_spinePoints.push_back(p);
 }
 
 void ivf::Extrusion::clearPath()
 {
-    m_path.clear();
-}
-
-void ivf::Extrusion::createCircleSection(float r, int segments)
-{
-    this->clearSection();
-
-    float da = glm::pi<float>() / segments;
-    float angle = 0.0f;
-
-    float x, y;
-
-    while (angle < glm::pi<float>() * 2.0)
-    {
-        x = r * cos(angle);
-        y = r * sin(angle);
-        this->addSectionPoint(glm::vec2(x, y));
-        angle += da;
-    }
+    m_spinePoints.clear();
 }
 
 void ivf::Extrusion::addSectionPoint(glm::vec2 p)
 {
-    glm::vec3 pp(p.x, p.y, 0.0);
-    m_contour.push_back(pp);
+    m_profile.addPoint(p);
+    m_profile.setClosed(true);
+    m_profileExplicit = true;
 }
 
 void ivf::Extrusion::clearSection()
 {
-    m_contour.clear();
+    m_profile.clear();
+    m_profileExplicit = false;
+}
+
+void ivf::Extrusion::createCircleSection(float r, int segments)
+{
+    m_radius = r;
+    m_profileSegments = segments;
+    m_profile = ExtrusionProfile::circle(r, segments);
+    m_profileExplicit = true;
 }
 
 void ivf::Extrusion::doSetup()
 {
-    generateContours();
+    this->clear();
 
-    /*
-    this->newMesh(m_path.size() * m_contours[0].size() * 2);
+    if (m_spinePoints.size() < 2)
+        return;
 
-    mesh()->begin(GL_LINES);
-    for (auto i = 0; i < m_path.size(); i++)
-    {
-        std::vector<glm::vec3> contour = m_contours[i];
-        std::vector<glm::vec3> normal = m_normals[i];
+    ExtrusionProfile profile =
+        m_profileExplicit ? m_profile : ExtrusionProfile::circle(float(m_radius), m_profileSegments);
 
-        for (auto j = 0; j < contour.size()-1; j++)
-        {
-            mesh()->color3f(1.0f, 1.0, 1.0f);
-            mesh()->vertex3f(contour[j]);
-            mesh()->normal3f(normal[j]);
-            mesh()->color3f(1.0f, 1.0, 1.0f);
-            mesh()->vertex3f(contour[j+1]);
-            mesh()->normal3f(normal[j+1]);
-        }
-    }
-    mesh()->end();
-    */
+    if (profile.pointCount() < 2)
+        return;
 
-    for (auto i = 0; i < m_path.size() - 1; i++)
-    {
-        std::vector<glm::vec3> c1 = m_contours[i];
-        std::vector<glm::vec3> c2 = m_contours[i + 1];
-        std::vector<glm::vec3> n1 = m_normals[i];
-        std::vector<glm::vec3> n2 = m_normals[i + 1];
+    std::vector<PathFrame> frames = buildPathFrames(
+        m_spinePoints, static_cast<SpineInterp>(m_spineInterp), static_cast<JoinStyle>(m_joinStyle), m_samples,
+        static_cast<FrameMethod>(m_frameMethod), m_upVector, m_closedSpine, float(m_cornerRadius), m_cornerSegments);
 
-        this->newMesh((c1.size() + 1) * 2);
+    if (frames.size() < 2)
+        return;
 
-        currentMesh()->begin(GL_TRIANGLE_STRIP);
-        for (auto j = 0; j < c1.size(); j++)
-        {
-            currentMesh()->vertex3f(c1[j]);
-            currentMesh()->normal3f(n1[j]);
-            currentMesh()->vertex3f(c2[j]);
-            currentMesh()->normal3f(n2[j]);
-        }
-        currentMesh()->vertex3f(c1[0]);
-        currentMesh()->normal3f(n1[0]);
-        currentMesh()->vertex3f(c2[0]);
-        currentMesh()->normal3f(n2[0]);
-        currentMesh()->end();
-    }
+    ExtrusionOptions options;
+    options.capStart = m_capStart;
+    options.capEnd = m_capEnd;
+    options.closedPath = m_closedSpine;
+    options.normalStyle = static_cast<NormalStyle>(m_normalStyle);
+    options.texMode = static_cast<TexMode>(m_texMode);
+    options.sectionFn = m_sectionFn;
+
+    MeshData data = ExtrusionBuilder::build(profile, frames, options);
+
+    this->createFromMeshData(data);
 }
 
-void ivf::Extrusion::doPreDraw()
+void ivf::Extrusion::setupProperties()
 {
-    MeshNode::doPreDraw();
+    MeshNode::setupProperties();
+    addProperty("Radius", &m_radius, "Geometry");
+    addProperty("Profile segments", &m_profileSegments, "Geometry");
+    addProperty("Cap start", &m_capStart, "Geometry");
+    addProperty("Cap end", &m_capEnd, "Geometry");
+    addProperty("Closed spine", &m_closedSpine, "Geometry");
+    addProperty("Spine interp (0=poly,1=spline)", &m_spineInterp, "Path");
+    addProperty("Samples", &m_samples, "Path");
+    addProperty("Join (0=raw,1=angle,2=cut,3=round)", &m_joinStyle, "Path");
+    addProperty("Corner radius", &m_cornerRadius, "Path");
+    addProperty("Corner segments", &m_cornerSegments, "Path");
+    addProperty("Frame (0=rmf,1=frenet,2=fixed)", &m_frameMethod, "Path");
+    addProperty("Normal (0=smooth,1=facet)", &m_normalStyle, "Surface");
+    addProperty("Tex (0=norm,1=length)", &m_texMode, "Surface");
 }
 
-void ivf::Extrusion::doPostDraw()
+void ivf::Extrusion::onPropertyChanged(const std::string &name)
 {
-    MeshNode::doPostDraw();
+    this->refresh();
 }

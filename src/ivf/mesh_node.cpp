@@ -110,6 +110,40 @@ void ivf::MeshNode::createFromGenerator(generator::AnyGenerator<generator::MeshV
     updateBoundingBox();
 }
 
+void ivf::MeshNode::createFromMeshData(const MeshData &data)
+{
+    this->clear();
+
+    if (data.positions.empty() || data.indices.empty())
+        return;
+
+    this->newMesh(GLuint(data.positions.size()), GLuint(data.indices.size()), GL_TRIANGLES,
+                  ivf::mmDefaultMeshUsage());
+
+    mesh()->setGenerateNormals(false);
+    mesh()->begin(GL_TRIANGLES);
+
+    for (std::size_t i = 0; i < data.positions.size(); ++i)
+    {
+        const glm::vec3 &p = data.positions[i];
+        const glm::vec3 &n = data.normals[i];
+        const glm::vec2 &t = data.texCoords[i];
+        const glm::vec4 &c = data.colors[i];
+
+        mesh()->color4f(c.r, c.g, c.b, c.a);
+        mesh()->normal3f(n.x, n.y, n.z);
+        mesh()->tex2f(t.x, t.y);
+        mesh()->vertex3f(p.x, p.y, p.z);
+    }
+
+    for (const auto &tri : data.indices)
+        mesh()->index3i(tri[0], tri[1], tri[2]);
+
+    mesh()->end();
+
+    updateBoundingBox();
+}
+
 void ivf::MeshNode::debugFromGenerator(generator::AnyGenerator<generator::MeshVertex> &vertices,
                                        generator::AnyGenerator<generator::Triangle> &triangles)
 {

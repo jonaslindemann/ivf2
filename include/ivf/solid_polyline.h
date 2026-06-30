@@ -6,7 +6,7 @@
 #include <glm/gtc/constants.hpp>
 #include <gml/gml.hpp>
 
-#include <generator/PolyLinePath.hpp>
+#include <vector>
 
 namespace ivf {
 
@@ -21,9 +21,9 @@ namespace ivf {
  */
 class SolidPolyLine : public MeshNode {
 private:
-    double m_radius;                    ///< Tube radius.
-    generator::PolyLinePath m_polyPath; ///< Polyline path generator.
-    int m_segments;                     ///< Number of segments around the tube.
+    double m_radius;                     ///< Tube radius.
+    std::vector<glm::vec3> m_points;     ///< Polyline control points.
+    int m_segments;                      ///< Number of segments around the tube.
 
 public:
     /**

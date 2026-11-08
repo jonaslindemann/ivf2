@@ -120,9 +120,18 @@ public:
 class TweenManager {
 private:
     std::vector<TweenBasePtr> m_tweens;
+    std::vector<TweenBasePtr> m_pending; ///< Tweens added during update(), e.g. from an onComplete callback.
+    bool m_updating{false};
+    bool m_clearRequested{false};
     static TweenManager* m_instance;
 
     TweenManager() = default;
+
+    void addTween(TweenBasePtr tween)
+    {
+        // Adding to m_tweens while update() iterates it would invalidate the iteration
+        (m_updating ? m_pending : m_tweens).push_back(std::move(tween));
+    }
 
 public:
     static TweenManager* instance()
@@ -133,7 +142,7 @@ public:
     }
 
     /** Add a tween created with Tween<T>::create(). Ownership is shared. */
-    void add(TweenBasePtr tween) { m_tweens.push_back(std::move(tween)); }
+    void add(TweenBasePtr tween) { addTween(std::move(tween)); }
 
     /** Convenience: create and immediately register a tween. Returns the tween for callback chaining. */
     template<typename T>
@@ -141,23 +150,44 @@ public:
                                   Easing easing = Easing::Linear)
     {
         auto t = Tween<T>::create(target, toValue, duration, easing);
-        m_tweens.push_back(t);
+        addTween(t);
         return t;
     }
 
-    /** Update all active tweens and remove completed ones. Call once per frame. */
+    /**
+     * Update all active tweens and remove completed ones. Call once per frame.
+     * Tweens added from callbacks during the update start with the next update.
+     */
     void update(float dt)
     {
+        m_updating = true;
         m_tweens.erase(
             std::remove_if(m_tweens.begin(), m_tweens.end(),
                 [dt](const TweenBasePtr& tw) { return tw->update(dt); }),
             m_tweens.end());
+        m_updating = false;
+
+        if (m_clearRequested)
+        {
+            m_tweens.clear();
+            m_clearRequested = false;
+        }
+        for (auto& tween : m_pending)
+            m_tweens.push_back(std::move(tween));
+        m_pending.clear();
     }
 
-    /** Cancel all active tweens. */
-    void clear() { m_tweens.clear(); }
+    /** Cancel all active tweens. Safe to call from a tween callback. */
+    void clear()
+    {
+        m_pending.clear();
+        if (m_updating)
+            m_clearRequested = true;
+        else
+            m_tweens.clear();
+    }
 
-    [[nodiscard]] size_t count() const { return m_tweens.size(); }
+    [[nodiscard]] size_t count() const { return m_tweens.size() + m_pending.size(); }
 };
 
 } // namespace ivf

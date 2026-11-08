@@ -9,9 +9,13 @@
 #undef GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
 
+#include <algorithm>
+#include <cstdio>
 #include <filesystem>
 #include <iostream>
 #include <vector>
+
+#include <ivf/logger.h>
 #include <ivfui/glfw_window.h>
 #include <ivf/shader_manager.h>
 
@@ -65,7 +69,8 @@ void GLFWWindow::makeCurrent()
     if (m_window)
     {
         glfwMakeContextCurrent(m_window);
-        glfwSwapInterval(1);
+        // Exports render as fast as possible instead of at the display refresh rate
+        glfwSwapInterval(m_exporting ? 0 : 1);
     }
 }
 
@@ -242,11 +247,37 @@ void GLFWWindow::draw()
 
     this->makeCurrent();
 
-    // Compute wall-clock frame delta time (time since the previous call to draw()).
-    // This gives a real dt for animations regardless of how fast onDraw() runs.
+    // Frame time: wall-clock delta since the previous draw(), or the fixed step
+    // when exporting frames, so animation is deterministic and independent of
+    // how long a frame takes to render.
     double now = glfwGetTime();
-    if (m_lastFrameTime > 0.0)
-        m_frameTime = now - m_lastFrameTime;
+    if (m_exportPending)
+    {
+        // First exported frame: switch to fixed steps at the requested time
+        m_exportPending = false;
+        m_exporting = true;
+        m_previousFixedTimeStep = m_fixedTimeStep;
+        const double step = 1.0 / m_recordFps;
+        m_simTime = m_exportStartTime >= 0.0 ? m_exportStartTime : m_simTime + step;
+        m_fixedTimeStep = step;
+        m_fixedStepStarted = true;
+        m_frameTime = step;
+        this->onFrameExportStarted();
+    }
+    else if (m_fixedTimeStep > 0.0)
+    {
+        // The frame that switched to fixed steps keeps its time; later frames advance
+        if (m_fixedStepStarted)
+            m_simTime += m_fixedTimeStep;
+        m_fixedStepStarted = true;
+        m_frameTime = m_fixedTimeStep;
+    }
+    else
+    {
+        if (m_lastFrameTime > 0.0)
+            m_frameTime = now - m_lastFrameTime;
+        m_simTime = now - m_timeOffset;
+    }
     m_lastFrameTime = now;
 
     auto result = 0;
@@ -292,6 +323,10 @@ void GLFWWindow::draw()
         this->doDraw();
     }
 
+    // Capture the scene without the interface (before the back buffer is swapped)
+
+    this->captureFrames(false);
+
     // Render user interfaec
 
     m_uiRenderer->draw();
@@ -299,6 +334,10 @@ void GLFWWindow::draw()
     // Tell derived class to do any final rendering
 
     this->doDrawComplete();
+
+    // Capture with the interface
+
+    this->captureFrames(true);
 
     // Window/viewport handling
 
@@ -317,16 +356,13 @@ void GLFWWindow::draw()
 
     this->swapBuffers();
 
-    // Recording: capture after swap so the frame is complete
-    if (m_recording) {
-        double interval = (m_recordFps > 0) ? 1.0 / m_recordFps : 0.0;
-        m_recordAccum += m_frameTime;
-        while (m_recording && interval > 0.0 && m_recordAccum >= interval) {
-            char name[64];
-            std::snprintf(name, sizeof(name), "/frame_%06d.png", m_recordFrameIdx++);
-            captureFrame(m_recordPath + name);
-            m_recordAccum -= interval;
-        }
+    // An export with a frame count ends after its last frame
+    if (m_exporting && m_exportFrameCount > 0 && m_recordedFrames >= m_exportFrameCount)
+    {
+        bool closeWhenDone = m_exportCloseWhenDone;
+        this->finishExport();
+        if (closeWhenDone)
+            this->close();
     }
 }
 
@@ -467,7 +503,25 @@ int ivfui::GLFWWindow::frameCount() const
 
 double ivfui::GLFWWindow::elapsedTime() const
 {
-    return glfwGetTime();
+    return m_simTime;
+}
+
+void GLFWWindow::setFixedTimeStep(double dt)
+{
+    dt = std::max(dt, 0.0);
+    if (dt == m_fixedTimeStep)
+        return;
+
+    if (dt == 0.0)
+    {
+        // Continue real time from the current simulation time
+        m_timeOffset = glfwGetTime() - m_simTime;
+    }
+    else if (m_fixedTimeStep == 0.0)
+    {
+        m_fixedStepStarted = false;
+    }
+    m_fixedTimeStep = dt;
 }
 
 void ivfui::GLFWWindow::clearError()
@@ -542,38 +596,149 @@ int GLFWWindow::onSetup()
     return 0;
 }
 
-void GLFWWindow::captureFrame(const std::string& path)
-{
-    int w, h;
-    getSize(w, h);
-    if (w <= 0 || h <= 0) return;
+namespace {
 
-    std::vector<unsigned char> pixels(w * h * 3);
+std::string framePath(const std::string &directory, int index)
+{
+    char name[32];
+    std::snprintf(name, sizeof(name), "frame_%06d.png", index);
+    return (std::filesystem::path(directory) / name).string();
+}
+
+bool ensureDirectory(const std::string &directory)
+{
+    std::error_code ec;
+    std::filesystem::create_directories(directory, ec);
+    if (ec)
+        ivf::logError("Could not create directory " + directory + ": " + ec.message(), "GLFWWindow");
+    return !ec;
+}
+
+} // namespace
+
+std::vector<unsigned char> GLFWWindow::readFramePixels(int &width, int &height)
+{
+    getSize(width, height);
+    if (width <= 0 || height <= 0)
+        return {};
+
+    // Read the finished frame from the back buffer, before it is swapped
+    std::vector<unsigned char> pixels(size_t(width) * height * 3);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glReadBuffer(GL_BACK);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadPixels(0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
-
-    // stb_image_write uses top-left origin; OpenGL uses bottom-left.
-    // Negative stride flips rows automatically.
-    stbi_write_png(path.c_str(), w, h, 3,
-                   pixels.data() + (h - 1) * w * 3,
-                   -w * 3);
+    glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+    return pixels;
 }
 
-void GLFWWindow::saveScreenshot(const std::string& path)
+void GLFWWindow::captureFrames(bool uiDrawn)
 {
-    captureFrame(path);
+    const bool screenshot = !m_screenshotPath.empty() && m_screenshotIncludeUi == uiDrawn;
+
+    // Number of sequence frames this rendered frame stands for
+    int copies = 0;
+    if (m_exporting && m_recordIncludeUi == uiDrawn)
+    {
+        copies = 1;
+    }
+    else if (m_recording && m_recordIncludeUi == uiDrawn)
+    {
+        // Real time: repeat the frame when rendering is slower than the capture rate
+        const double interval = 1.0 / m_recordFps;
+        m_recordAccum += m_frameTime;
+        while (m_recordAccum >= interval)
+        {
+            ++copies;
+            m_recordAccum -= interval;
+        }
+    }
+
+    if (!screenshot && copies == 0)
+        return;
+
+    int width, height;
+    auto pixels = readFramePixels(width, height);
+    if (pixels.empty())
+        return;
+
+    if (!m_frameWriter)
+        m_frameWriter = std::make_unique<FrameWriter>();
+
+    if (screenshot)
+    {
+        m_frameWriter->write(m_screenshotPath, width, height, copies > 0 ? pixels : std::move(pixels));
+        m_screenshotPath.clear();
+    }
+
+    for (int i = 0; i < copies; ++i)
+    {
+        auto frame = (i + 1 < copies) ? pixels : std::move(pixels);
+        m_frameWriter->write(framePath(m_recordPath, m_recordFrameIdx++), width, height, std::move(frame));
+        ++m_recordedFrames;
+    }
 }
 
-void GLFWWindow::startRecording(const std::string& directory, int fps)
+void GLFWWindow::saveScreenshot(const std::string &path, bool includeUi)
 {
-    m_recordPath      = directory;
-    m_recordFps       = fps;
-    m_recordFrameIdx  = 0;
-    m_recordAccum     = 0.0;
-    m_recording       = true;
+    m_screenshotPath = path;
+    m_screenshotIncludeUi = includeUi;
+}
+
+void GLFWWindow::startRecording(const std::string &directory, int fps, int startFrame, bool includeUi)
+{
+    stopRecording();
+    if (!ensureDirectory(directory))
+        return;
+
+    m_recordPath = directory;
+    m_recordFps = std::max(fps, 1);
+    m_recordFrameIdx = startFrame;
+    m_recordedFrames = 0;
+    m_recordIncludeUi = includeUi;
+    m_recordAccum = 1.0 / m_recordFps; // capture the current frame first
+    m_recording = true;
+}
+
+void GLFWWindow::startFrameExport(const FrameExportSettings &settings)
+{
+    stopRecording();
+    if (!ensureDirectory(settings.directory))
+        return;
+
+    m_recordPath = settings.directory;
+    m_recordFps = std::max(settings.fps, 1);
+    m_recordFrameIdx = settings.startFrame;
+    m_recordedFrames = 0;
+    m_exportFrameCount = std::max(settings.frameCount, 0);
+    m_recordIncludeUi = settings.includeUi;
+    m_exportCloseWhenDone = settings.closeWhenDone;
+    m_exportStartTime = settings.startTime;
+
+    // Takes effect at the start of the next frame, see draw()
+    m_exportPending = true;
+
+    ivf::logInfo("Exporting frames to " + m_recordPath + " at " + std::to_string(m_recordFps) + " fps", "GLFWWindow");
+}
+
+void GLFWWindow::finishExport()
+{
+    m_exportPending = false;
+    if (!m_exporting)
+        return;
+
+    m_exporting = false;
+    setFixedTimeStep(m_previousFixedTimeStep);
+    if (m_frameWriter)
+        m_frameWriter->finish();
+
+    ivf::logInfo("Exported " + std::to_string(m_recordedFrames) + " frames to " + m_recordPath, "GLFWWindow");
+    this->onFrameExportFinished();
 }
 
 void GLFWWindow::stopRecording()
 {
+    finishExport();
     m_recording = false;
+    if (m_frameWriter)
+        m_frameWriter->finish();
 }

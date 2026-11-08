@@ -844,7 +844,7 @@ void GLFWSceneWindow::doDraw()
         for (auto &effect : m_effects)
             effect->use();
 
-        m_postProcessor->setTime(glfwGetTime());
+        m_postProcessor->setTime(float(elapsedTime()));
         {
             auto &xfm = *TransformManager::instance();
             m_postProcessor->setCameraMatrices(xfm.viewMatrix(), xfm.projectionMatrix());

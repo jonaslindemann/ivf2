@@ -13,6 +13,9 @@
 #include <mutex>
 #include <string>
 
+#include <vector>
+
+#include <ivfui/frame_writer.h>
 #include <ivfui/ui_manager.h>
 
 namespace ivfui {
@@ -68,14 +71,33 @@ private:
     int m_lastClickButton;      ///< Button code of the most recent click.
     static constexpr double k_doubleClickInterval = 0.3; ///< Max seconds between two clicks.
 
+    // Simulation time
+    double m_simTime{0.0};       ///< Time of the current frame, see elapsedTime().
+    double m_timeOffset{0.0};    ///< glfwGetTime() minus simulation time in real-time mode.
+    double m_fixedTimeStep{0.0}; ///< Fixed frame time in seconds, 0 for real time.
+    bool m_fixedStepStarted{false};
+
     // Screenshot / recording
-    bool        m_recording{false};
+    bool        m_recording{false};       ///< Real-time recording (startRecording).
+    bool        m_exporting{false};       ///< Fixed-step export (startFrameExport).
+    bool        m_exportPending{false};   ///< Export starts with the next frame.
+    double      m_exportStartTime{-1.0};
     std::string m_recordPath;
     int         m_recordFps{60};
     int         m_recordFrameIdx{0};
+    int         m_recordedFrames{0};
+    int         m_exportFrameCount{0};
+    bool        m_recordIncludeUi{true};
+    bool        m_exportCloseWhenDone{false};
+    double      m_previousFixedTimeStep{0.0};
     double      m_recordAccum{0.0};
+    std::string m_screenshotPath;
+    bool        m_screenshotIncludeUi{false};
+    std::unique_ptr<FrameWriter> m_frameWriter;
 
-    void captureFrame(const std::string& path);
+    std::vector<unsigned char> readFramePixels(int &width, int &height);
+    void captureFrames(bool uiDrawn);
+    void finishExport();
 
 public:
     /**
@@ -292,7 +314,11 @@ public:
     int frameCount() const;
 
     /**
-     * @brief Get the elapsed time since window creation (seconds).
+     * @brief Get the time of the current frame in seconds.
+     *
+     * Sampled once at the start of each frame, so it is the same everywhere
+     * during a frame. Follows the wall clock in real-time mode and advances by
+     * exactly the fixed step with setFixedTimeStep() or startFrameExport().
      * @return double Elapsed time.
      */
     double elapsedTime() const;
@@ -304,27 +330,90 @@ public:
     UiRendererPtr uiRenderer() const { return m_uiRenderer; }
 
     /**
-     * @brief Save a PNG screenshot of the current framebuffer.
+     * @brief Save a PNG screenshot of the next rendered frame.
+     *
+     * The frame is captured once it has been drawn, so this can be called from
+     * onUpdate() or a key handler. The file is written on a background thread.
      * @param path Output file path (should end in .png).
+     * @param includeUi Include the ImGui interface in the screenshot.
      */
-    void saveScreenshot(const std::string& path);
+    void saveScreenshot(const std::string& path, bool includeUi = false);
 
     /**
-     * @brief Start saving sequential PNG frames to a directory.
-     * @param directory Output directory (must exist). Frames named frame_000000.png, etc.
-     * @param fps Target capture rate (frames per second of captured content).
+     * @brief Start capturing PNG frames in real time, e.g. to record an interactive session.
+     *
+     * Frames are sampled at @p fps of wall-clock time; when rendering is slower,
+     * frames are repeated. For a smooth video at an exact frame rate, use
+     * startFrameExport() instead.
+     * @param directory Output directory, created if missing. Frames are named frame_000000.png, etc.
+     * @param fps Capture rate.
+     * @param startFrame Number of the first file, to continue an earlier recording.
+     * @param includeUi Include the ImGui interface in the frames.
      */
-    void startRecording(const std::string& directory, int fps = 60);
+    void startRecording(const std::string& directory, int fps = 60, int startFrame = 0, bool includeUi = true);
 
     /**
-     * @brief Stop recording frames.
+     * @brief Settings for startFrameExport().
+     */
+    struct FrameExportSettings {
+        std::string directory;     ///< Output directory, created if missing.
+        int fps{60};               ///< Frame rate of the exported video.
+        int startFrame{0};         ///< Number of the first file (frame_000000.png, ...).
+        int frameCount{0};         ///< Frames to export; 0 exports until stopRecording().
+        bool includeUi{false};     ///< Include the ImGui interface in the frames.
+        bool closeWhenDone{false}; ///< Close the window after frameCount frames.
+        double startTime{-1.0};    ///< elapsedTime() of the first frame; negative continues the current time.
+    };
+
+    /**
+     * @brief Export a PNG sequence at an exact frame rate, for rendering video.
+     *
+     * Switches to a fixed time step of 1/fps, so every rendered frame advances
+     * elapsedTime() and frameTime() by exactly one video frame regardless of how
+     * long it takes to render, and every frame is written. Time-driven animation
+     * (tweens, timers, behaviors, effects) is therefore identical between runs.
+     * The export starts with the next frame; with a startTime, frame k is
+     * rendered at exactly startTime + k / fps. Assemble the video with e.g.
+     * `ffmpeg -framerate 60 -i frame_%06d.png -i song.wav -c:v libx264 -pix_fmt yuv420p -crf 16 -shortest out.mp4`.
+     *
+     * The image size is the window's framebuffer size.
+     */
+    void startFrameExport(const FrameExportSettings &settings);
+
+    /**
+     * @brief Stop recording or exporting, and wait until all frames are written.
      */
     void stopRecording();
 
     /**
-     * @brief Check if recording is active.
+     * @brief Check if real-time recording or frame export is active.
      */
-    bool isRecording() const { return m_recording; }
+    bool isRecording() const { return m_recording || isExporting(); }
+
+    /**
+     * @brief Check if a fixed-step frame export is active or about to start.
+     */
+    bool isExporting() const { return m_exporting || m_exportPending; }
+
+    /**
+     * @brief Number of frames captured by the current or last recording/export.
+     */
+    int recordedFrameCount() const { return m_recordedFrames; }
+
+    /**
+     * @brief Advance time by a fixed step per frame instead of wall-clock time.
+     *
+     * With a fixed step, frameTime() returns @p dt and elapsedTime() advances by
+     * @p dt every frame. Switching back to real time continues from the current
+     * time without a jump.
+     * @param dt Time step in seconds, 0 for real time.
+     */
+    void setFixedTimeStep(double dt);
+
+    /**
+     * @brief Current fixed time step, 0 in real-time mode.
+     */
+    double fixedTimeStep() const { return m_fixedTimeStep; }
 
 public:
     /**
@@ -465,6 +554,19 @@ public:
      * @brief Draw complete callback (calls doDrawComplete by default).
      */
     virtual void onDrawComplete();
+
+    /**
+     * @brief Called at the start of the first frame of a frame export, before onUpdate().
+     *
+     * Reset animation state here (tweens, random seeds, song position) so that
+     * repeated exports produce identical frames.
+     */
+    virtual void onFrameExportStarted() {}
+
+    /**
+     * @brief Called when a frame export has finished and all frames are written.
+     */
+    virtual void onFrameExportFinished() {}
 
     /**
      * @brief Update other UI callback (calls doUpdateOtherUi by default).

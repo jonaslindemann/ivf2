@@ -40,6 +40,10 @@ private:
 
     std::vector<ProgramPtr> m_fxPrograms; ///< List of shader programs (effects).
 
+    GLuint m_depthTexture{0};       ///< Scene depth texture, 0 if not available.
+    glm::mat4 m_viewMatrix{1.0f};       ///< Camera view matrix of the processed frame.
+    glm::mat4 m_projectionMatrix{1.0f}; ///< Camera projection matrix of the processed frame.
+
 public:
     /**
      * @brief Constructor.
@@ -99,6 +103,22 @@ public:
      * @param time Time value.
      */
     void setTime(float time);
+
+    /**
+     * @brief Set the scene depth texture made available to effects.
+     *
+     * Bound to texture unit 2 as the `depthTexture` sampler for every effect.
+     * @param texture OpenGL depth texture ID, 0 to disable.
+     */
+    void setDepthTexture(GLuint texture);
+
+    /**
+     * @brief Set the camera matrices the processed frame was rendered with.
+     *
+     * Effects receive `invProjection` and `invView` uniforms, which together with
+     * `depthTexture` reconstruct view- and world-space positions per pixel.
+     */
+    void setCameraMatrices(const glm::mat4 &view, const glm::mat4 &projection);
 
     /**
      * @brief Apply all post-processing effects to the given texture.

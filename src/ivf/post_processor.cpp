@@ -132,6 +132,17 @@ void PostProcessor::setTime(float time)
     m_time = time;
 }
 
+void PostProcessor::setDepthTexture(GLuint texture)
+{
+    m_depthTexture = texture;
+}
+
+void PostProcessor::setCameraMatrices(const glm::mat4 &view, const glm::mat4 &projection)
+{
+    m_viewMatrix = view;
+    m_projectionMatrix = projection;
+}
+
 void PostProcessor::apply(GLuint inputTexture)
 {
     // Only enabled effects participate in the chain. A disabled effect is skipped
@@ -161,6 +172,13 @@ void PostProcessor::apply(GLuint inputTexture)
     // "previousFrame" sampler (feedback, trails, motion blur) read from it; others ignore it.
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_historyTex[prev]);
+
+    // Scene depth on unit 2 for depth-aware effects (fog, depth of field)
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_depthTexture);
+
+    const glm::mat4 invProjection = glm::inverse(m_projectionMatrix);
+    const glm::mat4 invView = glm::inverse(m_viewMatrix);
 
     // Apply each enabled effect in sequence
     for (size_t i = 0; i < active.size(); i++)
@@ -194,6 +212,9 @@ void PostProcessor::apply(GLuint inputTexture)
 
         active[i]->uniformInt("screenTexture", 0);
         active[i]->uniformInt("previousFrame", 1);
+        active[i]->uniformInt("depthTexture", 2);
+        active[i]->uniformMatrix4("invProjection", invProjection);
+        active[i]->uniformMatrix4("invView", invView);
         active[i]->uniformFloat("time", m_time);
 
         // Draw full-screen quad

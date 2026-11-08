@@ -612,4 +612,62 @@ void main()
     FragColor = vec4(result, 1.0);
 })";
 
+inline const std::string fog_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform sampler2D depthTexture;
+uniform mat4 invProjection;
+uniform mat4 invView;
+
+uniform vec3 fogColor;
+uniform float fogDensity;
+uniform float fogStart;
+uniform float fogHeightFalloff;
+uniform float fogBaseHeight;
+uniform float fogMaxOpacity;
+uniform float fogSkyAmount;
+
+// Average of exp(-k * h) along a ray from height h0 to h1 (heights relative to
+// the fog base, clamped so fog below the base has uniform density).
+float heightTerm(float h0, float h1, float k)
+{
+    h0 = max(h0, 0.0);
+    h1 = max(h1, 0.0);
+    float dh = h1 - h0;
+    if (abs(k * dh) < 1e-4)
+        return exp(-k * h0);
+    return (exp(-k * h0) - exp(-k * h1)) / (k * dh);
+}
+
+void main()
+{
+    vec4 scene = texture(screenTexture, TexCoords);
+    float depth = texture(depthTexture, TexCoords).r;
+
+    float fog;
+    if (depth >= 1.0) {
+        // Background: nothing was drawn here
+        fog = fogSkyAmount;
+    } else {
+        vec4 ndc = vec4(TexCoords * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
+        vec4 viewPos = invProjection * ndc;
+        viewPos /= viewPos.w;
+        vec3 worldPos = (invView * vec4(viewPos.xyz, 1.0)).xyz;
+        vec3 cameraPos = invView[3].xyz;
+
+        float dist = max(length(viewPos.xyz) - fogStart, 0.0);
+        float opticalDepth = fogDensity * dist;
+        if (fogHeightFalloff > 0.0)
+            opticalDepth *= heightTerm(cameraPos.y - fogBaseHeight, worldPos.y - fogBaseHeight, fogHeightFalloff);
+
+        fog = 1.0 - exp(-opticalDepth);
+    }
+
+    fog = clamp(fog, 0.0, fogMaxOpacity);
+    FragColor = vec4(mix(scene.rgb, fogColor, fog), scene.a);
+})";
+
 } // namespace ivf

@@ -54,10 +54,16 @@ void FrameBuffer::attachColorTexture(GLuint &texture)
 
 void FrameBuffer::attachDepthBuffer(GLuint &buffer)
 {
-    glGenRenderbuffers(1, &buffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, buffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, buffer);
+    // A texture rather than a renderbuffer, so effects can sample scene depth
+    glGenTextures(1, &buffer);
+    glBindTexture(GL_TEXTURE_2D, buffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_width, m_height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT,
+                 NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, buffer, 0);
 }
 
 void ivf::FrameBuffer::attachMultisampledColorTexture()
@@ -75,7 +81,8 @@ void ivf::FrameBuffer::attachMultisampledDepthBuffer()
     // Multisampled depth buffer
     glGenRenderbuffers(1, &m_multisampledDepthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_multisampledDepthBuffer);
-    glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, GL_DEPTH_COMPONENT, m_width, m_height);
+    // Sized format must match the resolved depth texture for the depth blit in end()
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, GL_DEPTH_COMPONENT24, m_width, m_height);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_multisampledDepthBuffer);
 }
 
@@ -111,11 +118,10 @@ void ivf::FrameBuffer::initialize()
     else
     {
         glGenFramebuffers(1, &m_frameBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
 
         this->attachColorTexture(m_colorTexture);
         this->attachDepthBuffer(m_depthBuffer);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
     }
 
     this->unbind();
@@ -145,7 +151,7 @@ void ivf::FrameBuffer::drop()
     }
 
     glDeleteTextures(1, &m_colorTexture);
-    glDeleteRenderbuffers(1, &m_depthBuffer);
+    glDeleteTextures(1, &m_depthBuffer);
     glDeleteFramebuffers(1, &m_frameBuffer);
 }
 
@@ -210,7 +216,8 @@ void ivf::FrameBuffer::end()
     {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, m_multisampledFrameBuffer);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBuffer);
-        glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+        glBlitFramebuffer(0, 0, m_width, m_height, 0, 0, m_width, m_height,
+                          GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -239,6 +246,11 @@ void ivf::FrameBuffer::draw()
 GLuint ivf::FrameBuffer::colorTexture()
 {
     return m_colorTexture;
+}
+
+GLuint ivf::FrameBuffer::depthTexture()
+{
+    return m_depthBuffer;
 }
 
 GLuint ivf::FrameBuffer::id()

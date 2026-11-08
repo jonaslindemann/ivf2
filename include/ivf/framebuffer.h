@@ -19,7 +19,7 @@ private:
     GLuint m_frameBuffer;             ///< Main framebuffer object.
     GLuint m_multisampledFrameBuffer; ///< Multisampled framebuffer object.
 
-    GLuint m_depthBuffer;             ///< Depth buffer attachment.
+    GLuint m_depthBuffer;             ///< Depth texture attachment.
     GLuint m_multisampledDepthBuffer; ///< Multisampled depth buffer attachment.
 
     GLuint m_colorTexture;             ///< Color texture attachment.
@@ -94,8 +94,11 @@ public:
     void attachColorTexture(GLuint &texture);
 
     /**
-     * @brief Attach a depth buffer to the framebuffer.
-     * @param buffer Reference to the buffer ID.
+     * @brief Attach a depth texture to the framebuffer.
+     *
+     * The depth is stored in a texture (not a renderbuffer) so post-processing
+     * effects can sample it, see depthTexture().
+     * @param buffer Reference to the texture ID.
      */
     void attachDepthBuffer(GLuint &buffer);
 
@@ -163,6 +166,15 @@ public:
      * @return GLuint Texture ID.
      */
     GLuint colorTexture();
+
+    /**
+     * @brief Get the depth texture of the framebuffer.
+     *
+     * Holds non-linear window-space depth in [0, 1]. When multisampling is
+     * enabled, it is resolved from the multisampled buffer in end().
+     * @return GLuint Texture ID.
+     */
+    GLuint depthTexture();
 
     /**
      * @brief Get the OpenGL framebuffer object ID.

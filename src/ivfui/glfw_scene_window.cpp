@@ -821,6 +821,11 @@ void GLFWSceneWindow::doDraw()
             effect->use();
 
         m_postProcessor->setTime(glfwGetTime());
+        {
+            auto &xfm = *TransformManager::instance();
+            m_postProcessor->setCameraMatrices(xfm.viewMatrix(), xfm.projectionMatrix());
+        }
+        m_postProcessor->setDepthTexture(m_frameBuffer->depthTexture());
         m_postProcessor->apply(m_frameBuffer->colorTexture());
 
         // Reset shader to basic

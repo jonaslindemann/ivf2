@@ -22,6 +22,7 @@
 #include <ivf/post_processor.h>
 #include <ivf/effect.h>
 #include <ivf/cursor.h>
+#include <ivf/planar_reflection.h>
 
 #include <ivfui/scene_control_panel.h>
 #include <ivfui/camera_window.h>
@@ -89,6 +90,10 @@ private:
     UiInputDialogPtr m_inputDialog; ///< Generic input dialog.
 
     std::vector<ivf::EffectPtr> m_effects; ///< List of post-processing effects.
+
+    std::vector<ivf::PlanarReflectionPtr> m_reflections; ///< Reflection passes rendered before the scene.
+
+    void renderReflections();
 
 public:
     /**
@@ -171,6 +176,22 @@ public:
      * @param effect Shared pointer to the effect.
      */
     void addEffect(ivf::EffectPtr effect);
+
+    /**
+     * @brief Add a planar reflection pass, rendered every frame before the main scene.
+     * @param reflection Reflection to render.
+     */
+    void addReflection(ivf::PlanarReflectionPtr reflection);
+
+    /**
+     * @brief Remove a previously added reflection pass.
+     */
+    void removeReflection(ivf::PlanarReflectionPtr reflection);
+
+    /**
+     * @brief Remove all reflection passes.
+     */
+    void clearReflections();
 
     // EffectListProvider interface implementation
 

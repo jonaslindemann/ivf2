@@ -22,10 +22,15 @@ layout (location = 1) in vec4 aColor;
 layout (location = 2) in vec2 aTex;
 layout (location = 3) in vec3 aNormal;
 
+// Per-instance attributes, used when useInstancing is set (see InstancedMeshNode)
+layout (location = 4) in mat4 aInstanceModel;
+layout (location = 8) in vec4 aInstanceColor;
+
 out vec3 fragPos;
 out vec3 normal;
 out vec4 color;
 out vec2 texCoord;
+out vec4 instanceColor;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -33,22 +38,26 @@ uniform mat4 projection;
 
 uniform bool shadowPass = false;
 uniform mat4 lightSpaceMatrix;
+uniform bool useInstancing = false;
 
 void main()
 {
-    fragPos = vec3(model * vec4(aPos, 1.0));
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    mat4 modelMatrix = useInstancing ? model * aInstanceModel : model;
+    instanceColor = useInstancing ? aInstanceColor : vec4(1.0);
+
+    fragPos = vec3(modelMatrix * vec4(aPos, 1.0));
+    mat3 normalMatrix = transpose(inverse(mat3(modelMatrix)));
     // Transform normal to world space
     // and then to view space
     //normal = normalMatrix * aNormal;
-    normal = mat3(model) * aNormal; 
+    normal = mat3(modelMatrix) * aNormal;
 
     color = aColor;
     texCoord = aTex;
-    
+
     if (shadowPass) {
         // When rendering shadow map, just output position in light space
-        gl_Position = lightSpaceMatrix * model * vec4(aPos, 1.0);
+        gl_Position = lightSpaceMatrix * modelMatrix * vec4(aPos, 1.0);
     } else {
         // Normal rendering path
         gl_Position = projection * view * vec4(fragPos, 1.0);
@@ -142,8 +151,9 @@ in vec3 normal;
 in vec3 fragPos;  
 in vec4 color;
 in vec2 texCoord;
+in vec4 instanceColor;
 
-uniform vec3 lightPos; 
+uniform vec3 lightPos;
 uniform vec3 viewPos; 
 uniform vec4 lightColor;
 uniform vec3 textColor;
@@ -371,6 +381,8 @@ void main()
             vec3 R = reflect(I, normalize(normal));
             fragColor.rgb = mix(fragColor.rgb, texture(envMap, R).rgb, envReflectivity);
         }
+
+        fragColor *= instanceColor;
     }
 }
 

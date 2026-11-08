@@ -290,6 +290,11 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     GLint previousViewport[4];
     glGetIntegerv(GL_VIEWPORT, previousViewport);
 
+    // The scene may be rendering into an offscreen framebuffer (post-processing),
+    // so restore that binding rather than the default framebuffer afterwards.
+    GLint previousFramebuffer = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+
     // For each shadow-casting light:
 
     for (auto &light : m_dirLights)
@@ -329,8 +334,9 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
         light->shadowMap()->unbind();
     }
 
-    // Restore viewport
+    // Restore framebuffer and viewport
 
+    glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
     glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
 
     // Restore regular shader

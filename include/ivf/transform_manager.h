@@ -327,6 +327,15 @@ public:
      * @return glm::vec3 View position.
      */
     glm::vec3 viewPos() const;
+
+    /**
+     * @brief Set the view (camera) position used for lighting, without changing the view matrix.
+     *
+     * Used by render passes that replace the view matrix directly, such as
+     * PlanarReflection. The value is uploaded on the next refreshForProgram().
+     * @param pos Camera position in world space.
+     */
+    void setViewPos(glm::vec3 pos);
 };
 
 /**

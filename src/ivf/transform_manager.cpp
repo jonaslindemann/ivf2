@@ -305,3 +305,8 @@ glm::vec3 TransformManager::viewPos() const
 {
     return m_viewPos;
 }
+
+void TransformManager::setViewPos(glm::vec3 pos)
+{
+    m_viewPos = pos;
+}

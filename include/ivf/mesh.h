@@ -83,6 +83,11 @@ private:
      */
     void setupPrim();
 
+    /**
+     * @brief Draw the mesh, instanced when @p instanceCount is greater than 0.
+     */
+    void drawImpl(GLsizei instanceCount);
+
 public:
     /**
      * @brief Constructor.
@@ -370,6 +375,21 @@ public:
      * @brief Draw the mesh using the current OpenGL state.
      */
     void draw();
+
+    /**
+     * @brief Draw @p instanceCount instances of the mesh in one draw call.
+     *
+     * Per-instance vertex attributes must be attached to the mesh's vertex
+     * array beforehand (see vertexArray() and InstancedMeshNode).
+     * @param instanceCount Number of instances to draw.
+     */
+    void drawInstanced(GLsizei instanceCount);
+
+    /**
+     * @brief Get the vertex array object of the mesh.
+     * @return Pointer to the vertex array, nullptr before the mesh is set up with end().
+     */
+    VertexArray *vertexArray();
 
     /**
      * @brief Draw the mesh using a specific OpenGL primitive type.

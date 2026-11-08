@@ -127,6 +127,28 @@ void ivfui::GLFWSceneWindow::addEffect(ivf::EffectPtr effect)
     m_postProcessor->addEffect(effect->program());
 }
 
+void ivfui::GLFWSceneWindow::addReflection(ivf::PlanarReflectionPtr reflection)
+{
+    if (reflection)
+        m_reflections.push_back(reflection);
+}
+
+void ivfui::GLFWSceneWindow::removeReflection(ivf::PlanarReflectionPtr reflection)
+{
+    std::erase(m_reflections, reflection);
+}
+
+void ivfui::GLFWSceneWindow::clearReflections()
+{
+    m_reflections.clear();
+}
+
+void ivfui::GLFWSceneWindow::renderReflections()
+{
+    for (auto &reflection : m_reflections)
+        reflection->render(m_scene);
+}
+
 // EffectListProvider interface implementation
 
 int GLFWSceneWindow::getEffectCount() const
@@ -797,6 +819,8 @@ void GLFWSceneWindow::doDraw()
 
         smApplyProgram("basic");
         LightManager::instance()->renderShadowMaps(m_scene);
+        if (!m_selectionRendering)
+            renderReflections();
         m_scene->draw();
 
         {
@@ -842,6 +866,8 @@ void GLFWSceneWindow::doDraw()
 
         smApplyProgram("basic");
         LightManager::instance()->renderShadowMaps(m_scene);
+        if (!m_selectionRendering)
+            renderReflections();
         m_scene->draw();
 
         {

@@ -13,18 +13,27 @@ layout (location = 1) in vec4 aColor;
 layout (location = 2) in vec2 aTex;
 layout (location = 3) in vec3 aNormal;
 
+// Per-instance attributes, used when useInstancing is set (see InstancedMeshNode)
+layout (location = 4) in mat4 aInstanceModel;
+layout (location = 8) in vec4 aInstanceColor;
+
 out vec3 fragPos;
 out vec3 vNormal;
 out vec2 texCoord;
+out vec4 instanceColor;
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform bool useInstancing = false;
 
 void main()
 {
-    fragPos  = vec3(model * vec4(aPos, 1.0));
-    vNormal  = mat3(model) * aNormal;
+    mat4 modelMatrix = useInstancing ? model * aInstanceModel : model;
+    instanceColor = useInstancing ? aInstanceColor : vec4(1.0);
+
+    fragPos  = vec3(modelMatrix * vec4(aPos, 1.0));
+    vNormal  = mat3(modelMatrix) * aNormal;
     texCoord = aTex;
     gl_Position = projection * view * vec4(fragPos, 1.0);
 }
@@ -43,6 +52,7 @@ out vec4 fragColor;
 in vec3 fragPos;
 in vec3 vNormal;
 in vec2 texCoord;
+in vec4 instanceColor;
 
 // ---- Light structs (identical names to basic shader so LightManager works) -
 
@@ -221,7 +231,7 @@ void main()
     }
 
     // --- Resolve material values from maps or scalars ---
-    vec4  albedo4   = useAlbedoMap    ? texture(albedoMap, texCoord)    : pbr.albedo;
+    vec4  albedo4   = (useAlbedoMap   ? texture(albedoMap, texCoord)    : pbr.albedo) * instanceColor;
     vec3  albedo    = pow(albedo4.rgb, vec3(2.2)); // gamma to linear
     float roughness = useRoughnessMap ? texture(roughnessMap, texCoord).r : pbr.roughness;
     float metallic  = useMetallicMap  ? texture(metallicMap, texCoord).r  : pbr.metallic;

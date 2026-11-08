@@ -405,6 +405,22 @@ void ivf::Mesh::updateNormals()
 
 void Mesh::draw()
 {
+    drawImpl(0);
+}
+
+void Mesh::drawInstanced(GLsizei instanceCount)
+{
+    if (instanceCount > 0)
+        drawImpl(instanceCount);
+}
+
+VertexArray *Mesh::vertexArray()
+{
+    return m_VAO.get();
+}
+
+void Mesh::drawImpl(GLsizei instanceCount)
+{
     if (m_material != nullptr)
         m_material->apply();
 
@@ -435,7 +451,15 @@ void Mesh::draw()
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-        GL_ERR(glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0));
+        // GL_ERR expands to several statements, so keep the braces
+        if (instanceCount > 0)
+        {
+            GL_ERR(glDrawElementsInstanced(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0, instanceCount));
+        }
+        else
+        {
+            GL_ERR(glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0));
+        }
     }
     else
     {
@@ -447,7 +471,14 @@ void Mesh::draw()
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
-        GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
+        if (instanceCount > 0)
+        {
+            GL_ERR(glDrawArraysInstanced(m_primType, 0, m_verts->rows(), instanceCount));
+        }
+        else
+        {
+            GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
+        }
     }
     m_VAO->unbind();
 

@@ -34,6 +34,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cmath>
+#include <cstdint>
 #include <filesystem>
 #include <mutex>
 #include <numbers>
@@ -86,6 +87,14 @@ struct ivf::AudioManagerImpl {
     bool       analysisActive{false};
     bool       analysisLoop{false};
     std::string analysisPath;
+    std::uint64_t analysisLength{0};  // in frames, 0 if unknown
+
+    // Shared with the audio thread. The decoder is only touched by the callback
+    // while the device runs, so seeks are requested here and applied there.
+    std::atomic<bool>          analysisPaused{false};
+    std::atomic<bool>          analysisAtEnd{false};
+    std::atomic<std::uint64_t> analysisCursor{0};
+    std::atomic<std::int64_t>  analysisSeekRequest{-1};
 
     AudioManagerImpl()
     {
@@ -141,6 +150,19 @@ static void analysisPlaybackCallback(ma_device* dev, void* pOutput,
     float* out = static_cast<float*>(pOutput);
     int ch = static_cast<int>(dev->playback.channels);
 
+    // Apply a seek requested by the main thread (also while paused, for scrubbing)
+    std::int64_t seek = impl->analysisSeekRequest.exchange(-1, std::memory_order_acq_rel);
+    if (seek >= 0) {
+        ma_decoder_seek_to_pcm_frame(&impl->analysisDecoder, static_cast<ma_uint64>(seek));
+        impl->analysisCursor.store(static_cast<std::uint64_t>(seek), std::memory_order_release);
+        impl->analysisAtEnd.store(false, std::memory_order_release);
+    }
+
+    if (impl->analysisPaused.load(std::memory_order_acquire)) {
+        std::fill(out, out + frameCount * ch, 0.0f);
+        return;
+    }
+
     ma_uint64 framesRead = 0;
     ma_decoder_read_pcm_frames(&impl->analysisDecoder, out, frameCount, &framesRead);
 
@@ -153,8 +175,16 @@ static void analysisPlaybackCallback(ma_device* dev, void* pOutput,
         pushSample(impl->analysisBuffer, impl->analysisPos, mono / ch);
     }
 
-    if (framesRead < frameCount && impl->analysisLoop)
-        ma_decoder_seek_to_pcm_frame(&impl->analysisDecoder, 0);
+    if (framesRead < frameCount) {
+        if (impl->analysisLoop)
+            ma_decoder_seek_to_pcm_frame(&impl->analysisDecoder, 0);
+        else
+            impl->analysisAtEnd.store(true, std::memory_order_release);
+    }
+
+    ma_uint64 cursor = 0;
+    if (ma_decoder_get_cursor_in_pcm_frames(&impl->analysisDecoder, &cursor) == MA_SUCCESS)
+        impl->analysisCursor.store(cursor, std::memory_order_release);
 }
 
 #endif // IVF_HAS_MINIAUDIO
@@ -223,6 +253,87 @@ void AudioManager::stop(int h)
 #endif
 }
 
+void AudioManager::pause(int h)
+{
+#if IVF_HAS_MINIAUDIO
+    if (h < 0 || h >= (int)m_impl->sounds.size()) return;
+    ma_sound_stop(&m_impl->sounds[h]);
+#else
+    (void)h;
+#endif
+}
+
+void AudioManager::resume(int h)
+{
+#if IVF_HAS_MINIAUDIO
+    if (h < 0 || h >= (int)m_impl->sounds.size()) return;
+    ma_sound_start(&m_impl->sounds[h]);
+#else
+    (void)h;
+#endif
+}
+
+bool AudioManager::isPlaying(int h) const
+{
+#if IVF_HAS_MINIAUDIO
+    if (h < 0 || h >= (int)m_impl->sounds.size()) return false;
+    return ma_sound_is_playing(&m_impl->sounds[h]) == MA_TRUE;
+#else
+    (void)h; return false;
+#endif
+}
+
+#if IVF_HAS_MINIAUDIO
+static ma_uint32 soundSampleRate(const ma_sound* snd)
+{
+    ma_uint32 sampleRate = 0;
+    if (ma_sound_get_data_format(snd, nullptr, nullptr, &sampleRate, nullptr, 0) != MA_SUCCESS)
+        return 0;
+    return sampleRate;
+}
+#endif
+
+double AudioManager::soundPosition(int h) const
+{
+#if IVF_HAS_MINIAUDIO
+    if (h < 0 || h >= (int)m_impl->sounds.size()) return 0.0;
+    const ma_sound* snd = &m_impl->sounds[h];
+    ma_uint32 sampleRate = soundSampleRate(snd);
+    ma_uint64 cursor = 0;
+    if (sampleRate == 0 || ma_sound_get_cursor_in_pcm_frames(snd, &cursor) != MA_SUCCESS) return 0.0;
+    return double(cursor) / sampleRate;
+#else
+    (void)h; return 0.0;
+#endif
+}
+
+double AudioManager::soundLength(int h) const
+{
+#if IVF_HAS_MINIAUDIO
+    if (h < 0 || h >= (int)m_impl->sounds.size()) return 0.0;
+    const ma_sound* snd = &m_impl->sounds[h];
+    ma_uint32 sampleRate = soundSampleRate(snd);
+    ma_uint64 length = 0;
+    if (sampleRate == 0 || ma_sound_get_length_in_pcm_frames(snd, &length) != MA_SUCCESS) return 0.0;
+    return double(length) / sampleRate;
+#else
+    (void)h; return 0.0;
+#endif
+}
+
+void AudioManager::seekSound(int h, double seconds)
+{
+#if IVF_HAS_MINIAUDIO
+    if (h < 0 || h >= (int)m_impl->sounds.size()) return;
+    ma_sound* snd = &m_impl->sounds[h];
+    ma_uint32 sampleRate = soundSampleRate(snd);
+    if (sampleRate == 0) return;
+    ma_sound_seek_to_pcm_frame(snd, static_cast<ma_uint64>(std::llround(std::max(0.0, seconds) * sampleRate)));
+#else
+    (void)h; (void)seconds;
+#endif
+}
+
 void AudioManager::setVolume(int h, float v)
 {
 #if IVF_HAS_MINIAUDIO
@@ -279,6 +390,14 @@ bool AudioManager::startFileAnalysis(std::string_view path, bool loop)
         return false;
     }
 
+    ma_uint64 length = 0;
+    m_impl->analysisLength = ma_decoder_get_length_in_pcm_frames(&m_impl->analysisDecoder, &length) == MA_SUCCESS
+        ? length : 0;
+    m_impl->analysisPaused.store(false, std::memory_order_relaxed);
+    m_impl->analysisAtEnd.store(false, std::memory_order_relaxed);
+    m_impl->analysisCursor.store(0, std::memory_order_relaxed);
+    m_impl->analysisSeekRequest.store(-1, std::memory_order_relaxed);
+
     ma_uint32 ch = m_impl->analysisDecoder.outputChannels;
     if (ch == 0) ch = 2;
 
@@ -322,6 +441,75 @@ void AudioManager::stopFileAnalysis()
 }
 
 bool AudioManager::fileAnalysisRunning() const { return m_impl->analysisActive; }
+
+void AudioManager::pauseFileAnalysis()
+{
+#if IVF_HAS_MINIAUDIO
+    m_impl->analysisPaused.store(true, std::memory_order_release);
+#endif
+}
+
+void AudioManager::resumeFileAnalysis()
+{
+#if IVF_HAS_MINIAUDIO
+    m_impl->analysisPaused.store(false, std::memory_order_release);
+#endif
+}
+
+bool AudioManager::fileAnalysisPaused() const
+{
+#if IVF_HAS_MINIAUDIO
+    return m_impl->analysisActive && m_impl->analysisPaused.load(std::memory_order_acquire);
+#else
+    return false;
+#endif
+}
+
+double AudioManager::fileAnalysisPosition() const
+{
+#if IVF_HAS_MINIAUDIO
+    if (!m_impl->analysisActive) return 0.0;
+    std::int64_t pending = m_impl->analysisSeekRequest.load(std::memory_order_acquire);
+    std::uint64_t frames = pending >= 0
+        ? static_cast<std::uint64_t>(pending)
+        : m_impl->analysisCursor.load(std::memory_order_acquire);
+    return double(frames) / ANALYSIS_SAMPLE_RATE;
+#else
+    return 0.0;
+#endif
+}
+
+double AudioManager::fileAnalysisLength() const
+{
+#if IVF_HAS_MINIAUDIO
+    if (!m_impl->analysisActive) return 0.0;
+    return double(m_impl->analysisLength) / ANALYSIS_SAMPLE_RATE;
+#else
+    return 0.0;
+#endif
+}
+
+void AudioManager::seekFileAnalysis(double seconds)
+{
+#if IVF_HAS_MINIAUDIO
+    if (!m_impl->analysisActive) return;
+    double frames = std::max(0.0, seconds) * ANALYSIS_SAMPLE_RATE;
+    if (m_impl->analysisLength > 0)
+        frames = std::min(frames, double(m_impl->analysisLength));
+    m_impl->analysisSeekRequest.store(std::llround(frames), std::memory_order_release);
+#else
+    (void)seconds;
+#endif
+}
+
+bool AudioManager::fileAnalysisAtEnd() const
+{
+#if IVF_HAS_MINIAUDIO
+    return m_impl->analysisActive && m_impl->analysisAtEnd.load(std::memory_order_acquire);
+#else
+    return false;
+#endif
+}
 
 std::string AudioManager::lastError() const { return m_impl->lastError; }
 

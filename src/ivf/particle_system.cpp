@@ -209,36 +209,36 @@ glm::vec3 ParticleSystem::randVec3(glm::vec3 lo, glm::vec3 hi)
 
 void ParticleSystem::spawnParticle()
 {
-    // Find a dead slot
-    for (auto& p : m_pool) {
-        if (p.alive) continue;
+    // Alive particles are kept compacted in [0, m_aliveCount); a new particle simply
+    // appends at the frontier. When the pool is full the spawn is dropped.
+    if (m_aliveCount >= m_maxParticles) return;
 
-        glm::vec3 spawnPos{0,0,0};
-        if (m_emitShape == 0) {
-            spawnPos = m_emitCenter;
-        } else if (m_emitShape == 1) {
-            // Random point inside sphere
-            float theta = randRange(0, glm::two_pi<float>());
-            float phi   = randRange(0, glm::pi<float>());
-            float r     = m_emitRadius * std::cbrt(randRange(0,1));
-            spawnPos = m_emitCenter + glm::vec3(
-                r * std::sin(phi) * std::cos(theta),
-                r * std::cos(phi),
-                r * std::sin(phi) * std::sin(theta));
-        } else {
-            spawnPos = randVec3(m_emitBoxMin, m_emitBoxMax);
-        }
+    Particle& p = m_pool[static_cast<size_t>(m_aliveCount)];
 
-        p.position = spawnPos;
-        p.velocity = randVec3(m_minVel, m_maxVel);
-        p.maxLife  = randRange(m_minLife, m_maxLife);
-        p.life     = p.maxLife;
-        p.color    = m_startColor;
-        p.size     = m_startSize;
-        p.alive    = true;
-        ++m_aliveCount;
-        return;
+    glm::vec3 spawnPos{0,0,0};
+    if (m_emitShape == 0) {
+        spawnPos = m_emitCenter;
+    } else if (m_emitShape == 1) {
+        // Random point inside sphere
+        float theta = randRange(0, glm::two_pi<float>());
+        float phi   = randRange(0, glm::pi<float>());
+        float r     = m_emitRadius * std::cbrt(randRange(0,1));
+        spawnPos = m_emitCenter + glm::vec3(
+            r * std::sin(phi) * std::cos(theta),
+            r * std::cos(phi),
+            r * std::sin(phi) * std::sin(theta));
+    } else {
+        spawnPos = randVec3(m_emitBoxMin, m_emitBoxMax);
     }
+
+    p.position = spawnPos;
+    p.velocity = randVec3(m_minVel, m_maxVel);
+    p.maxLife  = randRange(m_minLife, m_maxLife);
+    p.life     = p.maxLife;
+    p.color    = m_startColor;
+    p.size     = m_startSize;
+    p.alive    = true;
+    ++m_aliveCount;
 }
 
 // ---- Emit / Update / Draw --------------------------------------------------
@@ -259,31 +259,33 @@ void ParticleSystem::update(float dt)
         }
     }
 
-    m_aliveCount = 0;
-    for (auto& p : m_pool) {
-        if (!p.alive) continue;
+    // Advance only the live particles, kept compacted in [0, m_aliveCount). When one
+    // expires it is swap-removed with the last live particle and slot i is reprocessed,
+    // so the pool stays packed and per-frame cost tracks the live count, not the capacity.
+    int i = 0;
+    while (i < m_aliveCount) {
+        Particle& p = m_pool[static_cast<size_t>(i)];
         p.life -= dt;
-        bool expired = p.life <= 0.0f;
 
-        if (!expired) {
-            if (m_updateFn) {
-                m_updateFn(p, dt);
-            } else {
-                p.velocity += m_gravity * dt;
-                p.position += p.velocity * dt;
-            }
+        if (p.life <= 0.0f) {
+            p.alive = false;
+            --m_aliveCount;
+            if (i != m_aliveCount)
+                m_pool[static_cast<size_t>(i)] = m_pool[static_cast<size_t>(m_aliveCount)];
+            continue; // reprocess the particle swapped into slot i
+        }
+
+        if (m_updateFn) {
+            m_updateFn(p, dt);
+        } else {
+            p.velocity += m_gravity * dt;
+            p.position += p.velocity * dt;
         }
 
         float t = glm::clamp(1.0f - p.life / p.maxLife, 0.0f, 1.0f);
         p.color = glm::mix(m_startColor, m_endColor, t);
         p.size  = glm::mix(m_startSize,  m_endSize,  t);
-
-        if (expired) {
-            p.alive = false;
-            continue;
-        }
-
-        ++m_aliveCount;
+        ++i;
     }
 }
 
@@ -302,12 +304,11 @@ void ParticleSystem::doDraw()
 
     if (m_aliveCount == 0) return;
 
-    // Pack instance data
-    int idx = 0;
-    for (const auto& p : m_pool) {
-        if (!p.alive) continue;
-        m_instanceData[idx++] = { p.position, p.size, p.color };
-        if (idx >= m_maxParticles) break;
+    // Live particles are already compacted in [0, m_aliveCount), so copy them straight across.
+    const int idx = m_aliveCount;
+    for (int i = 0; i < idx; ++i) {
+        const Particle& p = m_pool[static_cast<size_t>(i)];
+        m_instanceData[static_cast<size_t>(i)] = { p.position, p.size, p.color };
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_instanceVBO);

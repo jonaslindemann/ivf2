@@ -1,0 +1,1 @@
+add_ivf2_example(shader_material1 SOURCES shader_material1.cpp)

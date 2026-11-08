@@ -137,6 +137,7 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
     m_fragCompileErrors = !fragmentShader->compile();
 
     auto program = std::make_shared<Program>();
+    program->setName(name);
     program->addShader(vertexShader);
     program->addShader(fragmentShader);
 
@@ -147,7 +148,8 @@ std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string v
     program->bindAttribLoc(2, "aTex");
     program->bindAttribLoc(3, "aNormal");
 
-    program->use();
+    if (makeCurrent)
+        program->use();
 
     auto it = m_programs.find(name);
 
@@ -294,6 +296,16 @@ bool ivf::ShaderManager::setCurrentProgram(const std::string name)
     {
         return false;
     }
+}
+
+bool ivf::ShaderManager::setCurrentProgram(ProgramPtr program)
+{
+    if (!program)
+        return false;
+
+    m_currentProgram = program;
+    m_currentProgram->use();
+    return true;
 }
 
 ProgramPtr ivf::ShaderManager::program(const std::string name)

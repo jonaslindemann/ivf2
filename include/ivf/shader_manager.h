@@ -125,6 +125,15 @@ public:
     bool setCurrentProgram(const std::string name);
 
     /**
+     * @brief Set the current shader program directly.
+     *
+     * The program does not need to be registered with the manager.
+     * @param program Program to make current.
+     * @return bool True if the program was non-null and set.
+     */
+    bool setCurrentProgram(ProgramPtr program);
+
+    /**
      * @brief Get a shader program by name.
      * @param name Name of the program.
      * @return ProgramPtr Shared pointer to the program.

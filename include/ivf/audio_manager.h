@@ -25,9 +25,17 @@
  * AudioManager::instance()->update();
  * float amp = AudioManager::instance()->getAmplitude();
  * auto fft = AudioManager::instance()->getFFT(16);
+ *
+ * // Music with transport control (e.g. a timeline driven by the song):
+ * audio->startFileAnalysis("music/song.mp3", false);
+ * audio->seekFileAnalysis(42.0);
+ * double t = audio->fileAnalysisPosition();
+ * audio->pauseFileAnalysis();
+ * audio->resumeFileAnalysis();
  * @endcode
  */
 
+#include <string>
 #include <string_view>
 #include <vector>
 #include <memory>
@@ -95,6 +103,47 @@ public:
     void stop(int handle);
 
     /**
+     * @brief Pause a playing sound, keeping its playback position.
+     * @param handle Sound handle.
+     */
+    void pause(int handle);
+
+    /**
+     * @brief Resume a paused sound from its current position.
+     *
+     * Unlike play(), this does not rewind to the start.
+     * @param handle Sound handle.
+     */
+    void resume(int handle);
+
+    /**
+     * @brief Check whether a sound is currently playing.
+     * @param handle Sound handle.
+     */
+    bool isPlaying(int handle) const;
+
+    /**
+     * @brief Get the playback position of a sound.
+     * @param handle Sound handle.
+     * @return Position in seconds, 0 for an invalid handle.
+     */
+    double soundPosition(int handle) const;
+
+    /**
+     * @brief Get the length of a sound.
+     * @param handle Sound handle.
+     * @return Length in seconds, 0 if unknown (e.g. still loading asynchronously).
+     */
+    double soundLength(int handle) const;
+
+    /**
+     * @brief Move the playback position of a sound.
+     * @param handle  Sound handle.
+     * @param seconds New position in seconds.
+     */
+    void seekSound(int handle, double seconds);
+
+    /**
      * @brief Set the volume of a sound.
      * @param handle Sound handle.
      * @param volume Volume in the range [0, 1].
@@ -135,6 +184,54 @@ public:
     bool fileAnalysisRunning() const;
 
     /**
+     * @brief Pause file playback. The device keeps running and outputs silence,
+     * so resuming is immediate.
+     */
+    void pauseFileAnalysis();
+
+    /**
+     * @brief Resume paused file playback from its current position.
+     */
+    void resumeFileAnalysis();
+
+    /**
+     * @brief Check whether file playback is paused.
+     */
+    bool fileAnalysisPaused() const;
+
+    /**
+     * @brief Get the playback position of the analysed file.
+     *
+     * The position is the decoder cursor, updated once per audio callback
+     * (typically every ~10 ms), and runs slightly ahead of what is heard by the
+     * device latency. For smooth visual sync, interpolate between updates.
+     *
+     * @return Position in seconds, 0 if no file is playing.
+     */
+    double fileAnalysisPosition() const;
+
+    /**
+     * @brief Get the length of the analysed file.
+     * @return Length in seconds, 0 if no file is playing or the length is unknown.
+     */
+    double fileAnalysisLength() const;
+
+    /**
+     * @brief Move the playback position of the analysed file.
+     *
+     * The seek is applied by the audio thread on its next callback; until then
+     * fileAnalysisPosition() reports the requested position.
+     *
+     * @param seconds New position in seconds, clamped to the file length.
+     */
+    void seekFileAnalysis(double seconds);
+
+    /**
+     * @brief Check whether a non-looping file has played to the end.
+     */
+    bool fileAnalysisAtEnd() const;
+
+    /**
      * @brief Return a human-readable description of the last error from
      * startFileAnalysis() or startCapture().
      */
@@ -160,15 +257,16 @@ public:
     float getAmplitude();
 
     /**
-     * @brief Compute crude band-energy "FFT" from the capture buffer.
+     * @brief Compute a frequency spectrum of the most recent analysis samples.
      *
-     * Splits the capture ring-buffer into @p bands equal-width segments and
-     * returns the RMS energy of each segment. This is not a true FFT but gives
-     * a frequency-band breakdown adequate for audio-reactive visuals without
+     * Applies a Hann window to the last 2048 samples and evaluates a DFT at
+     * @p bands logarithmically spaced frequencies between 40 Hz and 16 kHz.
+     * Each band is a single-frequency magnitude rather than the energy of a
+     * frequency range, which is adequate for audio-reactive visuals without
      * requiring an FFT library.
      *
-     * @param bands Number of frequency bands (1–256).
-     * @return Vector of @p bands energy values in [0, 1].
+     * @param bands Number of frequency bands (1–64).
+     * @return Vector of @p bands magnitudes.
      */
     std::vector<float> getFFT(int bands = 32);
 

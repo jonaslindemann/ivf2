@@ -232,6 +232,20 @@ public:
     bool fileAnalysisAtEnd() const;
 
     /**
+     * @brief Set the output volume of the analysed file.
+     *
+     * Only affects what is heard; analysis (getAmplitude(), getFFT()) uses the
+     * unscaled signal. The volume is kept when a new file is started.
+     * @param volume Volume in [0, 1].
+     */
+    void setFileAnalysisVolume(float volume);
+
+    /**
+     * @brief Get the output volume of the analysed file.
+     */
+    float fileAnalysisVolume() const;
+
+    /**
      * @brief Return a human-readable description of the last error from
      * startFileAnalysis() or startCapture().
      */

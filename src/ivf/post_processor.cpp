@@ -6,6 +6,9 @@
 #include <ivf/stock_shaders.h>
 #include <ivf/shader_manager.h>
 
+#include <algorithm>
+#include <cmath>
+
 namespace ivf {
 
 PostProcessor::PostProcessor(int width, int height)
@@ -209,6 +212,16 @@ void PostProcessor::apply(GLuint inputTexture)
         // Bind source texture and set uniforms
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, sourceTexture);
+
+        // Effects that declare "screenTextureLevels" (e.g. wide glows) can sample
+        // blurred versions of their input with textureLod(); build the mip chain for them
+        if (GLint levelsLoc = active[i]->uniformLoc("screenTextureLevels"); levelsLoc >= 0)
+        {
+            glGenerateMipmap(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            const int levels = 1 + int(std::floor(std::log2(double(std::max(m_width, m_height)))));
+            active[i]->uniformInt(levelsLoc, levels);
+        }
 
         active[i]->uniformInt("screenTexture", 0);
         active[i]->uniformInt("previousFrame", 1);

@@ -88,6 +88,7 @@ struct ivf::AudioManagerImpl {
     bool       analysisLoop{false};
     std::string analysisPath;
     std::uint64_t analysisLength{0};  // in frames, 0 if unknown
+    std::atomic<float> analysisVolume{1.0f};
 
     // Shared with the audio thread. The decoder is only touched by the callback
     // while the device runs, so seeks are requested here and applied there.
@@ -174,6 +175,12 @@ static void analysisPlaybackCallback(ma_device* dev, void* pOutput,
         for (int c = 0; c < ch; ++c) mono += out[f * ch + c];
         pushSample(impl->analysisBuffer, impl->analysisPos, mono / ch);
     }
+
+    // Output volume is applied after analysis, so muting does not affect the analysis
+    const float volume = impl->analysisVolume.load(std::memory_order_relaxed);
+    if (volume != 1.0f)
+        for (ma_uint64 i = 0; i < framesRead * ch; ++i)
+            out[i] *= volume;
 
     if (framesRead < frameCount) {
         if (impl->analysisLoop)
@@ -499,6 +506,24 @@ void AudioManager::seekFileAnalysis(double seconds)
     m_impl->analysisSeekRequest.store(std::llround(frames), std::memory_order_release);
 #else
     (void)seconds;
+#endif
+}
+
+void AudioManager::setFileAnalysisVolume(float volume)
+{
+#if IVF_HAS_MINIAUDIO
+    m_impl->analysisVolume.store(std::clamp(volume, 0.0f, 1.0f), std::memory_order_relaxed);
+#else
+    (void)volume;
+#endif
+}
+
+float AudioManager::fileAnalysisVolume() const
+{
+#if IVF_HAS_MINIAUDIO
+    return m_impl->analysisVolume.load(std::memory_order_relaxed);
+#else
+    return 0.0f;
 #endif
 }
 

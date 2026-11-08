@@ -122,6 +122,11 @@ public:
 
     /**
      * @brief Apply all post-processing effects to the given texture.
+     *
+     * Every effect receives `screenTexture` (unit 0), `previousFrame` (unit 1),
+     * `depthTexture` (unit 2), `invProjection`, `invView` and `time`. An effect
+     * that declares `uniform int screenTextureLevels` also gets a mip chain of
+     * its input, for wide blurs with textureLod().
      * @param texture OpenGL texture ID to process.
      */
     void apply(GLuint texture);

@@ -86,6 +86,26 @@ float FogEffect::skyAmount() const
     return m_skyAmount;
 }
 
+void FogEffect::setGroundBelowHorizon(bool enabled)
+{
+    m_groundBelowHorizon = enabled;
+}
+
+bool FogEffect::groundBelowHorizon() const
+{
+    return m_groundBelowHorizon;
+}
+
+void FogEffect::setHorizonBlend(float blend)
+{
+    m_horizonBlend = std::clamp(blend, 0.0f, 1.0f);
+}
+
+float FogEffect::horizonBlend() const
+{
+    return m_horizonBlend;
+}
+
 void FogEffect::doLoad()
 {
     m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, ivf::fog_frag_shader_source,
@@ -101,6 +121,8 @@ void FogEffect::doUpdateParams()
     m_program->uniformFloat("fogBaseHeight", m_baseHeight);
     m_program->uniformFloat("fogMaxOpacity", m_maxOpacity);
     m_program->uniformFloat("fogSkyAmount", m_skyAmount);
+    m_program->uniformBool("fogGroundBelowHorizon", m_groundBelowHorizon);
+    m_program->uniformFloat("fogHorizonBlend", m_horizonBlend);
 }
 
 void FogEffect::setupProperties()
@@ -112,4 +134,6 @@ void FogEffect::setupProperties()
     addProperty("Base height", &m_baseHeight, -20.0, 20.0, "Fog");
     addProperty("Max opacity", &m_maxOpacity, 0.0, 1.0, "Fog");
     addProperty("Sky amount", &m_skyAmount, 0.0, 1.0, "Fog");
+    addProperty("Ground below horizon", &m_groundBelowHorizon, "Fog");
+    addProperty("Horizon blend", &m_horizonBlend, 0.0, 0.5, "Fog");
 }

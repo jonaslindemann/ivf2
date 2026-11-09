@@ -15,6 +15,11 @@ namespace ivf {
  * right with the camera inside the fog layer.
  *
  * Pixels where nothing was drawn (the background) receive skyAmount() of fog.
+ * With setGroundBelowHorizon(true), background below the horizon is fogged as
+ * the base plane instead (ground or water beyond the far plane), so the fog
+ * there matches the distant ground, also over transparent geometry such as
+ * additive particles. setHorizonBlend() then fades from the ground fog into the
+ * sky's over a band above the horizon, instead of switching at the horizon.
  * Because fog is applied in the effect chain, put it before effects such as
  * bloom or vignette.
  *
@@ -36,6 +41,8 @@ private:
     float m_baseHeight{0.0f};            ///< World height where the fog is densest.
     float m_maxOpacity{1.0f};            ///< Upper limit of the fog amount [0, 1].
     float m_skyAmount{1.0f};             ///< Fog amount applied to the background [0, 1].
+    bool m_groundBelowHorizon{false};    ///< Fog the background below the horizon as the base plane.
+    float m_horizonBlend{0.0f};          ///< Height of the band above the horizon (sine of the angle) over which ground fog blends into sky fog.
 
 public:
     FogEffect();
@@ -62,6 +69,12 @@ public:
 
     void setSkyAmount(float amount);
     float skyAmount() const;
+
+    void setGroundBelowHorizon(bool enabled);
+    bool groundBelowHorizon() const;
+
+    void setHorizonBlend(float blend);
+    float horizonBlend() const;
 
 protected:
     virtual void doLoad();

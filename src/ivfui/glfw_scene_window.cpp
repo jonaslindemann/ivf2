@@ -1214,6 +1214,9 @@ void ivfui::GLFWSceneWindow::doMouseButton(int button, int action, int mods)
             }
         }
     }
+
+    // Drag tracking, double clicks and the onMouseButton()/onMouseDrag() callbacks
+    GLFWWindow::doMouseButton(button, action, mods);
 }
 
 void ivfui::GLFWSceneWindow::onBoxSelect(std::vector<ivf::Node*> /*nodes*/)

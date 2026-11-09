@@ -629,6 +629,8 @@ uniform float fogHeightFalloff;
 uniform float fogBaseHeight;
 uniform float fogMaxOpacity;
 uniform float fogSkyAmount;
+uniform bool fogGroundBelowHorizon;
+uniform float fogHorizonBlend;
 
 // Average of exp(-k * h) along a ray from height h0 to h1 (heights relative to
 // the fog base, clamped so fog below the base has uniform density).
@@ -642,28 +644,48 @@ float heightTerm(float h0, float h1, float k)
     return (exp(-k * h0) - exp(-k * h1)) / (k * dh);
 }
 
+// Fog amount between the camera and a world position
+float fogAmount(vec3 cameraPos, vec3 worldPos)
+{
+    float dist = max(length(worldPos - cameraPos) - fogStart, 0.0);
+    float opticalDepth = fogDensity * dist;
+    if (fogHeightFalloff > 0.0)
+        opticalDepth *= heightTerm(cameraPos.y - fogBaseHeight, worldPos.y - fogBaseHeight, fogHeightFalloff);
+    return 1.0 - exp(-opticalDepth);
+}
+
 void main()
 {
     vec4 scene = texture(screenTexture, TexCoords);
     float depth = texture(depthTexture, TexCoords).r;
 
+    vec3 cameraPos = invView[3].xyz;
+
     float fog;
     if (depth >= 1.0) {
         // Background: nothing was drawn here
         fog = fogSkyAmount;
+        if (fogGroundBelowHorizon) {
+            // Below the horizon the background stands for ground beyond the far plane:
+            // fog it as the base plane where the view ray meets it
+            vec4 farPos = invProjection * vec4(TexCoords * 2.0 - 1.0, 1.0, 1.0);
+            vec3 dir = normalize(mat3(invView) * (farPos.xyz / farPos.w));
+            float above = cameraPos.y - fogBaseHeight;
+            if (above > 0.0) {
+                // Just above the horizon, continue with the ground fog at the horizon and
+                // blend it into the sky's over fogHorizonBlend, so the sky (and anything
+                // drawn over it) sinks into the mist instead of ending at a hard line
+                float down = max(-dir.y, 1e-4);
+                float ground = fogAmount(cameraPos, cameraPos + vec3(dir.x, -down, dir.z) * (above / down));
+                float sky = fogHorizonBlend > 0.0 ? smoothstep(0.0, fogHorizonBlend, dir.y) : step(0.0, dir.y);
+                fog = mix(ground, fogSkyAmount, sky);
+            }
+        }
     } else {
         vec4 ndc = vec4(TexCoords * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
         vec4 viewPos = invProjection * ndc;
         viewPos /= viewPos.w;
-        vec3 worldPos = (invView * vec4(viewPos.xyz, 1.0)).xyz;
-        vec3 cameraPos = invView[3].xyz;
-
-        float dist = max(length(viewPos.xyz) - fogStart, 0.0);
-        float opticalDepth = fogDensity * dist;
-        if (fogHeightFalloff > 0.0)
-            opticalDepth *= heightTerm(cameraPos.y - fogBaseHeight, worldPos.y - fogBaseHeight, fogHeightFalloff);
-
-        fog = 1.0 - exp(-opticalDepth);
+        fog = fogAmount(cameraPos, (invView * vec4(viewPos.xyz, 1.0)).xyz);
     }
 
     fog = clamp(fog, 0.0, fogMaxOpacity);

@@ -43,6 +43,7 @@ private:
     glm::vec3 m_normal;
     float m_resolutionScale{0.5f};
     float m_clipOffset{0.02f};
+    int m_samples{4};
     bool m_enabled{true};
 
     std::shared_ptr<FrameBuffer> m_frameBuffer;
@@ -84,6 +85,15 @@ public:
      */
     void setClipOffset(float offset);
     [[nodiscard]] float clipOffset() const;
+
+    /**
+     * @brief Set the number of multisampling samples of the reflection (default 4, 0 = off).
+     *
+     * Anti-aliasing matters more here than on screen, because the reflection is
+     * rendered at reduced resolution and magnified.
+     */
+    void setSamples(int samples);
+    [[nodiscard]] int samples() const;
 
     void setEnabled(bool enabled);
     [[nodiscard]] bool enabled() const;

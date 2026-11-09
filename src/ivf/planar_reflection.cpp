@@ -82,6 +82,20 @@ float PlanarReflection::clipOffset() const
     return m_clipOffset;
 }
 
+void PlanarReflection::setSamples(int samples)
+{
+    samples = std::max(samples, 0);
+    if (samples == m_samples)
+        return;
+    m_samples = samples;
+    m_frameBuffer.reset(); // recreated with the new setting on the next render()
+}
+
+int PlanarReflection::samples() const
+{
+    return m_samples;
+}
+
 void PlanarReflection::setEnabled(bool enabled)
 {
     m_enabled = enabled;
@@ -137,7 +151,15 @@ void PlanarReflection::render(CompositeNodePtr scene)
     if (!m_frameBuffer)
     {
         m_frameBuffer = FrameBuffer::create(width, height);
-        m_frameBuffer->initialize();
+        if (m_samples > 0)
+        {
+            m_frameBuffer->setSamples(m_samples);
+            m_frameBuffer->setMultisample(true);
+        }
+        else
+        {
+            m_frameBuffer->initialize();
+        }
     }
     else if (width != m_width || height != m_height)
     {
@@ -189,6 +211,7 @@ void PlanarReflection::render(CompositeNodePtr scene)
     for (auto &[node, wasVisible] : hidden)
         node->setVisible(wasVisible);
 
+    m_frameBuffer->end(); // resolves the multisampled buffer into the texture
     glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
     glViewport(previousViewport[0], previousViewport[1], previousViewport[2], previousViewport[3]);
 }

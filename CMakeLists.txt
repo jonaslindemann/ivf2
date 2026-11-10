@@ -9,14 +9,27 @@ if(DEFINED CMAKE_TOOLCHAIN_FILE)
         set(_VS_VCPKG_DETECTED TRUE)
         message(STATUS "Visual Studio bundled vcpkg detected, checking for local installations...")
     endif()
-endif() 
+endif()
+
+# Visual Studio developer shells set VCPKG_ROOT to the bundled vcpkg, which has no
+# ports tree and requires a manifest baseline. Treat it like the bundled toolchain
+# and only fall back to it when no standalone installation is found.
+set(_VCPKG_ROOT_IS_VS FALSE)
+if(DEFINED ENV{VCPKG_ROOT})
+    file(TO_CMAKE_PATH "$ENV{VCPKG_ROOT}" _ENV_VCPKG_ROOT)
+    string(FIND "${_ENV_VCPKG_ROOT}" "Microsoft Visual Studio" _VCPKG_ROOT_VS_POS)
+    if(NOT _VCPKG_ROOT_VS_POS EQUAL -1)
+        set(_VCPKG_ROOT_IS_VS TRUE)
+        message(STATUS "VCPKG_ROOT points to Visual Studio bundled vcpkg, checking for local installations...")
+    endif()
+endif()
 
 if(NOT DEFINED CMAKE_TOOLCHAIN_FILE OR _VS_VCPKG_DETECTED)
-    # Check for VCPKG_ROOT environment variable first
-    if(DEFINED ENV{VCPKG_ROOT})
-        set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" 
+    # Check for VCPKG_ROOT environment variable first (unless it is the VS bundled vcpkg)
+    if(DEFINED ENV{VCPKG_ROOT} AND NOT _VCPKG_ROOT_IS_VS)
+        set(CMAKE_TOOLCHAIN_FILE "${_ENV_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
             CACHE STRING "Vcpkg toolchain file" FORCE)
-        message(STATUS "Using vcpkg from VCPKG_ROOT: $ENV{VCPKG_ROOT}")
+        message(STATUS "Using vcpkg from VCPKG_ROOT: ${_ENV_VCPKG_ROOT}")
     # Try common vcpkg installation locations
     elseif(WIN32)
         if(EXISTS "c:/vcpkg/scripts/buildsystems/vcpkg.cmake")
@@ -29,6 +42,10 @@ if(NOT DEFINED CMAKE_TOOLCHAIN_FILE OR _VS_VCPKG_DETECTED)
             message(STATUS "Found and using vcpkg at: e:/vcpkg")
         elseif(_VS_VCPKG_DETECTED)
             message(STATUS "No local vcpkg found, using Visual Studio bundled vcpkg: ${CMAKE_TOOLCHAIN_FILE}")
+        elseif(_VCPKG_ROOT_IS_VS)
+            set(CMAKE_TOOLCHAIN_FILE "${_ENV_VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+                CACHE STRING "Vcpkg toolchain file" FORCE)
+            message(STATUS "No local vcpkg found, using Visual Studio bundled vcpkg: ${_ENV_VCPKG_ROOT}")
         endif()
     elseif(UNIX AND NOT APPLE)
         if(EXISTS "$ENV{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake")

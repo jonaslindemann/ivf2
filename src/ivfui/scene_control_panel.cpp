@@ -95,6 +95,8 @@ void SceneControlPanel::doDraw()
     ImGui::Text("Ivf2 Version %s", ivf::version_string);
     ImGui::Text("Build date - %s", ivf::version_date);
     ImGui::Text("FPS: %.1f", ImGui::GetIO().Framerate);
+    if (double gpu = m_sceneWindow->gpuFrameTime(); gpu > 0.0)
+        ImGui::Text("GPU: %.2f ms (max %.1f FPS)", gpu * 1000.0, 1.0 / gpu);
 }
 
 bool ivfui::SceneControlPanel::isDirty()

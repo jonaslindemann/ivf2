@@ -26,9 +26,9 @@ PostProcessor::~PostProcessor()
     glDeleteTextures(2, m_historyTex);
 }
 
-void PostProcessor::addEffect(ProgramPtr fxProgram)
+void PostProcessor::addEffect(ProgramPtr fxProgram, ProgramPtr prePass)
 {
-    m_fxPrograms.push_back(fxProgram);
+    m_fxPrograms.push_back({fxProgram, prePass});
 }
 
 void PostProcessor::clearEffects()
@@ -150,12 +150,18 @@ void PostProcessor::apply(GLuint inputTexture)
 {
     // Only enabled effects participate in the chain. A disabled effect is skipped
     // entirely (Program::use() is a no-op when disabled, so drawing it would re-run
-    // the previously bound shader and apply effects multiple times).
+    // the previously bound shader and apply effects multiple times). An effect's
+    // pre-pass runs as a separate pass right before it.
     std::vector<ProgramPtr> active;
     active.reserve(m_fxPrograms.size());
-    for (auto &program : m_fxPrograms)
-        if (program && program->enabled())
-            active.push_back(program);
+    for (auto &fx : m_fxPrograms)
+    {
+        if (!fx.program || !fx.program->enabled())
+            continue;
+        if (fx.prePass)
+            active.push_back(fx.prePass);
+        active.push_back(fx.program);
+    }
 
     // Nothing enabled: the scene was already drawn to the screen by the caller.
     if (active.empty())

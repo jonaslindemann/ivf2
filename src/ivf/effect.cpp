@@ -73,3 +73,8 @@ ProgramPtr ivf::Effect::program()
 {
     return m_program;
 }
+
+ProgramPtr ivf::Effect::prePassProgram()
+{
+    return m_prePassProgram;
+}

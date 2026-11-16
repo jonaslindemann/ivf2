@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <vector>
+#include <utility>
 
 #include "Axis.hpp"
 #include "MeshVertex.hpp"
@@ -67,7 +68,7 @@ public:
 
 		const LatheMesh* mesh_;
 
-		decltype(mesh_->shape_.edges()) shape_Edges;
+		decltype(std::declval<const Shape&>().edges()) shape_Edges;
 
 		int i_;
 
@@ -121,7 +122,7 @@ public:
 
 		const LatheMesh* mesh_;
 
-		decltype(mesh_->shape_.vertices()) shapeVertices_;
+		decltype(std::declval<const Shape&>().vertices()) shapeVertices_;
 
 		int i_;
 

@@ -97,8 +97,20 @@ public:
      */
     ProgramPtr program();
 
+    /**
+     * @brief Get the optional program run just before program() in the effect chain.
+     *
+     * Lets an effect prepare per-pixel data once (e.g. distances from the depth
+     * buffer) that its main pass then samples many times. The pre-pass receives
+     * the same standard uniforms as any effect (screenTexture, depthTexture,
+     * invProjection, ...) but not the effect's own parameters.
+     * @return ProgramPtr Pre-pass program, or nullptr if the effect has none.
+     */
+    ProgramPtr prePassProgram();
+
 protected:
-    ProgramPtr m_program; ///< Shader program used by the effect.
+    ProgramPtr m_program;        ///< Shader program used by the effect.
+    ProgramPtr m_prePassProgram; ///< Optional pre-pass program, see prePassProgram().
 
     /**
      * @brief Load effect-specific resources (to be overridden by derived classes).

@@ -71,6 +71,14 @@ private:
     int m_lastClickButton;      ///< Button code of the most recent click.
     static constexpr double k_doubleClickInterval = 0.3; ///< Max seconds between two clicks.
 
+    // GPU frame timing (GL_TIME_ELAPSED queries, read back a few frames later)
+    static constexpr int k_gpuQueryCount = 4;
+    unsigned int m_gpuQueries[k_gpuQueryCount]{}; ///< Query objects, created on first draw.
+    bool m_gpuQueryPending[k_gpuQueryCount]{};   ///< Query issued but its result not yet read.
+    int m_gpuQueryIndex{0};                       ///< Query used for the current frame.
+    bool m_gpuTimerRunning{false};                ///< A query was started this frame.
+    double m_gpuFrameTime{0.0};                   ///< Smoothed GPU time per frame in seconds.
+
     // Simulation time
     double m_simTime{0.0};       ///< Time of the current frame, see elapsedTime().
     double m_timeOffset{0.0};    ///< glfwGetTime() minus simulation time in real-time mode.
@@ -98,6 +106,9 @@ private:
     std::vector<unsigned char> readFramePixels(int &width, int &height);
     void captureFrames(bool uiDrawn);
     void finishExport();
+
+    void beginGpuTimer();
+    void endGpuTimer();
 
 public:
     /**
@@ -306,6 +317,17 @@ public:
      * @return double Frame time.
      */
     double frameTime() const;
+
+    /**
+     * @brief Get the GPU time spent rendering a frame (seconds).
+     *
+     * Measured with timer queries around scene and UI rendering and smoothed
+     * over recent frames. Results lag a few frames behind so reading them never
+     * stalls the CPU. Unlike frameTime(), this shows when the GPU is the
+     * bottleneck even if the CPU loop still runs at the display refresh rate.
+     * @return double GPU frame time, 0 until the first result is available.
+     */
+    double gpuFrameTime() const;
 
     /**
      * @brief Get the number of frames rendered.

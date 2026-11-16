@@ -7,6 +7,8 @@
 #ifndef GENERATOR_EXTRUDEMESH_HPP
 #define GENERATOR_EXTRUDEMESH_HPP
 
+#include <utility>
+
 #include "MeshVertex.hpp"
 #include "PathVertex.hpp"
 #include "ShapeVertex.hpp"
@@ -73,9 +75,9 @@ public:
 
 		const ExtrudeMesh* mesh_;
 
-		decltype(mesh_->shape_.edges()) shapeEdges_;
+		decltype(std::declval<const Shape&>().edges()) shapeEdges_;
 
-		decltype(mesh_->path_.edges()) pathEdges_;
+		decltype(std::declval<const Path&>().edges()) pathEdges_;
 
 		bool odd_;
 
@@ -130,9 +132,9 @@ public:
 
 		const ExtrudeMesh* mesh_;
 
-		decltype(mesh_->shape_.vertices()) shapeVertices_;
+		decltype(std::declval<const Shape&>().vertices()) shapeVertices_;
 
-		decltype(mesh_->path_.vertices()) pathVertices_;
+		decltype(std::declval<const Path&>().vertices()) pathVertices_;
 
 		Vertices(const ExtrudeMesh& mesh) :
 			mesh_{&mesh},

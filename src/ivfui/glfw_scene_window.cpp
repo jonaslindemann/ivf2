@@ -124,7 +124,7 @@ void ivfui::GLFWSceneWindow::addUiWindow(ivfui::UiWindowPtr uiWindow)
 void ivfui::GLFWSceneWindow::addEffect(ivf::EffectPtr effect)
 {
     m_effects.push_back(effect);
-    m_postProcessor->addEffect(effect->program());
+    m_postProcessor->addEffect(effect->program(), effect->prePassProgram());
 }
 
 void ivfui::GLFWSceneWindow::addReflection(ivf::PlanarReflectionPtr reflection)
@@ -260,7 +260,7 @@ bool GLFWSceneWindow::reorderEffect(int fromIndex, int toIndex)
     {
         if (eff)
         {
-            m_postProcessor->addEffect(eff->program());
+            m_postProcessor->addEffect(eff->program(), eff->prePassProgram());
         }
     }
 
@@ -767,8 +767,11 @@ void GLFWSceneWindow::doResize(int width, int height)
 {
     m_camManip->update();
     m_bufferSelection->resize(width, height);
-    m_frameBuffer->resize(width, height);
-    m_postProcessor->resize(width, height);
+
+    // width/height are in screen coordinates; render targets need framebuffer pixels,
+    // which differ on high-DPI displays (e.g. macOS Retina)
+    m_frameBuffer->resize(this->width(), this->height());
+    m_postProcessor->resize(this->width(), this->height());
     GLFWWindow::doResize(width, height);
 }
 
@@ -804,6 +807,7 @@ void GLFWSceneWindow::doDraw()
     if ((m_renderToTexture) && (!m_selectionRendering))
     {
         m_frameBuffer->resize(width(), height());
+        m_postProcessor->resize(width(), height());
 
         // m_frameBuffer->reset();
 

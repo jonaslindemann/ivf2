@@ -18,9 +18,10 @@ namespace ivf {
  * center of the screen every frame. showBlur() renders the blur amount instead
  * of the image (red in front of the focus, blue behind) for tuning.
  *
- * The blur uses the scene depth, so place it before effects that move pixels
- * (wave, swirl, kaleidoscope). Cost grows with maxBlur() squared divided by
- * radiusStep().
+ * A pre-pass stores each pixel's view distance next to its colour, so every
+ * blur sample is a single texture fetch. The blur uses the scene depth, so
+ * place it before effects that move pixels (wave, swirl, kaleidoscope). Cost
+ * grows with maxBlur() squared divided by radiusStep().
  *
  * @code
  * auto dof = DepthOfFieldEffect::create();

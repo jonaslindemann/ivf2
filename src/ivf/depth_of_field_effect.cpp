@@ -88,6 +88,8 @@ bool DepthOfFieldEffect::showBlur() const
 
 void DepthOfFieldEffect::doLoad()
 {
+    m_prePassProgram = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
+                                                ivf::dof_distance_frag_shader_source, "depth_of_field_distance", false);
     m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, ivf::dof_frag_shader_source,
                                          "depth_of_field", false);
 }

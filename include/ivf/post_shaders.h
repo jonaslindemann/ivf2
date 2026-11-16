@@ -695,7 +695,10 @@ void main()
 // Single-pass depth of field: golden-angle spiral gather where each sample is
 // weighted by its own blur size (after Dennis Gustafsson, "Bokeh depth of field
 // in a single pass"), which keeps sharp objects from bleeding into blurred ones.
-inline const std::string dof_frag_shader_source = R"(
+// Depth of field pre-pass: scene colour with the view distance in alpha, so the
+// blur pass gets both from one fetch instead of reconstructing every sample's
+// distance from the depth buffer
+inline const std::string dof_distance_frag_shader_source = R"(
 #version 330 core
 out vec4 FragColor;
 in vec2 TexCoords;
@@ -703,6 +706,29 @@ in vec2 TexCoords;
 uniform sampler2D screenTexture;
 uniform sampler2D depthTexture;
 uniform mat4 invProjection;
+
+// Background distance, kept below the half-float maximum of the effect targets
+const float BACKGROUND_DISTANCE = 60000.0;
+
+void main()
+{
+    float dist = BACKGROUND_DISTANCE;
+    float depth = texture(depthTexture, TexCoords).r;
+    if (depth < 1.0) {
+        vec4 viewPos = invProjection * vec4(TexCoords * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
+        dist = min(length(viewPos.xyz / viewPos.w), BACKGROUND_DISTANCE);
+    }
+    FragColor = vec4(texture(screenTexture, TexCoords).rgb, dist);
+})";
+
+// Depth of field blur. Expects the output of dof_distance_frag_shader_source as
+// screenTexture: colour in rgb, view distance in alpha.
+inline const std::string dof_frag_shader_source = R"(
+#version 330 core
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
 
 uniform float dofFocusDistance;
 uniform float dofFocusRange;
@@ -714,16 +740,6 @@ uniform bool dofShowBlur;
 
 const float GOLDEN_ANGLE = 2.39996323;
 const int MAX_SAMPLES = 256;
-const float BACKGROUND_DISTANCE = 1.0e6;
-
-float viewDistance(vec2 uv)
-{
-    float depth = texture(depthTexture, uv).r;
-    if (depth >= 1.0)
-        return BACKGROUND_DISTANCE;
-    vec4 viewPos = invProjection * vec4(uv * 2.0 - 1.0, depth * 2.0 - 1.0, 1.0);
-    return length(viewPos.xyz / viewPos.w);
-}
 
 float blurSize(float dist, float focus)
 {
@@ -733,8 +749,9 @@ float blurSize(float dist, float focus)
 
 void main()
 {
-    float focus = dofAutoFocus ? viewDistance(vec2(0.5)) : dofFocusDistance;
-    float centerDist = viewDistance(TexCoords);
+    float focus = dofAutoFocus ? texture(screenTexture, vec2(0.5)).a : dofFocusDistance;
+    vec4 center = texture(screenTexture, TexCoords);
+    float centerDist = center.a;
     float centerSize = blurSize(centerDist, focus);
 
     if (dofShowBlur) {
@@ -744,22 +761,23 @@ void main()
         return;
     }
 
-    vec4 center = texture(screenTexture, TexCoords);
     vec3 color = center.rgb;
     if (dofMaxBlur <= 0.0) {
-        FragColor = center;
+        FragColor = vec4(color, 1.0);
         return;
     }
 
     vec2 pixelSize = 1.0 / vec2(textureSize(screenTexture, 0));
     float total = 1.0;
     float radius = dofRadiusStep;
-    float angle = 0.0;
+
+    // Spiral direction, rotated by the golden angle each step
+    vec2 dir = vec2(1.0, 0.0);
+    const mat2 rotation = mat2(cos(GOLDEN_ANGLE), sin(GOLDEN_ANGLE), -sin(GOLDEN_ANGLE), cos(GOLDEN_ANGLE));
 
     for (int i = 0; i < MAX_SAMPLES && radius < dofMaxBlur; ++i) {
-        vec2 uv = TexCoords + vec2(cos(angle), sin(angle)) * pixelSize * radius;
-        vec3 sampleColor = texture(screenTexture, uv).rgb;
-        float sampleDist = viewDistance(uv);
+        vec4 s = texture(screenTexture, TexCoords + dir * pixelSize * radius);
+        float sampleDist = s.a;
         float sampleSize = blurSize(sampleDist, focus);
 
         // A sharper surface behind this pixel must not spread over it
@@ -767,14 +785,14 @@ void main()
             sampleSize = clamp(sampleSize, 0.0, centerSize * 2.0);
 
         float weight = smoothstep(radius - 0.5, radius + 0.5, sampleSize);
-        color += mix(color / total, sampleColor, weight);
+        color += mix(color / total, s.rgb, weight);
         total += 1.0;
 
         radius += dofRadiusStep / radius;
-        angle += GOLDEN_ANGLE;
+        dir = rotation * dir;
     }
 
-    FragColor = vec4(color / total, center.a);
+    FragColor = vec4(color / total, 1.0);
 })";
 
 } // namespace ivf

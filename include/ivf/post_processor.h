@@ -38,7 +38,13 @@ private:
     GLuint m_quadVAO; ///< Vertex array object for the screen quad.
     GLuint m_quadVBO; ///< Vertex buffer object for the screen quad.
 
-    std::vector<ProgramPtr> m_fxPrograms; ///< List of shader programs (effects).
+    /// An effect in the chain: its program and an optional pre-pass run before it.
+    struct EffectPasses {
+        ProgramPtr program;
+        ProgramPtr prePass;
+    };
+
+    std::vector<EffectPasses> m_fxPrograms; ///< List of effects in chain order.
 
     GLuint m_depthTexture{0};       ///< Scene depth texture, 0 if not available.
     glm::mat4 m_viewMatrix{1.0f};       ///< Camera view matrix of the processed frame.
@@ -60,8 +66,11 @@ public:
     /**
      * @brief Add a post-processing effect (shader program).
      * @param fxProgram Shared pointer to the shader program.
+     * @param prePass Optional program run just before fxProgram, whose output
+     *                becomes fxProgram's screenTexture. Skipped with fxProgram
+     *                when the effect is disabled.
      */
-    void addEffect(ProgramPtr fxProgram);
+    void addEffect(ProgramPtr fxProgram, ProgramPtr prePass = nullptr);
 
     /**
      * @brief Remove all post-processing effects.

@@ -316,6 +316,8 @@ void GLFWWindow::draw()
 
     // Render scene
 
+    this->beginGpuTimer();
+
     if (m_enabled && (result == 0))
     {
         if (auto shaderMgr = ivf::ShaderManager::instance(); shaderMgr->currentProgram())
@@ -334,6 +336,8 @@ void GLFWWindow::draw()
     // Tell derived class to do any final rendering
 
     this->doDrawComplete();
+
+    this->endGpuTimer();
 
     // Capture with the interface
 
@@ -494,6 +498,53 @@ void ivfui::GLFWWindow::setError(int error)
 double ivfui::GLFWWindow::frameTime() const
 {
     return m_frameTime;
+}
+
+double ivfui::GLFWWindow::gpuFrameTime() const
+{
+    return m_gpuFrameTime;
+}
+
+void ivfui::GLFWWindow::beginGpuTimer()
+{
+    // Query objects are freed with the context
+    if (m_gpuQueries[0] == 0)
+        glGenQueries(k_gpuQueryCount, m_gpuQueries);
+
+    // Collect finished results without waiting for the GPU
+    for (int i = 0; i < k_gpuQueryCount; i++)
+    {
+        if (!m_gpuQueryPending[i])
+            continue;
+
+        GLint available = 0;
+        glGetQueryObjectiv(m_gpuQueries[i], GL_QUERY_RESULT_AVAILABLE, &available);
+        if (!available)
+            continue;
+
+        GLuint64 elapsed = 0;
+        glGetQueryObjectui64v(m_gpuQueries[i], GL_QUERY_RESULT, &elapsed);
+        m_gpuQueryPending[i] = false;
+
+        const double seconds = double(elapsed) * 1e-9;
+        m_gpuFrameTime = (m_gpuFrameTime > 0.0) ? 0.9 * m_gpuFrameTime + 0.1 * seconds : seconds;
+    }
+
+    // All queries still in flight: skip timing this frame rather than stall
+    m_gpuTimerRunning = !m_gpuQueryPending[m_gpuQueryIndex];
+    if (m_gpuTimerRunning)
+        glBeginQuery(GL_TIME_ELAPSED, m_gpuQueries[m_gpuQueryIndex]);
+}
+
+void ivfui::GLFWWindow::endGpuTimer()
+{
+    if (!m_gpuTimerRunning)
+        return;
+
+    glEndQuery(GL_TIME_ELAPSED);
+    m_gpuQueryPending[m_gpuQueryIndex] = true;
+    m_gpuQueryIndex = (m_gpuQueryIndex + 1) % k_gpuQueryCount;
+    m_gpuTimerRunning = false;
 }
 
 int ivfui::GLFWWindow::frameCount() const

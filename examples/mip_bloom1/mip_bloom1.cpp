@@ -5,7 +5,8 @@
  *
  * Demonstrates:
  *  - MipBloomEffect: a wide, soft halo from the mip chain with soft tone mapping
- *  - BlendShaderMaterial: additive glowing orbs and an alpha-blended mist layer
+ *  - GlowMaterial: additive glowing orbs, MistMaterial: an alpha-blended mist layer
+ *  - GradientSkyMaterial: a night sky dome with a horizon glow and stars
  *  - PathCameraManipulator: the camera follows an authored orbit; drag with the
  *    left button to look around, with the right button or the wheel to float
  *    away from the path. The camera drifts back when left alone.
@@ -26,65 +27,6 @@ using namespace ivfui;
 
 namespace {
 
-const std::string orb_vert = R"(
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 3) in vec3 aNormal;
-
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
-out vec3 worldPos;
-out vec3 worldNormal;
-
-void main()
-{
-    vec4 p = model * vec4(aPos, 1.0);
-    worldPos = p.xyz;
-    worldNormal = normalize(mat3(model) * aNormal);
-    gl_Position = projection * view * p;
-})";
-
-// Bright core fading towards the silhouette, so additive orbs look like light
-const std::string orb_frag = R"(
-#version 330 core
-in vec3 worldPos;
-in vec3 worldNormal;
-
-uniform vec3 viewPos;
-uniform vec3 glowColor;
-uniform float brightness;
-
-out vec4 fragColor;
-
-void main()
-{
-    vec3 v = normalize(viewPos - worldPos);
-    float facing = max(dot(normalize(worldNormal), v), 0.0);
-    float core = pow(facing, 1.5);
-    fragColor = vec4(glowColor * core * brightness, core);
-})";
-
-// Soft radial mist; alpha falls off towards the edge of the disk
-const std::string mist_frag = R"(
-#version 330 core
-in vec3 worldPos;
-in vec3 worldNormal;
-
-uniform vec3 mistColor;
-uniform float mistOpacity;
-uniform float mistRadius;
-
-out vec4 fragColor;
-
-void main()
-{
-    float r = length(worldPos.xz) / mistRadius;
-    float alpha = mistOpacity * (1.0 - smoothstep(0.2, 1.0, r));
-    fragColor = vec4(mistColor, alpha);
-})";
-
 const char *k_blendModeNames[] = {"Additive", "Alpha", "Background"};
 
 } // namespace
@@ -92,8 +34,8 @@ const char *k_blendModeNames[] = {"Additive", "Alpha", "Background"};
 class MipBloomWindow : public GLFWSceneWindow {
 private:
     MipBloomEffectPtr m_bloom;
-    std::vector<BlendShaderMaterialPtr> m_orbMaterials;
-    BlendShaderMaterialPtr m_mist;
+    std::vector<GlowMaterialPtr> m_orbMaterials;
+    MistMaterialPtr m_mist;
     PathCameraManipulatorPtr m_pathCamera;
 
     bool m_bloomEnabled{true};
@@ -124,7 +66,18 @@ public:
         light->setDirection({-0.3f, -1.0f, -0.2f});
         light->setEnabled(true);
 
-        // Opaque geometry first
+        // Sky dome first; everything drawn later covers it
+        auto sky = GradientSkyMaterial::create({0.0f, 0.0f, 0.02f}, {0.05f, 0.04f, 0.1f});
+        if (!sky)
+            return -1;
+        sky->setGroundColor({0.01f, 0.01f, 0.03f});
+        sky->setGlowColor({0.08f, 0.05f, 0.14f});
+        sky->setStarIntensity(0.8f);
+        auto dome = Sphere::create(50.0, 64, 32);
+        dome->setMaterial(sky);
+        add(dome);
+
+        // Opaque geometry next
         auto groundMaterial = Material::create();
         groundMaterial->setDiffuseColor({0.08f, 0.08f, 0.12f, 1.0f});
         groundMaterial->setSpecularColor({0.0f, 0.0f, 0.0f, 1.0f}); // no highlight for the bloom to blow up
@@ -144,18 +97,13 @@ public:
         }
 
         // Blended geometry after the opaque geometry
-        // One program, one material per colour
-        auto orbMaterial =
-            BlendShaderMaterial::createFromStrings(orb_vert, orb_frag, "mip_bloom1_orb", BlendMode::Additive);
-        if (!orbMaterial)
-            return -1;
-
-        const glm::vec3 colors[] = {{1.0f, 0.55f, 0.2f}, {0.3f, 0.7f, 1.0f}, {0.9f, 0.35f, 1.0f}};
-        for (const auto &color : colors)
+        // One material per colour; they share one shader program
+        for (const glm::vec3 color : {glm::vec3(1.0f, 0.55f, 0.2f), glm::vec3(0.3f, 0.7f, 1.0f),
+                                      glm::vec3(0.9f, 0.35f, 1.0f)})
         {
-            auto material = m_orbMaterials.empty() ? orbMaterial
-                                                   : BlendShaderMaterial::create(orbMaterial->program());
-            material->setUniform("glowColor", color);
+            auto material = GlowMaterial::create(color);
+            if (!material)
+                return -1;
             m_orbMaterials.push_back(material);
         }
 
@@ -169,11 +117,9 @@ public:
             add(orb);
         }
 
-        m_mist = BlendShaderMaterial::createFromStrings(orb_vert, mist_frag, "mip_bloom1_mist", BlendMode::Alpha);
+        m_mist = MistMaterial::create({0.5f, 0.45f, 0.7f}, m_mistOpacity, 12.0f);
         if (!m_mist)
             return -1;
-        m_mist->setUniform("mistColor", glm::vec3(0.5f, 0.45f, 0.7f));
-        m_mist->setUniform("mistRadius", 12.0f);
         auto mist = Plane::create(24.0, 24.0, 1, 1);
         mist->setPos({0.0f, 0.3f, 0.0f});
         mist->setMaterial(m_mist);
@@ -209,15 +155,16 @@ public:
 
         // Each orb colour pulses in turn, shaped by SmoothStep
         const double t = elapsedTime();
+        ShaderMaterial::setGlobalUniform("time", float(t)); // twinkling stars
         for (size_t i = 0; i < m_orbMaterials.size(); ++i)
         {
             const float phase = float(std::fmod(t * 0.5 + double(i) / double(m_orbMaterials.size()), 1.0));
             const float tri = phase < 0.5f ? phase * 2.0f : 2.0f - phase * 2.0f;
             const float pulse = detail::applyEasing(Easing::SmoothStep, tri);
             m_orbMaterials[i]->setBlendMode(BlendMode(m_orbBlendMode));
-            m_orbMaterials[i]->setUniform("brightness", m_orbBrightness * (0.4f + 0.6f * pulse));
+            m_orbMaterials[i]->setBrightness(m_orbBrightness * (0.4f + 0.6f * pulse));
         }
-        m_mist->setUniform("mistOpacity", m_mistOpacity);
+        m_mist->setOpacity(m_mistOpacity);
 
         if (m_guided)
         {

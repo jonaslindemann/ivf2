@@ -36,6 +36,13 @@ struct MusicSceneConfig {
     std::string scoreFile;      ///< Composition with note events (.xrns), optional.
     std::string automationFile; ///< Automation (.json), optional; reloaded when changed.
 
+    /// MIDI bindings (.json) for live control, optional; reloaded when changed. See LiveControls.
+    std::string controlsFile;
+    /// File recorded takes are saved to and laid over the automation.
+    /// Default: the automation file with the extension ".take.json".
+    std::string takeFile;
+    bool liveControls{true}; ///< Open MIDI devices and apply the bindings.
+
     /// Project asset directory. Paths starting with "assets/" are read from here
     /// when the file exists, so edits in the project are picked up without a rebuild.
     std::string assetSourceDir;
@@ -60,7 +67,8 @@ struct MusicSceneConfig {
      * @brief Override settings from command-line arguments.
      *
      * Supported: --fullscreen, --present (alias --show), --size WxH, --start SECONDS,
-     * --end SECONDS, --export DIR, --fps FPS, --paused, --mute, --bpm BPM, --help.
+     * --end SECONDS, --export DIR, --fps FPS, --paused, --mute, --bpm BPM,
+     * --controls FILE, --take FILE, --no-live, --help.
      */
     ParseResult parseArgs(int argc, char **argv);
 

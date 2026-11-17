@@ -65,6 +65,18 @@ MusicSceneConfig::ParseResult MusicSceneConfig::parseArgs(int argc, char **argv)
         {
             endTime = std::atof(argv[++i]);
         }
+        else if (arg == "--controls" && hasValue)
+        {
+            controlsFile = argv[++i];
+        }
+        else if (arg == "--take" && hasValue)
+        {
+            takeFile = argv[++i];
+        }
+        else if (arg == "--no-live")
+        {
+            liveControls = false;
+        }
         else if (arg == "--export" && hasValue)
         {
             exportDir = argv[++i];
@@ -112,6 +124,9 @@ void MusicSceneConfig::printUsage(const char *program)
                 "  --paused         Start paused\n"
                 "  --mute           Start muted\n"
                 "  --bpm BPM        Override the tempo\n"
+                "  --controls FILE  MIDI bindings (.json) for live control\n"
+                "  --take FILE      File recorded takes are saved to (default: <automation>.take.json)\n"
+                "  --no-live        Ignore MIDI controllers\n"
                 "  --help           Show this help\n",
                 program);
 }

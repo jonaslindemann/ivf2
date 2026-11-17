@@ -103,7 +103,54 @@ public:
 
     [[nodiscard]] const std::string &path() const { return m_path; }
 
+    /**
+     * @brief Write markers and parameters to a JSON file in the format loadFile() reads.
+     *
+     * The file is written to a temporary file first and then renamed, so a reader
+     * never sees a half-written file. Comments of a hand-written file are not kept;
+     * GLFWMusicSceneWindow therefore saves recordings to a separate take file.
+     * The automation then refers to @p path, so reloadIfChanged() watches it.
+     */
+    bool saveFile(const std::string &path, std::string *error = nullptr);
+
     void clear();
+
+    /**
+     * @brief Lay the lanes of @p other over this automation.
+     *
+     * A lane of @p other with regions (a recorded take) is used only inside its
+     * regions; everywhere else this automation's lane of the same name is used
+     * exactly as before. A lane without regions replaces the lane of the same name.
+     * Markers are kept.
+     */
+    void merge(const Automation &other);
+
+    /**
+     * @brief Mark [fromBar, toBar] of lane @p name as a region, merging it with regions it overlaps.
+     *
+     * Regions mark where a recorded take is in effect when this automation is
+     * merged into another; they are saved as "regions" in the JSON file.
+     */
+    void addRegion(const std::string &name, double fromBar, double toBar);
+
+    /** @brief Regions of lane @p name, sorted; empty if it has none. */
+    [[nodiscard]] std::vector<std::pair<double, double>> regions(std::string_view name) const;
+
+    /** @brief Names of all parameters, including those only defined by merged takes. */
+    [[nodiscard]] std::vector<std::string> names() const;
+
+    /** @brief Remove the keys of @p name with fromBar <= bar <= toBar. */
+    void eraseKeys(const std::string &name, double fromBar, double toBar);
+
+    /** @brief Remove a parameter. */
+    void removeLane(const std::string &name);
+
+    /**
+     * @brief The last key of @p name at or before @p bar, nullptr if there is none.
+     *
+     * With a merged take, keys of the lane inside the take's regions are replaced by the take's keys.
+     */
+    [[nodiscard]] const AutomationKey *keyAtOrBefore(std::string_view name, double bar) const;
 
     /** @brief Add or replace the key of @p name at key.bar. */
     void setKey(const std::string &name, const AutomationKey &key);
@@ -120,7 +167,12 @@ public:
 
     [[nodiscard]] bool has(std::string_view name) const;
 
-    /** @brief Interpolated value at a bar position; @p fallback if the parameter is missing. */
+    /**
+     * @brief Interpolated value at a bar position.
+     *
+     * @p fallback if the parameter is missing, or only defined by a merged take
+     * whose regions do not cover @p bar.
+     */
     [[nodiscard]] glm::vec4 vec4(std::string_view name, double bar, glm::vec4 fallback = glm::vec4(0.0f)) const;
     [[nodiscard]] glm::vec3 vec3(std::string_view name, double bar, glm::vec3 fallback = glm::vec3(0.0f)) const;
     [[nodiscard]] float value(std::string_view name, double bar, float fallback = 0.0f) const;
@@ -149,8 +201,19 @@ public:
     static bool parseEasing(std::string_view name, ivf::Easing &easing, bool &spline);
 
 private:
+    using Regions = std::vector<std::pair<double, double>>;
+    struct Overlay {
+        Regions regions;
+        std::vector<AutomationKey> keys;
+    };
+
+    /** @brief The overlay of @p name covering @p bar, nullptr if none. */
+    [[nodiscard]] const Overlay *overlayAt(std::string_view name, double bar) const;
+
     Lanes m_lanes;
     std::vector<SongMarker> m_markers;
+    std::map<std::string, Regions, std::less<>> m_regions;   ///< Regions of this automation's lanes (a take).
+    std::map<std::string, Overlay, std::less<>> m_overlays; ///< Takes merged into this automation.
 
     std::string m_path;
     std::filesystem::file_time_type m_fileTime{};

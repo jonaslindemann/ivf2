@@ -46,3 +46,6 @@
 #include <ivf/bump_material.h>
 #include <ivf/shader_material.h>
 #include <ivf/blend_shader_material.h>
+#include <ivf/glow_material.h>
+#include <ivf/mist_material.h>
+#include <ivf/gradient_sky_material.h>

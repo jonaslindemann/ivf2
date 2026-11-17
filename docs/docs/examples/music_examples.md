@@ -7,10 +7,12 @@ This example shows the ivfmusic library. A ring of glowing orbs pulses on every 
 **Scene setup:**
 
 - `GLFWMusicSceneWindow` with `assets/sounds/pf.mp3` at an assumed 120 BPM
-- 32 spheres sharing one additive `BlendShaderMaterial`; the fragment shader reads the global `beatPhase` uniform
+- A `GradientSkyMaterial` sky dome with stars; its horizon glows faintly in the orb colour
+- 32 spheres sharing one `GlowMaterial`, whose brightness flashes on every beat
 - `MipBloomEffect` whose intensity follows the `bloom` parameter
 - Rotation from `Automation::integral("spin", ...)`, so the angle stays a function of the song position
 - Camera path from the `cameraPos` / `cameraTarget` spline keys
+- Live control from `assets/music_scene1_controls.json`: faders for bloom, pulse and colour, pads for blackout, strobe, freeze and a `burst` trigger that pushes the orbs outwards (read with `triggerAge()`), and transport buttons. The numbers are those of a KORG nanoKONTROL2 and an Akai MPD218; adapt them to your controllers with the MIDI monitor (F5)
 
 **Controls:**
 
@@ -21,6 +23,7 @@ This example shows the ivfmusic library. A ring of glowing orbs pulses on every 
 | `PgUp` / `PgDn` | Previous / next marker |
 | `M` | Mute |
 | `F1` / `F3` / `F4` | Overlay / automation panel / free camera |
+| `F5` / `F6` | Live panel / record a take into `music_scene1.take.json` |
 | Left / right mouse drag, wheel | Look around / float away from the camera path |
 
 Try editing `examples/music_scene1/assets/music_scene1.json` while the example runs. The changes appear within half a second. Run `music_scene1 --help` for the command-line options, e.g. `--present` or `--export frames --start 30 --end 40`.
@@ -37,9 +40,15 @@ Try editing `examples/music_scene1/assets/music_scene1.json` while the example r
 --8<-- "examples/music_scene1/assets/music_scene1.json"
 ```
 
+### music_scene1_controls.json
+
+```json
+--8<-- "examples/music_scene1/assets/music_scene1_controls.json"
+```
+
 ## mip_bloom1: Wide Glow, Blending and a Guided Camera
 
-A dark scene with glowing orbs, a translucent mist layer and a ring of pillars, shown under `MipBloomEffect`. The camera follows an orbit through `PathCameraManipulator`.
+A night scene with `GlowMaterial` orbs, a `MistMaterial` layer, a ring of pillars and a starry `GradientSkyMaterial` sky, shown under `MipBloomEffect`. None of the materials needs shader code in the example. The camera follows an orbit through `PathCameraManipulator`.
 
 **What to try:**
 

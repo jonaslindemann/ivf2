@@ -1,0 +1,40 @@
+// Live MIDI control for music_scene1, reloaded when the file changes.
+//
+// "devices" maps an alias to part of a MIDI port name. The numbers below are the
+// factory settings of a KORG nanoKONTROL2 (mixer) and an Akai MPD218 (pads);
+// change the names and numbers to match your controllers. Press F5 in the
+// example: the MIDI monitor shows what each control sends.
+//
+// Faders take over from the automation once moved ("pickup": only when they pass
+// the current value, so nothing jumps). Press F6 (or REC on the mixer) to record
+// a take; it is saved to music_scene1.take.json and plays back without MIDI.
+{
+  "devices": {
+    "mixer": "nanoKONTROL",
+    "pads": "MPD218"
+  },
+  "bindings": [
+    // Faders 1-5
+    { "device": "mixer", "cc": 0, "param": "bloom", "range": [0.0, 2.0], "pickup": true },
+    { "device": "mixer", "cc": 1, "param": "pulse", "range": [0.0, 1.5], "pickup": true },
+    { "device": "mixer", "cc": 2, "param": "color", "component": 0, "range": [0.0, 1.0] },
+    { "device": "mixer", "cc": 3, "param": "color", "component": 1, "range": [0.0, 1.0] },
+    { "device": "mixer", "cc": 4, "param": "color", "component": 2, "range": [0.0, 1.0] },
+
+    // Knob 1: strobe speed, from a flash every beat to one every 16th
+    { "device": "mixer", "cc": 16, "param": "strobeRate", "range": [1.0, 0.25] },
+
+    // Pads: blackout while held, strobe on/off, a burst of the orbs, freeze the picture while held
+    { "device": "pads", "note": 36, "param": "blackout", "smoothing": 0.15 },
+    { "device": "pads", "note": 37, "param": "strobe", "toggle": true, "smoothing": 0 },
+    { "device": "pads", "note": 38, "trigger": "burst" },
+    { "device": "pads", "note": 39, "action": "freeze" },
+
+    // Transport buttons
+    { "device": "mixer", "cc": 41, "action": "play" },
+    { "device": "mixer", "cc": 45, "action": "record" },
+    { "device": "mixer", "cc": 42, "action": "release" },
+    { "device": "mixer", "cc": 43, "action": "previousMarker" },
+    { "device": "mixer", "cc": 44, "action": "nextMarker" }
+  ]
+}

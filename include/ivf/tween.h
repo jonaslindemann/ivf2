@@ -16,8 +16,26 @@ enum class Easing {
     SineIn,    SineOut,    SineInOut,
     ElasticOut,
     BounceOut,
-    BackOut
+    BackOut,
+    Step,      ///< Hold the start value, jump to the end value at t = 1.
+    SmoothStep ///< Hermite smoothstep, 3t² - 2t³.
 };
+
+/// Number of values in Easing, for iterating over all curves (e.g. in a UI).
+inline constexpr int EasingCount = static_cast<int>(Easing::SmoothStep) + 1;
+
+/**
+ * @brief Name of an easing curve, matching the enumerator ("QuadInOut", "SmoothStep", ...).
+ */
+inline const char *easingName(Easing e) noexcept
+{
+    static constexpr const char *names[EasingCount] = {
+        "Linear",  "QuadIn",  "QuadOut",    "QuadInOut", "CubicIn", "CubicOut", "CubicInOut",
+        "SineIn",  "SineOut", "SineInOut",  "ElasticOut", "BounceOut", "BackOut", "Step",
+        "SmoothStep"};
+    const int index = static_cast<int>(e);
+    return index >= 0 && index < EasingCount ? names[index] : "Linear";
+}
 
 namespace detail {
 
@@ -36,6 +54,8 @@ inline float applyEasing(Easing e, float t) noexcept
         case Easing::ElasticOut: return easeOutElastic(t);
         case Easing::BounceOut:  return easeOutBounce(t);
         case Easing::BackOut:    return easeOutBack(t);
+        case Easing::Step:       return t < 1.0f ? 0.0f : 1.0f;
+        case Easing::SmoothStep: return t * t * (3.0f - 2.0f * t);
         default:                 return t;
     }
 }
@@ -116,6 +136,11 @@ public:
  *
  * GLFWSceneWindow calls update() automatically. You can also call it manually
  * if using GLFWWindow directly.
+ *
+ * Tweens run from the moment they are started and cannot be seeked, which
+ * suits transitions triggered by events or input. For values that must follow
+ * a song position (scrubbing, frame export), use ivfmusic::Automation, which
+ * shares the Easing curves; see it for a comparison of the animation tools.
  */
 class TweenManager {
 private:

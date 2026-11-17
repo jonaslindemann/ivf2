@@ -510,13 +510,10 @@ public:
     virtual void doPostSetup();
 
     /**
-     * @brief Key event callback (calls doKey by default).
-     * @param key Key code.
-     * @param scancode Scan code.
-     * @param action Key action.
-     * @param mods Modifier flags.
+     * @brief Scroll wheel event.
+     * @param xoffset Horizontal scroll delta.
+     * @param yoffset Vertical scroll delta.
      */
-    /** Scroll wheel event. xoffset/yoffset are the scroll deltas. */
     virtual void onScroll(double xoffset, double yoffset);
 
     /**

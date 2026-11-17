@@ -38,7 +38,10 @@ bin/Debug/lighting1       # Lighting configuration
 bin/Debug/textures1       # Texture mapping
 bin/Debug/animation1      # Keyframe animation
 bin/Debug/procedural1     # Geometry generation
+bin/Debug/music_scene1    # ivfmusic: song-driven scene (--help for options)
 ```
+
+Music scenes can be smoke-tested with a short frame export, which renders a few PNGs and exits by itself: `music_scene1 --export <dir> --start 10 --end 11 --fps 5`.
 
 ## Code Formatting
 
@@ -52,6 +55,7 @@ Clang Format is configured (`.clang-format`): Microsoft `BasedOnStyle`, 4-space 
 2. **ivf** — Core scene graph, rendering, primitives, materials, shaders, effects, animation
 3. **generator** — Header-only procedural geometry generation library (~97 generators)
 4. **ivfmath** — Keyframe/spline interpolation, spherical math
+5. **ivfmusic** — Scenes driven by a song: `GLFWMusicSceneWindow`, `SongTransport`, `Automation` (bar-keyed parameters from JSON), `Score`/`TrackEnvelope` (Renoise `.xrns` notes). Separate target `ivf2::ivfmusic`, not part of `ivf2::ivf2`; apps use `ivfmusic_add_executable()` from `cmake/ivfmusic.cmake`. Renoise support is behind the CMake option `IVF_WITH_RENOISE` (miniz, pugixml)
 
 ### Scene Graph
 
@@ -105,7 +109,13 @@ int main() {
 
 ### Effects / Post-Processing
 
-Effects are applied to a `CompositeNode` via the effects system. Available effects: `BlurEffect`, `BloomEffect`, `ChromaticEffect`, `DitheringEffect`, `FilmGrainEffect`, `PixelationEffect`, `TintEffect`, `VignetteEffect`, `EdgeDetectionEffect`.
+Effects are applied to a `CompositeNode` via the effects system. Available effects include: `BlurEffect`, `BloomEffect`, `MipBloomEffect` (wide bloom from the mip chain with tone mapping; place last), `ChromaticEffect`, `DitheringEffect`, `FilmGrainEffect`, `FogEffect`, `PixelationEffect`, `TintEffect`, `VignetteEffect`, `EdgeDetectionEffect`.
+
+Custom shaders on nodes use `ShaderMaterial`; `BlendShaderMaterial` adds additive, alpha or background blending without depth writes (add blended nodes after opaque ones). `ivfui::PathCameraManipulator` lets the viewer look around an authored camera path (`ivf::TimelineCamera`) and returns to it.
+
+### Animation and Time
+
+`ivf::Easing` (in `tween.h`, with `easingName()`/`EasingCount`) is shared by `Tween` and `ivfmusic::Automation`. Use `Automation` for seekable, song-synchronised parameters, `SceneTimeline` for sequencing scenes, `Tween` for event-driven transitions. `AudioManager`'s music stream (`startMusic`, `seekMusic`, `musicPosition`, ...) plays one file with transport control and feeds the analyser; the older `*FileAnalysis` names are aliases.
 
 ### Deformers
 
@@ -121,7 +131,7 @@ ReactPhysics3D integration is in `examples/rigid_body1/`. The framework does not
 
 ## Dependencies (vcpkg.json)
 
-GLFW3, GLEW, OpenGL, ImGui (docking), Assimp, FreeType, libpng, libjpeg-turbo, stb, nlohmann-json, zlib, ReactPhysics3D, GLM (header-only, bundled in `include/glm/`).
+GLFW3, GLEW, OpenGL, ImGui (docking), Assimp, FreeType, libpng, libjpeg-turbo, stb, nlohmann-json, zlib, ReactPhysics3D, miniaudio, RtMidi, miniz and pugixml (ivfmusic Renoise reader), GLM (header-only, bundled in `include/glm/`).
 
 ## Shaders
 

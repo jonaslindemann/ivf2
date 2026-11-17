@@ -11,6 +11,7 @@ Lightweight scene graph library and wrapper over modern OpenGL.
 - **Unified library target** (`ivf2::ivf2`) for easy integration
 - **Automatic asset management** - shaders, fonts, and models copied automatically
 - **Cross-platform** - Windows, Linux, and macOS support
+- **Music-driven scenes** (`ivf2::ivfmusic`) - song playback as the master clock, bar-keyed automation with live reload, note events from Renoise songs, presentation mode and frame export
 - **Rich examples** demonstrating lighting, animations, physics, UI, and more
 
 # Documentation
@@ -110,6 +111,7 @@ cmake --build build-release
   - `ivf[d].lib` - Core visualization framework
   - `ivfui[d].lib` - UI components
   - `ivfmath[d].lib` - Math utilities
+  - `ivfmusic[d].lib` - Music-driven scenes (separate target `ivf2::ivfmusic`)
   - `generator[d].lib` - Geometry generation
   - `glad[d].lib` - OpenGL loader
   - *(Note: 'd' suffix indicates debug builds)*
@@ -145,7 +147,15 @@ add_ivf2_example(my_example SOURCES main.cpp utils.cpp)
 add_ivf2_example(physics_demo SOURCES demo.cpp EXTRA_LIBS ReactPhysics3D::ReactPhysics3D)
 ```
 
-This eliminates the need to manually list all dependencies (`ivfui`, `ivf`, `ivfmath`, `generator`, `glad`, `imgui::imgui`, etc.) for each project.
+For scenes driven by a song, link `ivf2::ivfmusic` instead (it includes `ivf2::ivf2`), or use the `ivfmusic_add_executable()` helper from `cmake/ivfmusic.cmake`, which also copies the application's assets:
+
+```cmake
+ivfmusic_add_executable(my_scene SOURCES main.cpp ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/assets)
+```
+
+Reading Renoise songs needs miniz and pugixml (in `vcpkg.json`) and can be switched off with `-DIVF_WITH_RENOISE=OFF`.
+
+The `add_ivf2_example` helper eliminates the need to manually list all dependencies (`ivfui`, `ivf`, `ivfmath`, `generator`, `glad`, `imgui::imgui`, etc.) for each project.
 
 ### Automatic Asset Management
 

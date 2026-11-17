@@ -31,15 +31,8 @@ class TweenWindow : public GLFWSceneWindow {
 private:
     std::vector<TransformNodePtr> m_shapes;
     std::vector<glm::vec3>        m_positions; // current target
-    int    m_easingIdx{7};  // default: ElasticOut
+    int    m_easingIdx{static_cast<int>(Easing::ElasticOut)};
     bool   m_autoShuffle{false};
-
-    static constexpr const char* k_easingNames[] = {
-        "Linear","QuadIn","QuadOut","QuadInOut",
-        "CubicIn","CubicOut","CubicInOut",
-        "ElasticOut","BounceOut","BackOut",
-        "SineIn","SineOut","SineInOut"
-    };
 
 public:
     TweenWindow(int w, int h, std::string title) : GLFWSceneWindow(w, h, title) {}
@@ -118,7 +111,9 @@ public:
         ImGui::SetNextWindowSize({280, 200}, ImGuiCond_FirstUseEver);
         ImGui::Begin("Tweening");
         ImGui::Text("Click any shape to tween it.");
-        ImGui::Combo("Easing", &m_easingIdx, k_easingNames, 13);
+        ImGui::Combo(
+            "Easing", &m_easingIdx,
+            [](void *, int i) { return easingName(static_cast<Easing>(i)); }, nullptr, EasingCount);
         if (ImGui::Button("Shuffle All")) shuffleAll();
         ImGui::SameLine();
         ImGui::Checkbox("Auto shuffle", &m_autoShuffle);

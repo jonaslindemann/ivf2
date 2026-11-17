@@ -994,8 +994,10 @@ WARN_LOGFILE           =
 
 INPUT                  = src/ivf \
                          src/ivfui \
+                         src/ivfmusic \
                          include/ivf \
                          include/ivfui \
+                         include/ivfmusic \
                          examples
 
 # This tag can be used to specify the character encoding of the source files

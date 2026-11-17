@@ -26,12 +26,13 @@
  * float amp = AudioManager::instance()->getAmplitude();
  * auto fft = AudioManager::instance()->getFFT(16);
  *
- * // Music with transport control (e.g. a timeline driven by the song):
- * audio->startFileAnalysis("music/song.mp3", false);
- * audio->seekFileAnalysis(42.0);
- * double t = audio->fileAnalysisPosition();
- * audio->pauseFileAnalysis();
- * audio->resumeFileAnalysis();
+ * // Music with transport control (e.g. a scene driven by the song);
+ * // getAmplitude() / getFFT() then react to the music:
+ * audio->startMusic("music/song.mp3", false);
+ * audio->seekMusic(42.0);
+ * double t = audio->musicPosition();
+ * audio->pauseMusic();
+ * audio->resumeMusic();
  * @endcode
  */
 
@@ -51,8 +52,9 @@ struct AudioManagerImpl;
  * @brief Singleton audio manager for playback and audio-reactivity.
  *
  * Supports loading and playing sounds (WAV, OGG, MP3, FLAC via miniaudio),
- * microphone/loopback capture, RMS amplitude measurement, and a lightweight
- * band-energy frequency analyser suitable for audio-reactive visuals.
+ * one streamed music track with transport control, microphone/loopback capture,
+ * RMS amplitude measurement, and a lightweight band-energy frequency analyser
+ * suitable for audio-reactive visuals.
  */
 class AudioManager {
 public:
@@ -157,97 +159,121 @@ public:
      */
     void setSoundPosition(int handle, glm::vec3 pos);
 
-    // ---- File-based audio reactivity ----------------------------------------
+    // ---- Music stream ------------------------------------------------------
 
     /**
-     * @brief Play an audio file and simultaneously feed its PCM data into the
-     * analysis ring-buffer so that getAmplitude() / getFFT() react to the file.
+     * @brief Stream an audio file as the music track, with transport control and analysis.
      *
-     * The file is played through a custom playback device whose callback both
-     * outputs audio to the speakers and pushes mono samples into the ring-buffer.
-     * This works with any miniaudio-supported format (WAV, OGG, MP3, FLAC).
+     * There is one music stream. It is played through its own playback device,
+     * whose callback both outputs audio to the speakers and feeds mono samples
+     * into the analysis ring-buffer, so getAmplitude() / getFFT() react to the
+     * music. Unlike loadSound(), the stream offers a sample-accurate position,
+     * seeking, pausing and an end-of-file state, which makes it suitable as the
+     * master clock of a music-driven scene (see ivfmusic::SongTransport).
+     *
+     * Works with any miniaudio-supported format (WAV, OGG, MP3, FLAC). Starting
+     * a new file replaces the current one.
      *
      * @param path  File path relative to the working directory.
      * @param loop  If true the file loops.
-     * @return true on success.
+     * @return true on success; see lastError() otherwise.
      */
-    bool startFileAnalysis(std::string_view path, bool loop = true);
+    bool startMusic(std::string_view path, bool loop = true);
+
+    /** @brief Stop the music stream. */
+    void stopMusic();
+
+    /** @brief Check whether a music stream is running (playing or paused). */
+    bool musicRunning() const;
 
     /**
-     * @brief Stop file-based analysis playback.
-     */
-    void stopFileAnalysis();
-
-    /**
-     * @brief Check whether file-based analysis is currently running.
-     */
-    bool fileAnalysisRunning() const;
-
-    /**
-     * @brief Pause file playback. The device keeps running and outputs silence,
+     * @brief Pause the music. The device keeps running and outputs silence,
      * so resuming is immediate.
      */
-    void pauseFileAnalysis();
+    void pauseMusic();
+
+    /** @brief Resume paused music from its current position. */
+    void resumeMusic();
+
+    /** @brief Check whether the music is paused. */
+    bool musicPaused() const;
 
     /**
-     * @brief Resume paused file playback from its current position.
-     */
-    void resumeFileAnalysis();
-
-    /**
-     * @brief Check whether file playback is paused.
-     */
-    bool fileAnalysisPaused() const;
-
-    /**
-     * @brief Get the playback position of the analysed file.
+     * @brief Get the playback position of the music.
      *
      * The position is the decoder cursor, updated once per audio callback
      * (typically every ~10 ms), and runs slightly ahead of what is heard by the
      * device latency. For smooth visual sync, interpolate between updates.
      *
-     * @return Position in seconds, 0 if no file is playing.
+     * @return Position in seconds, 0 if no music is running.
      */
-    double fileAnalysisPosition() const;
+    double musicPosition() const;
 
     /**
-     * @brief Get the length of the analysed file.
-     * @return Length in seconds, 0 if no file is playing or the length is unknown.
+     * @brief Get the length of the music.
+     * @return Length in seconds, 0 if no music is running or the length is unknown.
      */
-    double fileAnalysisLength() const;
+    double musicLength() const;
 
     /**
-     * @brief Move the playback position of the analysed file.
+     * @brief Move the playback position of the music.
      *
      * The seek is applied by the audio thread on its next callback; until then
-     * fileAnalysisPosition() reports the requested position.
+     * musicPosition() reports the requested position.
      *
      * @param seconds New position in seconds, clamped to the file length.
      */
-    void seekFileAnalysis(double seconds);
+    void seekMusic(double seconds);
+
+    /** @brief Check whether non-looping music has played to the end. */
+    bool musicAtEnd() const;
 
     /**
-     * @brief Check whether a non-looping file has played to the end.
-     */
-    bool fileAnalysisAtEnd() const;
-
-    /**
-     * @brief Set the output volume of the analysed file.
+     * @brief Set the output volume of the music.
      *
      * Only affects what is heard; analysis (getAmplitude(), getFFT()) uses the
      * unscaled signal. The volume is kept when a new file is started.
      * @param volume Volume in [0, 1].
      */
-    void setFileAnalysisVolume(float volume);
+    void setMusicVolume(float volume);
 
-    /**
-     * @brief Get the output volume of the analysed file.
-     */
+    /** @brief Get the output volume of the music. */
+    float musicVolume() const;
+
+    // ---- Music stream, original names ----------------------------------------
+    //
+    // The music stream was first introduced for file-based audio reactivity.
+    // These names are kept for compatibility and behave exactly like the
+    // music functions above.
+
+    /** @brief Same as startMusic(). */
+    bool startFileAnalysis(std::string_view path, bool loop = true);
+    /** @brief Same as stopMusic(). */
+    void stopFileAnalysis();
+    /** @brief Same as musicRunning(). */
+    bool fileAnalysisRunning() const;
+    /** @brief Same as pauseMusic(). */
+    void pauseFileAnalysis();
+    /** @brief Same as resumeMusic(). */
+    void resumeFileAnalysis();
+    /** @brief Same as musicPaused(). */
+    bool fileAnalysisPaused() const;
+    /** @brief Same as musicPosition(). */
+    double fileAnalysisPosition() const;
+    /** @brief Same as musicLength(). */
+    double fileAnalysisLength() const;
+    /** @brief Same as seekMusic(). */
+    void seekFileAnalysis(double seconds);
+    /** @brief Same as musicAtEnd(). */
+    bool fileAnalysisAtEnd() const;
+    /** @brief Same as setMusicVolume(). */
+    void setFileAnalysisVolume(float volume);
+    /** @brief Same as musicVolume(). */
     float fileAnalysisVolume() const;
 
     /**
      * @brief Return a human-readable description of the last error from
-     * startFileAnalysis() or startCapture().
+     * startMusic() or startCapture().
      */
     std::string lastError() const;
 

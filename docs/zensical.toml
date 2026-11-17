@@ -37,6 +37,7 @@ nav = [
     { "Overview" = "creative/index.md" },
     { "Flow Fields" = "creative/flow_field.md" },
     { "Time-Driven Animation" = "creative/time_and_animation.md" },
+    { "Music-Driven Scenes" = "creative/music_scenes.md" },
   ] },
   { "UI" = [
     { "UI Windows" = "ui/ui_windows.md" },
@@ -56,6 +57,7 @@ nav = [
     { "Time Control Examples" = "examples/time_control_examples.md" },
     { "Flow Field Examples" = "examples/flow_field_examples.md" },
     { "Camera Animation Examples" = "examples/camera_anim_examples.md" },
+    { "Music Scene Examples" = "examples/music_examples.md" },
   ] },
   { "API Reference" = [
     { "Overview" = "api/index.md" },

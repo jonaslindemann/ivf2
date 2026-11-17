@@ -362,12 +362,12 @@ void AudioManager::setSoundPosition(int h, glm::vec3 pos)
 }
 
 // ---------------------------------------------------------------------------
-// File-based analysis
+// Music stream (played and analysed)
 // ---------------------------------------------------------------------------
-bool AudioManager::startFileAnalysis(std::string_view path, bool loop)
+bool AudioManager::startMusic(std::string_view path, bool loop)
 {
 #if IVF_HAS_MINIAUDIO
-    if (m_impl->analysisActive) stopFileAnalysis();
+    if (m_impl->analysisActive) stopMusic();
 
     m_impl->analysisPath = std::string(path);
     m_impl->analysisLoop = loop;
@@ -436,7 +436,7 @@ bool AudioManager::startFileAnalysis(std::string_view path, bool loop)
 #endif
 }
 
-void AudioManager::stopFileAnalysis()
+void AudioManager::stopMusic()
 {
 #if IVF_HAS_MINIAUDIO
     if (!m_impl->analysisActive) return;
@@ -447,23 +447,23 @@ void AudioManager::stopFileAnalysis()
 #endif
 }
 
-bool AudioManager::fileAnalysisRunning() const { return m_impl->analysisActive; }
+bool AudioManager::musicRunning() const { return m_impl->analysisActive; }
 
-void AudioManager::pauseFileAnalysis()
+void AudioManager::pauseMusic()
 {
 #if IVF_HAS_MINIAUDIO
     m_impl->analysisPaused.store(true, std::memory_order_release);
 #endif
 }
 
-void AudioManager::resumeFileAnalysis()
+void AudioManager::resumeMusic()
 {
 #if IVF_HAS_MINIAUDIO
     m_impl->analysisPaused.store(false, std::memory_order_release);
 #endif
 }
 
-bool AudioManager::fileAnalysisPaused() const
+bool AudioManager::musicPaused() const
 {
 #if IVF_HAS_MINIAUDIO
     return m_impl->analysisActive && m_impl->analysisPaused.load(std::memory_order_acquire);
@@ -472,7 +472,7 @@ bool AudioManager::fileAnalysisPaused() const
 #endif
 }
 
-double AudioManager::fileAnalysisPosition() const
+double AudioManager::musicPosition() const
 {
 #if IVF_HAS_MINIAUDIO
     if (!m_impl->analysisActive) return 0.0;
@@ -486,7 +486,7 @@ double AudioManager::fileAnalysisPosition() const
 #endif
 }
 
-double AudioManager::fileAnalysisLength() const
+double AudioManager::musicLength() const
 {
 #if IVF_HAS_MINIAUDIO
     if (!m_impl->analysisActive) return 0.0;
@@ -496,7 +496,7 @@ double AudioManager::fileAnalysisLength() const
 #endif
 }
 
-void AudioManager::seekFileAnalysis(double seconds)
+void AudioManager::seekMusic(double seconds)
 {
 #if IVF_HAS_MINIAUDIO
     if (!m_impl->analysisActive) return;
@@ -509,7 +509,7 @@ void AudioManager::seekFileAnalysis(double seconds)
 #endif
 }
 
-void AudioManager::setFileAnalysisVolume(float volume)
+void AudioManager::setMusicVolume(float volume)
 {
 #if IVF_HAS_MINIAUDIO
     m_impl->analysisVolume.store(std::clamp(volume, 0.0f, 1.0f), std::memory_order_relaxed);
@@ -518,7 +518,7 @@ void AudioManager::setFileAnalysisVolume(float volume)
 #endif
 }
 
-float AudioManager::fileAnalysisVolume() const
+float AudioManager::musicVolume() const
 {
 #if IVF_HAS_MINIAUDIO
     return m_impl->analysisVolume.load(std::memory_order_relaxed);
@@ -527,7 +527,7 @@ float AudioManager::fileAnalysisVolume() const
 #endif
 }
 
-bool AudioManager::fileAnalysisAtEnd() const
+bool AudioManager::musicAtEnd() const
 {
 #if IVF_HAS_MINIAUDIO
     return m_impl->analysisActive && m_impl->analysisAtEnd.load(std::memory_order_acquire);
@@ -535,6 +535,20 @@ bool AudioManager::fileAnalysisAtEnd() const
     return false;
 #endif
 }
+
+// Original names of the music stream functions, kept for compatibility
+bool AudioManager::startFileAnalysis(std::string_view path, bool loop) { return startMusic(path, loop); }
+void AudioManager::stopFileAnalysis() { stopMusic(); }
+bool AudioManager::fileAnalysisRunning() const { return musicRunning(); }
+void AudioManager::pauseFileAnalysis() { pauseMusic(); }
+void AudioManager::resumeFileAnalysis() { resumeMusic(); }
+bool AudioManager::fileAnalysisPaused() const { return musicPaused(); }
+double AudioManager::fileAnalysisPosition() const { return musicPosition(); }
+double AudioManager::fileAnalysisLength() const { return musicLength(); }
+void AudioManager::seekFileAnalysis(double seconds) { seekMusic(seconds); }
+bool AudioManager::fileAnalysisAtEnd() const { return musicAtEnd(); }
+void AudioManager::setFileAnalysisVolume(float volume) { setMusicVolume(volume); }
+float AudioManager::fileAnalysisVolume() const { return musicVolume(); }
 
 std::string AudioManager::lastError() const { return m_impl->lastError; }
 

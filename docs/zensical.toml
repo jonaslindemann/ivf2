@@ -109,7 +109,10 @@ primary = "yellow"
 [project.markdown_extensions.pymdownx.tabbed]
 [project.markdown_extensions.pymdownx.arithmatex]
 [project.markdown_extensions.pymdownx.snippets]
-base_path = "../"
+# Resolved against the build directory: "." when building from the repo root (Read the Docs),
+# ".." when building from docs/. Missing files fail the build instead of being skipped.
+base_path = [".", ".."]
+check_paths = true
 [project.markdown_extensions.admonition]
 [project.markdown_extensions.toc]
 permalink = true

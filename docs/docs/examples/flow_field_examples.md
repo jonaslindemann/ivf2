@@ -2,6 +2,8 @@
 
 ## flow_field1 — Curl-Noise Particle Steering
 
+![flow_field1](../images/sc_flow_field1.png)
+
 This example shows `FlowField` steering 8 000 particles through organic, fluid-like trajectories using curl noise. The field evolves slowly over time and the parameters can be tweaked live via ImGui sliders. Pausing via `TimeController` freezes both the field and the particles in place.
 
 **Scene setup:**
@@ -34,3 +36,10 @@ The `onUpdate()` pattern is minimal: set the field's time from `TimeController::
 ```cpp
 --8<-- "examples/flow_field1/flow_field1.cpp"
 ```
+
+## Related guides
+
+- [Flow Fields](../creative/flow_field.md)
+- [Time Control](../core/time_controller.md)
+
+All examples are listed in the [Example Index](index.md).

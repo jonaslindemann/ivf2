@@ -1,12 +1,12 @@
 # Primitives Examples
 
-In this chapter we will explore how to create and use various primitive shapes in the ivf2 library. Primitives are basic geometric shapes that can be used as building blocks for more complex models. The ivf2 library provides a variety of primitives, including cubes, spheres, cylinders, cones, planes, toruses, capsules, lines, and capped cylinders. There are also primitives for text and more complex shapes.
+In this chapter we will explore how to create and use various primitive shapes in the ivf2 library. Primitives are basic geometric shapes that can be used as building blocks for more complex models. The ivf2 library provides a variety of primitives, including boxes, spheres, cylinders, cones, tubes, planes, disks, capsules and dodecahedrons, with capped and rounded variants. There are also primitives for text and more complex shapes.
 
-## Availble Primitives
+## Available Primitives
 
 ![primitives1](../images/sc_primitives1.png)
 
-Thi example demonstrates the use of various primitive nodes in the ivf2 library. Available primitives include Cube, Sphere, Cylinder, Cone, Plane, Torus, Capsule, Line, and Capped Cylinder.
+This example shows every basic primitive: Box, RoundedBox, Sphere, Capsule, Cylinder, CappedCylinder, Cone, CappedCone, Tube, CappedTube, Plane, Disk and Dodecahedron.
 
 ### primitives1.cpp
 
@@ -49,3 +49,11 @@ In this example, we will demonstrate how to apply transformations to primitive s
 ```cpp
 --8<-- "examples/transforms1/transforms1.cpp"
 ```
+
+## Related guides
+
+- [Basic Primitives](../primitives/basic_primitives.md)
+- [Complex Primitives](../primitives/complex_primitives.md)
+- [Text](../primitives/text.md)
+
+All examples are listed in the [Example Index](index.md).

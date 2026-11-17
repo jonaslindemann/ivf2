@@ -33,3 +33,9 @@ This example demonstrates `CameraAnimation`: a smooth camera path that orbits an
 ```cpp
 --8<-- "examples/camera_anim1/camera_anim1.cpp"
 ```
+
+## Related guides
+
+- [Camera Animation](../animation/camera_animation.md)
+
+All examples are listed in the [Example Index](index.md).

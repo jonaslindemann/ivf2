@@ -6,7 +6,7 @@ In this section, we will explore how to create and use textures in the ivf2 libr
 
 ![texture1](../images/sc_textures1.png)
 
-In this example, we will create a simple scene with a textured cube an sphere. The texture will be loaded from an image file, and we will apply it to the nodes. Number keys toggle the differen texture modes. The T key toggles the texture on and off.
+In this example, we will create a simple scene with a textured cube and sphere. The texture will be loaded from an image file, and we will apply it to the nodes. Number keys toggle the different texture modes. The T key toggles the texture on and off.
 
 ### textures1.cpp
 
@@ -14,3 +14,8 @@ In this example, we will create a simple scene with a textured cube an sphere. T
 --8<-- "examples/textures1/textures1.cpp"
 ```
 
+## Related guides
+
+- [Materials and Textures](../core/materials_and_textures.md)
+
+All examples are listed in the [Example Index](index.md).

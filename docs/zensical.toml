@@ -19,19 +19,37 @@ nav = [
   { "Core" = [
     { "Nodes" = "core/nodes.md" },
     { "Materials and Textures" = "core/materials_and_textures.md" },
+    { "Shader Materials" = "core/shader_materials.md" },
     { "Lighting" = "core/lighting.md" },
+    { "Deformers" = "core/deformers.md" },
+    { "Procedural Geometry" = "core/procedural_geometry.md" },
     { "Time Control" = "core/time_controller.md" },
   ] },
   { "Primitives" = [
     { "Basic Primitives" = "primitives/basic_primitives.md" },
     { "Complex Primitives" = "primitives/complex_primitives.md" },
+    { "Text" = "primitives/text.md" },
   ] },
   { "Animation" = [
+    { "Choosing an Animation Tool" = "animation/choosing.md" },
     { "Basic Animation" = "animation/basic_animation.md" },
     { "Keyframe Animation" = "animation/keyframe_animation.md" },
     { "Spline Animation" = "animation/spline_animation.md" },
     { "Lissajous" = "animation/lissajous.md" },
     { "Camera Animation" = "animation/camera_animation.md" },
+  ] },
+  { "Effects" = [
+    { "Overview" = "effects/index.md" },
+    { "Blur, Bloom and Depth" = "effects/blur.md" },
+    { "Colour Effects" = "effects/color_effects.md" },
+    { "Film and Distortion" = "effects/film_effects.md" },
+    { "Custom Effects" = "effects/custom_effects.md" },
+  ] },
+  { "Advanced" = [
+    { "Shadows" = "advanced/shadows.md" },
+    { "Selection" = "advanced/selection.md" },
+    { "Model Loading" = "advanced/model_loading.md" },
+    { "Visitors" = "advanced/visitor_pattern.md" },
   ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },
@@ -42,9 +60,13 @@ nav = [
   { "UI" = [
     { "UI Windows" = "ui/ui_windows.md" },
     { "Scene Window" = "ui/scene_window.md" },
+    { "Built-in Scene Tools" = "ui/scene_ui_integration.md" },
+    { "Ready-made Widgets" = "ui/widgets.md" },
+    { "Custom UI" = "ui/custom_ui.md" },
     { "Time Control Panel" = "ui/time_control_panel.md" },
   ] },
   { "Examples" = [
+    { "Example Index" = "examples/index.md" },
     { "Primitive Examples" = "examples/primitives_examples.md" },
     { "Texture Examples" = "examples/texture_examples.md" },
     { "Animation Examples" = "examples/animation_examples.md" },
@@ -59,13 +81,14 @@ nav = [
     { "Camera Animation Examples" = "examples/camera_anim_examples.md" },
     { "Music Scene Examples" = "examples/music_examples.md" },
   ] },
-  { "API Reference" = [
-    { "Overview" = "api/index.md" },
+  { "Reference" = [
+    { "Cheat Sheet" = "reference/cheat_sheet.md" },
+    { "API Reference" = "api/index.md" },
   ] },
 ]
 
 [project.theme]
-font = { text = "Barlow" }
+font = { text = "Geist", code = "Geist Mono" }
 features = [
   "navigation.tabs",
   "navigation.expand",
@@ -91,3 +114,4 @@ base_path = "../"
 [project.markdown_extensions.toc]
 permalink = true
 [project.markdown_extensions.attr_list]
+[project.markdown_extensions.md_in_html]

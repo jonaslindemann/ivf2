@@ -1,13 +1,13 @@
 # Effect examples
 
-In this section, we will explore how to create and use effects in the ivf2 library. Effects allow us to apply visual enhancements to the scene, such as post-processing effects, particle systems, and more.
+In this section, we will explore how to create and use effects in the ivf2 library. Effects allow us to apply post-processing effects to the rendered image and add shadows to the scene.
 
 
 ## Post-Processing Effects Example
 
 ![post_processing](../images/sc_effects1.png)
 
-In this example we illustrate the different post-processing effects available in the ivf2 library. The effects include bloom, depth of field, and motion blur. The `ObjectInspector` class is used to control the parameters of each effect in real-time.
+In this example we illustrate the different post-processing effects available in the ivf2 library. It adds 19 effects, from blur and bloom to kaleidoscope, glitch and halftone, and lets you switch between them while it runs. Press **E** to open the effect inspector and tweak the parameters.
 
 ### effects1.cpp
 
@@ -26,3 +26,10 @@ In this example, we demonstrate how to implement shadow mapping in the ivf2 libr
 ```cpp
 --8<-- "examples/shadows1/shadows1.cpp"
 ```
+
+## Related guides
+
+- [Post-Processing Effects](../effects/index.md)
+- [Shadows](../advanced/shadows.md)
+
+All examples are listed in the [Example Index](index.md).

@@ -4,10 +4,9 @@ In the following examples, we will explore how to create animations using the iv
 
 ## Animation using onUpdate()
 
-![animiation1](../images/sc_animation1.png)
+![animation1](../images/sc_animation1.png)
 
-In this example, we will create a simple animation using the `onUpdate()` function. The animation will move a rectangle across the screen. The elapsedTime() method will be used to determine how much time has passed since the last frame, allowing us to create smooth animations.
-
+A cube spins around a diagonal axis while a small sphere orbits it. Both are animated in `onUpdate()` from `elapsedTime()`, so they turn at the same speed on any computer. The orbit comes from putting the sphere in a `Transform` group and rotating the group. See [Basic Animation](../animation/basic_animation.md).
 
 ### animation1.cpp
 
@@ -19,8 +18,7 @@ In this example, we will create a simple animation using the `onUpdate()` functi
 
 ![animation1](../images/sc_animation2.png)
 
-In this example, we will create a simple animation using the `onUpdate()` function. The animation will move a rectangle across the screen. The elapsedTime() method will be used to determine how much time has passed since the last frame, allowing us to create smooth animations.
-
+A sphere traces a 3D Lissajous curve, leaving a trail drawn with `LineTrace`. An ImGui window has sliders for all nine curve parameters, the speed and the trail length, so you can explore the shapes live. See [Lissajous Curves](../animation/lissajous.md).
 
 ### lissajou_window.h 
 
@@ -44,10 +42,20 @@ In this example, we will create a simple animation using the `onUpdate()` functi
 
 ![animation1](../images/sc_animation3.png)
 
-In this example, we will create a more complex animation using splines and keyframes. A Sphere will move along a spline path defined by keyframes. The Cube is animated using keyframe anitmation, where the Cube's position and rotation are defined by keyframes. To illustrate the animation a trace is drawn along both of the object using the `LineTrace` node. 
+In this example, we will create a more complex animation using splines and keyframes. A sphere moves along a spline through four control points, and a cube is animated with keyframes that set its position and rotation over 15 seconds. To illustrate the animation a trace is drawn along both of the object using the `LineTrace` node. 
 
 ### animation3.cpp
 
 ```cpp
 --8<-- "examples/animation3/animation3.cpp"
 ```
+
+## Related guides
+
+- [Basic Animation](../animation/basic_animation.md)
+- [Keyframe Animation](../animation/keyframe_animation.md)
+- [Spline Animation](../animation/spline_animation.md)
+- [Lissajous Curves](../animation/lissajous.md)
+- [Choosing an Animation Tool](../animation/choosing.md)
+
+All examples are listed in the [Example Index](index.md).

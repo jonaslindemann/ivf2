@@ -1,8 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
 
 :root,
 [data-md-color-scheme="slate"] {
-  --md-text-font: "Barlow", sans-serif;
+  --md-text-font: "Geist", sans-serif;
+  --md-code-font: "Geist Mono", monospace;
+  --ivf-heading-font: "Geist", sans-serif;
   --md-default-bg-color: #191B1F;
   --md-primary-fg-color: #FFD43B;
   --md-primary-fg-color--light: #FFE066;
@@ -11,7 +13,14 @@
 
 body,
 .md-typeset {
-  font-family: "Barlow", sans-serif;
+  font-family: var(--md-text-font);
+}
+
+.md-typeset code,
+.md-typeset kbd,
+.md-typeset pre {
+  font-family: var(--md-code-font);
+  font-variant-ligatures: none;
 }
 
 body,
@@ -75,4 +84,89 @@ body,
 .md-typeset h5,
 .md-typeset h6 {
   color: #FFD43B;
+}
+
+/* Geist for display text: headings, site title, tabs */
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6,
+.md-header__title,
+.md-tabs__link,
+.md-nav__title {
+  font-family: var(--ivf-heading-font);
+}
+
+.md-typeset h1 {
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.md-typeset h2 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.md-typeset h3,
+.md-typeset h4,
+.md-typeset h5,
+.md-typeset h6 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.md-header__title {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.md-tabs__link {
+  font-weight: 500;
+}
+
+/* Screenshot gallery on the start page */
+.md-typeset .ivf-gallery ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.8rem;
+  margin: 1.5em 0;
+  padding: 0;
+  list-style: none;
+}
+
+.md-typeset .ivf-gallery li {
+  margin: 0;
+}
+
+.md-typeset .ivf-gallery a {
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.4rem;
+  background-color: #22252B;
+  color: var(--md-default-fg-color);
+  font-family: var(--ivf-heading-font);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-align: center;
+  padding-bottom: 0.4rem;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.md-typeset .ivf-gallery img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1282 / 832;
+  object-fit: cover;
+  margin-bottom: 0.4rem;
+}
+
+.md-typeset .ivf-gallery a:hover,
+.md-typeset .ivf-gallery a:focus-visible {
+  border-color: var(--md-primary-fg-color);
+  color: var(--md-primary-fg-color);
+  transform: translateY(-2px);
 }

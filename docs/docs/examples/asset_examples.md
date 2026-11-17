@@ -13,3 +13,9 @@ In this example, we will demonstrate how to load 3D models using the Assimp libr
 ```cpp
 --8<-- "examples/assimp1/assimp1.cpp"
 ```
+
+## Related guides
+
+- [Model Loading](../advanced/model_loading.md)
+
+All examples are listed in the [Example Index](index.md).

@@ -68,7 +68,7 @@ void onKey(int key, int, int action, int) override {
 ivf2 offers several built-in animation types:
 
 1. **Direct manipulation** - Updating properties each frame via `onUpdate()`
-2. **SplineAnimation** - Animation along a spline path
-3. **KeyframeAnimation** - Animation between key poses
+2. **SplineAnimation** - Animation along a spline path (see [Spline Animation](spline_animation.md))
+3. **KeyframeAnimation** - Animation between key poses (see [Keyframe Animation](keyframe_animation.md))
 4. **CameraAnimation** - Spline fly-through with optional shake (see [Camera Animation](camera_animation.md))
-5. **Procedural animation** - Using mathematical functions driven by `TimeController::elapsed()`
+5. **Procedural animation** - Using mathematical functions driven by `TimeController::elapsed()` (see [Lissajous Curves](lissajous.md))

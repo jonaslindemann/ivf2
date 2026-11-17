@@ -35,3 +35,11 @@ This examples shows how to implement your own user interfaces and menus using th
 ```cpp
 --8<-- "examples/scene_ui1/scene_ui1.cpp"
 ```
+
+## Related guides
+
+- [UI Windows](../ui/ui_windows.md)
+- [Custom UI](../ui/custom_ui.md)
+- [Built-in Scene Tools](../ui/scene_ui_integration.md)
+
+All examples are listed in the [Example Index](index.md).

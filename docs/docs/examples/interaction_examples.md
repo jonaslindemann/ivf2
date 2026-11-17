@@ -13,3 +13,9 @@ In this example, we will create a simple scene with multiple objects that can be
 ```cpp
 --8<-- "examples/selection1/selection1.cpp"
 ```
+
+## Related guides
+
+- [Selection](../advanced/selection.md)
+
+All examples are listed in the [Example Index](index.md).

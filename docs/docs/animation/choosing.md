@@ -1,0 +1,129 @@
+# Choosing an Animation Tool
+
+ivf2 has several ways to make things change over time. They overlap a little, but each is built for a different job. This page helps you pick one, and introduces tweens and scene timelines, which don't have pages of their own.
+
+## Quick guide
+
+| You want to... | Use |
+|----------------|-----|
+| Move or spin something continuously, by a formula | Code in `onUpdate()` with [`TimeController`](../core/time_controller.md) time ([Basic Animation](basic_animation.md)) |
+| Animate a value smoothly from A to B when something happens (a click, a key, a timer) | [`Tween`](#tweens) |
+| Move an object through poses at fixed times | [`KeyframeAnimation`](keyframe_animation.md) |
+| Move an object along a curved path at a steady speed | [`SplineAnimation`](spline_animation.md) |
+| Fly the camera along a path | [Camera Animation](camera_animation.md) |
+| Play a sequence of scenes, each with its own objects, camera and effects | [`SceneTimeline`](#scene-timelines) |
+| Synchronise changes to music, by bar and beat | [`ivfmusic::Automation`](../creative/music_scenes.md) |
+| Bend or ripple a shape over time | [Deformers](../core/deformers.md) with `setTime()` |
+| Pause, slow down or speed up everything | [`TimeController`](../core/time_controller.md) |
+
+## How they differ
+
+The most important difference is what drives the animation:
+
+| Tool | Driven by | Can jump to any time? | Follows `TimeController` pause and scale? |
+|------|-----------|-----------------------|-------------------------------------------|
+| Formula in `onUpdate()` | Whatever time you pass | Yes | Yes, with `elapsed()` |
+| `Tween` | Real frame time from when it starts | No | No |
+| `KeyframeAnimation`, `SplineAnimation` | The delta you pass to `update()` | No, only play and stop | Yes, with `delta()` |
+| `SceneTimeline` | The delta you pass to the player | Yes, `seek()` | Yes, with `delta()` |
+| `ivfmusic::Automation` | Position in the song | Yes | Follows the music |
+
+**Seekable** tools compute their state from the current time alone, so scrubbing, looping and frame export always give the same picture. Prefer them for anything that will be recorded or presented. **Incremental** tools add up small steps each frame; they are simpler for interactive, one-off motion.
+
+## Tweens
+
+A tween animates one value from its current state to a target over a duration, with an easing curve. It is the right tool for reactions: an object that jumps to a new position when clicked, a panel that fades in, a camera that glides to a new view.
+
+```cpp
+#include <ivf/tween.h>
+
+glm::vec3 m_cubePos{0.0f};
+
+void onKey(int key, int, int action, int) override
+{
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+        ivf::TweenManager::instance()->to(m_cubePos, glm::vec3(3.0f, 1.0f, 0.0f), 1.2f, ivf::Easing::CubicInOut);
+}
+
+void onUpdate() override
+{
+    m_cube->setPos(m_cubePos);   // apply the animated value
+}
+```
+
+`TweenManager::to(value, target, seconds, easing)` starts a tween on any variable that supports arithmetic, such as `float`, `glm::vec3` or `glm::vec4`. The scene window updates all tweens automatically every frame.
+
+!!! warning
+    A tween keeps a reference to the variable it animates. Animate member variables, never local ones, and apply the value to your nodes in `onUpdate()`.
+
+To run something when the tween finishes, for example to chain a second movement:
+
+```cpp
+auto t = ivf::TweenManager::instance()->to(m_alpha, 1.0f, 0.5f, ivf::Easing::SineOut);
+t->setOnComplete([this]() { startNextStep(); });
+```
+
+### Easing curves
+
+| Easing | Feel |
+|--------|------|
+| `Linear` | Constant speed, mechanical |
+| `QuadIn/Out/InOut`, `CubicIn/Out/InOut`, `SineIn/Out/InOut` | Gentle acceleration and/or deceleration; *Out* is the most natural for reactions |
+| `BackOut` | Overshoots slightly, then settles |
+| `ElasticOut` | Springs back and forth before settling |
+| `BounceOut` | Bounces to rest like a dropped ball |
+| `Step` | Holds, then jumps at the end |
+| `SmoothStep` | Soft start and end |
+
+The same curves are used by `ivfmusic::Automation`. `easingName()` gives each curve's name, and `EasingCount` the number of curves, which is handy for a combo box in a UI. See the `tweening1` example.
+
+## Scene timelines
+
+A `SceneTimeline` plays a sequence of scenes, like the shots of a film. Each scene has a duration, its own root node, camera and effects, and optional callbacks for entering, updating and leaving it. A `SceneTimelinePlayer` switches the window to the right scene as time passes.
+
+```cpp
+#include <ivf/scene_timeline.h>
+#include <ivfui/scene_timeline_player.h>
+
+m_timeline = ivf::SceneTimeline::create();
+m_timeline->setLoop(true);
+
+m_timeline->addScene("Opening", 5.0)
+    .root(openingRoot)
+    .camera(ivf::TimelineCamera::lookAt({0.0f, 4.0f, 9.0f}, {0.0f, 0.9f, 0.0f}, 42.0))
+    .effect(openingVignette)
+    .onUpdate([this](double localTime, double dt) {
+        m_sphere->setEulerAngles(0.0f, float(localTime * 0.45), 0.0f);
+    });
+
+m_timeline->addScene("Finale", 5.0)
+    .root(finaleRoot)
+    .camera(ivf::TimelineCamera::lookAt({-6.5f, 6.5f, 7.0f}, {0.0f, 1.0f, 0.0f}, 50.0));
+
+m_player = ivfui::SceneTimelinePlayer::create(this, m_timeline);
+m_timeline->play();
+```
+
+```cpp
+void onUpdate() override
+{
+    m_player->update(ivf::TimeController::instance()->delta());
+}
+```
+
+The `onUpdate` callback receives the time since the scene started, so animations inside a scene restart cleanly when you jump to it. Effects must be loaded with `load()` before they are added to a scene.
+
+| Method | Description |
+|--------|-------------|
+| `play()`, `pause()`, `stop()` | Transport control |
+| `seek(t)` | Jump to a time in seconds from the start of the timeline |
+| `seekToScene(i)`, `nextScene()`, `previousScene()` | Jump between scenes |
+| `setLoop(on)` | Start again after the last scene |
+
+See the `timeline1` example. With music, a timeline can be combined with [music-driven scenes](../creative/music_scenes.md).
+
+## Related
+
+- [Basic Animation](basic_animation.md)
+- [Time Control](../core/time_controller.md)
+- [Animation Examples](../examples/animation_examples.md)

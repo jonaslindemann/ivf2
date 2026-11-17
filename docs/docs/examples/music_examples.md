@@ -2,6 +2,8 @@
 
 ## music_scene1: A Scene Driven by a Song
 
+![music_scene1](../images/sc_music1.png)
+
 This example shows the ivfmusic library. A ring of glowing orbs pulses on every beat. Their colour, the bloom intensity, the pulse strength and the rotation speed follow an automation file, and the camera flies a spline path defined in the same file. See [Music-Driven Scenes](../creative/music_scenes.md) for the concepts.
 
 **Scene setup:**
@@ -64,3 +66,11 @@ The orb brightness is shaped with `Easing::SmoothStep` through `ivf::detail::app
 ```cpp
 --8<-- "examples/mip_bloom1/mip_bloom1.cpp"
 ```
+
+## Related guides
+
+- [Music-Driven Scenes](../creative/music_scenes.md)
+- [Shader Materials](../core/shader_materials.md)
+- [Blur, Bloom and Depth](../effects/blur.md)
+
+All examples are listed in the [Example Index](index.md).

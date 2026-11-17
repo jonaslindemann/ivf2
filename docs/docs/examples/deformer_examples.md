@@ -37,3 +37,10 @@ In this example, we will create a random deformer that applies random noise to t
 ```cpp
 --8<-- "examples/deformer3/deformer3.cpp"
 ```
+
+## Related guides
+
+- [Deformers](../core/deformers.md)
+- [Procedural Geometry](../core/procedural_geometry.md)
+
+All examples are listed in the [Example Index](index.md).

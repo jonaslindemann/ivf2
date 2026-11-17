@@ -53,7 +53,7 @@ Clang Format is configured (`.clang-format`): Microsoft `BasedOnStyle`, 4-space 
 
 1. **ivfui** — GLFW window/event management + ImGui integration
 2. **ivf** — Core scene graph, rendering, primitives, materials, shaders, effects, animation
-3. **generator** — Header-only procedural geometry generation library (~97 generators)
+3. **generator** — Procedural geometry generation library (headers in `include/generator/`, sources in `src/generator/`, built as `lib/*/generator.lib`)
 4. **ivfmath** — Keyframe/spline interpolation, spherical math
 5. **ivfmusic** — Scenes driven by a song: `GLFWMusicSceneWindow`, `SongTransport`, `Automation` (bar-keyed parameters from JSON), `Score`/`TrackEnvelope` (Renoise `.xrns` notes), `LiveControls` (MIDI bindings from JSON applied in `param()`; opens ports only with a controls file) and `AutomationRecorder` (live takes saved punch-in style to `<automation>.take.json`, laid over the automation only inside their regions). Separate target `ivf2::ivfmusic`, not part of `ivf2::ivf2`; apps use `ivfmusic_add_executable()` from `cmake/ivfmusic.cmake`. Renoise support is behind the CMake option `IVF_WITH_RENOISE` (miniz, pugixml)
 
@@ -109,7 +109,7 @@ int main() {
 
 ### Effects / Post-Processing
 
-Effects are applied to a `CompositeNode` via the effects system. Available effects include: `BlurEffect`, `BloomEffect`, `MipBloomEffect` (wide bloom from the mip chain with tone mapping; place last), `ChromaticEffect`, `DitheringEffect`, `FilmGrainEffect`, `FogEffect`, `PixelationEffect`, `TintEffect`, `VignetteEffect`, `EdgeDetectionEffect`.
+Effects belong to the `GLFWSceneWindow`: call `setRenderToTexture(true)`, create the effect, call `load()`, then `addEffect()`; they run in the order added. Available effects include: `BlurEffect`, `BloomEffect`, `MipBloomEffect` (wide bloom from the mip chain with tone mapping; place last), `ChromaticEffect`, `DitheringEffect`, `FilmGrainEffect`, `FogEffect`, `PixelationEffect`, `TintEffect`, `VignetteEffect`, `EdgeDetectionEffect`.
 
 Custom shaders on nodes use `ShaderMaterial`; `BlendShaderMaterial` adds additive, alpha or background blending without depth writes (add blended nodes after opaque ones); `GlowMaterial`, `MistMaterial` and `GradientSkyMaterial` are ready-made subclasses with built-in shaders and typed setters (same pattern as `WaterMaterial`). `ivfui::PathCameraManipulator` lets the viewer look around an authored camera path (`ivf::TimelineCamera`) and returns to it.
 
@@ -123,7 +123,7 @@ Mesh deformation is applied to geometry nodes. Available: `ScaleDeformer`, `Twis
 
 ### Procedural Geometry (generator)
 
-The `generator` library is header-only and included via `#include <generator/generator.hpp>`. Generators produce meshes, paths, and shapes that can be composed (repeat, transform, scale, rotate, mirror, subdivide). Use `ivf::MeshNode` to consume generator output.
+The `generator` library is included via `#include <generator/generator.hpp>` (Z-up; `MeshNode::createFromGenerator()` swaps Y and Z). Generators produce meshes, paths, and shapes that can be composed (repeat, transform, scale, rotate, mirror, subdivide). Use `ivf::MeshNode` to consume generator output.
 
 ### Physics
 

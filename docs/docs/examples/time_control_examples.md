@@ -2,6 +2,8 @@
 
 ## time_control1 — Global Pause, Slow-Motion, and Time Scaling
 
+![time_control1](../images/sc_time_control1.png)
+
 This example demonstrates `TimeController` as a single control point for all animation in a scene. A wave-deformed ocean plane and nine orbiting coloured cubes all derive their motion from `TimeController::elapsed()`. Pausing, slowing, or resetting time affects every element simultaneously.
 
 **Scene setup:**
@@ -26,3 +28,11 @@ The key pattern to observe: every animation reads `TimeController::instance()->e
 ```cpp
 --8<-- "examples/time_control1/time_control1.cpp"
 ```
+
+## Related guides
+
+- [Time Control](../core/time_controller.md)
+- [Time Control Panel](../ui/time_control_panel.md)
+- [Deformers](../core/deformers.md)
+
+All examples are listed in the [Example Index](index.md).

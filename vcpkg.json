@@ -23,6 +23,8 @@
     "zlib",
     "reactphysics3d",
     "miniaudio",
-    "rtmidi"
+    "rtmidi",
+    "miniz",
+    "pugixml"
   ]
 }

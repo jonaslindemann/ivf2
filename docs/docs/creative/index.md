@@ -20,6 +20,10 @@ Steer thousands of particles through organic, fluid-like trajectories using curl
 
 `TimeController` gives you a global, pausable, scalable time stream. Wire it into any animation, deformer, or particle system and get pause, slow-motion, and time-scrubbing for free. Combine it with `TimeControlPanel` for a drop-in interactive control.
 
+### [Music-Driven Scenes](music_scenes.md)
+
+Make the song the clock of a scene. `GLFWMusicSceneWindow` adds a transport bar, markers and presentation mode. Parameters are keyframed in bars in a JSON file that reloads while the music plays, and the composition's notes become control values. Scrubbing and frame export give exactly the same picture.
+
 ### Camera Animation
 
 Compose cinematic fly-throughs from a handful of position keyframes. Auto-look-forward, looping, and shake effects turn a static scene into a presentation. See [Camera Animation](../animation/camera_animation.md).
@@ -31,3 +35,5 @@ The three examples in the [Examples](../examples/time_control_examples.md) secti
 - `time_control1` — wave-deformed plane and orbiting cubes with pause/slow-motion
 - `flow_field1` — 8 000 curl-noise particles with live-tweak sliders
 - `camera_anim1` — spline fly-through with shake and keyboard controls
+
+For music-driven work, start with `music_scene1` in the [Music Scene Examples](../examples/music_examples.md).

@@ -81,6 +81,12 @@ public:
 /**
  * @class SceneTimeline
  * @brief Ordered collection of timeline scenes with play, pause, seek, and looping.
+ *
+ * Use a SceneTimeline to sequence whole scenes, each with its own root, camera
+ * and effects; time is in seconds and advanced by update(). For continuous
+ * parameter changes synchronised to music (positioned in bars and looked up for
+ * any song position), use ivfmusic::Automation instead; for event-driven
+ * transitions use Tween. See ivfmusic::Automation for a comparison.
  */
 class SceneTimeline {
 public:

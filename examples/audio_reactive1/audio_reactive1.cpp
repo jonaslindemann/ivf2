@@ -113,7 +113,7 @@ public:
     void stopAll()
     {
         auto audio = AudioManager::instance();
-        if (m_source == Source::File) audio->stopFileAnalysis();
+        if (m_source == Source::File) audio->stopMusic();
         if (m_source == Source::Mic)  audio->stopCapture();
         m_source = Source::None;
         m_statusMsg.clear();
@@ -123,7 +123,7 @@ public:
     {
         stopAll();
         auto audio = AudioManager::instance();
-        if (audio->startFileAnalysis(m_filePath, true)) {
+        if (audio->startMusic(m_filePath, true)) {
             m_source    = Source::File;
             m_statusMsg = std::string("Playing: ") + m_filePath;
         } else {

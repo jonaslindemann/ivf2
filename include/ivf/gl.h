@@ -45,3 +45,4 @@
 #include <ivf/billboard.h>
 #include <ivf/bump_material.h>
 #include <ivf/shader_material.h>
+#include <ivf/blend_shader_material.h>

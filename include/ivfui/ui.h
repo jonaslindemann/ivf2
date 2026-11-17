@@ -2,6 +2,7 @@
 
 #include <ivfui/camera_manipulator.h>
 #include <ivfui/fly_camera_manipulator.h>
+#include <ivfui/path_camera_manipulator.h>
 #include <ivfui/dir_light_window.h>
 #include <ivfui/fps_window.h>
 #include <ivfui/glfw_application.h>

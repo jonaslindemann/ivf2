@@ -75,7 +75,8 @@ Goal: make the library trustworthy to depend on.
    ```
 
    - **Contents:** only GL-bound state - shaders/programs, textures, meshes, font glyph
-     textures, lights (shader uniforms), selection framebuffers. Not context-bound and kept
+     textures, lights (shader uniforms), selection framebuffers, `DebugDraw` (own VAO/VBO/
+     program) and `ShaderWatcher` (reloads programs). Not context-bound and kept
      out: `Logger`, `TimeController`, tweens, `AudioManager`, `MidiController`; the
      transform stack belongs to a render pass, not a context. Per-context matters because
      VAOs and framebuffers can never be shared between GL contexts.
@@ -95,6 +96,22 @@ Goal: make the library trustworthy to depend on.
    - **Benefits:** multiple windows/contexts, deterministic GL teardown, ivf usable in other
      applications and toolkits, headless rendering for tests and CI (1.8), and the basis for
      the Python, web and offline targets in phase 3.
+   - **Impact on examples** (survey of the 53 examples): none *need* to change - step A keeps
+     `XxxManager::instance()`/`create()` working because both window classes create and make
+     current their context before calling `onSetup`/`onDraw`/`onUpdateUi`.
+     - 42 `GLFWSceneWindow` examples: migrate the GL-bound manager calls
+       (29 examples, ~40 lines, e.g. `LightManager::instance()` -> `renderContext()->lights()`)
+       in the same change, so examples show the new API and don't trigger the deprecation.
+     - 10 `GLFWWindow` examples (`hello_ivf`, `extrusions1`, `textures1-3`, `ui1/2`, ...) keep
+       their manual setup as the low-level path; one becomes an embedding walkthrough
+       (`RenderContext::create()` + `setupDefaults()`), the pattern for Qt/SDL hosts.
+     - Unaffected: GLFW key/mouse codes (110 uses in 20 examples - `GLFWWindow::onKey(int ...)`
+       keeps its signature; `ivf::Key` only in core APIs, same values), the non-GL globals
+       (`TimeController`, `TweenManager`, `TimerManager`, `AudioManager`), `glfwGetTime()`.
+     - No example subclasses scene nodes or creates nodes before `onSetup` (the seven
+       `doDraw()` overrides are ImGui panels), so step B and lazy upload (2.1) don't affect them.
+     - New: a two-window example (one scene per window) as the acceptance test - impossible
+       with the current singletons.
 3. **Hide third-party headers.** *Done for the optional libraries:* assimp, FreeType,
    miniaudio, RtMidi and stb are private to `ivf` (no public header includes them) and the
    first four are optional via `IVF2_WITH_ASSIMP/FREETYPE/AUDIO/MIDI` (default ON), with

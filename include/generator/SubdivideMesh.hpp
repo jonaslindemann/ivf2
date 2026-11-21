@@ -217,7 +217,14 @@ private:
 
 	std::vector<Edge> edgeCache_;
 
-	std::map<gml::ivec2, int> edgeMap_;
+	// Lexicographic edge ordering (glm vectors have no operator<; this matches gml's).
+	struct EdgeLess {
+		bool operator()(const gml::ivec2& a, const gml::ivec2& b) const noexcept {
+			return a[0] < b[0] || (a[0] == b[0] && a[1] < b[1]);
+		}
+	};
+
+	std::map<gml::ivec2, int, EdgeLess> edgeMap_;
 
 	std::vector<MeshVertex> vertexCache_;
 

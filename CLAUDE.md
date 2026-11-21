@@ -127,6 +127,8 @@ Mesh deformation is applied to geometry nodes. Available: `ScaleDeformer`, `Twis
 
 ### Procedural Geometry (generator)
 
+The generator always uses glm (`GENERATOR_USE_GLM` is forced in `generator/math.hpp`; `gml::` names are glm aliases).
+
 The `generator` library is included via `#include <generator/generator.hpp>` (Z-up; `MeshNode::createFromGenerator()` swaps Y and Z). Generators produce meshes, paths, and shapes that can be composed (repeat, transform, scale, rotate, mirror, subdivide). Use `ivf::MeshNode` to consume generator output.
 
 ### Physics
@@ -135,7 +137,7 @@ ReactPhysics3D integration is in `examples/rigid_body1/`. The framework does not
 
 ## Dependencies (vcpkg.json)
 
-GLFW3, OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options, GLM (header-only, bundled in `include/glm/`).
+GLFW3, OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options, GLM (header-only, bundled in `include/glm/`; also used by the generator library).
 
 ## Shaders
 

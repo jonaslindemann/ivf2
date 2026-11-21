@@ -9,7 +9,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
-#include <gml/gml.hpp>
+#include <generator/math.hpp>
 
 namespace ivf {
 

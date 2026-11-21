@@ -133,9 +133,13 @@ Goal: make the library trustworthy to depend on.
    *Remaining:* ImGui is still a (private) dependency of the core for
    `DebugDraw::drawUi()` text labels - could move to ivfui; gml in public headers (see 4).
    GLFW and ImGui in ivfui headers are intended - they are part of that API.
-4. **One math library.** Port `generator` from gml to glm (or provide glm adapters) and
-   take glm from vcpkg instead of vendoring it; remove `include/gml` and `include/dirent`
-   (use `std::filesystem`).
+4. **One math library.** *Done:* the generator library's built-in `GENERATOR_USE_GLM` mode
+   is always on, so `gml::` names are aliases for glm; the bundled `include/gml` is removed.
+   Verified by dumping 35 generator meshes/paths/shapes with the old (gml) and new (glm)
+   build: identical structure, max difference 1e-12. Fixed on the way: `gml::length` alias
+   (PolyLinePath) and a comparator for `SubdivideMesh` (glm vectors have no `operator<`).
+   *Remaining:* take glm from vcpkg instead of the bundled `include/glm` (1.0.0), and remove
+   `include/dirent` (use `std::filesystem`).
 5. **Diagnostics.** Debug-context option on `GLFWWindow`, `glDebugMessageCallback` routed
    to `Logger` (when GL 4.3 / `KHR_debug` is available), `glObjectLabel` for named
    resources, and replace all `std::cout`/`std::cerr` with `IVF_LOG_*`. Add an

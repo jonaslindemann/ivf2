@@ -37,7 +37,6 @@ jobs:
           config: |
             paths-ignore:
               - include/glm
-              - include/gml
               - include/glad
               - include/KHR
               - include/dirent

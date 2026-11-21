@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
-#include <gml/gml.hpp>
+#include <generator/math.hpp>
 
 /*
  * double radius = 1.0, int segments = 1, int rings = 1

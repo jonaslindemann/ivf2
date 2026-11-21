@@ -7,10 +7,22 @@
 #ifndef GENERATOR_MATH_HPP
 #define GENERATOR_MATH_HPP
 
+// ivf2: the generator library always uses glm, so ivf2 has a single math
+// library. The gml names used by generator (gml::dvec3, gml::radians, ...)
+// become aliases for the corresponding glm types and functions below.
+#ifndef GENERATOR_USE_GLM
+#define GENERATOR_USE_GLM
+#endif
+
 #ifdef GENERATOR_USE_GLM
 
 #include <stdexcept>
 #include <limits>
+
+// The gtx headers below are glm "experimental" extensions.
+#ifndef GLM_ENABLE_EXPERIMENTAL
+#define GLM_ENABLE_EXPERIMENTAL
+#endif
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -77,6 +89,7 @@ using glm::clamp;
 using glm::cross;
 using glm::degrees;
 using glm::dot;
+using glm::length; // ivf2: used by PolyLinePath
 using glm::max;
 using glm::min;
 using glm::mix;
@@ -343,7 +356,7 @@ glm::tmat2x3<T> bezier2Jacobian(
 
 #else
 
-#include <gml/gml.hpp>
+#include <generator/math.hpp>
 
 #endif
 

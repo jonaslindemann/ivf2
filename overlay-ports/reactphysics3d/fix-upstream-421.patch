@@ -1,0 +1,22 @@
+From 583fabe502be637e0cee4807c1c0b04d39e587e8 Mon Sep 17 00:00:00 2001
+From: Roberto Capuano <roberto.capuano@gmail.com>
+Date: Sun, 4 May 2025 13:26:31 +0200
+Subject: [PATCH] Add explicit include of chrone header.
+
+Visual Studio Code doesn't find chrono namespace: include is needed
+---
+ include/reactphysics3d/utils/DefaultLogger.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/include/reactphysics3d/utils/DefaultLogger.h b/include/reactphysics3d/utils/DefaultLogger.h
+index 1088d1e9247cf446771e7ea3196f5415513ab90c..8360f076b1b71df47fafe38dbf2023338fe37ceb 100644
+--- a/include/reactphysics3d/utils/DefaultLogger.h
++++ b/include/reactphysics3d/utils/DefaultLogger.h
+@@ -37,6 +37,7 @@
+ #include <iomanip>
+ #include <mutex>
+ #include <ctime>
++#include <chrono>
+ 
+ /// ReactPhysics3D namespace
+ namespace reactphysics3d {

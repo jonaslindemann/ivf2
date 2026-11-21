@@ -1,0 +1,155 @@
+# Continuous integration: build and test ivf2 on Windows, Linux and macOS.
+#
+# Runs on every push to main, on every pull request, and on demand from the
+# "Actions" tab (workflow_dispatch). Each platform runs as its own job in parallel.
+
+name: Build
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['docs/**', '**.md']   # documentation-only changes don't need a rebuild
+  pull_request:
+    paths-ignore: ['docs/**', '**.md']
+  workflow_dispatch:
+
+# A newer push to the same branch cancels a still-running older build.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+# The workflow only needs to read the repository.
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash   # use bash on all three OSes (Git Bash on Windows) so steps are identical
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 150
+
+    strategy:
+      fail-fast: false   # let the other platforms finish even if one fails
+      matrix:
+        include:
+          - name: Windows (MSVC)
+            os: windows-2025
+            configure-preset: vs           # names from CMakePresets.json
+            build-preset: vs-release
+            build-dir: build/vs
+          - name: Linux (GCC)
+            os: ubuntu-24.04
+            configure-preset: release
+            build-preset: release
+            build-dir: build/release
+          - name: macOS (AppleClang)
+            os: macos-15
+            configure-preset: release
+            build-preset: release
+            build-dir: build/release
+
+    steps:
+      # 1. Get the ivf2 source code onto the runner.
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # 2. Operating-system packages that vcpkg expects from the system
+      #    (X11/Wayland and OpenGL headers for GLFW, ALSA for RtMidi).
+      - name: Install system packages (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ninja-build pkg-config autoconf automake libtool \
+            libgl1-mesa-dev libglu1-mesa-dev libopengl-dev \
+            xorg-dev libxinerama-dev libxcursor-dev libxi-dev libxrandr-dev \
+            libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules \
+            libasound2-dev
+
+      - name: Install system packages (macOS)
+        if: runner.os == 'macOS'
+        run: brew install ninja pkg-config autoconf automake libtool || true
+
+      # 3. Get vcpkg at exactly the commit named by "builtin-baseline" in vcpkg.json,
+      #    so CI builds the same dependency versions as a developer machine.
+      - name: Set up vcpkg
+        run: |
+          # Normalise Windows paths (D:\a\_temp -> D:/a/_temp) so CMake gets forward slashes.
+          tmp="$RUNNER_TEMP"; ws="$GITHUB_WORKSPACE"
+          if [ "$RUNNER_OS" = "Windows" ]; then tmp=$(cygpath -m "$tmp"); ws=$(cygpath -m "$ws"); fi
+
+          baseline=$(jq -r '."builtin-baseline"' vcpkg.json)
+          echo "vcpkg baseline: $baseline"
+          git clone --quiet https://github.com/microsoft/vcpkg.git "$tmp/vcpkg"
+          git -C "$tmp/vcpkg" checkout --quiet "$baseline"
+          cd "$tmp/vcpkg"
+          if [ "$RUNNER_OS" = "Windows" ]; then ./bootstrap-vcpkg.bat -disableMetrics; else ./bootstrap-vcpkg.sh -disableMetrics; fi
+          mkdir -p "$tmp/vcpkg-cache"
+
+          # Variables written to $GITHUB_ENV are visible to all later steps.
+          echo "TMP_DIR=$tmp" >> "$GITHUB_ENV"
+          echo "WORKSPACE_DIR=$ws" >> "$GITHUB_ENV"
+          echo "VCPKG_ROOT=$tmp/vcpkg" >> "$GITHUB_ENV"
+          echo "VCPKG_DEFAULT_BINARY_CACHE=$tmp/vcpkg-cache" >> "$GITHUB_ENV"
+
+      # 4. Restore previously built dependency packages. The key changes whenever
+      #    the dependency list changes; restore-keys allows reusing an older cache
+      #    so only the changed packages are rebuilt.
+      - name: Restore vcpkg binary cache
+        id: vcpkg-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-${{ matrix.os }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'overlay-ports/**') }}
+          restore-keys: vcpkg-${{ matrix.os }}-
+
+      # 5. Configure. vcpkg installs the dependencies during this step.
+      - name: Configure
+        run: cmake --preset ${{ matrix.configure-preset }}
+
+      # 6. Save the dependency cache right away, so it survives even if the
+      #    build or tests below fail.
+      - name: Save vcpkg binary cache
+        if: always() && steps.vcpkg-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
+
+      # 7. Build libraries, examples and tests.
+      - name: Build
+        run: cmake --build --preset ${{ matrix.build-preset }} --parallel
+
+      # 8. Run the unit tests with CTest.
+      - name: Test
+        run: ctest --preset ${{ matrix.build-preset }}
+
+      # 9. Install ivf2 and build a separate project against the installed package.
+      - name: Install
+        run: cmake --install ${{ matrix.build-dir }} --config Release --prefix "$TMP_DIR/ivf2-install"
+
+      - name: Package consumer test
+        run: |
+          cmake -S tests/package -B "$TMP_DIR/package-build" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_PREFIX_PATH="$TMP_DIR/ivf2-install" \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_MANIFEST_MODE=OFF \
+            -DVCPKG_INSTALLED_DIR="$WORKSPACE_DIR/vcpkg_installed"
+          cmake --build "$TMP_DIR/package-build" --config Release --parallel
+
+      # On failure, keep vcpkg's build logs so dependency build errors can be inspected
+      # (download them from the run's summary page).
+      - name: Upload vcpkg logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vcpkg-logs-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/vcpkg/buildtrees/**/*.log
+          if-no-files-found: ignore
+          retention-days: 7

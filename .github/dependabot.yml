@@ -1,0 +1,11 @@
+# Dependabot opens pull requests when the GitHub Actions used in
+# .github/workflows/ have new versions. CI then runs on that PR before you merge.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ["*"]   # bundle all action updates into one PR

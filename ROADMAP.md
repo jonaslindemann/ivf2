@@ -54,10 +54,12 @@ visualisation and creative coding. Based on a review of the code base in Novembe
 
 Goal: make the library trustworthy to depend on.
 
-1. **Continuous integration.** GitHub Actions matrix (Windows/MSVC, Ubuntu/GCC+Clang,
-   macOS/AppleClang) using the presets, vcpkg binary caching (`VCPKG_BINARY_SOURCES` with
-   GitHub Actions cache), `ctest`, and an install + `find_package` consumer test. Add
-   `clang-format --dry-run` and later `clang-tidy` checks.
+1. **Continuous integration.** *In place:* `.github/workflows/build.yml` builds and tests on
+   Windows/MSVC, Ubuntu/GCC and macOS/AppleClang using the presets, caches vcpkg binaries,
+   runs `ctest`, installs and builds `tests/package` against the installed package. CodeQL
+   updated to v3 (`build-mode: none`); Dependabot keeps actions current.
+   *Next:* Ubuntu/Clang job, a sanitizer (ASan/UBSan) job, `clang-format` check on changed
+   lines, `clang-tidy`.
 2. **Replace singletons with a context object.** Introduce `ivf::RenderContext` (owned by
    the window) holding the shader, light, texture, font, mesh and transform managers.
    Keep `XxxManager::instance()` as a deprecated forwarder to the active context for one

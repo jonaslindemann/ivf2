@@ -29,6 +29,8 @@ Everything is built under `build/<preset>/`: libraries in `lib/<Config>/`, execu
 
 Library targets are static, created with `ivf2_add_library()` and exported as `ivf2::<name>`; dependencies are linked per target (no global include dirs). New `.cpp`/`.h` files in `src/<lib>/` and `include/<lib>/` are picked up automatically (`CONFIGURE_DEPENDS` globs), except `src/generator`, which lists its files explicitly. Unit tests (GL-free) live in `tests/`.
 
+**CI**: `.github/workflows/build.yml` runs the same presets on Windows (`vs`/`vs-release`), Ubuntu and macOS (`release`), then `ctest` and a package consumer build (`tests/package/`, a standalone project using `find_package(ivf2)`). vcpkg is pinned to `builtin-baseline` from `vcpkg.json`; keep code portable (GCC 13 / AppleClang, case-sensitive includes).
+
 ## Running Examples
 
 Examples are the primary way to validate functionality. Each example is a standalone executable built alongside the library:

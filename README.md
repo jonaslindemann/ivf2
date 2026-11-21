@@ -1,5 +1,8 @@
 # Interactive Visualisation Framework - Ivf++ 2
 
+[![Build](https://github.com/jonaslindemann/ivf2/actions/workflows/build.yml/badge.svg)](https://github.com/jonaslindemann/ivf2/actions/workflows/build.yml)
+[![CodeQL](https://github.com/jonaslindemann/ivf2/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jonaslindemann/ivf2/actions/workflows/codeql-analysis.yml)
+
 Lightweight scene graph library and wrapper over modern OpenGL. 
 
 ![alt text](docs/docs/images/logo.png "Logo")

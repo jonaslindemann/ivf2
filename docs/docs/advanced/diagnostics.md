@@ -48,16 +48,16 @@ Sources longer than the column are shortened with `~`. The layout can be adjuste
 auto log = ivf::Logger::instance();
 log->setShowDate(true);         // 2026-11-21 23:02:01.912 instead of the time only
 log->setContextWidth(20);       // wider source column (default 16)
-log->setWrapColumn(100);        // wrap long messages at column 100 (default: no wrapping)
+log->setWrapColumn(120);        // wrap long messages at column 120 (default 100, 0 = no wrapping)
 log->setShowTimestamp(false);   // no time column
 log->setLogLevel(ivf::LogLevel::Debug);  // also show debug messages
 ```
 
-With wrapping, continuation lines - and the lines of multi-line messages such as shader compiler output - are indented to the message column:
+Long messages are wrapped at column 100 by default. Continuation lines - and the lines of multi-line messages such as shader compiler output - are indented to the message column:
 
 ```text
-23:02:02.151 INFO  RenderContext    OpenGL 4.6.0 NVIDIA 621.01 | NVIDIA GeForce RTX
-                                    3060/PCIe/SSE2 | GLSL 4.60 NVIDIA
+23:02:02.151 INFO  RenderContext    OpenGL 4.6.0 NVIDIA 621.01 | NVIDIA GeForce RTX 3060/PCIe/SSE2 |
+                                    GLSL 4.60 NVIDIA
 ```
 
 `Logger::formatMessage()` returns a line exactly as it would be written.

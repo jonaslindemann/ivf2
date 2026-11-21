@@ -62,7 +62,7 @@ private:
     int m_levelWidth;
     int m_contextWidth;
     bool m_showDate;   ///< Include the date in the timestamp.
-    int m_wrapColumn;  ///< Wrap messages at this column (0 = no wrapping).
+    int m_wrapColumn;  ///< Wrap messages at this column (default 100, 0 = no wrapping).
 
     std::mutex m_mutex;                              ///< Serialises output from several threads.
     std::vector<std::pair<int, LogSink>> m_sinks;    ///< Registered sinks with their ids.
@@ -107,7 +107,7 @@ public:
     bool showDate() const;
 
     /**
-     * @brief Wrap long messages at this column (0 = no wrapping, the default).
+     * @brief Wrap long messages at this column (default 100; 0 = no wrapping).
      *
      * Continuation lines, and lines of messages that contain line breaks, are
      * indented to the start of the message column so the output stays aligned.

@@ -19,7 +19,7 @@ Logger::Logger()
       m_levelWidth(5),       // DEBUG / INFO / WARN / ERROR
       m_contextWidth(16),    // longer contexts are shortened with '~'
       m_showDate(false),     // time only: HH:MM:SS.mmm
-      m_wrapColumn(0)        // no wrapping
+      m_wrapColumn(100)      // wrap long messages at column 100
 {}
 
 Logger::~Logger() { 

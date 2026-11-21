@@ -96,7 +96,7 @@ struct FormatSettings {
         auto l = Logger::instance();
         l->setShowTimestamp(true);
         l->setContextWidth(16);
-        l->setWrapColumn(0);
+        l->setWrapColumn(100); // the default
     }
 };
 

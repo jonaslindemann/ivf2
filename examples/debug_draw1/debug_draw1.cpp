@@ -104,7 +104,7 @@ public:
     void onUpdate() override
     {
         m_time += float(frameTime());
-        auto* dd = DebugDraw::instance();
+        auto* dd = renderContext()->debugDraw();
 
         // ---- Bounding boxes ------------------------------------------------
         if (m_showBoxes) {
@@ -171,15 +171,15 @@ public:
         ImGui::SliderFloat("Duration (s)", &m_persistDuration, 0.5f, 5.0f);
 
         if (ImGui::Button("Draw persistent box (origin)")) {
-            DebugDraw::instance()->box({0, 0, 0}, {6.0f, 3.0f, 1.0f},
+            renderContext()->debugDraw()->box({0, 0, 0}, {6.0f, 3.0f, 1.0f},
                                        {1.0f, 0.0f, 1.0f, 1.0f}, m_persistDuration);
         }
         if (ImGui::Button("Draw persistent sphere (origin)")) {
-            DebugDraw::instance()->sphere({0, 0, 0}, 4.0f,
+            renderContext()->debugDraw()->sphere({0, 0, 0}, 4.0f,
                                           {0.0f, 1.0f, 0.5f, 1.0f}, m_persistDuration);
         }
         if (ImGui::Button("Draw persistent arrow")) {
-            DebugDraw::instance()->arrow({-5, 0, 0}, {2, 2, 0},
+            renderContext()->debugDraw()->arrow({-5, 0, 0}, {2, 2, 0},
                                          {1.0f, 0.8f, 0.0f, 1.0f}, m_persistDuration);
         }
 

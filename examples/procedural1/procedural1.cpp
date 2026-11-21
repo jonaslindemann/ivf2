@@ -101,7 +101,7 @@ public:
     int onSetup()
     {
         // Create and load the basic shader
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
+        ShaderManagerPtr shaderMgr = renderContext()->shaders();
         shaderMgr->loadBasicShader();
 
         if (shaderMgr->compileLinkErrors())
@@ -111,7 +111,7 @@ public:
         }
 
         // Create the LightManager and add a point light
-        m_lightMgr = LightManager::create();
+        m_lightMgr = renderContext()->lights();
 
         auto pointLight1 = m_lightMgr->addPointLight();
         pointLight1->setEnabled(true);
@@ -122,7 +122,7 @@ public:
         m_lightMgr->apply();
 
         // Create the TextureManager and enable texture usage
-        m_texMgr = TextureManager::create();
+        m_texMgr = renderContext()->textures();
         m_texMgr->setUseTexture(true);
         m_texMgr->apply();
 

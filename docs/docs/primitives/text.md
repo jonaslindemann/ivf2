@@ -6,12 +6,10 @@
 
 ## Loading a font
 
-Text needs a font, loaded once through the `FontManager` before any text node is created:
+Text needs a font, loaded once through the window's `FontManager` before any text node is created (`GLFWSceneWindow` already loads Gidole as `"gidole"`):
 
 ```cpp
-#include <ivf/font_manager.h>
-
-ivf::FontManager::instance()->loadFace("fonts/Gidole-Regular.ttf", "gidole");
+renderContext()->fonts()->loadFace("fonts/Gidole-Regular.ttf", "gidole");
 ```
 
 Any TrueType (`.ttf`) or OpenType (`.otf`) font works. The most recently loaded font is used for new text. ivf2 ships with Gidole, Gidolinya and Roboto in `bin/fonts/`, which are copied next to the executables at build time.

@@ -47,12 +47,12 @@ public:
 
         // Create and load font face for UI rendering
 
-        auto fontMgr = FontManager::create();
+        auto fontMgr = renderContext()->fonts();
         fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
 
         // Create and load basic shader for rendering
 
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
+        ShaderManagerPtr shaderMgr = renderContext()->shaders();
         shaderMgr->loadBasicShader();
 
         // Check for shader compilation/linking errors
@@ -65,7 +65,7 @@ public:
 
         // Create and enable lighting manager
 
-        auto lightMgr = LightManager::create();
+        auto lightMgr = renderContext()->lights();
         lightMgr->enableLighting();
 
         // Add and configure a directional light

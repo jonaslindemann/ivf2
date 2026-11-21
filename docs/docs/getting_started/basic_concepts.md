@@ -40,7 +40,7 @@ int onSetup()
 {
     // Load basic shaders
 
-    auto shaderMgr = ShaderManager::instance();
+    auto shaderMgr = renderContext()->shaders();
     shaderMgr->loadBasicShader();
 
     // Check for shader compilation errors
@@ -56,14 +56,14 @@ int onSetup()
 
     In all the examples in this chapter we have omitted the ivf namespace. The Ivf2 library is designed to be used with the `ivf` namespace, so all classes and functions in the library are prefixed with `ivf::`. In the examples we will use the `using namespace ivf;` directive to avoid having to prefix all classes and functions with `ivf::`. This is not recommended in production code, but it makes the examples easier to read.
 
-The `ShaderManager` singleton class is used to manage the shaders in the library. It provides methods for loading and compiling shaders, as well as for checking for compilation errors. The `ShaderManager` class is a singleton, meaning that there is only one instance of it in the application. The `instance()` method of this class will always return the same instance of the class. The `loadBasicShader()` method loads the basic shader from the Ivf2 library. The `compileLinkErrors()` method checks for compilation errors in the shaders. If there are any errors, it will print them to the console and return true. If there are no errors, it will return false.
+The `ShaderManager` manages the shaders. It provides methods for loading and compiling shaders, as well as for checking for compilation errors. Every window owns a *render context* (`renderContext()`) holding the managers for its OpenGL context, so `renderContext()->shaders()` returns this window's shader manager. The `loadBasicShader()` method loads the basic shader from the Ivf2 library. The `compileLinkErrors()` method checks for compilation errors in the shaders. If there are any errors, it will print them to the console and return true. If there are no errors, it will return false.
 
-In the next step we initialise scene lighting by using the `LightManager` class. The `LightManager` class is used to manage the lights in the scene. It provides methods for adding and removing lights, as well as for updating the lights in the scene. The `LightManager` class is also a singleton accessed by the `instance()` method. The code below shows how to add a light to the scene.
+In the next step we initialise scene lighting by using the `LightManager` class. The `LightManager` class is used to manage the lights in the scene. It provides methods for adding and removing lights, as well as for updating the lights in the scene. Like the shader manager, it belongs to the window's render context and is accessed with `renderContext()->lights()`. (The older `LightManager::instance()` still works and returns the same object; see [Render Context](../advanced/render_context.md).) The code below shows how to add a light to the scene.
 
 ```cpp
     // Setup lighting
 
-    auto lightMgr = LightManager::instance();
+    auto lightMgr = renderContext()->lights();
 
     auto pointLight1 = lightMgr->addPointLight();
     pointLight1->setEnabled(true);
@@ -159,7 +159,7 @@ public:
     {
         // Load basic shaders
 
-        auto shaderMgr = ShaderManager::instance();
+        auto shaderMgr = renderContext()->shaders();
         shaderMgr->loadBasicShader();
 
         // Check for shader compilation errors
@@ -172,7 +172,7 @@ public:
 
         // Setup lighting
 
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
 
         auto pointLight1 = lightMgr->addPointLight();
         pointLight1->setEnabled(true);

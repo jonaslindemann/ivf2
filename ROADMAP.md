@@ -61,7 +61,16 @@ Goal: make the library trustworthy to depend on.
    updated to v3 (`build-mode: none`); Dependabot keeps actions current.
    *Next:* Ubuntu/Clang job, a sanitizer (ASan/UBSan) job, `clang-format` check on changed
    lines, `clang-tidy`.
-2. **Render context, independent of the windowing system.** Replace the GL-bound
+2. **Render context, independent of the windowing system.** *Step A done:*
+   `ivf::RenderContext` owns the nine GL-bound managers and the fallback textures;
+   `GLFWWindow` creates one per window and switches GL, RenderContext and ImGui contexts
+   together (also before input callbacks); `setupDefaults()` replaces the setup in
+   `GLFWSceneWindow::doSetup`; examples use `renderContext()->...`; new `multi_window1`,
+   `embedding1` and `test_render_context`. Finding during implementation:
+   `TransformManager` caches uniform locations of the context's program, so it is
+   context-bound and lives in the context (the original plan kept it out). Still open:
+   `ivf::Key`/`ivf::MouseButton`, step B (with 2.1), and dropping the `instance()`
+   forwarders after a deprecation period. Original plan: replace the GL-bound
    singletons with `ivf::RenderContext`, defined in the core `ivf` library with no
    knowledge of windows. It represents *one OpenGL context and the resources that belong
    to it*; whatever owns a GL context creates one. `ivfui::GLFWWindow` becomes one host
@@ -76,9 +85,9 @@ Goal: make the library trustworthy to depend on.
 
    - **Contents:** only GL-bound state - shaders/programs, textures, meshes, font glyph
      textures, lights (shader uniforms), selection framebuffers, `DebugDraw` (own VAO/VBO/
-     program) and `ShaderWatcher` (reloads programs). Not context-bound and kept
-     out: `Logger`, `TimeController`, tweens, `AudioManager`, `MidiController`; the
-     transform stack belongs to a render pass, not a context. Per-context matters because
+     program), `ShaderWatcher` (reloads programs) and `TransformManager` (uniform
+     locations). Not context-bound and kept out: `Logger`, `TimeController`, tweens,
+     `AudioManager`, `MidiController`. Per-context matters because
      VAOs and framebuffers can never be shared between GL contexts.
    - **GL loading** moves from `GLFWWindow` into `RenderContext::create(loaderFn)`
      (`glfwGetProcAddress`, `QOpenGLContext::getProcAddress`, `eglGetProcAddress`, ...).

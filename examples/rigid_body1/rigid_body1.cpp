@@ -205,7 +205,7 @@ public:
 
     virtual int onSetup() override
     {
-        auto lightManager = LightManager::instance();
+        auto lightManager = renderContext()->lights();
         lightManager->clearLights();
         lightManager->setUseShadows(true);
         lightManager->setAutoCalcBBox(false);

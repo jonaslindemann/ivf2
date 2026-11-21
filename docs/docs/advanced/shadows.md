@@ -9,7 +9,7 @@ Shadows make it much easier to read where objects are in space: without them, a 
 Shadows need two switches: shadow mapping in the `LightManager`, and shadow casting on the light. Only **directional lights** cast shadows.
 
 ```cpp
-auto lm = ivf::LightManager::instance();
+auto lm = renderContext()->lights();
 lm->clearLights();
 lm->setUseShadows(true);
 

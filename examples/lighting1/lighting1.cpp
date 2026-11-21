@@ -54,7 +54,7 @@ public:
     {
         // Get the singleton instance of the LightManager
 
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
 
         // Remove any existing lights from the scene
 
@@ -186,7 +186,7 @@ public:
     {
         if ((m_pointLightControl1->isDirty()) || (m_pointLightControl2->isDirty()) || (m_dirLightControl->isDirty()) ||
             (m_spotLightControl->isDirty()))
-            LightManager::instance()->apply();
+            renderContext()->lights()->apply();
     }
 };
 

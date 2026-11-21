@@ -81,7 +81,7 @@ public:
     {
         // Create and initialize the shader manager, then load the basic shader.
 
-        auto shaderMgr = ShaderManager::create();
+        auto shaderMgr = renderContext()->shaders();
         shaderMgr->loadBasicShader();
 
         // Check for shader compilation or linking errors.
@@ -94,7 +94,7 @@ public:
 
         // Create the light manager.
 
-        auto lightMgr = LightManager::create();
+        auto lightMgr = renderContext()->lights();
 
         // Add and configure a point light.
 

@@ -58,16 +58,16 @@ public:
     int onSetup() override
     {
         // Register the bump shader (basic + PBR are already loaded by GLFWSceneWindow).
-        ShaderManager::instance()->loadBumpShader();
+        renderContext()->shaders()->loadBumpShader();
 
         // Enable texture sampling in the basic shader (used by the left sphere).
         // The bump shader gets useTexture forwarded from the material in BumpMaterial::apply().
-        auto texMgr = TextureManager::create();
+        auto texMgr = renderContext()->textures();
         texMgr->setUseTexture(true);
         texMgr->apply();
 
         // Single orbiting point light for maximum bump-map impact.
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
         lightMgr->clearLights();
 
         m_light = lightMgr->addPointLight();
@@ -132,7 +132,7 @@ public:
             float x = m_lightRadius * cosf(m_lightAngle);
             float z = m_lightRadius * sinf(m_lightAngle);
             m_light->setPosition(glm::vec3(x, m_lightHeight, z));
-            LightManager::instance()->apply();
+            renderContext()->lights()->apply();
         }
     }
 

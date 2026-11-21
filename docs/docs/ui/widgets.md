@@ -33,7 +33,7 @@ One window per light, for adjusting lighting interactively. After a change, the 
 ```cpp
 int onSetup() override
 {
-    auto lm = ivf::LightManager::instance();
+    auto lm = renderContext()->lights();
     auto sun = lm->addDirectionalLight();
     // ...
     m_sunWindow = ivfui::DirectionalLightWindow::create(sun, "Sun");
@@ -44,7 +44,7 @@ int onSetup() override
 void onUpdateUi() override
 {
     if (m_sunWindow->isDirty())
-        ivf::LightManager::instance()->apply();
+        renderContext()->lights()->apply();
 }
 ```
 

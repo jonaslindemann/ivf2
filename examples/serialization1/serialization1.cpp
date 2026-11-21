@@ -43,7 +43,7 @@ public:
         enableGrid();
         cameraManipulator()->setCameraPosition({0, 6, 16});
 
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
         lightMgr->clearLights();
         auto light = lightMgr->addDirectionalLight();
         light->setDirection({-1, -1.5f, -1});

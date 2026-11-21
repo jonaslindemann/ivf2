@@ -83,7 +83,7 @@ protected:
         addEffect(m_bloom);
         setRenderToTexture(true);
 
-        auto light = LightManager::instance()->addDirectionalLight();
+        auto light = renderContext()->lights()->addDirectionalLight();
         light->setDiffuseColor({0.3f, 0.3f, 0.4f});
         light->setDirection({-0.3f, -1.0f, -0.2f});
         light->setEnabled(true);

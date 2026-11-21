@@ -49,7 +49,7 @@ public:
     {
         // Create a font manager and load a custom font
 
-        auto fontMgr = FontManager::create();
+        auto fontMgr = renderContext()->fonts();
         fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
 
         // Create a material for the text node

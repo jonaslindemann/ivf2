@@ -76,7 +76,7 @@ public:
         m_sphere->setMaterial(mat);
         add(m_sphere);
 
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
         lightMgr->clearLights();
         auto light = lightMgr->addDirectionalLight();
         light->setDirection({-0.5f, -1.0f, -0.5f});

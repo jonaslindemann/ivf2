@@ -71,14 +71,15 @@ All drawable entities inherit from `Node`. The hierarchy is:
     - `TextNode` — text rendering
   - `CompositeNode` — groups child nodes (Composite pattern)
 
-### Manager Singletons
+### Render Context and Managers
 
-Global state is managed via singleton managers, accessed through static `instance()`:
+GL-bound state lives in an `ivf::RenderContext` (`include/ivf/render_context.h`) — one per OpenGL context, defined in `ivf` with no windowing dependency. It owns, created lazily on first use: `ShaderManager` (`shaders()`), `LightManager` (`lights()`), `TextureManager` (`textures()`), `FontManager` (`fonts()`), `MeshManager` (`meshes()`), `SelectionManager` (`selection()`), `TransformManager` (`transforms()`, caches uniform locations of the context's program), `DebugDraw`, `ShaderWatcher`, and the fallback textures.
 
-- `ShaderManager` — GLSL program lifecycle
-- `LightManager` — point/directional/spot lights (max defined in shaders)
-- `TextureManager` — texture loading and binding
-- `FontManager` — FreeType font loading
+- `GLFWWindow` creates its context (loading GL via `RenderContext::create(glfwGetProcAddress)`), and `makeCurrent()` switches GL, RenderContext and ImGui context together — before drawing and before input callbacks. `GLFWSceneWindow` calls `renderContext()->setupDefaults()` (default shaders, font, light).
+- In window code use `renderContext()->lights()` etc. `XxxManager::instance()`/`create()` still work: they forward to `RenderContext::current()` (thread-local), or to a leaked process-wide fallback with a warning if none is current. `drop()` is a no-op. Library internals still use `instance()` (explicit passing is planned with the phase 2 render queue).
+- Non-GL globals stay singletons: `Logger`, `TimeController`, `TweenManager`, `TimerManager`, `AudioManager`.
+- Don't add function-local `static` GL objects or binding caches — they break with several contexts; put per-context GL state in `RenderContext`.
+- Other hosts (Qt, SDL, EGL): see `examples/embedding1`; several windows: `examples/multi_window1`.
 
 ### Key Patterns
 
@@ -97,7 +98,7 @@ Subclass `ivfui::GLFWWindow` and override event methods. Launch via `ivfui::GLFW
 #include <ivf/gl.h>  // includes all core ivf classes
 
 class MyWindow : public ivfui::GLFWWindow {
-    void onInit() override { /* scene setup */ }
+    int onSetup() override { /* scene setup, renderContext()->lights() ... */ return 0; }
     void onDraw() override { /* per-frame updates */ }
     // onResize, onKey, onMouseButton, onMouseMove, onScroll, ...
 };

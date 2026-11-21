@@ -52,7 +52,7 @@ public:
     {
         // Create and load the basic shader using the ShaderManager.
 
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
+        ShaderManagerPtr shaderMgr = renderContext()->shaders();
         shaderMgr->loadBasicShader();
 
         // Check for shader compilation and linking errors.
@@ -65,7 +65,7 @@ public:
 
         // Create the LightManager and add a point light to the scene.
 
-        m_lightMgr = LightManager::create();
+        m_lightMgr = renderContext()->lights();
 
         // Configure the point light's properties.
 
@@ -79,7 +79,7 @@ public:
 
         // Create the TextureManager and enable texture usage.
 
-        m_texMgr = TextureManager::create();
+        m_texMgr = renderContext()->textures();
         m_texMgr->setUseTexture(true);
         m_texMgr->apply();
 

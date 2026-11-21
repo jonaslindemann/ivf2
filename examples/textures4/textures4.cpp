@@ -67,7 +67,7 @@ public:
             }
         }
 
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
         lightMgr->clearLights();
 
         // Directional key light

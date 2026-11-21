@@ -37,7 +37,7 @@ public:
         setSelectionEnabled(true);
 
         /*
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
         auto light = lightMgr->addPointLight();
         light->setEnabled(true);
         light->setDiffuseColor({1.0f, 1.0f, 1.0f});

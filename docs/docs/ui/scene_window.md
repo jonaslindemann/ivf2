@@ -41,7 +41,7 @@ public:
 
     int onSetup()
     {
-        auto lightMgr = LightManager::create();
+        auto lightMgr = renderContext()->lights();
 
         auto pointLight1 = lightMgr->addPointLight();
         pointLight1->setEnabled(true);

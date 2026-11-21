@@ -43,7 +43,7 @@ int SolarWindow::onSetup()
 
     // Setup lighting
 
-    m_lightMgr = LightManager::create();
+    m_lightMgr = renderContext()->lights();
     m_lightMgr->clearLights();
     m_lightMgr->enableLighting();
 

@@ -127,7 +127,7 @@ public:
 
     void onDraw() override
     {
-        auto prog = ShaderManager::instance()->program("basic");
+        auto prog = renderContext()->shaders()->program("basic");
         if (prog && m_cubemap)
         {
             glActiveTexture(GL_TEXTURE5);

@@ -45,7 +45,7 @@ public:
     {
         // Load basic shaders
 
-        auto shaderMgr = ShaderManager::instance();
+        auto shaderMgr = renderContext()->shaders();
         shaderMgr->loadBasicShader();
 
         // Check for shader compilation errors
@@ -58,7 +58,7 @@ public:
 
         // Setup lighting
 
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
 
         auto pointLight1 = lightMgr->addPointLight();
         pointLight1->setEnabled(true);

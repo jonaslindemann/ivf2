@@ -44,7 +44,7 @@ public:
         enableHeadlight();
 
         // Build a scene: grid of coloured cubes
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
         auto light = lightMgr->addPointLight();
         light->setEnabled(true);
         light->setDiffuseColor({1.0f, 0.95f, 0.85f});

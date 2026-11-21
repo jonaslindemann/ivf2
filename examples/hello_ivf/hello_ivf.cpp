@@ -42,7 +42,7 @@ public:
     {
         // Load basic shaders
 
-        auto shaderMgr = ShaderManager::create();
+        auto shaderMgr = renderContext()->shaders();
 
         // Load the default basic shader program
 
@@ -58,7 +58,7 @@ public:
 
         // Setup lighting
 
-        auto lightMgr = LightManager::instance();
+        auto lightMgr = renderContext()->lights();
 
         // Add a point light to the scene
 

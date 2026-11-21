@@ -41,7 +41,7 @@ public:
 
     int onSetup() override
     {
-        auto light = LightManager::instance()->addDirectionalLight();
+        auto light = renderContext()->lights()->addDirectionalLight();
         light->setDiffuseColor({0.9f, 0.85f, 0.8f});
         light->setDirection({-0.4f, -1.0f, -0.3f});
         light->setEnabled(true);

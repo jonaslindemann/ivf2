@@ -92,7 +92,7 @@ public:
     int onSetup()
     {
         // Create and load the basic shader
-        ShaderManagerPtr shaderMgr = ShaderManager::create();
+        ShaderManagerPtr shaderMgr = renderContext()->shaders();
         shaderMgr->loadBasicShader();
 
         if (shaderMgr->compileLinkErrors())
@@ -102,7 +102,7 @@ public:
         }
 
         // Create the LightManager and add a point light
-        m_lightMgr = LightManager::create();
+        m_lightMgr = renderContext()->lights();
 
         auto pointLight1 = m_lightMgr->addPointLight();
         pointLight1->setEnabled(true);
@@ -113,7 +113,7 @@ public:
         m_lightMgr->apply();
         
         // Create and configure the TextureManager to enable textures globally
-        TextureManagerPtr texMgr = TextureManager::create();
+        TextureManagerPtr texMgr = renderContext()->textures();
         //texMgr->setUseTexture(true);
         texMgr->setTextureBlendMode(TextureBlendMode::Multiply);
         texMgr->setBlendFactor(1.0f);

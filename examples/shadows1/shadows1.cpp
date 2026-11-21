@@ -70,7 +70,7 @@ public:
     {
         // Get the singleton instance of the LightManager
 
-        auto lightManager = LightManager::instance();
+        auto lightManager = renderContext()->lights();
 
         // Remove all lights from the scene
 
@@ -202,12 +202,12 @@ public:
         }
         else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
         {
-            LightManager::instance()->setUseShadows(!LightManager::instance()->useShadows());
+            renderContext()->lights()->setUseShadows(!renderContext()->lights()->useShadows());
         }
         else if (key == GLFW_KEY_D && action == GLFW_PRESS)
         {
             m_debugShadow++;
-            LightManager::instance()->setDebugShadow(m_debugShadow);
+            renderContext()->lights()->setDebugShadow(m_debugShadow);
 
             if (m_debugShadow > 4)
                 m_debugShadow = 0;

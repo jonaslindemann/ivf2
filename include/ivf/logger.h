@@ -61,6 +61,8 @@ private:
     int m_timestampWidth;
     int m_levelWidth;
     int m_contextWidth;
+    bool m_showDate;   ///< Include the date in the timestamp.
+    int m_wrapColumn;  ///< Wrap messages at this column (0 = no wrapping).
 
     std::mutex m_mutex;                              ///< Serialises output from several threads.
     std::vector<std::pair<int, LogSink>> m_sinks;    ///< Registered sinks with their ids.
@@ -99,6 +101,28 @@ public:
     bool showTimestamp() const;
     void setShowContext(bool enable);
     bool showContext() const;
+
+    /** @brief Include the date in timestamps (default: time only, HH:MM:SS.mmm). */
+    void setShowDate(bool enable);
+    bool showDate() const;
+
+    /**
+     * @brief Wrap long messages at this column (0 = no wrapping, the default).
+     *
+     * Continuation lines, and lines of messages that contain line breaks, are
+     * indented to the start of the message column so the output stays aligned.
+     */
+    void setWrapColumn(int column);
+    int wrapColumn() const;
+
+    /**
+     * @brief Format a message exactly as it is written to the console and log file.
+     *
+     * Layout: `time level context message`, each column padded to its width,
+     * e.g. `23:02:01.912 INFO  GLFWApplication  Initializing GLFW`. Contexts longer
+     * than the context width are shortened with a trailing '~'.
+     */
+    std::string formatMessage(LogLevel level, const std::string &message, const std::string &context = "") const;
     
     // Field width configuration methods
     void setTimestampWidth(int width);
@@ -212,6 +236,8 @@ bool setFileOutput(const std::string &filePath);
 void disableFileOutput();
 void setShowTimestamp(bool enable);
 void setShowContext(bool enable);
+void setShowDate(bool enable);
+void setWrapColumn(int column);
 
 // Field width configuration functions
 void setTimestampWidth(int width);

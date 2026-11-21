@@ -82,6 +82,69 @@ IVF_TEST(concurrent_logging_delivers_every_message)
     IVF_CHECK(count == threads * perThread);
 }
 
+// Format without timestamps so the output is deterministic.
+struct FormatSettings {
+    FormatSettings(int contextWidth = 16, int wrap = 0)
+    {
+        auto l = Logger::instance();
+        l->setShowTimestamp(false);
+        l->setContextWidth(contextWidth);
+        l->setWrapColumn(wrap);
+    }
+    ~FormatSettings()
+    {
+        auto l = Logger::instance();
+        l->setShowTimestamp(true);
+        l->setContextWidth(16);
+        l->setWrapColumn(0);
+    }
+};
+
+IVF_TEST(format_aligned_columns)
+{
+    FormatSettings fs;
+    auto l = Logger::instance();
+    IVF_CHECK(l->formatMessage(LogLevel::Info, "Hello", "App") == "INFO  App              Hello");
+    IVF_CHECK(l->formatMessage(LogLevel::Warning, "Hello", "App") == "WARN  App              Hello");
+    IVF_CHECK(l->formatMessage(LogLevel::Error, "Hello", "App") == "ERROR App              Hello");
+}
+
+IVF_TEST(format_long_context_is_shortened)
+{
+    FormatSettings fs;
+    IVF_CHECK(Logger::instance()->formatMessage(LogLevel::Info, "x", "GLFWMusicSceneWindow") ==
+              "INFO  GLFWMusicSceneW~ x");
+}
+
+IVF_TEST(format_wraps_under_message_column)
+{
+    FormatSettings fs(16, 50); // prefix is 23 characters, so 27 for the message
+    const std::string out =
+        Logger::instance()->formatMessage(LogLevel::Info, "one two three four five six seven eight nine", "App");
+    const std::string indent(23, ' ');
+    // "one two three four five six" is exactly 27 characters, so it fits on the first line
+    IVF_CHECK(out == "INFO  App              one two three four five six\n" + indent + "seven eight nine");
+}
+
+IVF_TEST(format_indents_embedded_line_breaks)
+{
+    FormatSettings fs;
+    const std::string out = Logger::instance()->formatMessage(LogLevel::Error, "line 1\nline 2\n", "Shader");
+    IVF_CHECK(out == "ERROR Shader           line 1\n" + std::string(23, ' ') + "line 2");
+}
+
+IVF_TEST(format_timestamp_time_only_by_default)
+{
+    auto l = Logger::instance();
+    const std::string out = l->formatMessage(LogLevel::Info, "m", "C");
+    // HH:MM:SS.mmm followed by a space, then the level
+    IVF_CHECK(out.size() > 13 && out[2] == ':' && out[5] == ':' && out[8] == '.' && out[12] == ' ');
+    l->setShowDate(true);
+    const std::string dated = l->formatMessage(LogLevel::Info, "m", "C");
+    l->setShowDate(false);
+    IVF_CHECK(dated.size() > 24 && dated[4] == '-' && dated[7] == '-' && dated[10] == ' ');
+}
+
 IVF_TEST(logStr_streams_like_cout)
 {
     IVF_CHECK(ivf::logStr("a", 1, ' ', 2.5, "b") == "a1 2.5b");

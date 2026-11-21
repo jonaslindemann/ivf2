@@ -33,7 +33,7 @@ Library targets are static, created with `ivf2_add_library()` and exported as `i
 
 ## Diagnostics and unattended runs
 
-- Debug builds (or `IVF2_GL_DEBUG=1`) get an OpenGL debug context; driver messages are logged with context `OpenGL` (`ivf/gl_debug.h`). Breakpoint on `ivf::logError` gives the stack of the offending GL call. Expect zero `[ ERROR ]`/`[ WARNING ]` lines from examples.
+- Debug builds (or `IVF2_GL_DEBUG=1`) get an OpenGL debug context; driver messages are logged with context `OpenGL` (`ivf/gl_debug.h`). Breakpoint on `ivf::logError` gives the stack of the offending GL call. Expect zero `ERROR`/`WARN` lines from examples. Log line format: `HH:MM:SS.mmm LEVEL Context16 message` (see `Logger::formatMessage`; `setShowDate`, `setContextWidth`, `setWrapColumn`).
 - Run examples without showing windows: `IVF2_HIDE_WINDOWS=1 IVF2_EXIT_AFTER_FRAMES=90 IVF2_SCREENSHOT=out.png` (PowerShell: set `$env:...`). `embedding1` uses raw GLFW and ignores these.
 - Use the Logger (`ivf::logInfo/logWarning/logError/logDebug`, `ivf::logStr(...)` for mixed values) instead of `std::cout`; `std::cout` is only for explicit `print()`/dump helpers.
 - Label new GL objects with `ivf::glLabel(GL_TEXTURE, id, "name")` after they are first bound.

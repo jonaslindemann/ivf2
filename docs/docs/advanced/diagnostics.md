@@ -7,7 +7,7 @@ ivf2 reports problems through its `Logger`. This page covers OpenGL debug output
 With an OpenGL *debug context*, the driver reports errors, undefined behaviour and performance hints as they happen, instead of failing silently. ivf2 routes these messages to the Logger with the context `OpenGL`:
 
 ```text
-[ ERROR   ] [ OpenGL ] API error (id 1282): GL_INVALID_OPERATION error generated. Render buffer not bound.
+23:02:02.410 ERROR OpenGL           API error (id 1282): GL_INVALID_OPERATION error generated. Render buffer not bound.
 ```
 
 - **When it is on:** in debug builds by default. Set the environment variable `IVF2_GL_DEBUG=1` to enable it in release builds, or `IVF2_GL_DEBUG=0` to turn it off.
@@ -31,6 +31,36 @@ ivf2 names its OpenGL objects - shader programs by their name (`"basic"`, `"pbr"
 ```cpp
 ivf::glLabel(GL_TEXTURE, textureId, "terrain height map");
 ```
+
+## Log format
+
+Each message is one aligned line - time, level, source (context) and message:
+
+```text
+23:02:01.912 INFO  GLFWApplication  Initializing GLFW
+23:02:02.151 INFO  RenderContext    OpenGL 4.6.0 NVIDIA 621.01 | NVIDIA GeForce RTX 3060/PCIe/SSE2
+23:02:02.410 WARN  DirectionalLight Directional light direction cannot be zero.
+```
+
+Sources longer than the column are shortened with `~`. The layout can be adjusted:
+
+```cpp
+auto log = ivf::Logger::instance();
+log->setShowDate(true);         // 2026-11-21 23:02:01.912 instead of the time only
+log->setContextWidth(20);       // wider source column (default 16)
+log->setWrapColumn(100);        // wrap long messages at column 100 (default: no wrapping)
+log->setShowTimestamp(false);   // no time column
+log->setLogLevel(ivf::LogLevel::Debug);  // also show debug messages
+```
+
+With wrapping, continuation lines - and the lines of multi-line messages such as shader compiler output - are indented to the message column:
+
+```text
+23:02:02.151 INFO  RenderContext    OpenGL 4.6.0 NVIDIA 621.01 | NVIDIA GeForce RTX
+                                    3060/PCIe/SSE2 | GLSL 4.60 NVIDIA
+```
+
+`Logger::formatMessage()` returns a line exactly as it would be written.
 
 ## Redirecting log messages
 

@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**ivf2** (Interactive Visualisation Framework 2) is a modern C++20 scene graph-based graphics and visualization library built on OpenGL 3.3+. It is a complete rewrite of the original ivfplusplus library. Documentation: https://interactive-visualisation-framework-2.readthedocs.io/
+**ivf2** (Interactive Visualisation Framework 2) is a modern C++23 scene graph-based graphics and visualization library built on OpenGL 3.3+. It is a complete rewrite of the original ivfplusplus library. Documentation: https://interactive-visualisation-framework-2.readthedocs.io/
 
 ## Build Commands
 
-**Requirements**: CMake 3.24+, vcpkg (auto-detected: `CMAKE_TOOLCHAIN_FILE` > `VCPKG_ROOT` > common paths > VS-bundled), C++20 compiler. Build files live in `cmake/` (`IvfVcpkgBootstrap`, `IvfTargets`, `IvfInstall`, `ivf2Helpers`, `ivfmusic`).
+**Requirements**: CMake 3.24+, C++23 compiler (MSVC 2022+, GCC 13+, Clang 17+, Xcode 16+), vcpkg (auto-detected: `CMAKE_TOOLCHAIN_FILE` > `VCPKG_ROOT` > common paths > VS-bundled), C++20 compiler. Build files live in `cmake/` (`IvfVcpkgBootstrap`, `IvfTargets`, `IvfInstall`, `ivf2Helpers`, `ivfmusic`).
 
 **Windows (Visual Studio)**:
 ```
@@ -30,6 +30,10 @@ Everything is built under `build/<preset>/`: libraries in `lib/<Config>/`, execu
 Library targets are static, created with `ivf2_add_library()` and exported as `ivf2::<name>`; dependencies are linked per target (no global include dirs). New `.cpp`/`.h` files in `src/<lib>/` and `include/<lib>/` are picked up automatically (`CONFIGURE_DEPENDS` globs), except `src/generator`, which lists its files explicitly. Unit tests (GL-free) live in `tests/`. Optional dependencies (`IVF2_WITH_ASSIMP`, `IVF2_WITH_FREETYPE`, `IVF2_WITH_AUDIO`, `IVF2_WITH_MIDI`, all default ON) are private to `ivf`: public headers must not include assimp/FreeType/miniaudio/RtMidi/stb/nlohmann-json/ImGui (ivf core) — the `header_check_<lib>` targets built with the tests enforce this and header self-containment; guard implementations with the `IVF2_HAS_*` macros from the generated `<ivf/config.h>` and keep a no-op fallback. The `minimal` preset (all off) runs in CI.
 
 **CI**: `.github/workflows/build.yml` runs the same presets on Windows (`vs`/`vs-release`), Ubuntu and macOS (`release`), then `ctest` and a package consumer build (`tests/package/`, a standalone project using `find_package(ivf2)`). vcpkg is pinned to `builtin-baseline` from `vcpkg.json`; keep code portable (GCC 13 / AppleClang, case-sensitive includes).
+
+## Error handling
+
+Expected failures (files, formats, compile errors) return `ivf::Result<T>` (`std::expected<T, ivf::Error>`, `ivf/result.h`); use `return ivf::makeError(ErrorCode::..., "message incl. file name", "Context");`, which also logs. Exceptions only for programming errors. Results are `[[nodiscard]]` — callers check them (`if (!tex->load(...)) return -1;`) or `static_cast<void>(...)` with a comment. Old APIs kept as `[[deprecated]]` wrappers (MSVC shows them via `/w14996`).
 
 ## Diagnostics and unattended runs
 

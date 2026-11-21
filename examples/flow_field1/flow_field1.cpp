@@ -58,7 +58,8 @@ public:
         add(sphere);
 
         auto texture = Texture::create();
-        texture->load("assets/particle.jpeg");
+        if (!texture->load("assets/particle.jpeg"))
+            return -1; // the reason is already logged
 
         // Flow field — offset into a well-varied noise region (away from origin)
         m_field = FlowField::create();

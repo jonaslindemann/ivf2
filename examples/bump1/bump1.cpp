@@ -81,7 +81,8 @@ public:
 
         // Shared diffuse texture.
         auto diffuseTex = Texture::create();
-        diffuseTex->load("assets/brick.png");
+        if (!diffuseTex->load("assets/brick.png"))
+            return -1; // the reason is already logged
 
         // ---- Left sphere: standard Phong material ----------------------------
         auto plainMat = Material::create();

@@ -48,7 +48,7 @@ See the [Building ivf2](#building-ivf2) section below for detailed instructions.
 
 1. **CMake** 3.24 or higher (3.26+ recommended)
 2. **vcpkg** package manager
-3. **Compiler** with C++20 support:
+3. **Compiler** with C++23 support (`std::expected`):
    - Windows: Visual Studio 2022 or 2026
    - Linux: GCC 12+ or Clang 15+
    - macOS: Xcode 15+ / Apple Clang
@@ -215,7 +215,7 @@ cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/scripts/buildsystems/v
 
 ## Build fails with "cannot find library"
 
-Make sure you're using a C++20 compiler and the same vcpkg triplet for ivf2 and your
+Make sure you're using a C++23 compiler and the same vcpkg triplet for ivf2 and your
 application. On Windows, the `vs` preset picks the newest installed Visual Studio.
 
 ## Examples can't find shaders or assets

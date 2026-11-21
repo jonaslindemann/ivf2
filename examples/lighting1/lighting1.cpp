@@ -106,7 +106,8 @@ public:
         // Load a texture for use in the scene
 
         auto texture = Texture::create();
-        texture->load("assets/planks.png");
+        if (!texture->load("assets/planks.png"))
+            return -1; // the reason is already logged
 
         // Create a base sphere node to be instanced
 

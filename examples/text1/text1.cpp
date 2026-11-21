@@ -50,7 +50,8 @@ public:
         // Create a font manager and load a custom font
 
         auto fontMgr = renderContext()->fonts();
-        fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
+        if (!fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole"))
+            return -1; // the reason is already logged
 
         // Create a material for the text node
 
@@ -72,7 +73,8 @@ public:
         // Load a texture (not used directly here, but could be applied)
 
         auto texture = Texture::create();
-        texture->load("assets/planks.png");
+        if (!texture->load("assets/planks.png"))
+            return -1; // the reason is already logged
 
         // Assign the material to the text node
 

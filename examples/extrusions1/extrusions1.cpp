@@ -48,7 +48,8 @@ public:
         // Create and load font face for UI rendering
 
         auto fontMgr = renderContext()->fonts();
-        fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
+        if (!fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole"))
+            return -1; // the reason is already logged
 
         // Create and load basic shader for rendering
 

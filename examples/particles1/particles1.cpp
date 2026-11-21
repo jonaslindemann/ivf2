@@ -39,7 +39,8 @@ public:
     int onSetup() override
     {
         auto texture = Texture::create();
-        texture->load("assets/particle.jpeg");
+        if (!texture->load("assets/particle.jpeg"))
+            return -1; // the reason is already logged
 
         m_ps = ParticleSystem::create(10000);
         m_ps->setEmitRate(m_emitRate);

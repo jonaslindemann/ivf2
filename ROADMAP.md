@@ -155,10 +155,18 @@ Goal: make the library trustworthy to depend on.
    wide lines never worked), `glViewport` with the camera's unset -1 size.
    *Open decision:* drop `GLFW_OPENGL_FORWARD_COMPAT` on Windows/Linux so line widths > 1
    take effect (changes how those scenes look; macOS stays at 1 pixel).
-6. **Error-handling policy.** Decide and document: loaders return
-   `std::expected`-style results (or `nullptr` + logged error), never silently continue.
-   Apply consistently to textures, models, shaders, fonts.
-7. **API polish.** Const-correct getters (`material() const`), `std::string_view`/`const&`
+6. **Error-handling policy.** *Done (policy + loaders):* C++23; `ivf::Result<T>` =
+   `std::expected<T, ivf::Error>` (code + message) in `ivf/result.h`; `makeError()` logs and
+   returns. Converted: `Texture::fromFile/load/loadHDR`, `Cubemap::load/loadFromDirectory`,
+   `FontManager::loadFace`, `ModelLoader::load` (old throwing `loadModel` deprecated),
+   `SceneSerializer::loadFile/saveFile` (old `load/save` deprecated). Exceptions only for
+   programming errors. Docs: Advanced > Error Handling; tests: `test_result`.
+   *Remaining:* shader programs (`ShaderManager::loadProgramFrom*` + `compileLinkErrors()`
+   flag -> `Result<ProgramPtr>`), effect/material shader loading; remove deprecated
+   wrappers in the next major release.
+7. **API polish.** Raise the MSVC warning level: CMake no longer adds `/W3`, so MSVC
+   builds run at `/W1` (only `/w14996` for deprecations was added); expect many conversion
+   warnings at `/W3`. Const-correct getters (`material() const`), `std::string_view`/`const&`
    parameters instead of `const std::string` by value, consistent naming
    (`texture(i)` vs `getTexture(i)`), `[[nodiscard]]` on factories. Generate
    `ivf/version.h` from `project(VERSION)`.

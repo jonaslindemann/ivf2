@@ -52,6 +52,7 @@ nav = [
     { "Visitors" = "advanced/visitor_pattern.md" },
     { "Render Context" = "advanced/render_context.md" },
     { "Diagnostics" = "advanced/diagnostics.md" },
+    { "Error Handling" = "advanced/error_handling.md" },
   ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },

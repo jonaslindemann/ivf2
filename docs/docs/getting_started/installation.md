@@ -7,9 +7,11 @@ This guide will help you install and set up the ivf2 library.
 - **CMake** 3.24 or higher
 - **vcpkg** package manager (handles all library dependencies automatically)
 - **Compiler**:
-  - Windows: Visual Studio 2022 or 2026 (MSVC with C++20 support)
-  - Linux: GCC or Clang with C++20 support
-  - macOS: Xcode with C++20 support
+  - Windows: Visual Studio 2022 (17.x) or 2026
+  - Linux: GCC 13+ or Clang 17+
+  - macOS: Xcode 16+ (Apple Clang)
+
+  ivf2 uses C++23 (`std::expected`); applications using ivf2 are compiled as C++23 too.
 - **OpenGL** 3.3 or higher
 
 All library dependencies (GLFW3, ImGui, Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi, ReactPhysics3D, etc.) are managed automatically by vcpkg and do not need to be installed manually.

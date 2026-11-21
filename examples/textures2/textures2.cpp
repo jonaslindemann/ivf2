@@ -138,19 +138,22 @@ public:
         
         // Layer 1: Base diffuse texture
         m_diffuseTexture = Texture::create();
-        m_diffuseTexture->load("assets/test_texture.png");
+        if (!m_diffuseTexture->load("assets/test_texture.png"))
+            return -1; // the reason is already logged
         m_diffuseTexture->setBlendMode(TextureBlendMode::Normal);
         m_diffuseTexture->setBlendFactor(1.0f);
 
         // Layer 2: Detail texture (adds fine details)
         m_detailTexture = Texture::create();
-        m_detailTexture->load("assets/pop_cat.png");
+        if (!m_detailTexture->load("assets/pop_cat.png"))
+            return -1; // the reason is already logged
         m_detailTexture->setBlendMode(TextureBlendMode::Multiply);
         m_detailTexture->setBlendFactor(0.5f);
 
         // Layer 3: Lightmap texture (adds lighting variation)
         m_lightmapTexture = Texture::create();
-        m_lightmapTexture->load("assets/brick.png"); // Reuse for demo
+        if (!m_lightmapTexture->load("assets/brick.png")) // Reuse for demo
+            return -1; // the reason is already logged
         m_lightmapTexture->setBlendMode(TextureBlendMode::Add);
         m_lightmapTexture->setBlendFactor(0.7f);
 

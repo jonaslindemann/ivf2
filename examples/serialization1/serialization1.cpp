@@ -93,7 +93,7 @@ public:
 
     void doSave()
     {
-        if (SceneSerializer::save(scene(), SAVE_PATH)) {
+        if (SceneSerializer::saveFile(scene(), SAVE_PATH)) {
             // Read back for preview
             std::ifstream f(SAVE_PATH);
             std::ostringstream ss;
@@ -106,13 +106,16 @@ public:
 
     void doLoad()
     {
-        auto loaded = SceneSerializer::load(SAVE_PATH);
-        if (loaded) {
-            scene()->clear();
-            for (auto& child : loaded->nodes())
-                add(child);
-            m_loaded = true;
+        auto loaded = SceneSerializer::loadFile(SAVE_PATH);
+        if (!loaded) {
+            // The Result carries the reason, e.g. "file not found" before the first save
+            m_jsonPreview = "Load failed: " + loaded.error().message;
+            return;
         }
+        scene()->clear();
+        for (auto& child : (*loaded)->nodes())
+            add(child);
+        m_loaded = true;
     }
 
     void onDrawUi() override

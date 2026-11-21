@@ -108,42 +108,32 @@ public:
                 std::string filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
                 std::string filename = ImGuiFileDialog::Instance()->GetCurrentFileName();
 
-                try
+                // ModelLoader::load() returns a Result: the model, or an Error
+                // (the reason is also logged).
+                if (auto loaded = ModelLoader::load(filePathName))
                 {
-                    auto model = ModelLoader::loadModel(filePathName);
+                    auto model = *loaded;
+                    this->clear(); // Clear previous models if needed
+                    this->add(model);
 
-                    if (model)
+                    std::cout << "Loaded model: " << filename << std::endl;
+
+                    auto wbbox = model->worldBoundingBox();
+
+                    std::cout << "World bounding box: "
+                              << "Min: " << wbbox.min().x << ", " << wbbox.min().y << ", " << wbbox.min().z << "\n"
+                              << "Max: " << wbbox.max().x << ", " << wbbox.max().y << ", " << wbbox.max().z << "\n"
+                              << "Center: " << wbbox.center().x << ", " << wbbox.center().y << ", "
+                              << wbbox.center().z << "\n";
+
+                    if (wbbox.isValid())
                     {
-                        this->clear(); // Clear previous models if needed
-                        this->add(model);
-
-                        std::cout << "Loaded model: " << filename << std::endl;
-
-                        auto wbbox = model->worldBoundingBox();
-
-                        std::cout << "World bounding box: "
-                                  << "Min: " << wbbox.min().x << ", " << wbbox.min().y << ", " << wbbox.min().z << "\n"
-                                  << "Max: " << wbbox.max().x << ", " << wbbox.max().y << ", " << wbbox.max().z << "\n"
-                                  << "Center: " << wbbox.center().x << ", " << wbbox.center().y << ", "
-                                  << wbbox.center().z << "\n";
-
-                        if (wbbox.isValid())
-                        {
-                            // Center the camera on the loaded model
-                            this->cameraManipulator()->setCameraTarget(wbbox.center());
-                            this->cameraManipulator()->setCameraPosition(
-                                glm::vec3(wbbox.center().x, wbbox.center().y, wbbox.max().z * 3.0f));
-                            this->cameraManipulator()->setFarZ(wbbox.max().z * 10.0f);
-                        }
+                        // Center the camera on the loaded model
+                        this->cameraManipulator()->setCameraTarget(wbbox.center());
+                        this->cameraManipulator()->setCameraPosition(
+                            glm::vec3(wbbox.center().x, wbbox.center().y, wbbox.max().z * 3.0f));
+                        this->cameraManipulator()->setFarZ(wbbox.max().z * 10.0f);
                     }
-                    else
-                    {
-                        std::cerr << "Failed to load model: " << filename << std::endl;
-                    }
-
-                } catch (const std::exception &e)
-                {
-                    std::cerr << "Error loading file: " << e.what() << std::endl;
                 }
             }
 

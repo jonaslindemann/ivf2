@@ -103,10 +103,12 @@ public:
         // Load textures for the sphere and box.
 
         auto textureCat = Texture::create();
-        textureCat->load("assets/pop_cat.png");
+        if (!textureCat->load("assets/pop_cat.png"))
+            return -1; // the reason is already logged
 
         auto textureBrick = Texture::create();
-        textureBrick->load("assets/brick.png");
+        if (!textureBrick->load("assets/brick.png"))
+            return -1; // the reason is already logged
 
         // Create a textured sphere and set its position.
 

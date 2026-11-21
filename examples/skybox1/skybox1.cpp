@@ -52,7 +52,8 @@ public:
     {
         // --- Procedural gradient cubemap -----------------------------------
         m_cubemap = Cubemap::create();
-        m_cubemap->loadFromDirectory("assets/skybox");
+        if (!m_cubemap->loadFromDirectory("assets/skybox"))
+            return -1; // the reason is already logged
         /*
         m_cubemap->loadGradient(
             {m_topColor[0],     m_topColor[1],     m_topColor[2]},

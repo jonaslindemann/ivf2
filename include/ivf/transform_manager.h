@@ -23,6 +23,8 @@ namespace ivf {
  * utilities, and updates shader uniforms as needed.
  */
 class TransformManager {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     /**
      * @enum MatrixMode
@@ -52,7 +54,6 @@ private:
     GLint m_viewPosId;    ///< Shader uniform location for view position.
 
     TransformManager();                  ///< Private constructor for singleton pattern.
-    static TransformManager *m_instance; ///< Singleton instance pointer.
 
     /**
      * @brief Update the shader with the current model, view, and projection matrices.
@@ -61,41 +62,21 @@ private:
 
 public:
     /**
-     * @brief Get the singleton instance of the TransformManager.
-     * @return TransformManager* Pointer to the singleton instance.
+     * @brief The TransformManager of the current RenderContext (RenderContext::current()->transforms()).
+     * @return TransformManager* Pointer to the manager.
      */
-    static TransformManager *instance()
-    {
-        if (!m_instance)
-        {
-            if (!m_instance)
-                m_instance = new TransformManager();
-        }
-        return m_instance;
-    }
+    static TransformManager *instance();
 
     /**
-     * @brief Create the singleton instance of the TransformManager (if not already created).
-     * @return TransformManager* Pointer to the singleton instance.
+     * @brief Same as instance(); kept for compatibility.
+     * @return TransformManager* Pointer to the manager.
      */
-    static TransformManager *create()
-    {
-        if (!m_instance)
-        {
-            if (!m_instance)
-                m_instance = new TransformManager();
-        }
-        return m_instance;
-    }
+    static TransformManager *create();
 
     /**
-     * @brief Destroy the singleton instance and release all resources.
+     * @brief Deprecated no-op: managers are owned and released by their RenderContext.
      */
-    static void drop()
-    {
-        delete m_instance;
-        m_instance = 0;
-    }
+    static void drop();
 
     // Generic functions
 

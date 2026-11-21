@@ -1,4 +1,5 @@
 #include <ivf/light_manager.h>
+#include <ivf/render_context.h>
 
 #include <ivf/shader_manager.h>
 #include <ivf/extent_visitor.h>
@@ -7,7 +8,22 @@
 
 using namespace ivf;
 
-LightManager *LightManager::m_instance = 0;
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+LightManager *LightManager::instance()
+{
+    return RenderContext::currentOrFallback()->lights();
+}
+
+LightManager *LightManager::create()
+{
+    return instance();
+}
+
+void LightManager::drop()
+{
+    // Managers are released together with their RenderContext.
+}
+
 
 LightManager::LightManager()
     : m_useLighting(true), m_useVertexColors(false), m_useLightingId(-1), m_useVertexColorsId(-1), m_useTextureId(-1),

@@ -21,6 +21,8 @@ namespace ivfui {
  */
 class UiRenderer {
 private:
+    ImGuiContext *m_context{nullptr}; ///< This window's ImGui context (one per window).
+
 public:
     /**
      * @brief Construct a UiRenderer for the given GLFW window.
@@ -39,6 +41,11 @@ public:
      * @return std::shared_ptr<UiRenderer> New UiRenderer instance.
      */
     static std::shared_ptr<UiRenderer> create(GLFWwindow *window);
+
+    /**
+     * @brief Make this renderer's ImGui context current (needed with several windows).
+     */
+    void makeCurrent();
 
     /**
      * @brief Begin a new ImGui frame (should be called at the start of each frame).

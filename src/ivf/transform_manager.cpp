@@ -1,4 +1,5 @@
 #include <ivf/transform_manager.h>
+#include <ivf/render_context.h>
 
 #include <glm/gtx/string_cast.hpp>
 
@@ -10,7 +11,22 @@
 using namespace ivf;
 using namespace std;
 
-TransformManager *TransformManager::m_instance = 0;
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+TransformManager *TransformManager::instance()
+{
+    return RenderContext::currentOrFallback()->transforms();
+}
+
+TransformManager *TransformManager::create()
+{
+    return instance();
+}
+
+void TransformManager::drop()
+{
+    // Managers are released together with their RenderContext.
+}
+
 
 TransformManager::TransformManager()
     : m_modelMatrix(1.0), m_projectionMatrix(1.0), m_viewMatrix(1.0), m_modelId(-1), m_viewId(-1), m_viewPosId(-1),

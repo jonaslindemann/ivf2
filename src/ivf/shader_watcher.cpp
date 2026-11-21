@@ -1,4 +1,5 @@
 #include <ivf/shader_watcher.h>
+#include <ivf/render_context.h>
 
 #include <ivf/vertex_shader.h>
 #include <ivf/fragment_shader.h>
@@ -8,14 +9,13 @@
 
 namespace ivf {
 
-ShaderWatcher* ShaderWatcher::m_instance = nullptr;
-
-ShaderWatcher* ShaderWatcher::instance()
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+ShaderWatcher *ShaderWatcher::instance()
 {
-    if (!m_instance)
-        m_instance = new ShaderWatcher();
-    return m_instance;
+    return RenderContext::currentOrFallback()->shaderWatcher();
 }
+
+
 
 void ShaderWatcher::watch(ProgramPtr program, std::string vertPath, std::string fragPath)
 {

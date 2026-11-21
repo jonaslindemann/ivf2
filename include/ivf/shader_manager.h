@@ -29,9 +29,10 @@ namespace ivf {
  * The class also provides error checking for shader compilation and linking.
  */
 class ShaderManager {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     ShaderManager();                  ///< Private constructor for singleton pattern.
-    static ShaderManager *m_instance; ///< Singleton instance pointer.
 
     bool m_linkErrors;          ///< True if there were linking errors.
     bool m_vertexCompileErrors; ///< True if there were vertex shader compile errors.
@@ -47,19 +48,19 @@ public:
     virtual ~ShaderManager();
 
     /**
-     * @brief Get the singleton instance of the ShaderManager.
-     * @return ShaderManager* Pointer to the singleton instance.
+     * @brief The ShaderManager of the current RenderContext (RenderContext::current()->shaders()).
+     * @return ShaderManager* Pointer to the manager.
      */
     static ShaderManager *instance();
 
     /**
-     * @brief Create the singleton instance of the ShaderManager (if not already created).
-     * @return ShaderManager* Pointer to the singleton instance.
+     * @brief Same as instance(); kept for compatibility.
+     * @return ShaderManager* Pointer to the manager.
      */
     static ShaderManager *create();
 
     /**
-     * @brief Destroy the singleton instance and release all resources.
+     * @brief Deprecated no-op: managers are owned and released by their RenderContext.
      */
     static void drop();
 

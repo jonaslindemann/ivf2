@@ -18,6 +18,7 @@
 #include <ivf/vertex_shader.h>
 #include <ivf/fragment_shader.h>
 #include <ivf/program.h>
+#include <ivf/render_context.h>
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
 #include <ivf/texture_manager.h>

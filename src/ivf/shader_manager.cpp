@@ -1,4 +1,5 @@
 #include <ivf/shader_manager.h>
+#include <ivf/render_context.h>
 
 #include <ivf/fragment_shader.h>
 #include <ivf/program.h>
@@ -19,7 +20,22 @@
 using namespace ivf;
 using namespace std;
 
-ShaderManager *ShaderManager::m_instance = nullptr;
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+ShaderManager *ShaderManager::instance()
+{
+    return RenderContext::currentOrFallback()->shaders();
+}
+
+ShaderManager *ShaderManager::create()
+{
+    return instance();
+}
+
+void ShaderManager::drop()
+{
+    // Managers are released together with their RenderContext.
+}
+
 
 namespace {
 
@@ -27,63 +43,23 @@ constexpr GLuint kDefaultCubemapUnit = 15;
 
 void bindDefaultTexture2D(GLuint unit)
 {
-    static GLuint defaultTexture = 0;
-
+    // The fallback texture belongs to the current RenderContext (one per GL context).
+    const GLuint texture = RenderContext::currentOrFallback()->fallbackTexture2D();
     GLint activeTexture = GL_TEXTURE0;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
-
-    if (defaultTexture == 0)
-    {
-        const unsigned char pixel[] = {255, 255, 255, 255};
-
-        glGenTextures(1, &defaultTexture);
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_2D, defaultTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
-    else
-    {
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_2D, defaultTexture);
-    }
-
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glActiveTexture(activeTexture);
 }
 
 void bindDefaultCubemap(GLuint unit)
 {
-    static GLuint defaultCubemap = 0;
-
+    // The fallback texture belongs to the current RenderContext (one per GL context).
+    const GLuint texture = RenderContext::currentOrFallback()->fallbackCubemap();
     GLint activeTexture = GL_TEXTURE0;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
-
-    if (defaultCubemap == 0)
-    {
-        const unsigned char pixel[] = {0, 0, 0, 255};
-
-        glGenTextures(1, &defaultCubemap);
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, defaultCubemap);
-
-        for (GLenum face = GL_TEXTURE_CUBE_MAP_POSITIVE_X; face <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z; ++face)
-            glTexImage2D(face, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
-
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    }
-    else
-    {
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, defaultCubemap);
-    }
-
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
     glActiveTexture(activeTexture);
 }
 
@@ -102,25 +78,8 @@ ShaderManager::~ShaderManager()
     m_programs.clear();
 }
 
-ShaderManager *ShaderManager::instance()
-{
-    if (!m_instance)
-    {
-        m_instance = new ShaderManager();
-    }
-    return m_instance;
-}
 
-ShaderManager *ShaderManager::create()
-{
-    return instance();
-}
 
-void ShaderManager::drop()
-{
-    delete m_instance;
-    m_instance = nullptr;
-}
 
 std::shared_ptr<Program> ShaderManager::loadProgramFromFiles(const std::string vertexSource,
                                                              const std::string fragmentSource, const std::string name,

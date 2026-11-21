@@ -1,4 +1,5 @@
 #include <ivf/debug_draw.h>
+#include <ivf/render_context.h>
 #include <ivf/shader_manager.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -9,7 +10,22 @@
 
 namespace ivf {
 
-DebugDraw* DebugDraw::m_instance = nullptr;
+DebugDraw::~DebugDraw()
+{
+    if (m_vbo != 0)
+        glDeleteBuffers(1, &m_vbo);
+    if (m_vao != 0)
+        glDeleteVertexArrays(1, &m_vao);
+    if (m_program != 0)
+        glDeleteProgram(m_program);
+}
+
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+DebugDraw *DebugDraw::instance()
+{
+    return RenderContext::currentOrFallback()->debugDraw();
+}
+
 
 // ---- Inline shaders --------------------------------------------------------
 

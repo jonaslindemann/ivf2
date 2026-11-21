@@ -12,3 +12,4 @@ endfunction()
 
 ivf2_add_test(test_generator LIBS ivf2::generator)
 ivf2_add_test(test_ivfmath LIBS ivf2::ivfmath)
+ivf2_add_test(test_render_context LIBS ivf2::ivf)

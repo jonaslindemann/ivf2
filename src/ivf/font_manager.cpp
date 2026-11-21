@@ -1,4 +1,5 @@
 #include <ivf/font_manager.h>
+#include <ivf/render_context.h>
 
 #include <ivf/config.h>
 #include <ivf/logger.h>
@@ -10,7 +11,22 @@
 
 using namespace ivf;
 
-FontManager *FontManager::m_instance = nullptr;
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+FontManager *FontManager::instance()
+{
+    return RenderContext::currentOrFallback()->fonts();
+}
+
+FontManager *FontManager::create()
+{
+    return instance();
+}
+
+void FontManager::drop()
+{
+    // Managers are released together with their RenderContext.
+}
+
 
 #if IVF2_HAS_FREETYPE
 

@@ -1,9 +1,25 @@
 #include <ivf/mesh_manager.h>
+#include <ivf/render_context.h>
 
 using namespace ivf;
 using namespace std;
 
-MeshManager *MeshManager::m_instance = 0;
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+MeshManager *MeshManager::instance()
+{
+    return RenderContext::currentOrFallback()->meshes();
+}
+
+MeshManager *MeshManager::create()
+{
+    return instance();
+}
+
+void MeshManager::drop()
+{
+    // Managers are released together with their RenderContext.
+}
+
 
 MeshManager::MeshManager()
 {}

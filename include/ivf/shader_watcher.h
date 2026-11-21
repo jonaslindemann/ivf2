@@ -31,6 +31,8 @@
 namespace ivf {
 
 class ShaderWatcher {
+    friend class RenderContext; // owns and creates the manager
+
 public:
     static ShaderWatcher* instance();
 
@@ -59,7 +61,6 @@ public:
 
 private:
     ShaderWatcher() = default;
-    static ShaderWatcher* m_instance;
 
     struct Entry {
         ProgramPtr program;

@@ -15,6 +15,7 @@ using namespace ivfui;
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     auto win = GLFWWindowTracker::instance()->get(window);
+    win->makeCurrent(); // managers and GL calls in user callbacks refer to this window
 
     if (win->useEscQuit()) {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -27,24 +28,28 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 static void mouse_callback(GLFWwindow *window, int button, int action, int mods)
 {
     auto win = GLFWWindowTracker::instance()->get(window);
+    win->makeCurrent(); // managers and GL calls in user callbacks refer to this window
     win->doMouseButton(button, action, mods);
 }
 
 static void mouse_pos_callback(GLFWwindow *window, double x, double y)
 {
     auto win = GLFWWindowTracker::instance()->get(window);
+    win->makeCurrent(); // managers and GL calls in user callbacks refer to this window
     win->doMousePosition(x, y);
 }
 
 static void window_resize_callback(GLFWwindow *window, int width, int height)
 {
     auto win = GLFWWindowTracker::instance()->get(window);
+    win->makeCurrent(); // managers and GL calls in user callbacks refer to this window
     win->doResize(width, height);
 }
 
 static void scroll_callback(GLFWwindow *window, double xoffset, double yoffset)
 {
     auto win = GLFWWindowTracker::instance()->get(window);
+    win->makeCurrent(); // managers and GL calls in user callbacks refer to this window
     win->doScroll(xoffset, yoffset);
 }
 

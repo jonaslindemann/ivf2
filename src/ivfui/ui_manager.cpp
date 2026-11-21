@@ -11,7 +11,10 @@ UiRenderer::UiRenderer(GLFWwindow *window)
 {
     IMGUI_CHECKVERSION();
 
-    ImGui::CreateContext();
+    // Each window gets its own ImGui context; GLFWWindow makes it current
+    // together with the window's GL context and RenderContext.
+    m_context = ImGui::CreateContext();
+    ImGui::SetCurrentContext(m_context);
 
     ImGuiIO &io = ImGui::GetIO();
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -64,6 +67,12 @@ std::shared_ptr<UiRenderer> ivfui::UiRenderer::create(GLFWwindow *window)
     return std::make_shared<UiRenderer>(window);
 }
 
+void UiRenderer::makeCurrent()
+{
+    if (m_context != nullptr)
+        ImGui::SetCurrentContext(m_context);
+}
+
 void UiRenderer::beginFrame()
 {
     ImGui_ImplOpenGL3_NewFrame();
@@ -83,9 +92,15 @@ void UiRenderer::draw()
 
 void UiRenderer::shutdown()
 {
+    if (m_context == nullptr)
+        return;
+
+    // The window's GL context must be current (GLFWWindow::destroy ensures this).
+    ImGui::SetCurrentContext(m_context);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    ImGui::DestroyContext(m_context);
+    m_context = nullptr;
 }
 
 bool UiRenderer::wantCaptureMouse()

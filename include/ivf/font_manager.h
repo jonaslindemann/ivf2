@@ -31,10 +31,11 @@ using FontFace = FT_FaceRec_ *;
  * all faces are nullptr; TextNode then renders nothing.
  */
 class FontManager {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     FontManager();                  ///< Private constructor for singleton pattern.
     virtual ~FontManager();         ///< Destructor.
-    static FontManager *m_instance; ///< Singleton instance pointer.
 
     FT_LibraryRec_ *m_freetype{nullptr};       ///< FreeType library handle.
     std::map<std::string, FontFace> m_faces;   ///< Map of font face names to face handles.
@@ -42,41 +43,21 @@ private:
 
 public:
     /**
-     * @brief Get the singleton instance of the FontManager.
-     * @return FontManager* Pointer to the singleton instance.
+     * @brief The FontManager of the current RenderContext (RenderContext::current()->fonts()).
+     * @return FontManager* Pointer to the manager.
      */
-    static FontManager *instance()
-    {
-        if (!m_instance)
-        {
-            if (!m_instance)
-                m_instance = new FontManager();
-        }
-        return m_instance;
-    }
+    static FontManager *instance();
 
     /**
-     * @brief Create the singleton instance of the FontManager (if not already created).
-     * @return FontManager* Pointer to the singleton instance.
+     * @brief Same as instance(); kept for compatibility.
+     * @return FontManager* Pointer to the manager.
      */
-    static FontManager *create()
-    {
-        if (!m_instance)
-        {
-            if (!m_instance)
-                m_instance = new FontManager();
-        }
-        return m_instance;
-    }
+    static FontManager *create();
 
     /**
-     * @brief Destroy the singleton instance and release all resources.
+     * @brief Deprecated no-op: managers are owned and released by their RenderContext.
      */
-    static void drop()
-    {
-        delete m_instance;
-        m_instance = 0;
-    }
+    static void drop();
 
     /**
      * @brief Load a font face from file and store it with a given name.

@@ -25,6 +25,8 @@ namespace ivf {
  * as a singleton.
  */
 class LightManager {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     bool m_useLighting;     ///< Whether lighting is enabled.
     bool m_useVertexColors; ///< Whether vertex colors are used.
@@ -58,38 +60,24 @@ private:
     int m_debugShadow{0};       ///< Debug flag for shadow rendering.
 
     LightManager();                  ///< Private constructor for singleton pattern.
-    static LightManager *m_instance; ///< Singleton instance pointer.
 
 public:
     /**
-     * @brief Get the singleton instance of the LightManager.
-     * @return LightManager* Pointer to the singleton instance.
+     * @brief The LightManager of the current RenderContext (RenderContext::current()->lights()).
+     * @return LightManager* Pointer to the manager.
      */
-    static LightManager *instance()
-    {
-        if (!m_instance)
-            m_instance = new LightManager();
-
-        return m_instance;
-    }
+    static LightManager *instance();
 
     /**
-     * @brief Create the singleton instance of the LightManager (if not already created).
-     * @return LightManager* Pointer to the singleton instance.
+     * @brief Same as instance(); kept for compatibility.
+     * @return LightManager* Pointer to the manager.
      */
-    static LightManager *create()
-    {
-        return instance();
-    }
+    static LightManager *create();
 
     /**
-     * @brief Destroy the singleton instance and release all resources.
+     * @brief Deprecated no-op: managers are owned and released by their RenderContext.
      */
-    static void drop()
-    {
-        delete m_instance;
-        m_instance = 0;
-    }
+    static void drop();
 
     /**
      * @brief Add a new point light to the scene.

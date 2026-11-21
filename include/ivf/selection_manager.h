@@ -20,9 +20,10 @@ namespace ivf {
  * to the rendering context or shaders as needed.
  */
 class SelectionManager {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     SelectionManager();                  ///< Private constructor for singleton pattern.
-    static SelectionManager *m_instance; ///< Singleton instance pointer.
 
     uint32_t m_objectId;      ///< Current object ID for selection.
     uint32_t m_savedObjectId; ///< Saved object ID for state restoration.
@@ -34,34 +35,21 @@ private:
 
 public:
     /**
-     * @brief Get the singleton instance of the SelectionManager.
-     * @return SelectionManager* Pointer to the singleton instance.
+     * @brief The SelectionManager of the current RenderContext (RenderContext::current()->selection()).
+     * @return SelectionManager* Pointer to the manager.
      */
-    static SelectionManager *instance()
-    {
-        if (!m_instance)
-            m_instance = new SelectionManager();
-
-        return m_instance;
-    }
+    static SelectionManager *instance();
 
     /**
-     * @brief Create the singleton instance of the SelectionManager (if not already created).
-     * @return SelectionManager* Pointer to the singleton instance.
+     * @brief Same as instance(); kept for compatibility.
+     * @return SelectionManager* Pointer to the manager.
      */
-    static SelectionManager *create()
-    {
-        return instance();
-    }
+    static SelectionManager *create();
 
     /**
-     * @brief Destroy the singleton instance and release all resources.
+     * @brief Deprecated no-op: managers are owned and released by their RenderContext.
      */
-    static void drop()
-    {
-        delete m_instance;
-        m_instance = 0;
-    }
+    static void drop();
 
     /**
      * @brief Set the current object ID for selection.

@@ -1,11 +1,27 @@
 #include <ivf/selection_manager.h>
+#include <ivf/render_context.h>
 
 #include <ivf/shader_manager.h>
 
 
 using namespace ivf;
 
-SelectionManager *SelectionManager::m_instance = 0;
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+SelectionManager *SelectionManager::instance()
+{
+    return RenderContext::currentOrFallback()->selection();
+}
+
+SelectionManager *SelectionManager::create()
+{
+    return instance();
+}
+
+void SelectionManager::drop()
+{
+    // Managers are released together with their RenderContext.
+}
+
 
 SelectionManager::SelectionManager()
     : m_objectId(0), m_objectIdId(-1), m_selectionRendering(false), m_selectionRenderingId(-1), m_savedObjectId(0),

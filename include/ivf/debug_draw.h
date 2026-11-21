@@ -26,6 +26,8 @@ namespace ivf {
  * @endcode
  */
 class DebugDraw {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     struct Vertex {
         glm::vec3 pos;
@@ -57,7 +59,6 @@ private:
     glm::mat4 m_lastViewProj{1.0f};
     glm::vec4 m_lastViewport{0,0,1,1};
 
-    static DebugDraw* m_instance;
 
     DebugDraw() = default;
 
@@ -65,12 +66,10 @@ private:
     void addLine(glm::vec3 p0, glm::vec3 p1, glm::vec4 color);
 
 public:
-    static DebugDraw* instance()
-    {
-        if (!m_instance)
-            m_instance = new DebugDraw();
-        return m_instance;
-    }
+    /** @brief Releases the GL objects (called by the owning RenderContext). */
+    ~DebugDraw();
+
+    static DebugDraw* instance();
 
     // ---- Primitives (one-frame unless duration > 0) ----
 

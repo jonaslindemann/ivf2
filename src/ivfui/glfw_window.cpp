@@ -48,26 +48,41 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonit
 
     this->makeCurrent();
 
-    if (!gladLoadGL())
+    // Every GL context gets its own ivf RenderContext, which also loads the GL functions.
+    m_renderContext = ivf::RenderContext::create(reinterpret_cast<ivf::GLLoadProc>(glfwGetProcAddress));
+    if (!m_renderContext)
         exit(EXIT_FAILURE);
+    m_renderContext->makeCurrent();
 
     m_uiRenderer = UiRenderer::create(m_window);
 }
 
 GLFWWindow::~GLFWWindow()
 {
-    if (m_window)
-        glfwDestroyWindow(m_window);
+    this->destroy();
 }
 
 void GLFWWindow::makeCurrent()
 {
     if (m_window)
     {
-        glfwMakeContextCurrent(m_window);
+        if (glfwGetCurrentContext() != m_window)
+            glfwMakeContextCurrent(m_window);
+
         // Exports render as fast as possible instead of at the display refresh rate
-        glfwSwapInterval(m_exporting ? 0 : 1);
+        const int interval = m_exporting ? 0 : 1;
+        if (interval != m_swapInterval)
+        {
+            glfwSwapInterval(interval);
+            m_swapInterval = interval;
+        }
     }
+
+    if (m_renderContext)
+        m_renderContext->makeCurrent();
+
+    if (m_uiRenderer)
+        m_uiRenderer->makeCurrent();
 }
 
 bool GLFWWindow::isClosing()
@@ -99,6 +114,14 @@ void GLFWWindow::destroy()
 {
     if (m_window)
     {
+        // Release ImGui and ivf resources while this window's GL context is still current.
+        this->makeCurrent();
+
+        if (m_uiRenderer)
+            m_uiRenderer->shutdown();
+
+        m_renderContext.reset();
+
         glfwDestroyWindow(m_window);
         m_window = nullptr;
     }

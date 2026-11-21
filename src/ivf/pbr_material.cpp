@@ -1,4 +1,5 @@
 #include <ivf/pbr_material.h>
+#include <ivf/render_context.h>
 
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
@@ -15,63 +16,23 @@ constexpr GLuint kEnvCubemapUnit = 15;
 
 void bindFallbackTexture2D(GLuint unit)
 {
-    static GLuint fallbackTexture = 0;
-
+    // The fallback texture belongs to the current RenderContext (one per GL context).
+    const GLuint texture = RenderContext::currentOrFallback()->fallbackTexture2D();
     GLint activeTexture = GL_TEXTURE0;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
-
-    if (fallbackTexture == 0)
-    {
-        const unsigned char pixel[] = {255, 255, 255, 255};
-
-        glGenTextures(1, &fallbackTexture);
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_2D, fallbackTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    }
-    else
-    {
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_2D, fallbackTexture);
-    }
-
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glActiveTexture(activeTexture);
 }
 
 void bindFallbackCubemap(GLuint unit)
 {
-    static GLuint fallbackCubemap = 0;
-
+    // The fallback texture belongs to the current RenderContext (one per GL context).
+    const GLuint texture = RenderContext::currentOrFallback()->fallbackCubemap();
     GLint activeTexture = GL_TEXTURE0;
     glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture);
-
-    if (fallbackCubemap == 0)
-    {
-        const unsigned char pixel[] = {0, 0, 0, 255};
-
-        glGenTextures(1, &fallbackCubemap);
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, fallbackCubemap);
-
-        for (GLenum face = GL_TEXTURE_CUBE_MAP_POSITIVE_X; face <= GL_TEXTURE_CUBE_MAP_NEGATIVE_Z; ++face)
-            glTexImage2D(face, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
-
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    }
-    else
-    {
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, fallbackCubemap);
-    }
-
+    glActiveTexture(GL_TEXTURE0 + unit);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, texture);
     glActiveTexture(activeTexture);
 }
 

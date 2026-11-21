@@ -19,9 +19,10 @@ namespace ivf {
  * as a singleton and supports push/pop of state using JSON for flexible state management.
  */
 class MeshManager {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     MeshManager();                  ///< Private constructor for singleton pattern.
-    static MeshManager *m_instance; ///< Singleton instance pointer.
 
     std::stack<nlohmann::json> m_stateStack; ///< Stack for storing mesh state (as JSON).
     size_t m_maxStackSize = 100;             ///< Maximum stack size to prevent memory bloat.
@@ -30,41 +31,21 @@ private:
 
 public:
     /**
-     * @brief Get the singleton instance of the MeshManager.
-     * @return MeshManager* Pointer to the singleton instance.
+     * @brief The MeshManager of the current RenderContext (RenderContext::current()->meshes()).
+     * @return MeshManager* Pointer to the manager.
      */
-    static MeshManager *instance()
-    {
-        if (!m_instance)
-        {
-            if (!m_instance)
-                m_instance = new MeshManager();
-        }
-        return m_instance;
-    }
+    static MeshManager *instance();
 
     /**
-     * @brief Create the singleton instance of the MeshManager (if not already created).
-     * @return MeshManager* Pointer to the singleton instance.
+     * @brief Same as instance(); kept for compatibility.
+     * @return MeshManager* Pointer to the manager.
      */
-    static MeshManager *create()
-    {
-        if (!m_instance)
-        {
-            if (!m_instance)
-                m_instance = new MeshManager();
-        }
-        return m_instance;
-    }
+    static MeshManager *create();
 
     /**
-     * @brief Destroy the singleton instance and release all resources.
+     * @brief Deprecated no-op: managers are owned and released by their RenderContext.
      */
-    static void drop()
-    {
-        delete m_instance;
-        m_instance = 0;
-    }
+    static void drop();
 
     /**
      * @brief Push the current mesh state onto the stack.

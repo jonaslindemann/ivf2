@@ -15,6 +15,8 @@
 
 #include <vector>
 
+#include <ivf/render_context.h>
+
 #include <ivfui/frame_writer.h>
 #include <ivfui/ui_manager.h>
 
@@ -56,6 +58,8 @@ private:
     int m_frameCount;           ///< Number of frames rendered.
     int m_lastError;            ///< Last error code.
     UiRendererPtr m_uiRenderer; ///< UI renderer for this window.
+    ivf::RenderContextPtr m_renderContext; ///< ivf resources of this window's GL context.
+    int m_swapInterval{-1};     ///< Swap interval last set for this window (-1 = not set).
 
     // Scroll
     double m_scrollX;           ///< Last scroll X offset.
@@ -140,7 +144,9 @@ public:
                                               GLFWmonitor *monitor = nullptr, GLFWwindow *shared = nullptr);
 
     /**
-     * @brief Make this window's OpenGL context current.
+     * @brief Make this window current: its OpenGL context, its ivf RenderContext and
+     *        its ImGui context. Called automatically before drawing and before input
+     *        callbacks, so manager accessors always refer to this window's resources.
      */
     void makeCurrent();
 
@@ -350,6 +356,14 @@ public:
      * @return UiRendererPtr Shared pointer to the UI renderer.
      */
     UiRendererPtr uiRenderer() const { return m_uiRenderer; }
+
+    /**
+     * @brief The render context of this window's OpenGL context.
+     *
+     * Gives access to the window's managers, e.g. renderContext()->lights().
+     * @return ivf::RenderContextPtr The window's render context.
+     */
+    ivf::RenderContextPtr renderContext() const { return m_renderContext; }
 
     /**
      * @brief Save a PNG screenshot of the next rendered frame.

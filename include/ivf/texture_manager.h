@@ -32,6 +32,8 @@ enum TextureBlendMode {
  * applies texture parameters to the rendering context or shaders as needed.
  */
 class TextureManager {
+    friend class RenderContext; // owns and creates the manager
+
 private:
     TextureBlendMode m_textureBlendMode;      ///< Current texture blend mode.
     TextureBlendMode m_savedTextureBlendMode; ///< Saved blend mode for state restoration.
@@ -49,38 +51,24 @@ private:
     bool m_globalMultitexturingEnabled{true}; ///< Global enable/disable for multitexturing.
 
     TextureManager();                  ///< Private constructor for singleton pattern.
-    static TextureManager *m_instance; ///< Singleton instance pointer.
 
 public:
     /**
-     * @brief Get the singleton instance of the TextureManager.
-     * @return TextureManager* Pointer to the singleton instance.
+     * @brief The TextureManager of the current RenderContext (RenderContext::current()->textures()).
+     * @return TextureManager* Pointer to the manager.
      */
-    static TextureManager *instance()
-    {
-        if (!m_instance)
-            m_instance = new TextureManager();
-
-        return m_instance;
-    }
+    static TextureManager *instance();
 
     /**
-     * @brief Create the singleton instance of the TextureManager (if not already created).
-     * @return TextureManager* Pointer to the singleton instance.
+     * @brief Same as instance(); kept for compatibility.
+     * @return TextureManager* Pointer to the manager.
      */
-    static TextureManager *create()
-    {
-        return instance();
-    }
+    static TextureManager *create();
 
     /**
-     * @brief Destroy the singleton instance and release all resources.
+     * @brief Deprecated no-op: managers are owned and released by their RenderContext.
      */
-    static void drop()
-    {
-        delete m_instance;
-        m_instance = 0;
-    }
+    static void drop();
 
     /**
      * @brief Set the current texture blend mode.

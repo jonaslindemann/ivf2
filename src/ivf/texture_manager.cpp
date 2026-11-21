@@ -1,11 +1,27 @@
 #include <ivf/texture_manager.h>
+#include <ivf/render_context.h>
 
 #include <ivf/shader_manager.h>
 
 
 using namespace ivf;
 
-TextureManager *TextureManager::m_instance = 0;
+// The manager lives in the current RenderContext (see ivf/render_context.h).
+TextureManager *TextureManager::instance()
+{
+    return RenderContext::currentOrFallback()->textures();
+}
+
+TextureManager *TextureManager::create()
+{
+    return instance();
+}
+
+void TextureManager::drop()
+{
+    // Managers are released together with their RenderContext.
+}
+
 
 TextureManager::TextureManager()
     : m_textureBlendMode(TextureBlendMode::Normal), m_blendFactor(1.0), m_useTexture(true), m_textureBlendModeId(-1),

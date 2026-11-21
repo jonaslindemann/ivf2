@@ -534,31 +534,9 @@ int ivfui::GLFWSceneWindow::doSetup()
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_DEPTH_TEST);
 
-    auto fontMgr = ivf::FontManager::create();
-    fontMgr->loadFace("fonts/Gidole-Regular.ttf", "gidole");
-
-    auto shaderMgr = ivf::ShaderManager::create();
-    shaderMgr->loadRenderToTextureShader();
-    shaderMgr->loadBasicShader();
-    shaderMgr->loadPBRShader();
-    shaderMgr->apply();
-
-    if (shaderMgr->compileLinkErrors())
-    {
-        cout << "Couldn't compile shaders, exiting..." << endl;
+    // Default shaders, font and light live in this window's render context.
+    if (!this->renderContext()->setupDefaults())
         return -1;
-    }
-
-    auto lightMgr = ivf::LightManager::create();
-    lightMgr->enableLighting();
-
-    auto dirLight = lightMgr->addDirectionalLight();
-    dirLight->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
-    dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-    dirLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-    dirLight->setDirection(glm::vec3(-1.0, -2.0, -3.0));
-    dirLight->setEnabled(true);
-    lightMgr->apply();
 
     m_axis = ivf::Axis::create();
     m_grid = ivf::Grid::create();

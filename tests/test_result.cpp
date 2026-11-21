@@ -2,6 +2,7 @@
 
 #include "test_main.h"
 
+#include <ivf/config.h>
 #include <ivf/logger.h>
 #include <ivf/model_loader.h>
 #include <ivf/result.h>
@@ -71,7 +72,12 @@ IVF_TEST(model_loader_reports_missing_file)
     CapturedErrors log;
     auto model = ModelLoader::load("does/not/exist.obj");
     IVF_CHECK(!model);
+#if IVF2_HAS_ASSIMP
     IVF_CHECK(!model && model.error().code == ErrorCode::FileNotFound);
+#else
+    // Built without assimp (e.g. the "minimal" preset): no model can be loaded at all
+    IVF_CHECK(!model && model.error().code == ErrorCode::NotSupported);
+#endif
     IVF_CHECK(!model && model.error().message.find("does/not/exist.obj") != std::string::npos);
     IVF_CHECK(log.messages.size() == 1);
 }

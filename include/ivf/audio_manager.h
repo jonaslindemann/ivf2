@@ -5,8 +5,8 @@
  * @brief Audio playback and capture singleton using miniaudio.
  *
  * @section Requirements
- * Requires miniaudio, which is declared as a vcpkg dependency in vcpkg.json.
- * After running `vcpkg install` the header is available as `<miniaudio.h>`.
+ * Requires miniaudio (CMake option IVF2_WITH_AUDIO, default ON; check
+ * IVF2_HAS_AUDIO in ivf/config.h). Without it every method is a safe no-op.
  *
  * AudioManager uses a pimpl so this header has zero dependency on miniaudio types.
  * `audio_manager.cpp` is the only translation unit that includes miniaudio.

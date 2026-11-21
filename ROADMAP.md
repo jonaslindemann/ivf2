@@ -65,12 +65,12 @@ Goal: make the library trustworthy to depend on.
    Keep `XxxManager::instance()` as a deprecated forwarder to the active context for one
    release. Benefits: multiple windows/contexts, GL resources destroyed while the context
    is alive, testable code.
-3. **Hide third-party headers.** Pimpl or forward declarations in `model_loader.h`
-   (assimp), `font_manager.h` (FreeType), `texture.h` (stb), `scene_serializer.h` /
-   `mesh_manager.h` (nlohmann/json). Then make dependencies `PRIVATE` and optional:
-   `IVF2_WITH_ASSIMP`, `IVF2_WITH_AUDIO` (miniaudio), `IVF2_WITH_MIDI` (RtMidi),
-   exposed as `find_package(ivf2 COMPONENTS ...)`. Faster compiles and a much smaller
-   minimal install.
+3. **Hide third-party headers.** *Done for the optional libraries:* assimp, FreeType,
+   miniaudio, RtMidi and stb are private to `ivf` (no public header includes them) and the
+   first four are optional via `IVF2_WITH_ASSIMP/FREETYPE/AUDIO/MIDI` (default ON), with
+   matching vcpkg features, a generated `ivf/config.h` and `find_package(ivf2 COMPONENTS ...)`.
+   *Remaining:* nlohmann/json in `scene_serializer.h` / `mesh_manager.h`; GLFW and ImGui in
+   ivfui headers (intended - they are part of that API).
 4. **One math library.** Port `generator` from gml to glm (or provide glm adapters) and
    take glm from vcpkg instead of vendoring it; remove `include/gml` and `include/dirent`
    (use `std::filesystem`).

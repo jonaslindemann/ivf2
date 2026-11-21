@@ -7,10 +7,16 @@
 
 #include <glm/glm.hpp>
 
-#include <ft2build.h>
-#include FT_FREETYPE_H
+// FreeType is a private dependency of ivf. Its handle types are pointers to these
+// structs (FT_Library == FT_LibraryRec_*, FT_Face == FT_FaceRec_*), so they can be
+// named here without including FreeType headers.
+struct FT_LibraryRec_;
+struct FT_FaceRec_;
 
 namespace ivf {
+
+/** @brief Handle to a loaded font face (FreeType's FT_Face). */
+using FontFace = FT_FaceRec_ *;
 
 /**
  * @class FontManager
@@ -20,6 +26,9 @@ namespace ivf {
  * FreeType font faces. It ensures that font resources are managed efficiently and
  * provides methods to load new faces, retrieve the current face, and access faces by name.
  * This class is implemented as a singleton.
+ *
+ * Without FreeType (IVF2_WITH_FREETYPE=OFF) loading fails with a logged error and
+ * all faces are nullptr; TextNode then renders nothing.
  */
 class FontManager {
 private:
@@ -27,9 +36,9 @@ private:
     virtual ~FontManager();         ///< Destructor.
     static FontManager *m_instance; ///< Singleton instance pointer.
 
-    FT_Library m_freetype;                  ///< FreeType library handle.
-    std::map<std::string, FT_Face> m_faces; ///< Map of font face names to FT_Face handles.
-    FT_Face m_currentFace;                  ///< Currently active font face.
+    FT_LibraryRec_ *m_freetype{nullptr};       ///< FreeType library handle.
+    std::map<std::string, FontFace> m_faces;   ///< Map of font face names to face handles.
+    FontFace m_currentFace{nullptr};           ///< Currently active font face.
 
 public:
     /**
@@ -78,16 +87,16 @@ public:
 
     /**
      * @brief Get the currently active font face.
-     * @return FT_Face Handle to the current font face.
+     * @return Handle to the current font face, or nullptr if none is loaded.
      */
-    FT_Face currentFace();
+    FontFace currentFace();
 
     /**
      * @brief Get a font face by name.
      * @param name Name of the font face.
-     * @return FT_Face Handle to the requested font face.
+     * @return Handle to the requested font face, or nullptr if not found.
      */
-    FT_Face face(const std::string name);
+    FontFace face(const std::string name);
 };
 
 /**

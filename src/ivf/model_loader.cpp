@@ -1,16 +1,31 @@
 #include <ivf/model_loader.h>
 #include <ivf/composite_node.h>
+#include <ivf/config.h>
 #include <ivf/logger.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
 #include <stdexcept>
-#include <iostream>
-#include <iomanip>
 
 using namespace ivf;
 
-void ModelLoader::processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNode> compNode,
+#if IVF2_HAS_ASSIMP
+
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
+#include <iomanip>
+#include <iostream>
+
+// assimp is a private dependency: these helpers are internal to this file.
+namespace {
+
+void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNode> compNode,
+                 aiMatrix4x4 parentTransform);
+void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode);
+void processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node);
+void processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh);
+
+void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNode> compNode,
                               aiMatrix4x4 parentTransform)
 {
     // Combine with parent transformation
@@ -92,7 +107,7 @@ void ModelLoader::processNode(const aiScene *scene, aiNode *node, std::shared_pt
         }
     }
 }
-void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode)
+void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode)
 {
     logInfo("Processing aiMesh...", "ModelLoader");
     logInfofc("ModelLoader", "  Mesh name: {}", aiMesh->mName.C_Str());
@@ -259,7 +274,7 @@ void ModelLoader::processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::share
               mesh->indexPos());
 }
 
-void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node)
+void processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node)
 {
     aiColor3D diffuse(1.0f, 1.0f, 1.0f);
     aiColor3D ambient(0.2f, 0.2f, 0.2f);
@@ -322,7 +337,7 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> n
     }
 }
 
-void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
+void processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
 {
     aiColor3D diffuse(1.0f, 1.0f, 1.0f);
     aiColor3D ambient(0.2f, 0.2f, 0.2f);
@@ -375,6 +390,8 @@ void ModelLoader::processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
     }
 }
 
+} // namespace
+
 std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
 {
     Assimp::Importer importer;
@@ -414,3 +431,13 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
 
     return compositeNode;
 }
+
+#else // !IVF2_HAS_ASSIMP
+
+std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
+{
+    throw std::runtime_error("Cannot load model '" + path +
+                             "': ivf2 was built without assimp (IVF2_WITH_ASSIMP=OFF)");
+}
+
+#endif // IVF2_HAS_ASSIMP

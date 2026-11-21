@@ -8,8 +8,6 @@
   "$comment-baseline": "Must be a commit that exists in github.com/microsoft/vcpkg (CI clones upstream). Pick it with: git -C <vcpkg> rev-parse origin/master",
   "builtin-baseline": "05925b52317eb9a900a8583782e630aafd7a8929",
   "dependencies": [
-    "assimp",
-    "freetype",
     "glfw3",
     {
       "name": "imgui",
@@ -19,13 +17,35 @@
         "opengl3-binding"
       ]
     },
-    "miniaudio",
     "nlohmann-json",
     "opengl",
-    "rtmidi",
     "stb"
   ],
   "features": {
+    "assimp": {
+      "description": "Model loading (ivf::ModelLoader) - CMake option IVF2_WITH_ASSIMP",
+      "dependencies": [
+        "assimp"
+      ]
+    },
+    "freetype": {
+      "description": "Text rendering (ivf::TextNode) - CMake option IVF2_WITH_FREETYPE",
+      "dependencies": [
+        "freetype"
+      ]
+    },
+    "audio": {
+      "description": "Audio playback and analysis (ivf::AudioManager) - CMake option IVF2_WITH_AUDIO",
+      "dependencies": [
+        "miniaudio"
+      ]
+    },
+    "midi": {
+      "description": "MIDI input (ivf::MidiController) - CMake option IVF2_WITH_MIDI",
+      "dependencies": [
+        "rtmidi"
+      ]
+    },
     "examples": {
       "description": "Dependencies used only by the example programs",
       "dependencies": [

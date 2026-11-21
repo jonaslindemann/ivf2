@@ -2,6 +2,8 @@
 #
 # Targets:  ivf2::ivf2 (everything except ivfmusic), ivf2::ivf, ivf2::ivfui,
 #           ivf2::ivfmath, ivf2::generator, ivf2::glad, and ivf2::ivfmusic when built.
+# Components (optional features), e.g. find_package(ivf2 REQUIRED COMPONENTS Assimp):
+#           Assimp, FreeType, Audio, Midi, Music
 # Functions: ivf2_copy_runtime_files(<target> [ASSETS <dirs...>])
 #            ivfmusic_add_executable(<name> SOURCES ... [ASSETS <dir>])
 # Variables: IVF2_RUNTIME_DATA_DIR (installed shaders/ and fonts/)
@@ -14,10 +16,23 @@ find_dependency(OpenGL)
 find_dependency(Threads)
 find_dependency(glfw3 CONFIG)
 find_dependency(imgui CONFIG)
-find_dependency(Freetype)
-find_dependency(assimp CONFIG)
 find_dependency(nlohmann_json CONFIG)
-find_dependency(RtMidi CONFIG)
+
+# Optional features this ivf2 was built with. The libraries are private to the
+# static ivf library but still have to be linked into applications.
+set(IVF2_HAS_ASSIMP @IVF2_WITH_ASSIMP@)
+set(IVF2_HAS_FREETYPE @IVF2_WITH_FREETYPE@)
+set(IVF2_HAS_AUDIO @IVF2_WITH_AUDIO@)
+set(IVF2_HAS_MIDI @IVF2_WITH_MIDI@)
+if(IVF2_HAS_ASSIMP)
+    find_dependency(assimp CONFIG)
+endif()
+if(IVF2_HAS_FREETYPE)
+    find_dependency(Freetype)
+endif()
+if(IVF2_HAS_MIDI)
+    find_dependency(RtMidi CONFIG)
+endif()
 
 set(IVF2_HAS_MUSIC @IVF2_BUILD_MUSIC@)
 set(IVF2_HAS_RENOISE @IVF_WITH_RENOISE@)
@@ -32,5 +47,12 @@ set_and_check(IVF2_RUNTIME_DATA_DIR "@PACKAGE_IVF2_INSTALL_DATADIR@")
 
 include("${CMAKE_CURRENT_LIST_DIR}/ivf2Helpers.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/ivfmusic.cmake")
+
+# Report components so find_package(ivf2 COMPONENTS ...) can require features.
+set(ivf2_Assimp_FOUND ${IVF2_HAS_ASSIMP})
+set(ivf2_FreeType_FOUND ${IVF2_HAS_FREETYPE})
+set(ivf2_Audio_FOUND ${IVF2_HAS_AUDIO})
+set(ivf2_Midi_FOUND ${IVF2_HAS_MIDI})
+set(ivf2_Music_FOUND ${IVF2_HAS_MUSIC})
 
 check_required_components(ivf2)

@@ -2,16 +2,18 @@
  * @file midi_controller.cpp
  * @brief MidiController implementation using RtMidi.
  *
- * RtMidi is declared as a vcpkg dependency (vcpkg.json).
- * After `vcpkg install` the header is available as <RtMidi.h>.
+ * RtMidi is enabled with the IVF2_WITH_MIDI CMake option (default ON),
+ * which also selects the "midi" vcpkg feature.
  *
- * If RtMidi.h is absent the library still compiles — all methods return
- * safe no-op/failure values so the rest of the application is unaffected.
+ * Without it the library still compiles — all methods return safe
+ * no-op/failure values so the rest of the application is unaffected.
  */
 
+#include <ivf/config.h>
+
+#if IVF2_HAS_MIDI
 // The vcpkg layout installs the header as <rtmidi/RtMidi.h>; some other
 // distributions place it at <RtMidi.h>. Support both.
-#if __has_include(<rtmidi/RtMidi.h>) || __has_include(<RtMidi.h>)
     #define IVF_HAS_RTMIDI 1
     #ifndef NOMINMAX
     #define NOMINMAX

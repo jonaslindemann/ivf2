@@ -35,6 +35,9 @@ foreach(_dir ivf ivfui ivfmath ivfmusic generator glad KHR glm gml)
             PATTERN "*.inl")
 endforeach()
 
+# Generated build configuration (feature switches, version).
+install(FILES "${IVF2_GENERATED_INCLUDE_DIR}/ivf/config.h" DESTINATION ${IVF2_INSTALL_INCLUDEDIR}/ivf)
+
 # Runtime data needed by applications.
 install(DIRECTORY "${IVF2_RUNTIME_DATA_DIR}/shaders" "${IVF2_RUNTIME_DATA_DIR}/fonts"
     DESTINATION ${IVF2_INSTALL_DATADIR})

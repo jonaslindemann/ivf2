@@ -2,15 +2,16 @@
  * @file audio_manager.cpp
  * @brief AudioManager implementation using miniaudio.
  *
- * miniaudio is declared as a vcpkg dependency (vcpkg.json).
- * After `vcpkg install` the header is available as <miniaudio.h>.
+ * miniaudio is enabled with the IVF2_WITH_AUDIO CMake option (default ON),
+ * which also selects the "audio" vcpkg feature.
  *
- * If miniaudio.h is absent the library still compiles — all methods return
- * safe no-op/failure values.
+ * Without it the library still compiles — all methods return safe
+ * no-op/failure values.
  */
 
-// Detect miniaudio presence at compile time.
-#if __has_include(<miniaudio.h>)
+#include <ivf/config.h>
+
+#if IVF2_HAS_AUDIO
     #define IVF_HAS_MINIAUDIO 1
     #define MINIAUDIO_IMPLEMENTATION
     #define MA_NO_FLAC

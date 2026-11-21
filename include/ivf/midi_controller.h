@@ -5,8 +5,8 @@
  * @brief MIDI input wrapper using RtMidi.
  *
  * @section Requirements
- * Requires RtMidi, declared as a vcpkg dependency in vcpkg.json.
- * After running `vcpkg install` the header is available as `<RtMidi.h>`.
+ * Requires RtMidi (CMake option IVF2_WITH_MIDI, default ON; check IVF2_HAS_MIDI
+ * in ivf/config.h). Without it every method is a safe no-op.
  *
  * MidiController uses a pimpl so this header has zero dependency on RtMidi types.
  * `midi_controller.cpp` is the only translation unit that includes RtMidi.

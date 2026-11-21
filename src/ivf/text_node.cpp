@@ -1,7 +1,13 @@
 #include <ivf/text_node.h>
 
+#include <ivf/config.h>
 #include <ivf/font_manager.h>
 #include <ivf/shader_manager.h>
+
+#if IVF2_HAS_FREETYPE
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#endif
 
 #include <ivf/utils.h>
 #include <ivf/logger.h>
@@ -120,7 +126,14 @@ void ivf::TextNode::updateCharMap()
     m_textWidth = 0.0;
     m_textHeight = 0.0;
 
+#if IVF2_HAS_FREETYPE
     FT_Face face = FontManager::instance()->currentFace();
+
+    if (face == nullptr)
+    {
+        logWarning("No font loaded - call FontManager::loadFace() before creating text", "TextNode");
+        return;
+    }
 
     FT_Set_Pixel_Sizes(face, 0, m_maxPixels);
 
@@ -169,6 +182,9 @@ void ivf::TextNode::updateCharMap()
         m_charMap.insert(std::pair<char, CharacterInfo>(c, character));
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+#else
+    logWarning("ivf2 was built without FreeType (IVF2_WITH_FREETYPE=OFF) - text is not rendered", "TextNode");
+#endif
 }
 
 void ivf::TextNode::prepareBuffers()

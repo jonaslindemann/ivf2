@@ -72,7 +72,7 @@ Open `build/vs/ivf2.sln` to work in the IDE.
 ### Linux / macOS (Ninja)
 
 ```bash
-cmake --preset release            # or: debug, ninja (multi-config), lib-only
+cmake --preset release            # or: debug, ninja (multi-config), lib-only, minimal
 cmake --build --preset release
 ctest --preset release
 ```
@@ -94,10 +94,21 @@ vcpkg will download and compile all required dependencies on the first run. This
 | `IVF2_BUILD_TESTS` | ON (top level) | Build the CTest unit tests |
 | `IVF2_BUILD_MUSIC` | ON | Build `ivfmusic` |
 | `IVF_WITH_RENOISE` | ON | Renoise (.xrns) support in ivfmusic |
+| `IVF2_WITH_ASSIMP` | ON | Model loading (`ivf::ModelLoader`) with assimp |
+| `IVF2_WITH_FREETYPE` | ON | Text rendering (`ivf::TextNode`) with FreeType |
+| `IVF2_WITH_AUDIO` | ON | Audio playback/analysis (`ivf::AudioManager`) with miniaudio; required by ivfmusic |
+| `IVF2_WITH_MIDI` | ON | MIDI input (`ivf::MidiController`) with RtMidi |
 | `IVF2_INSTALL` | ON (top level) | Install rules and CMake package |
 | `IVF2_USE_PCH` | ON | Precompiled headers |
 | `IVF2_WARNINGS` | OFF | Extra compiler warnings |
 | `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: binaries in `<source>/bin/<config>` |
+
+The `IVF2_WITH_*` options switch optional dependencies. Each also selects the matching vcpkg
+feature, so a disabled library is not downloaded or built. With a feature off, its classes still
+exist but log an error and do nothing (`ModelLoader::loadModel` throws). Check what a build
+supports with the macros in the generated `<ivf/config.h>` (`IVF2_HAS_ASSIMP`, ...) or with
+`find_package(ivf2 REQUIRED COMPONENTS Assimp FreeType Audio Midi Music)`. The `minimal`
+preset turns all of them off.
 
 ## Build Output
 

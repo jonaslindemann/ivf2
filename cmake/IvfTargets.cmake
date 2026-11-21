@@ -19,6 +19,7 @@ function(ivf2_add_library name)
 
     target_include_directories(${name} PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${IVF2_GENERATED_INCLUDE_DIR}>
         $<INSTALL_INTERFACE:${IVF2_INSTALL_INCLUDEDIR}>)
 
     target_compile_features(${name} PUBLIC cxx_std_20)

@@ -1,6 +1,10 @@
 {
   "version": 5,
-  "cmakeMinimumRequired": { "major": 3, "minor": 24, "patch": 0 },
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
   "configurePresets": [
     {
       "name": "base",
@@ -13,8 +17,15 @@
       "displayName": "Visual Studio (multi-config)",
       "description": "Newest installed Visual Studio, x64. Build with --config Debug|Release.",
       "inherits": "base",
-      "architecture": { "value": "x64", "strategy": "set" },
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
     },
     {
       "name": "ninja",
@@ -28,14 +39,18 @@
       "displayName": "Ninja Debug",
       "inherits": "base",
       "generator": "Ninja",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
     },
     {
       "name": "release",
       "displayName": "Ninja Release",
       "inherits": "base",
       "generator": "Ninja",
-      "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     },
     {
       "name": "lib-only",
@@ -48,23 +63,115 @@
         "IVF2_BUILD_EXAMPLES": "OFF",
         "IVF2_BUILD_TESTS": "OFF"
       }
+    },
+    {
+      "name": "minimal",
+      "displayName": "Minimal (no optional dependencies)",
+      "description": "Release build with assimp, FreeType, audio, MIDI and ivfmusic disabled. Uses its own vcpkg_installed so it does not disturb the other presets.",
+      "inherits": "base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "IVF2_WITH_ASSIMP": "OFF",
+        "IVF2_WITH_FREETYPE": "OFF",
+        "IVF2_WITH_AUDIO": "OFF",
+        "IVF2_WITH_MIDI": "OFF",
+        "IVF2_BUILD_MUSIC": "OFF",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/${presetName}/vcpkg_installed"
+      }
     }
   ],
   "buildPresets": [
-    { "name": "vs-debug", "configurePreset": "vs", "configuration": "Debug" },
-    { "name": "vs-release", "configurePreset": "vs", "configuration": "Release" },
-    { "name": "ninja-debug", "configurePreset": "ninja", "configuration": "Debug" },
-    { "name": "ninja-release", "configurePreset": "ninja", "configuration": "Release" },
-    { "name": "debug", "configurePreset": "debug" },
-    { "name": "release", "configurePreset": "release" },
-    { "name": "lib-only", "configurePreset": "lib-only" }
+    {
+      "name": "vs-debug",
+      "configurePreset": "vs",
+      "configuration": "Debug"
+    },
+    {
+      "name": "vs-release",
+      "configurePreset": "vs",
+      "configuration": "Release"
+    },
+    {
+      "name": "ninja-debug",
+      "configurePreset": "ninja",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ninja-release",
+      "configurePreset": "ninja",
+      "configuration": "Release"
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "lib-only",
+      "configurePreset": "lib-only"
+    },
+    {
+      "name": "minimal",
+      "configurePreset": "minimal"
+    }
   ],
   "testPresets": [
-    { "name": "vs-debug", "configurePreset": "vs", "configuration": "Debug", "output": { "outputOnFailure": true } },
-    { "name": "vs-release", "configurePreset": "vs", "configuration": "Release", "output": { "outputOnFailure": true } },
-    { "name": "ninja-debug", "configurePreset": "ninja", "configuration": "Debug", "output": { "outputOnFailure": true } },
-    { "name": "ninja-release", "configurePreset": "ninja", "configuration": "Release", "output": { "outputOnFailure": true } },
-    { "name": "debug", "configurePreset": "debug", "output": { "outputOnFailure": true } },
-    { "name": "release", "configurePreset": "release", "output": { "outputOnFailure": true } }
+    {
+      "name": "vs-debug",
+      "configurePreset": "vs",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "vs-release",
+      "configurePreset": "vs",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ninja-debug",
+      "configurePreset": "ninja",
+      "configuration": "Debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "ninja-release",
+      "configurePreset": "ninja",
+      "configuration": "Release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "debug",
+      "configurePreset": "debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "release",
+      "configurePreset": "release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "minimal",
+      "configurePreset": "minimal",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
   ]
 }

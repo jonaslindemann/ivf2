@@ -1,1 +1,1 @@
-add_ivf2_example(editor1 SOURCES editor_example.cpp EXTRA_LIBS assimp::assimp)
+add_ivf2_example(editor1 SOURCES editor_example.cpp)

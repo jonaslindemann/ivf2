@@ -69,7 +69,7 @@ jobs:
     steps:
       # 1. Get the ivf2 source code onto the runner.
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # 2. Operating-system packages that vcpkg expects from the system
       #    (X11/Wayland and OpenGL headers for GLFW, ALSA for RtMidi).
@@ -115,7 +115,7 @@ jobs:
       #    so only the changed packages are rebuilt.
       - name: Restore vcpkg binary cache
         id: vcpkg-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: ${{ runner.temp }}/vcpkg-cache
           key: vcpkg-${{ matrix.cache-id }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'overlay-ports/**') }}
@@ -129,7 +129,7 @@ jobs:
       #    build or tests below fail.
       - name: Save vcpkg binary cache
         if: always() && steps.vcpkg-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: ${{ runner.temp }}/vcpkg-cache
           key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
@@ -160,7 +160,7 @@ jobs:
       # (download them from the run's summary page).
       - name: Upload vcpkg logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vcpkg-logs-${{ matrix.cache-id }}
           path: |

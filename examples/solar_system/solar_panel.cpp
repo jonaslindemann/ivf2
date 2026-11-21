@@ -143,8 +143,8 @@ void solar_ui::SolarPanel::doDraw()
     if (ImGui::SliderFloat("Planet Speed Max", &m_planetSpeedMax, 0.0f, 100.0f))
 		m_solarSystem->setPlanetSpeedMax(m_planetSpeedMax);
 
-    if (ImGui::SliderInt("Tracers per Planet", &m_nTracersPerPlanet, 0, 500))
-        m_nTracersPerPlanet = m_nTracersPerPlanet;
+    // Read by SolarWindow when tracers are (re)created.
+    ImGui::SliderInt("Tracers per Planet", &m_nTracersPerPlanet, 0, 500);
 
     ImGui::SeparatorText("Dynamic properties");
 

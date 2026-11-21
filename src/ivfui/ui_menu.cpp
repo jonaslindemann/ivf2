@@ -73,7 +73,7 @@ void ivfui::UiMenuItem::doDraw()
     {
         m_selected = m_selectedCallback();
 
-        if (ImGui::MenuItem(m_name.c_str(), m_shortcut.c_str(), &m_selected, &m_enabled))
+        if (ImGui::MenuItem(m_name.c_str(), m_shortcut.c_str(), &m_selected, m_enabled))
         {
             if (m_actionCallback)
                 m_actionCallback();

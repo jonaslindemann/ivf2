@@ -30,7 +30,8 @@ void SceneSerializer::registerType(std::string_view typeName, std::function<Node
     std::string name(typeName);
     // Create one dummy instance to capture its type_index for serialisation.
     auto instance = factory();
-    reg().typeNames[std::type_index(typeid(*instance))] = name;
+    const auto &instanceRef = *instance;
+    reg().typeNames[std::type_index(typeid(instanceRef))] = name;
     reg().factories[name] = std::move(factory);
 }
 
@@ -191,7 +192,8 @@ json SceneSerializer::serializeNode(NodePtr node)
     json j;
 
     // Type name
-    auto it = reg().typeNames.find(std::type_index(typeid(*node)));
+    const auto &nodeRef = *node;
+    auto it = reg().typeNames.find(std::type_index(typeid(nodeRef)));
     j["type"] = (it != reg().typeNames.end()) ? it->second : "Unknown";
 
     // Base properties

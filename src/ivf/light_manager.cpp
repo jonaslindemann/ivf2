@@ -4,7 +4,6 @@
 #include <ivf/extent_visitor.h>
 #include <ivf/shadow_shaders.h>
 
-#include <strstream>
 
 using namespace ivf;
 

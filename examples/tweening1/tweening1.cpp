@@ -118,7 +118,7 @@ public:
         ImGui::SameLine();
         ImGui::Checkbox("Auto shuffle", &m_autoShuffle);
         ImGui::Separator();
-        ImGui::Text("Active tweens: %d", TweenManager::instance()->count());
+        ImGui::Text("Active tweens: %zu", TweenManager::instance()->count());
         ImGui::End();
     }
 };

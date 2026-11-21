@@ -31,7 +31,7 @@ void BufferSelection::resize(int width, int height)
 
 void BufferSelection::refresh()
 {
-    m_scene->enumerateIds(0);
+    static_cast<void>(m_scene->enumerateIds(0)); // returns the next free id, not needed here
     MapVisitor mapVisitor;
     m_scene->accept(&mapVisitor);
     m_nodeMap = mapVisitor.takeMap();

@@ -2,7 +2,6 @@
 
 #include <ivf/shader_manager.h>
 
-#include <strstream>
 
 using namespace ivf;
 

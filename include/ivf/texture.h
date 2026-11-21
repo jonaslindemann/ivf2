@@ -5,6 +5,7 @@
 
 #include <ivf/glbase.h>
 #include <ivf/field.h>
+#include <ivf/result.h>
 
 #include <ivf/texture_manager.h>
 
@@ -55,6 +56,13 @@ public:
     static std::shared_ptr<Texture> create();
 
     /**
+     * @brief Create a texture from an image file (PNG, JPEG, BMP, TGA, ...).
+     * @param filename Path to the image file.
+     * @return The texture, or an Error (FileNotFound, UnsupportedFormat). Errors are also logged.
+     */
+    [[nodiscard]] static Result<std::shared_ptr<Texture>> fromFile(std::string_view filename);
+
+    /**
      * @brief Bind the texture to the current OpenGL context.
      */
     void bind();
@@ -62,9 +70,10 @@ public:
     /**
      * @brief Load texture data from an image file.
      * @param filename Path to the image file.
-     * @return bool True if loading succeeded.
+     * @return Success, or an Error (FileNotFound, UnsupportedFormat). Errors are also logged.
+     *         Usable as a condition: `if (texture->load("brick.png")) ...`
      */
-    bool load(std::string_view filename);
+    Result<void> load(std::string_view filename);
 
     /**
      * @brief Unbind the texture from the current OpenGL context.
@@ -177,9 +186,9 @@ public:
     /**
      * @brief Load an HDR (floating-point) image. Result stored as GL_RGB16F.
      * @param filename Path to a Radiance .hdr or other float-capable image.
-     * @return bool True if loading succeeded.
+     * @return Success, or an Error (FileNotFound, UnsupportedFormat). Errors are also logged.
      */
-    bool loadHDR(std::string_view filename);
+    Result<void> loadHDR(std::string_view filename);
 
     /**
      * @brief Get the OpenGL texture object ID.

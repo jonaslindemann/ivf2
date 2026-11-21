@@ -58,7 +58,29 @@ void Texture::bind()
     GL_ERR_END("Texture::bind()");
 }
 
-bool Texture::load(const std::string_view filename)
+namespace {
+
+// Error for an image that could not be decoded: missing file or unsupported data.
+std::unexpected<Error> imageError(std::string_view filename)
+{
+    const std::string name(filename);
+    if (!std::filesystem::exists(std::filesystem::path(name)))
+        return makeError(ErrorCode::FileNotFound, "Could not load texture '" + name + "': file not found", "Texture");
+    return makeError(ErrorCode::UnsupportedFormat,
+                     "Could not load texture '" + name + "': " + ivf::imageFailureReason(), "Texture");
+}
+
+} // namespace
+
+Result<std::shared_ptr<Texture>> Texture::fromFile(std::string_view filename)
+{
+    auto texture = Texture::create();
+    if (auto loaded = texture->load(filename); !loaded)
+        return std::unexpected(loaded.error());
+    return texture;
+}
+
+Result<void> Texture::load(const std::string_view filename)
 {
     logInfofc("Texture", "Loading texture from file: {}", filename);
 
@@ -88,13 +110,11 @@ bool Texture::load(const std::string_view filename)
     }
     else
     {
-        logErrorfc("Texture", "Failed to load texture from file: {}", filename);
-        ivf::freeImage(data);
-        return false;
+        return imageError(filename);
     }
     ivf::freeImage(data);
 
-    return true;
+    return {};
 }
 
 void Texture::unbind()
@@ -117,17 +137,15 @@ void Texture::setAnisotropicFiltering(float level)
     }
 }
 
-bool Texture::loadHDR(std::string_view filename)
+Result<void> Texture::loadHDR(std::string_view filename)
 {
     ivf::setImageFlipVerticallyOnLoad(true);
     int width, height, nrChannels;
     float* data = ivf::loadImageF(std::string(filename).c_str(), &width, &height, &nrChannels, 0);
     ivf::setImageFlipVerticallyOnLoad(false);
 
-    if (!data) {
-        logErrorfc("Texture", "Failed to load HDR: {}", filename);
-        return false;
-    }
+    if (!data)
+        return imageError(filename);
 
     glBindTexture(GL_TEXTURE_2D, m_id);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -139,5 +157,5 @@ bool Texture::loadHDR(std::string_view filename)
 
     ivf::freeImage(data);
     logInfofc("Texture", "Loaded HDR texture: {} ({}x{})", filename, width, height);
-    return true;
+    return {};
 }

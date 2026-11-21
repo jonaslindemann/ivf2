@@ -9,7 +9,7 @@ set(IVF2_INSTALL_INCLUDEDIR "${CMAKE_INSTALL_INCLUDEDIR}/ivf2")
 # ivf2_add_library(<name> [FOLDER <folder>] [PCH <header>] SOURCES <files...>)
 #
 # Creates a static library <name> with the alias ivf2::<name>, the common
-# include directories, C++20, position independent code and the shared
+# include directories, C++23, position independent code and the shared
 # compiler settings. The target is registered for export.
 function(ivf2_add_library name)
     cmake_parse_arguments(ARG "" "FOLDER;PCH" "SOURCES" ${ARGN})
@@ -22,7 +22,7 @@ function(ivf2_add_library name)
         $<BUILD_INTERFACE:${IVF2_GENERATED_INCLUDE_DIR}>
         $<INSTALL_INTERFACE:${IVF2_INSTALL_INCLUDEDIR}>)
 
-    target_compile_features(${name} PUBLIC cxx_std_20)
+    target_compile_features(${name} PUBLIC cxx_std_23)
 
     # utils.h checks _DEBUG; MSVC defines it for debug runtimes, other compilers do not.
     target_compile_definitions(${name} PUBLIC
@@ -52,7 +52,8 @@ endfunction()
 # Shared, non-propagating compiler settings for ivf2 libraries, examples and tests.
 function(ivf2_apply_compiler_settings target)
     if(MSVC)
-        target_compile_options(${target} PRIVATE /utf-8 /Zc:__cplusplus)
+        # /w14996: report use of [[deprecated]] APIs (level 3, invisible at MSVC's default /W1)
+        target_compile_options(${target} PRIVATE /utf-8 /Zc:__cplusplus /w14996)
         if(CMAKE_GENERATOR MATCHES "Visual Studio")
             target_compile_options(${target} PRIVATE /MP)
         endif()

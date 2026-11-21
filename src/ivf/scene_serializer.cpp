@@ -2,6 +2,7 @@
 
 #include <ivf/nodes.h>
 #include <ivf/logger.h>
+#include <filesystem>
 
 #include <nlohmann/json.hpp>
 
@@ -272,41 +273,63 @@ NodePtr deserializeNode(const json& j)
 } // namespace
 
 // ---------------------------------------------------------------------------
-bool SceneSerializer::save(CompositeNodePtr root, std::string_view path)
+Result<void> SceneSerializer::saveFile(CompositeNodePtr root, std::string_view path)
 {
-    if (!root) return false;
+    const std::string savePath(path);
+    if (!root)
+        return makeError(ErrorCode::InvalidArgument, "Cannot save scene to '" + savePath + "': no root node",
+                         "SceneSerializer");
+
     json j = serializeNode(root);
-    std::string savePath(path);
     std::ofstream f{savePath};
-    if (!f.is_open()) {
-        logWarning("SceneSerializer: cannot open '" + std::string(path) + "' for writing", "SceneSerializer");
-        return false;
-    }
+    if (!f.is_open())
+        return makeError(ErrorCode::WriteFailed, "Cannot open '" + savePath + "' for writing", "SceneSerializer");
     f << j.dump(2);
-    return f.good();
+    if (!f.good())
+        return makeError(ErrorCode::WriteFailed, "Could not write scene to '" + savePath + "'", "SceneSerializer");
+    return {};
 }
 
-// ---------------------------------------------------------------------------
-CompositeNodePtr SceneSerializer::load(std::string_view path)
+Result<CompositeNodePtr> SceneSerializer::loadFile(std::string_view path)
 {
-    std::string pathStr(path);
+    const std::string pathStr(path);
+    if (!std::filesystem::exists(std::filesystem::path(pathStr)))
+        return makeError(ErrorCode::FileNotFound, "Could not load scene '" + pathStr + "': file not found",
+                         "SceneSerializer");
+
     std::ifstream f{pathStr};
-    if (!f.is_open()) {
-        logWarning("SceneSerializer: cannot open '" + std::string(path) + "' for reading", "SceneSerializer");
-        return nullptr;
-    }
+    if (!f.is_open())
+        return makeError(ErrorCode::ReadFailed, "Cannot open '" + pathStr + "' for reading", "SceneSerializer");
+
     json j;
-    try { f >> j; } catch (const std::exception& e) {
-        logWarning(std::string("SceneSerializer: JSON parse error: ") + e.what(), "SceneSerializer");
-        return nullptr;
+    try
+    {
+        f >> j;
+    }
+    catch (const std::exception &e)
+    {
+        return makeError(ErrorCode::InvalidData, "Could not load scene '" + pathStr + "': " + e.what(),
+                         "SceneSerializer");
     }
 
     auto node = deserializeNode(j);
     auto composite = std::dynamic_pointer_cast<CompositeNode>(node);
-    if (!composite) {
+    if (!composite)
+    {
         // Wrap a non-composite root in a CompositeNode
         composite = CompositeNode::create();
-        if (node) composite->add(node);
+        if (node)
+            composite->add(node);
     }
     return composite;
+}
+
+bool SceneSerializer::save(CompositeNodePtr root, std::string_view path)
+{
+    return saveFile(std::move(root), path).has_value();
+}
+
+CompositeNodePtr SceneSerializer::load(std::string_view path)
+{
+    return loadFile(path).value_or(nullptr);
 }

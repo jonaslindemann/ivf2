@@ -29,13 +29,18 @@ std::shared_ptr<Cubemap> Cubemap::create()
     return std::make_shared<Cubemap>();
 }
 
-bool Cubemap::loadFace(GLenum target, std::string_view path)
+Result<void> Cubemap::loadFace(GLenum target, std::string_view path)
 {
     int w, h, ch;
     unsigned char* data = ivf::loadImage(std::string(path).c_str(), &w, &h, &ch, 0);
-    if (!data) {
-        logErrorfc("Cubemap", "Cannot load face: {}", path);
-        return false;
+    if (!data)
+    {
+        const std::string name(path);
+        if (!std::filesystem::exists(std::filesystem::path(name)))
+            return makeError(ErrorCode::FileNotFound, "Could not load cube map face '" + name + "': file not found",
+                             "Cubemap");
+        return makeError(ErrorCode::UnsupportedFormat,
+                         "Could not load cube map face '" + name + "': " + ivf::imageFailureReason(), "Cubemap");
     }
 
     // OpenGL's cubemap face coordinates are left-handed relative to the
@@ -54,10 +59,10 @@ bool Cubemap::loadFace(GLenum target, std::string_view path)
     GLenum fmt = (ch == 4) ? GL_RGBA : (ch == 3) ? GL_RGB : GL_RED;
     glTexImage2D(target, 0, fmt, w, h, 0, fmt, GL_UNSIGNED_BYTE, data);
     ivf::freeImage(data);
-    return true;
+    return {};
 }
 
-bool Cubemap::load(std::string_view posX, std::string_view negX,
+Result<void> Cubemap::load(std::string_view posX, std::string_view negX,
                    std::string_view posY, std::string_view negY,
                    std::string_view posZ, std::string_view negZ)
 {
@@ -68,16 +73,18 @@ bool Cubemap::load(std::string_view posX, std::string_view negX,
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    bool ok = true;
-    ok &= loadFace(GL_TEXTURE_CUBE_MAP_POSITIVE_X, posX);
-    ok &= loadFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, negX);
-    ok &= loadFace(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, posY);
-    ok &= loadFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, negY);
-    ok &= loadFace(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, posZ);
-    ok &= loadFace(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, negZ);
+    // Load every face (so all problems are logged); report the first failure.
+    Result<void> result;
+    const std::pair<GLenum, std::string_view> faces[] = {
+        {GL_TEXTURE_CUBE_MAP_POSITIVE_X, posX}, {GL_TEXTURE_CUBE_MAP_NEGATIVE_X, negX},
+        {GL_TEXTURE_CUBE_MAP_POSITIVE_Y, posY}, {GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, negY},
+        {GL_TEXTURE_CUBE_MAP_POSITIVE_Z, posZ}, {GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, negZ}};
+    for (const auto &[target, path] : faces)
+        if (auto face = loadFace(target, path); !face && result)
+            result = face;
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-    return ok;
+    return result;
 }
 
 std::string Cubemap::findFile(std::string_view dir, std::string_view stem)
@@ -89,7 +96,7 @@ std::string Cubemap::findFile(std::string_view dir, std::string_view stem)
     return {};
 }
 
-bool Cubemap::loadFromDirectory(std::string_view dir)
+Result<void> Cubemap::loadFromDirectory(std::string_view dir)
 {
     return load(
         findFile(dir, "right"),  findFile(dir, "left"),

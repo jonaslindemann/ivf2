@@ -20,6 +20,7 @@
 #include <ivf/program.h>
 #include <ivf/render_context.h>
 #include <ivf/gl_debug.h>
+#include <ivf/result.h>
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
 #include <ivf/texture_manager.h>

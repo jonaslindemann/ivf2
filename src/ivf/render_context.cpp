@@ -111,7 +111,8 @@ RenderContext *RenderContext::currentOrFallback()
 bool RenderContext::setupDefaults(const std::string &fontFile)
 {
 #if IVF2_HAS_FREETYPE
-    fonts()->loadFace(fontFile, "gidole");
+    // A missing default font only disables text rendering; the reason is logged.
+    static_cast<void>(fonts()->loadFace(fontFile, "gidole"));
 #endif
 
     auto shaderMgr = shaders();

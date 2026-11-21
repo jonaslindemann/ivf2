@@ -65,14 +65,14 @@ endif()
 
 project(ivf2
     VERSION 2.0.0
-    DESCRIPTION "Interactive Visualisation Framework 2 - a C++20 scene graph library for OpenGL"
+    DESCRIPTION "Interactive Visualisation Framework 2 - a C++23 scene graph library for OpenGL"
     HOMEPAGE_URL "https://github.com/jonaslindemann/ivf2"
     LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 if(_ivf2_top_level)
-    set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_STANDARD 23)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     set(CMAKE_CXX_EXTENSIONS OFF)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)

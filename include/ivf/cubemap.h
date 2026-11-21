@@ -13,6 +13,7 @@
  */
 
 #include <ivf/glbase.h>
+#include <ivf/result.h>
 #include <glm/glm.hpp>
 #include <string>
 #include <string_view>
@@ -29,8 +30,9 @@ public:
 
     /**
      * @brief Load 6 face images (right, left, top, bottom, front, back).
+     * @return Success, or the error of the first face that failed (also logged).
      */
-    bool load(std::string_view posX, std::string_view negX,
+    Result<void> load(std::string_view posX, std::string_view negX,
               std::string_view posY, std::string_view negY,
               std::string_view posZ, std::string_view negZ);
 
@@ -38,7 +40,7 @@ public:
      * @brief Scan a directory for right/left/top/bottom/front/back files
      *        with common extensions (.jpg, .png, .hdr).
      */
-    bool loadFromDirectory(std::string_view dir);
+    Result<void> loadFromDirectory(std::string_view dir);
 
     /**
      * @brief Generate a procedural gradient sky cubemap (no file assets needed).
@@ -64,7 +66,7 @@ public:
 private:
     GLuint m_id{0};
 
-    static bool loadFace(GLenum target, std::string_view path);
+    static Result<void> loadFace(GLenum target, std::string_view path);
     static std::string findFile(std::string_view dir, std::string_view stem);
 };
 

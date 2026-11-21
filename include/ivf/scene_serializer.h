@@ -27,6 +27,7 @@
 #include <ivf/composite_node.h>
 #include <ivf/transform_node.h>
 #include <ivf/material.h>
+#include <ivf/result.h>
 
 #include <functional>
 #include <map>
@@ -52,14 +53,29 @@ public:
      * @param path File path to write.
      * @return true on success.
      */
+    [[deprecated("use SceneSerializer::saveFile(), which returns a Result")]]
     static bool save(CompositeNodePtr root, std::string_view path);
+
+    /**
+     * @brief Save the scene graph rooted at @p root to a JSON file.
+     * @return Success, or an Error (InvalidArgument, WriteFailed). Errors are also logged.
+     */
+    [[nodiscard]] static Result<void> saveFile(CompositeNodePtr root, std::string_view path);
 
     /**
      * @brief Load a scene graph from a JSON file.
      * @param path File path to read.
      * @return Loaded root CompositeNode, or nullptr on failure.
      */
+    [[deprecated("use SceneSerializer::loadFile(), which returns a Result")]]
     static CompositeNodePtr load(std::string_view path);
+
+    /**
+     * @brief Load a scene graph from a JSON file.
+     * @return The root CompositeNode, or an Error (FileNotFound, ReadFailed, InvalidData).
+     *         Errors are also logged.
+     */
+    [[nodiscard]] static Result<CompositeNodePtr> loadFile(std::string_view path);
 
     // ---- Type registry -----------------------------------------------------
 

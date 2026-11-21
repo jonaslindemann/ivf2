@@ -3,6 +3,7 @@
 
 #include <ivf/config.h>
 #include <ivf/logger.h>
+#include <filesystem>
 
 #if IVF2_HAS_FREETYPE
 #include <ft2build.h>
@@ -51,19 +52,20 @@ FontManager::~FontManager()
         FT_Done_FreeType(m_freetype);
 }
 
-void FontManager::loadFace(const std::string filename, const std::string name)
+Result<void> FontManager::loadFace(const std::string filename, const std::string name)
 {
     if (m_freetype == nullptr)
-    {
-        logError("Could not load font " + filename + ": FreeType is not initialised", "FontManager");
-        return;
-    }
+        return makeError(ErrorCode::NotSupported, "Could not load font '" + filename + "': FreeType is not initialised",
+                         "FontManager");
 
     FT_Face face;
     if (FT_New_Face(m_freetype, filename.c_str(), 0, &face))
     {
-        logError("Could not load font: " + filename, "FontManager");
-        return;
+        if (!std::filesystem::exists(std::filesystem::path(filename)))
+            return makeError(ErrorCode::FileNotFound, "Could not load font '" + filename + "': file not found",
+                             "FontManager");
+        return makeError(ErrorCode::UnsupportedFormat, "Could not load font '" + filename + "': not a usable font file",
+                         "FontManager");
     }
 
     auto it = m_faces.find(name);
@@ -77,6 +79,7 @@ void FontManager::loadFace(const std::string filename, const std::string name)
 
     m_currentFace = face;
     logInfo("Loaded font: " + filename + " as " + name, "FontManager");
+    return {};
 }
 
 #else // !IVF2_HAS_FREETYPE
@@ -88,10 +91,11 @@ FontManager::FontManager()
 
 FontManager::~FontManager() = default;
 
-void FontManager::loadFace(const std::string filename, const std::string name)
+Result<void> FontManager::loadFace(const std::string filename, const std::string name)
 {
-    logError("Cannot load font " + filename + ": ivf2 was built without FreeType (IVF2_WITH_FREETYPE=OFF)",
-             "FontManager");
+    return makeError(ErrorCode::NotSupported,
+                     "Could not load font '" + filename + "': ivf2 was built without FreeType (IVF2_WITH_FREETYPE=OFF)",
+                     "FontManager");
 }
 
 #endif // IVF2_HAS_FREETYPE

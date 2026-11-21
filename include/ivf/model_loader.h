@@ -9,6 +9,7 @@
 
 #include <ivf/composite_node.h>
 #include <ivf/mesh_node.h>
+#include <ivf/result.h>
 
 #include <memory>
 #include <string>
@@ -27,10 +28,17 @@ public:
     /**
      * @brief Load a model file as a node hierarchy.
      * @param path Path to the model file.
-     * @return The root of the loaded hierarchy.
-     * @throws std::runtime_error if the file cannot be loaded, or if ivf2 was built
-     *         without assimp (IVF2_WITH_ASSIMP=OFF).
+     * @return The root of the loaded hierarchy, or an Error (FileNotFound, UnsupportedFormat,
+     *         NotSupported when built without assimp). Errors are also logged.
      */
+    [[nodiscard]] static Result<std::shared_ptr<CompositeNode>> load(const std::string &path);
+
+    /**
+     * @brief Load a model file; throws on failure.
+     * @deprecated Use load(), which returns a Result instead of throwing.
+     * @throws std::runtime_error if the file cannot be loaded.
+     */
+    [[deprecated("use ModelLoader::load(), which returns a Result")]]
     static std::shared_ptr<CompositeNode> loadModel(const std::string &path);
 };
 

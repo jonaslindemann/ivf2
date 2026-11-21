@@ -7,6 +7,8 @@
 
 #include <glm/glm.hpp>
 
+#include <ivf/result.h>
+
 // FreeType is a private dependency of ivf. Its handle types are pointers to these
 // structs (FT_Library == FT_LibraryRec_*, FT_Face == FT_FaceRec_*), so they can be
 // named here without including FreeType headers.
@@ -63,8 +65,9 @@ public:
      * @brief Load a font face from file and store it with a given name.
      * @param filename Path to the font file.
      * @param name Name to associate with the loaded font face.
+     * @return Success, or an Error (FileNotFound, UnsupportedFormat, NotSupported). Errors are also logged.
      */
-    void loadFace(const std::string filename, const std::string name);
+    Result<void> loadFace(const std::string filename, const std::string name);
 
     /**
      * @brief Get the currently active font face.

@@ -2,6 +2,7 @@
 #include <ivf/composite_node.h>
 #include <ivf/config.h>
 #include <ivf/logger.h>
+#include <filesystem>
 
 #include <stdexcept>
 
@@ -392,8 +393,11 @@ void processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
 
 } // namespace
 
-std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
+Result<std::shared_ptr<CompositeNode>> ModelLoader::load(const std::string &path)
 {
+    if (!std::filesystem::exists(std::filesystem::path(path)))
+        return makeError(ErrorCode::FileNotFound, "Could not load model '" + path + "': file not found", "ModelLoader");
+
     Assimp::Importer importer;
 
     importer.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 80.0f);
@@ -405,7 +409,8 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        throw std::runtime_error("Failed to load model '" + path + "': " + std::string(importer.GetErrorString()));
+        return makeError(ErrorCode::UnsupportedFormat,
+                         "Could not load model '" + path + "': " + std::string(importer.GetErrorString()), "ModelLoader");
     }
 
     logInfofc("ModelLoader", "Successfully loaded model: {}", path);
@@ -434,10 +439,19 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
 
 #else // !IVF2_HAS_ASSIMP
 
-std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
+Result<std::shared_ptr<CompositeNode>> ModelLoader::load(const std::string &path)
 {
-    throw std::runtime_error("Cannot load model '" + path +
-                             "': ivf2 was built without assimp (IVF2_WITH_ASSIMP=OFF)");
+    return makeError(ErrorCode::NotSupported,
+                     "Could not load model '" + path + "': ivf2 was built without assimp (IVF2_WITH_ASSIMP=OFF)",
+                     "ModelLoader");
 }
 
 #endif // IVF2_HAS_ASSIMP
+
+std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
+{
+    auto model = load(path);
+    if (!model)
+        throw std::runtime_error(model.error().message);
+    return *model;
+}

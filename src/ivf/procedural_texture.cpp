@@ -58,7 +58,7 @@ void ProceduralTexture::regenerate()
     logInfofc("ProceduralTexture", "Regenerating texture: {}x{}, {} channels", m_width, m_height, m_channels);
     
     // Allocate data buffer
-    m_data.resize(m_width * m_height * m_channels);
+    m_data.resize(static_cast<size_t>(m_width) * m_height * m_channels);
     
     // Generate the texture
     generate();

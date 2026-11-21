@@ -106,7 +106,7 @@ bool Cubemap::loadGradient(glm::vec3 topColor, glm::vec3 horizonColor, glm::vec3
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-    std::vector<unsigned char> face(size * size * 3);
+    std::vector<unsigned char> face(static_cast<size_t>(size) * size * 3);
 
     // UV [0,1] -> NDC [-1,1] direction vectors per cubemap face.
     // face_dir(face, s, t) returns the unnormalized ray direction.

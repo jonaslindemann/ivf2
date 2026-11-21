@@ -138,7 +138,7 @@ std::vector<Node*> BufferSelection::nodesInRegion(int x0, int y0, int x1, int y1
     // Flip Y: OpenGL origin is bottom-left
     int glY = m_height - by - 1;
 
-    std::vector<unsigned char> pixels(rw * rh * 3);
+    std::vector<unsigned char> pixels(static_cast<size_t>(rw) * rh * 3);
     glReadPixels(lx, glY, rw, rh, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
 
     std::unordered_set<unsigned int> seen;

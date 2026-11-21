@@ -21,7 +21,8 @@ visualisation and creative coding. Based on a review of the code base in Novembe
 | Area | Observation |
 |------|-------------|
 | Build & packaging | Legacy CMake (global include dirs, outputs in the source tree, no install/export) - *fixed in phase 0* |
-| Global state | 9 raw-pointer singletons (`ShaderManager`, `LightManager`, `TextureManager`, ...) - one GL context per process, no deterministic GL resource teardown, hard to test |
+| Global state | 9 raw-pointer singletons (`ShaderManager`, `LightManager`, `TextureManager`, ...) - one GL context per process, managers never dropped (GL objects leak or are freed after the context is gone), hard to test |
+| Host coupling | `ivf` makes no GLFW calls, but context bootstrap does: the GL loader runs only in `GLFWWindow`, default shaders/font/light are set up in `GLFWSceneWindow::doSetup`, and `XxxNode::create()` uploads to the GPU immediately, so nodes need a current context. Public input APIs use GLFW key/button codes |
 | Dependency footprint | Public headers include assimp, FreeType, stb, nlohmann/json, GLFW, ImGui. Every consumer compiles against all of them; none can be made optional |
 | Bundled third-party code | glm 1.0, gml, glad and dirent are vendored in `include/`. Two math libraries (glm in ivf, gml in generator) |
 | Rendering core | Immediate, recursive draw with a global "current program"; no render queue, sorting, culling or uniform buffers; `glGetUniformLocation` per call with no cache |
@@ -48,7 +49,7 @@ visualisation and creative coding. Based on a review of the code base in Novembe
 - Options: `IVF2_BUILD_EXAMPLES`, `IVF2_BUILD_TESTS`, `IVF2_BUILD_MUSIC`, `IVF_WITH_RENOISE`,
   `IVF2_INSTALL`, `IVF2_USE_PCH`, `IVF2_WARNINGS`.
 - `tests/` with a dependency-free harness and CTest tests for `generator` and `ivfmath`.
-- stb implementation moved from `ivfui` to `ivf` (`src/ivf/stb_impl.cpp`).
+- stb implementation moved from `ivfui` to `ivf`, later made private behind `ivf/image_io.h`.
 
 ## Phase 1 - Foundations and quality (next 1-3 months)
 
@@ -60,11 +61,40 @@ Goal: make the library trustworthy to depend on.
    updated to v3 (`build-mode: none`); Dependabot keeps actions current.
    *Next:* Ubuntu/Clang job, a sanitizer (ASan/UBSan) job, `clang-format` check on changed
    lines, `clang-tidy`.
-2. **Replace singletons with a context object.** Introduce `ivf::RenderContext` (owned by
-   the window) holding the shader, light, texture, font, mesh and transform managers.
-   Keep `XxxManager::instance()` as a deprecated forwarder to the active context for one
-   release. Benefits: multiple windows/contexts, GL resources destroyed while the context
-   is alive, testable code.
+2. **Render context, independent of the windowing system.** Replace the GL-bound
+   singletons with `ivf::RenderContext`, defined in the core `ivf` library with no
+   knowledge of windows. It represents *one OpenGL context and the resources that belong
+   to it*; whatever owns a GL context creates one. `ivfui::GLFWWindow` becomes one host
+   among several possible (Qt `QOpenGLWidget`, SDL, headless EGL, Emscripten, Python).
+
+   ```
+   host (GLFW | Qt | SDL | EGL | web)  -- makes its GL context current, then
+       auto ctx = ivf::RenderContext::create(getProcAddress);  // loads GL functions
+       ctx->setupDefaults();          // default shaders, font, light (from GLFWSceneWindow::doSetup)
+       ...                            // render; destroy ctx before the GL context
+   ```
+
+   - **Contents:** only GL-bound state - shaders/programs, textures, meshes, font glyph
+     textures, lights (shader uniforms), selection framebuffers. Not context-bound and kept
+     out: `Logger`, `TimeController`, tweens, `AudioManager`, `MidiController`; the
+     transform stack belongs to a render pass, not a context. Per-context matters because
+     VAOs and framebuffers can never be shared between GL contexts.
+   - **GL loading** moves from `GLFWWindow` into `RenderContext::create(loaderFn)`
+     (`glfwGetProcAddress`, `QOpenGLContext::getProcAddress`, `eglGetProcAddress`, ...).
+   - **Default setup** moves from `GLFWSceneWindow::doSetup` to
+     `RenderContext::setupDefaults()` so every host starts from the same state.
+   - **Lifetime:** the host destroys the context while its GL context is still current,
+     so all GL objects are released deterministically.
+   - **Finding the context - step A (this phase):** a thread-local *current* context set by
+     the host while rendering, mirroring GL's own model. `XxxManager::instance()` becomes a
+     deprecated forwarder to it, so existing user code and examples keep working.
+     Step B (explicit `RenderContext&` passed through drawing) comes with the phase 2
+     render queue.
+   - **Input codes:** introduce `ivf::Key` / `ivf::MouseButton` (values identical to GLFW's,
+     so existing code keeps compiling); hosts translate their native codes.
+   - **Benefits:** multiple windows/contexts, deterministic GL teardown, ivf usable in other
+     applications and toolkits, headless rendering for tests and CI (1.8), and the basis for
+     the Python, web and offline targets in phase 3.
 3. **Hide third-party headers.** *Done for the optional libraries:* assimp, FreeType,
    miniaudio, RtMidi and stb are private to `ivf` (no public header includes them) and the
    first four are optional via `IVF2_WITH_ASSIMP/FREETYPE/AUDIO/MIDI` (default ON), with
@@ -99,7 +129,10 @@ Goal: make the library trustworthy to depend on.
 1. **Render queue.** Separate scene traversal from drawing: collect draw items
    (mesh, material, transform, flags), frustum-cull with the existing bounding boxes, sort
    opaque front-to-back by program/material and transparent back-to-front. Shadow and
-   reflection passes reuse the same list instead of re-traversing.
+   reflection passes reuse the same list instead of re-traversing. The `RenderContext`
+   (1.2) is passed explicitly through the new drawing path (step B), and geometry is
+   uploaded lazily on first draw instead of in `create()`, so scenes can be built
+   without a current GL context (before the window exists, in tests, on worker threads).
 2. **Uniform handling.** Cache uniform locations in `Program`; move camera, lights and
    fog into std140 uniform buffers shared by all programs; automatic instancing of
    identical meshes.

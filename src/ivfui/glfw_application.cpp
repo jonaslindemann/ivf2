@@ -12,6 +12,15 @@
 using namespace ivf;
 using namespace ivfui;
 
+static void error_callback(int code, const char *description)
+{
+    // GLFWWindow probes for the newest OpenGL version; "unavailable" is expected there.
+    if (code == GLFW_VERSION_UNAVAILABLE)
+        logDebug(std::string("GLFW: ") + description, "GLFW");
+    else
+        logError("GLFW error " + std::to_string(code) + ": " + description, "GLFW");
+}
+
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
     auto win = GLFWWindowTracker::instance()->get(window);
@@ -63,6 +72,7 @@ static void window_close_callback(GLFWwindow *window)
 GLFWApplication::GLFWApplication()
 {
     logInfo("Initializing GLFW", "GLFWApplication");
+    glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
     {

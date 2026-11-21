@@ -97,9 +97,27 @@ std::string Logger::getTimestamp() const {
     return ss.str(); 
 }
 
+int Logger::addSink(LogSink sink)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    const int id = m_nextSinkId++;
+    m_sinks.emplace_back(id, std::move(sink));
+    return id;
+}
+
+void Logger::removeSink(int id)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    std::erase_if(m_sinks, [id](const auto &entry) { return entry.first == id; });
+}
+
 void Logger::writeLog(LogLevel level, const std::string &message, const std::string &context) { 
     if (m_logLevel == LogLevel::None || level < m_logLevel) 
         return; 
+
+    std::vector<std::pair<int, LogSink>> sinks;
+    {
+    std::lock_guard<std::mutex> lock(m_mutex);
     
     std::string finalMessage;
     
@@ -129,6 +147,13 @@ void Logger::writeLog(LogLevel level, const std::string &message, const std::str
         m_logFile << finalMessage << std::endl; 
         m_logFile.flush(); 
     } 
+
+    sinks = m_sinks;
+    }
+
+    // Outside the lock, so a sink may log without deadlocking.
+    for (const auto &entry : sinks)
+        entry.second(level, message, context);
 }
 
 void Logger::debug(const std::string &message, const std::string &context) { writeLog(LogLevel::Debug, message, context); }

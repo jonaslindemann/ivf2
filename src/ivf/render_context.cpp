@@ -30,10 +30,21 @@ RenderContext *g_fallback = nullptr;
 
 std::shared_ptr<RenderContext> RenderContext::create(GLLoadProc loader)
 {
-    if (loader != nullptr && !gladLoadGLLoader(reinterpret_cast<GLADloadproc>(loader)))
+    if (loader != nullptr)
     {
-        logError("Failed to load OpenGL functions", "RenderContext");
-        return nullptr;
+        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(loader)))
+        {
+            logError("Failed to load OpenGL functions", "RenderContext");
+            return nullptr;
+        }
+
+        auto str = [](GLenum name) {
+            const auto *s = reinterpret_cast<const char *>(glGetString(name));
+            return std::string(s ? s : "?");
+        };
+        logInfo("OpenGL " + str(GL_VERSION) + " | " + str(GL_RENDERER) + " | GLSL " +
+                    str(GL_SHADING_LANGUAGE_VERSION),
+                "RenderContext");
     }
 
     return std::shared_ptr<RenderContext>(new RenderContext());
@@ -213,6 +224,19 @@ GLuint RenderContext::fallbackTexture2D()
         glBindTexture(GL_TEXTURE_2D, static_cast<GLuint>(previous));
     }
     return m_fallbackTexture2D;
+}
+
+bool RenderContext::wideLinesSupported()
+{
+    if (!m_wideLines)
+    {
+        GLint flags = 0;
+        glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        GLfloat range[2] = {1.0f, 1.0f};
+        glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, range);
+        m_wideLines = (flags & GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT) == 0 && range[1] > 1.0f;
+    }
+    return *m_wideLines;
 }
 
 GLuint RenderContext::fallbackCubemap()

@@ -1,4 +1,5 @@
 #include <ivfui/enhanced_scene_window.h>
+#include <ivf/logger.h>
 #include <ivf/sphere.h>
 #include <ivf/cube.h>
 #include <ivf/material.h>
@@ -133,7 +134,7 @@ void EnhancedSceneWindow::onKey(int key, int scancode, int action, int mods)
     if (key == GLFW_KEY_P && action == GLFW_PRESS && (mods & GLFW_MOD_CONTROL))
     {
         enablePlacement(!m_placementEnabled);
-        std::cout << "Placement mode " << (m_placementEnabled ? "enabled" : "disabled") << std::endl;
+        ivf::logDebug(ivf::logStr("Placement mode ", (m_placementEnabled ? "enabled" : "disabled")), "EnhancedSceneWindow");
     }
 
     // Then call the base class implementation
@@ -172,7 +173,7 @@ void EnhancedSceneWindow::doPreSetup()
         material->setDiffuseColor(glm::vec4(r, g, b, 1.0f));
         sphere->setMaterial(material);
 
-        std::cout << "Created sphere at (" << x << ", " << y << ", " << z << ")" << std::endl;
+        ivf::logDebug(ivf::logStr("Created sphere at (", x, ", ", y, ", ", z, ")"), "EnhancedSceneWindow");
         return sphere;
     });
 
@@ -180,14 +181,13 @@ void EnhancedSceneWindow::doPreSetup()
     m_placementMixin->setNodeSelectionCallback([this](ivf::NodePtr node) {
         if (auto transformNode = std::dynamic_pointer_cast<TransformNode>(node))
         {
-            std::cout << "Selected node at (" << transformNode->pos().x << ", " << transformNode->pos().y << ", "
-                      << transformNode->pos().z << ")" << std::endl;
+            ivf::logDebug(ivf::logStr("Selected node at (", transformNode->pos().x, ", ", transformNode->pos().y, ", ", transformNode->pos().z, ")"), "EnhancedSceneWindow");
         }
     });
 
     // Set up moved callback
     m_placementMixin->setNodeMovedCallback([this](ivf::NodePtr node, float x, float y, float z) {
-        std::cout << "Moved node to (" << x << ", " << y << ", " << z << ")" << std::endl;
+        ivf::logDebug(ivf::logStr("Moved node to (", x, ", ", y, ", ", z, ")"), "EnhancedSceneWindow");
     });
 }
 

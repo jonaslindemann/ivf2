@@ -23,6 +23,12 @@ void BufferSelection::resize(int width, int height)
 {
     m_width = width;
     m_height = height;
+
+    // Windows resize the selection buffer even when selection was never initialised;
+    // binding object 0 here made glRenderbufferStorage fail (GL_INVALID_OPERATION).
+    if (m_colorTexture == 0 || m_depthRenderBuffer == 0 || width <= 0 || height <= 0)
+        return;
+
     glBindTexture(GL_TEXTURE_2D, m_colorTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glBindRenderbuffer(GL_RENDERBUFFER, m_depthRenderBuffer);

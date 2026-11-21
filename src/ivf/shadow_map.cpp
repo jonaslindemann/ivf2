@@ -1,4 +1,5 @@
 #include <ivf/shadow_map.h>
+#include <ivf/gl_debug.h>
 
 #include <ivf/logger.h>
 
@@ -41,6 +42,8 @@ void ShadowMap::initialize()
     // Create and configure FBO
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glLabel(GL_FRAMEBUFFER, m_fbo, "ivf shadow map");
+    glLabel(GL_TEXTURE, m_depthTexture, "ivf shadow map depth");
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);

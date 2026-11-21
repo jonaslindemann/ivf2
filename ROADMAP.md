@@ -141,10 +141,20 @@ Goal: make the library trustworthy to depend on.
    glm now comes from vcpkg (`glm::glm`, 1.0.3) instead of the bundled 1.0.0 copy (generator
    output re-verified: identical); `include/dirent` removed - the only user, ImGuiFileDialog in
    `assimp1`, uses `std::filesystem` (`USE_STD_FILESYSTEM`).
-5. **Diagnostics.** Debug-context option on `GLFWWindow`, `glDebugMessageCallback` routed
-   to `Logger` (when GL 4.3 / `KHR_debug` is available), `glObjectLabel` for named
-   resources, and replace all `std::cout`/`std::cerr` with `IVF_LOG_*`. Add an
-   `ivf::Logger` sink API so applications can redirect output.
+5. **Diagnostics.** *Done:* `ivf/gl_debug.h` routes OpenGL debug output (4.3) to the Logger
+   (severity mapping, repeat suppression, synchronous for usable stacks); `GLFWWindow`
+   requests the newest OpenGL (4.6 -> 4.3 -> 4.1 on macOS) and a debug context in debug
+   builds or with `IVF2_GL_DEBUG=1`; GLFW errors are logged; programs, textures and
+   framebuffers are labelled; the context's GL version/renderer is logged. Logger is
+   thread-safe and has sinks (`addSink`); status/warning `std::cout` output in the libraries
+   goes through the Logger (explicit `print()`/dump helpers still write to stdout).
+   Automation env vars `IVF2_HIDE_WINDOWS`, `IVF2_EXIT_AFTER_FRAMES`, `IVF2_SCREENSHOT`.
+   Running all 52 examples with debug output found and fixed three silent GL errors:
+   selection buffer resized without being created (`GL_INVALID_OPERATION`, 40 examples),
+   `glLineWidth` > 1 in a forward-compatible context (`GL_INVALID_VALUE`, 7 examples -
+   wide lines never worked), `glViewport` with the camera's unset -1 size.
+   *Open decision:* drop `GLFW_OPENGL_FORWARD_COMPAT` on Windows/Linux so line widths > 1
+   take effect (changes how those scenes look; macOS stays at 1 pixel).
 6. **Error-handling policy.** Decide and document: loaders return
    `std::expected`-style results (or `nullptr` + logged error), never silently continue.
    Apply consistently to textures, models, shaders, fonts.
@@ -154,7 +164,9 @@ Goal: make the library trustworthy to depend on.
    `ivf/version.h` from `project(VERSION)`.
 8. **Visual regression tests.** Headless rendering (hidden GLFW window, or EGL on CI)
    rendering each example scene to an FBO and comparing with golden images within a
-   tolerance. `FrameWriter` already provides most of the plumbing.
+   tolerance. *Groundwork done:* `IVF2_HIDE_WINDOWS` + `IVF2_EXIT_AFTER_FRAMES` +
+   `IVF2_SCREENSHOT` produce a screenshot of every example locally; CI still needs a GL
+   driver (xvfb + Mesa on Linux) and golden-image comparison.
 9. **Repository hygiene.** Move runtime data from `bin/` to `data/` and example assets to
    `examples/assets/` (consider Git LFS for the 93 MB of assets); remove `test_span.cpp`,
    `include/ivf/logger.cpp`, the diverged root `shaders/` directory and `_example8`.

@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 
 #include <memory>
+#include <optional>
 #include <string>
 
 namespace ivf {
@@ -116,6 +117,14 @@ public:
     GLuint fallbackCubemap();
 
     /**
+     * @brief True if glLineWidth() accepts widths above 1.
+     *
+     * Forward-compatible contexts (required on macOS, used by GLFWWindow) remove wide
+     * lines: there a width above 1 is a GL_INVALID_VALUE error and lines stay 1 pixel.
+     */
+    bool wideLinesSupported();
+
+    /**
      * @brief The current context, or a process-wide fallback context if none is current.
      *
      * Used by the singleton accessors for backwards compatibility. The fallback is
@@ -139,6 +148,7 @@ private:
 
     GLuint m_fallbackTexture2D{0};
     GLuint m_fallbackCubemap{0};
+    std::optional<bool> m_wideLines; ///< Queried on first use.
 };
 
 /** @brief Shared pointer to a RenderContext. */

@@ -1,4 +1,5 @@
 ﻿#include <ivfui/placement_mixin.h>
+#include <ivf/logger.h>
 #include <ivf/material.h>
 #include <ivf/sphere.h>
 #include <ivf/grid.h>
@@ -106,7 +107,7 @@ void PlacementMixin::setInteractionMode(InteractionMode mode)
         break;
     }
 
-    std::cout << "Interaction mode: " << modeStr << std::endl;
+    ivf::logDebug(ivf::logStr("Interaction mode: ", modeStr), "PlacementMixin");
 }
 
 InteractionMode PlacementMixin::currentInteractionMode() const
@@ -569,17 +570,17 @@ void PlacementMixin::updatePlacementGrid()
     case PlacementPlane::XZ:
         m_placementGrid->setPlane(ivf::GridPlane::XZ);
         m_placementGrid->setPos(glm::vec3(0.0f, offset, 0.0f));
-        std::cout << "Placement grid synchronized to XZ plane" << std::endl;
+        ivf::logDebug(std::string("Placement grid synchronized to XZ plane"), "PlacementMixin");
         break;
     case PlacementPlane::XY:
         m_placementGrid->setPlane(ivf::GridPlane::XY);
         m_placementGrid->setPos(glm::vec3(0.0f, 0.0f, offset));
-        std::cout << "Placement grid synchronized to XY plane" << std::endl;
+        ivf::logDebug(std::string("Placement grid synchronized to XY plane"), "PlacementMixin");
         break;
     case PlacementPlane::YZ:
         m_placementGrid->setPlane(ivf::GridPlane::YZ);
         m_placementGrid->setPos(glm::vec3(offset, 0.0f, 0.0f));
-        std::cout << "Placement grid synchronized to YZ plane" << std::endl;
+        ivf::logDebug(std::string("Placement grid synchronized to YZ plane"), "PlacementMixin");
         break;
     }
 }
@@ -613,8 +614,7 @@ void PlacementMixin::onCursorClick(float x, float y, float z, int button, int ac
                 if (newNode)
                 {
                     m_window->add(newNode);
-                    std::cout << "Node created at: (" << nodePos.x << ", " << nodePos.y << ", " << nodePos.z << ")"
-                              << std::endl;
+                    ivf::logDebug(ivf::logStr("Node created at: (", nodePos.x, ", ", nodePos.y, ", ", nodePos.z, ")"), "PlacementMixin");
                 }
             }
         }
@@ -780,7 +780,7 @@ void PlacementMixin::updateCameraModeHint()
         static bool lastBlockState = false;
         if (shouldBlock != lastBlockState)
         {
-            std::cout << "Camera manipulation " << (shouldBlock ? "BLOCKED" : "ENABLED") << std::endl;
+            ivf::logDebug(ivf::logStr("Camera manipulation ", (shouldBlock ? "BLOCKED" : "ENABLED")), "PlacementMixin");
             lastBlockState = shouldBlock;
         }
     }
@@ -1086,12 +1086,11 @@ void PlacementMixin::setPlaneLocked(bool locked)
             break;
         }
 
-        std::cout << "Plane constraint ENABLED - cursor constrained to " << getPlaneDescription() << " at offset "
-                  << m_planeConstraintOffset << std::endl;
+        ivf::logDebug(ivf::logStr("Plane constraint ENABLED - cursor constrained to ", getPlaneDescription(), " at offset ", m_planeConstraintOffset), "PlacementMixin");
     }
     else
     {
-        std::cout << "Plane constraint DISABLED - free 3D movement" << std::endl;
+        ivf::logDebug(std::string("Plane constraint DISABLED - free 3D movement"), "PlacementMixin");
     }
 }
 
@@ -1106,7 +1105,7 @@ void PlacementMixin::setPlaneConstraintOffset(float offset)
 
     if (m_planeLocked)
     {
-        std::cout << "Plane constraint offset updated to " << offset << std::endl;
+        ivf::logDebug(ivf::logStr("Plane constraint offset updated to ", offset), "PlacementMixin");
     }
 }
 

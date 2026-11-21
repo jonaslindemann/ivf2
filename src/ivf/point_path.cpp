@@ -35,9 +35,6 @@ PointPath::PointPath(int segments, std::vector<glm::vec3> points)
 			vertex.tangent[1] = tangent.y;
 			vertex.tangent[2] = tangent.z;
 
-			cout << "v: (" << vertex.position[0] << ", " << vertex.position[1] << ", " << vertex.position[2] << ")" << endl;
-			cout << "n: (" << vertex.normal[0] << ", " << vertex.normal[1] << ", " << vertex.normal[2] << ")" << endl;
-			//cout << "t: (" << vertex.texCoord[0] << ", " << vertex.texCoord[1] << ")" << endl;
 
 			vertex.texCoord = t;
 

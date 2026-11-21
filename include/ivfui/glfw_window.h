@@ -29,6 +29,14 @@ namespace ivfui {
  * The GLFWWindow class encapsulates a GLFW window, providing methods for window management,
  * event handling, OpenGL context control, and UI rendering. It supports mouse and keyboard
  * input, window resizing, frame timing, and integration with the ivfui UI system.
+ *
+ * Environment variables (read when a window is created):
+ * - `IVF2_GL_DEBUG=1|0` - request an OpenGL debug context and route driver messages
+ *   to the Logger (default: on in debug builds, off in release builds).
+ * - `IVF2_HIDE_WINDOWS=1` - create windows invisible (scripted runs, CI).
+ * - `IVF2_EXIT_AFTER_FRAMES=N` - close the window after N frames.
+ * - `IVF2_SCREENSHOT=file.png` - with IVF2_EXIT_AFTER_FRAMES, save the last frame
+ *   (including the UI); further windows write file_2.png, file_3.png, ...
  */
 class GLFWWindow {
 private:
@@ -49,6 +57,12 @@ private:
     bool m_enabled;             ///< Window enabled state.
     bool m_runSetup;            ///< True if setup should be run.
     bool m_closeNotified;       ///< True after close callback has been dispatched.
+
+    // Automation (environment variables, see the class documentation)
+    bool m_hidden{false};          ///< IVF2_HIDE_WINDOWS: window created invisible.
+    int m_autoExitFrames{0};       ///< IVF2_EXIT_AFTER_FRAMES: close after this many frames (0 = never).
+    std::string m_autoScreenshot;  ///< IVF2_SCREENSHOT: PNG written from the last frame before closing.
+    int m_drawnFrames{0};          ///< Frames completed by draw().
     int m_currentKey;           ///< Last key event.
     std::mutex m_mutex;         ///< Mutex for thread safety.
     double m_t0;                ///< Start time for frame timing.

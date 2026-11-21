@@ -1,4 +1,5 @@
 #include <ivf/shader_watcher.h>
+#include <ivf/logger.h>
 #include <ivf/render_context.h>
 
 #include <ivf/vertex_shader.h>
@@ -65,8 +66,7 @@ void ShaderWatcher::update(float dt, float checkInterval)
             if (tryReload(e)) {
                 e.lastVertTime = vt;
                 e.lastFragTime = ft;
-                std::cout << "[ShaderWatcher] Reloaded: "
-                          << e.vertPath << " / " << e.fragPath << "\n";
+                ivf::logInfo(ivf::logStr("Reloaded: ", e.vertPath, " / ", e.fragPath), "ShaderWatcher");
             }
         }
     }
@@ -76,21 +76,21 @@ bool ShaderWatcher::tryReload(Entry& e)
 {
     auto vert = std::make_shared<VertexShader>(e.vertPath);
     if (!vert->read()) {
-        std::cerr << "[ShaderWatcher] Cannot read: " << e.vertPath << "\n";
+        ivf::logError(ivf::logStr("Cannot read: ", e.vertPath), "ShaderWatcher");
         return false;
     }
     if (!vert->compile()) {
-        std::cerr << "[ShaderWatcher] Vertex compile error: " << e.vertPath << "\n";
+        ivf::logError(ivf::logStr("Vertex compile error: ", e.vertPath), "ShaderWatcher");
         return false;
     }
 
     auto frag = std::make_shared<FragmentShader>(e.fragPath);
     if (!frag->read()) {
-        std::cerr << "[ShaderWatcher] Cannot read: " << e.fragPath << "\n";
+        ivf::logError(ivf::logStr("Cannot read: ", e.fragPath), "ShaderWatcher");
         return false;
     }
     if (!frag->compile()) {
-        std::cerr << "[ShaderWatcher] Fragment compile error: " << e.fragPath << "\n";
+        ivf::logError(ivf::logStr("Fragment compile error: ", e.fragPath), "ShaderWatcher");
         return false;
     }
 
@@ -99,8 +99,7 @@ bool ShaderWatcher::tryReload(Entry& e)
     e.program->addShader(frag);
 
     if (!e.program->link()) {
-        std::cerr << "[ShaderWatcher] Link error for: "
-                  << e.vertPath << " / " << e.fragPath << "\n";
+        ivf::logError(ivf::logStr("Link error for: ", e.vertPath, " / ", e.fragPath), "ShaderWatcher");
         return false;
     }
 

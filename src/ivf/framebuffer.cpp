@@ -1,4 +1,5 @@
 #include <ivf/framebuffer.h>
+#include <ivf/gl_debug.h>
 
 #include <ivf/texture.h>
 #include <ivf/logger.h>
@@ -95,12 +96,14 @@ void ivf::FrameBuffer::initialize()
     {
         glGenFramebuffers(1, &m_multisampledFrameBuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, m_multisampledFrameBuffer);
+        glLabel(GL_FRAMEBUFFER, m_multisampledFrameBuffer, "ivf scene (multisampled)");
 
         this->attachMultisampledColorTexture();
         this->attachMultisampledDepthBuffer();
 
         glGenFramebuffers(1, &m_frameBuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+        glLabel(GL_FRAMEBUFFER, m_frameBuffer, "ivf scene");
 
         this->attachColorTexture(m_colorTexture);
         this->attachDepthBuffer(m_depthBuffer);
@@ -119,6 +122,7 @@ void ivf::FrameBuffer::initialize()
     {
         glGenFramebuffers(1, &m_frameBuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+        glLabel(GL_FRAMEBUFFER, m_frameBuffer, "ivf scene");
 
         this->attachColorTexture(m_colorTexture);
         this->attachDepthBuffer(m_depthBuffer);

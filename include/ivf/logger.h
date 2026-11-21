@@ -5,8 +5,27 @@
 #include <memory>
 #include <string>
 #include <format>
+#include <functional>
+#include <mutex>
+#include <sstream>
+#include <vector>
 
 namespace ivf {
+
+/**
+ * @brief Stream all arguments into one string, like `std::cout << a << b << c`.
+ *
+ * Convenience for log messages built from mixed values:
+ * @code
+ * ivf::logDebug(ivf::logStr("Point: (", p.x, ", ", p.y, ")"), "Picker");
+ * @endcode
+ */
+template <typename... Args> std::string logStr(const Args &...args)
+{
+    std::ostringstream os;
+    (os << ... << args);
+    return os.str();
+}
 
 enum class LogLevel {
     Debug,
@@ -15,6 +34,15 @@ enum class LogLevel {
     Error,
     None
 };
+
+/**
+ * @brief Receives every log message that passes the log level filter.
+ *
+ * Sinks get the raw message and context (no timestamp or level formatting), in
+ * addition to the console and file output. Use them to show log output in an
+ * application's own UI, collect it in tests, or forward it elsewhere.
+ */
+using LogSink = std::function<void(LogLevel level, const std::string &message, const std::string &context)>;
 
 class Logger {
 private:
@@ -34,6 +62,10 @@ private:
     int m_levelWidth;
     int m_contextWidth;
 
+    std::mutex m_mutex;                              ///< Serialises output from several threads.
+    std::vector<std::pair<int, LogSink>> m_sinks;    ///< Registered sinks with their ids.
+    int m_nextSinkId{1};
+
     std::string levelToString(LogLevel level) const;
     std::string getTimestamp() const;
     void writeLog(LogLevel level, const std::string &message, const std::string &context = "");
@@ -43,6 +75,18 @@ public:
     static Logger *instance();
     static Logger *create();
     static void drop();
+
+    /**
+     * @brief Register a sink that receives all messages passing the log level filter.
+     * @return Id for removeSink().
+     *
+     * Sinks are called outside the logger's lock, so they may log themselves, but
+     * they can be called from any thread that logs (e.g. FrameWriter workers).
+     */
+    int addSink(LogSink sink);
+
+    /** @brief Remove a sink registered with addSink(). */
+    void removeSink(int id);
 
     void setLogLevel(LogLevel level);
     LogLevel logLevel() const;

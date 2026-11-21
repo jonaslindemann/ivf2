@@ -11,6 +11,11 @@ ivf::Camera::Camera()
 
 void ivf::Camera::updateProjectMatrix()
 {
+    // No viewport yet (setPerspective() before setViewport()) or minimized window:
+    // setViewport() updates the projection once a size is known.
+    if (m_width <= 0 || m_height <= 0)
+        return;
+
     auto xfmMgr = TransformManager::instance();
 
     glViewport(0, 0, m_width, m_height);

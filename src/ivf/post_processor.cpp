@@ -1,4 +1,5 @@
 #include <ivf/post_processor.h>
+#include <ivf/gl_debug.h>
 
 #include <ivf/gl.h>
 
@@ -56,6 +57,11 @@ void PostProcessor::initialize()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_textureB, 0);
+
+    glLabel(GL_FRAMEBUFFER, m_fboA, "ivf post-process A");
+    glLabel(GL_FRAMEBUFFER, m_fboB, "ivf post-process B");
+    glLabel(GL_TEXTURE, m_textureA, "ivf post-process A");
+    glLabel(GL_TEXTURE, m_textureB, "ivf post-process B");
 
     // History framebuffer + double-buffered textures used to retain the previous
     // frame's final composite (bound to unit 1 as "previousFrame" for temporal effects).

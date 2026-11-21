@@ -1,5 +1,6 @@
 #include <ivfui/glfw_window.h>
 
+#include <ivf/gl_debug.h>
 #include <ivf/image_io.h>
 
 #undef GLAD_GL_IMPLEMENTATION
@@ -7,6 +8,8 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
+#include <string_view>
 #include <filesystem>
 #include <iostream>
 #include <vector>
@@ -14,6 +17,39 @@
 #include <ivf/logger.h>
 #include <ivfui/glfw_window.h>
 #include <ivf/shader_manager.h>
+
+
+namespace {
+
+// Value of an environment variable, or nullptr if unset or empty.
+const char *envValue(const char *name)
+{
+    const char *value = std::getenv(name);
+    return (value != nullptr && *value != '\0') ? value : nullptr;
+}
+
+// True if the environment variable is set to something other than "0".
+bool envFlag(const char *name)
+{
+    const char *value = envValue(name);
+    return value != nullptr && std::string_view(value) != "0";
+}
+
+// OpenGL debug context: on in debug builds, IVF2_GL_DEBUG=1/0 forces it on/off.
+bool debugContextRequested()
+{
+    if (const char *value = envValue("IVF2_GL_DEBUG"))
+        return std::string_view(value) != "0";
+#ifndef NDEBUG
+    return true;
+#else
+    return false;
+#endif
+}
+
+int g_windowCount = 0; // numbers IVF2_SCREENSHOT files when there are several windows
+
+} // namespace
 
 using namespace std;
 using namespace ivfui;
@@ -33,12 +69,40 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonit
       m_prevMouseX(-1.0), m_prevMouseY(-1.0), m_isDragging(false),
       m_lastClickTime(-1.0), m_lastClickButton(-1)
 {
-    // Stock and bump fragment shaders use GLSL 4.00 features.
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    // Core profile; the version is chosen below (stock shaders need GLSL 4.00).
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
-    m_window = glfwCreateWindow(width, height, title.c_str(), monitor, shared);
+    const bool debugContext = debugContextRequested();
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, debugContext ? GLFW_TRUE : GLFW_FALSE);
+
+    // Automation for scripted runs and CI (see class documentation)
+    m_hidden = envFlag("IVF2_HIDE_WINDOWS");
+    if (const char *frames = envValue("IVF2_EXIT_AFTER_FRAMES"))
+        m_autoExitFrames = std::max(0, std::atoi(frames));
+    if (const char *shot = envValue("IVF2_SCREENSHOT"))
+    {
+        std::filesystem::path path(shot);
+        if (g_windowCount > 0) // second and later windows: name_2.png, name_3.png, ...
+            path = path.parent_path() /
+                   (path.stem().string() + "_" + std::to_string(g_windowCount + 1) + path.extension().string());
+        m_autoScreenshot = path.string();
+    }
+    ++g_windowCount;
+    if (m_hidden)
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
+
+    // Request the newest OpenGL first: drivers return exactly the requested version, and
+    // 4.3+ provides debug output (and compute shaders). macOS supports at most 4.1.
+    constexpr int versions[][2] = {{4, 6}, {4, 3}, {4, 1}};
+    for (const auto &version : versions)
+    {
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, version[0]);
+        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, version[1]);
+        m_window = glfwCreateWindow(width, height, title.c_str(), monitor, shared);
+        if (m_window)
+            break;
+    }
+    glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); // don't leak the hint to other windows
 
     if (!m_window)
     {
@@ -53,6 +117,10 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonit
     if (!m_renderContext)
         exit(EXIT_FAILURE);
     m_renderContext->makeCurrent();
+
+    // Route driver messages (errors, undefined behaviour, performance hints) to the Logger.
+    if (debugContext && !ivf::enableGLDebugOutput())
+        ivf::logInfo("OpenGL debug output not available (requires OpenGL 4.3)", "GLFWWindow");
 
     m_uiRenderer = UiRenderer::create(m_window);
 }
@@ -241,7 +309,9 @@ void GLFWWindow::setWindowIcon(const std::string filename)
 
 void GLFWWindow::maximize()
 {
-    glfwMaximizeWindow(m_window);
+    // Maximizing would show a window created hidden (IVF2_HIDE_WINDOWS).
+    if (!m_hidden)
+        glfwMaximizeWindow(m_window);
 }
 
 void GLFWWindow::enable()
@@ -270,6 +340,10 @@ void GLFWWindow::draw()
     // Make this window the current context
 
     this->makeCurrent();
+
+    // IVF2_SCREENSHOT: capture the last frame before IVF2_EXIT_AFTER_FRAMES closes the window
+    if (!m_autoScreenshot.empty() && m_autoExitFrames > 0 && m_drawnFrames == m_autoExitFrames - 1)
+        this->saveScreenshot(m_autoScreenshot, true);
 
     // Frame time: wall-clock delta since the previous draw(), or the fixed step
     // when exporting frames, so animation is deterministic and independent of
@@ -383,6 +457,11 @@ void GLFWWindow::draw()
     // Swap buffers
 
     this->swapBuffers();
+
+    // IVF2_EXIT_AFTER_FRAMES
+    ++m_drawnFrames;
+    if (m_autoExitFrames > 0 && m_drawnFrames >= m_autoExitFrames)
+        this->close();
 
     // An export with a frame count ends after its last frame
     if (m_exporting && m_exportFrameCount > 0 && m_recordedFrames >= m_exportFrameCount)

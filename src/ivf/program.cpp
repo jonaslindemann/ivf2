@@ -1,4 +1,5 @@
 #include <ivf/program.h>
+#include <ivf/gl_debug.h>
 
 using namespace ivf;
 
@@ -52,6 +53,7 @@ bool Program::link()
         glAttachShader(m_id, m_shaders[i]->id());
 
     glLinkProgram(m_id);
+    glLabel(GL_PROGRAM, m_id, m_name);
 
     GLint result = GL_FALSE;
     int infoLogLength = 0;
@@ -276,6 +278,9 @@ std::string ivf::Program::name()
 void ivf::Program::setName(std::string_view name)
 {
     m_name = name;
+    // m_id is a GLuint holding -1 until link() creates the program; link() applies the label.
+    if (m_id != static_cast<GLuint>(-1) && m_id != 0)
+        glLabel(GL_PROGRAM, m_id, m_name);
 }
 
 void ivf::Program::doParams()

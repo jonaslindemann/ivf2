@@ -1,4 +1,5 @@
 #include <ivf/texture.h>
+#include <ivf/gl_debug.h>
 
 #include <ivf/image_io.h>
 
@@ -6,6 +7,7 @@
 #include <ivf/utils.h>
 #include <ivf/logger.h>
 
+#include <filesystem>
 #include <algorithm>
 #include <iostream>
 #include <string_view>
@@ -79,6 +81,7 @@ bool Texture::load(const std::string_view filename)
         this->bind();
         GL_ERR_BEGIN;
         glTexImage2D(GL_TEXTURE_2D, m_level, ifmt, width, height, 0, fmt, m_type, data);
+        glLabel(GL_TEXTURE, m_id, std::filesystem::path(filename).filename().string());
         glGenerateMipmap(GL_TEXTURE_2D);
         GL_ERR_END("Texture::load()");
         this->unbind();

@@ -1,4 +1,5 @@
 #include <ivf/mesh.h>
+#include <ivf/render_context.h>
 
 #include <memory>
 #include <iostream>
@@ -437,7 +438,9 @@ void Mesh::drawImpl(GLsizei instanceCount)
     if (m_depthFunc != GL_LESS)
         glDepthFunc(m_depthFunc);
 
-    if (m_lineWidth != 1.0f)
+    // Widths above 1 are an error in forward-compatible contexts (see wideLinesSupported()).
+    const bool wideLine = m_lineWidth != 1.0f && RenderContext::currentOrFallback()->wideLinesSupported();
+    if (wideLine)
         glLineWidth(m_lineWidth);
 
     m_VAO->bind();

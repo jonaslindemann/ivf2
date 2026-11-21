@@ -144,14 +144,13 @@ GLenum ivf::checkPrintError(const std::string context, const std::string file, c
         break;
     /*
     case GL_STACK_OVERFLOW:
-        cout << "Error: This command would cause a stack overflow. (GL_STACK_OVERFLOW)" << endl;
+        ivf::logError(std::string("This command would cause a stack overflow. (GL_STACK_OVERFLOW)"), "OpenGL");
         break;
     case GL_STACK_UNDERFLOW:
-        cout << "Error: This command would cause a stack underflow. (GL_STACK_UNDERFLOW)" << endl;
+        ivf::logError(std::string("This command would cause a stack underflow. (GL_STACK_UNDERFLOW)"), "OpenGL");
         break;
     case GL_TABLE_TOO_LARGE:
-        cout << "Error: The specified table exceeds the implementation's maximum supported table size.
-    (GL_TABLE_TOO_LARGE)" << endl; break;
+        ivf::logError(std::string("The specified table exceeds the implementation's maximum supported table size. (GL_TABLE_TOO_LARGE)"), "OpenGL"); break;
     */
     case GL_OUT_OF_MEMORY:
         logErrorfc("OpenGL",

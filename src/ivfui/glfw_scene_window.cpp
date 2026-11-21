@@ -1,4 +1,5 @@
 #include <ivfui/glfw_scene_window.h>
+#include <ivf/logger.h>
 
 using namespace std;
 using namespace ivfui;
@@ -169,7 +170,7 @@ void GLFWSceneWindow::enableEffect(int index)
 {
     if (index < 0 || index >= static_cast<int>(m_effects.size()))
     {
-        cout << "Invalid effect index: " << index << endl;
+        ivf::logWarning(ivf::logStr("Invalid effect index: ", index), "GLFWSceneWindow");
         return;
     }
 
@@ -180,7 +181,7 @@ void GLFWSceneWindow::enableEffect(int index)
     }
     else
     {
-        cout << "Effect at index " << index << " is null." << endl;
+        ivf::logWarning(ivf::logStr("Effect at index ", index, " is null."), "GLFWSceneWindow");
     }
 }
 
@@ -188,7 +189,7 @@ void GLFWSceneWindow::disableEffect(int index)
 {
     if (index < 0 || index >= static_cast<int>(m_effects.size()))
     {
-        cout << "Invalid effect index: " << index << endl;
+        ivf::logWarning(ivf::logStr("Invalid effect index: ", index), "GLFWSceneWindow");
         return;
     }
 
@@ -199,7 +200,7 @@ void GLFWSceneWindow::disableEffect(int index)
     }
     else
     {
-        cout << "Effect at index " << index << " is null." << endl;
+        ivf::logWarning(ivf::logStr("Effect at index ", index, " is null."), "GLFWSceneWindow");
     }
 }
 
@@ -207,7 +208,7 @@ bool GLFWSceneWindow::isEffectEnabled(int index) const
 {
     if (index < 0 || index >= static_cast<int>(m_effects.size()))
     {
-        cout << "Invalid effect index: " << index << endl;
+        ivf::logWarning(ivf::logStr("Invalid effect index: ", index), "GLFWSceneWindow");
         return false;
     }
     auto effect = m_effects[index];
@@ -217,7 +218,7 @@ bool GLFWSceneWindow::isEffectEnabled(int index) const
     }
     else
     {
-        cout << "Effect at index " << index << " is null." << endl;
+        ivf::logWarning(ivf::logStr("Effect at index ", index, " is null."), "GLFWSceneWindow");
         return false;
     }
 }
@@ -230,7 +231,7 @@ void GLFWSceneWindow::disableAllEffects()
             effect->program()->setEnabled(false);
         else
         {
-            cout << "Effect is null." << endl;
+            ivf::logWarning(std::string("Effect is null."), "GLFWSceneWindow");
         }
     }
 }
@@ -439,7 +440,7 @@ void ivfui::GLFWSceneWindow::setCursorPosition(float x, float y, float z)
         m_cursor->setPos(glm::vec3(x, y, z));
         m_currentIntersectionPoint = glm::vec3(x, y, z);
 #ifdef IVF_DEBUG
-        std::cout << "Cursor position manually set to: " << x << ", " << y << ", " << z << std::endl;
+        ivf::logDebug(ivf::logStr("Cursor position manually set to: ", x, ", ", y, ", ", z), "GLFWSceneWindow");
 #endif
     }
 }
@@ -556,9 +557,8 @@ int ivfui::GLFWSceneWindow::doSetup()
     // Make cursor visible by default and position it at origin
 
 #ifdef IVF_DEBUG
-    std::cout << "Cursor created and positioned at origin: " << m_cursor->pos().x << ", " << m_cursor->pos().y << ", "
-              << m_cursor->pos().z << std::endl;
-    std::cout << "Cursor visible: " << m_cursor->visible() << std::endl;
+    ivf::logDebug(ivf::logStr("Cursor created and positioned at origin: ", m_cursor->pos().x, ", ", m_cursor->pos().y, ", ", m_cursor->pos().z), "GLFWSceneWindow");
+    ivf::logDebug(ivf::logStr("Cursor visible: ", m_cursor->visible()), "GLFWSceneWindow");
 #endif
     if (m_selectionEnabled)
         m_bufferSelection->initialize(width(), height());
@@ -937,7 +937,7 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
 void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
 {
 #ifdef IVF_DEBUG
-    std::cout << "Key: " << key << " Scancode: " << scancode << " Action: " << action << " Mods: " << mods << std::endl;
+    ivf::logDebug(ivf::logStr("Key: ", key, " Scancode: ", scancode, " Action: ", action, " Mods: ", mods), "GLFWSceneWindow");
 #endif
 
     if (action == GLFW_PRESS || action == GLFW_REPEAT)
@@ -980,7 +980,7 @@ void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
             static float testX = 0.0f;
             testX += 1.0f; // Move cursor 1 unit along X each time T is pressed
             this->setCursorPosition(testX, 0.0f, 0.0f);
-            std::cout << "Test: Moving cursor to X=" << testX << std::endl;
+            ivf::logDebug(ivf::logStr("Test: Moving cursor to X=", testX), "GLFWSceneWindow");
         }
         if (key == GLFW_KEY_H)
         {
@@ -1077,10 +1077,9 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
             glm::vec3 intersectionPoint = rayOrigin + rayDirection * intersectionDistance;
 
 #ifdef IVF_DEBUG
-            std::cout << "Intersection found!" << std::endl;
-            std::cout << "Distance: " << intersectionDistance << std::endl;
-            std::cout << "Point: (" << intersectionPoint.x << ", " << intersectionPoint.y << ", " << intersectionPoint.z
-                      << ")" << std::endl;
+            ivf::logDebug(std::string("Intersection found!"), "GLFWSceneWindow");
+            ivf::logDebug(ivf::logStr("Distance: ", intersectionDistance), "GLFWSceneWindow");
+            ivf::logDebug(ivf::logStr("Point: (", intersectionPoint.x, ", ", intersectionPoint.y, ", ", intersectionPoint.z, ")"), "GLFWSceneWindow");
 #endif
 
             // Snap to grid
@@ -1104,7 +1103,7 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
 #ifdef IVF_DEBUG
         else
         {
-            std::cout << "No intersection found (ray parallel to plane or behind camera)" << std::endl;
+            ivf::logDebug(std::string("No intersection found (ray parallel to plane or behind camera)"), "GLFWSceneWindow");
         }
 #endif
     }
@@ -1131,10 +1130,9 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
             glm::vec3 intersectionPoint = rayOrigin + rayDirection * intersectionDistance;
 
 #ifdef IVF_DEBUG
-            std::cout << "Locked intersection found!" << std::endl;
-            std::cout << "Distance: " << intersectionDistance << std::endl;
-            std::cout << "Point: (" << intersectionPoint.x << ", " << intersectionPoint.y << ", " << intersectionPoint.z
-                      << ")" << std::endl;
+            ivf::logDebug(std::string("Locked intersection found!"), "GLFWSceneWindow");
+            ivf::logDebug(ivf::logStr("Distance: ", intersectionDistance), "GLFWSceneWindow");
+            ivf::logDebug(ivf::logStr("Point: (", intersectionPoint.x, ", ", intersectionPoint.y, ", ", intersectionPoint.z, ")"), "GLFWSceneWindow");
 #endif
 
             // Keep X and Z from previous position when locked
@@ -1161,7 +1159,7 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
 #ifdef IVF_DEBUG
         else
         {
-            std::cout << "No locked intersection found (ray parallel to plane or behind camera)" << std::endl;
+            ivf::logDebug(std::string("No locked intersection found (ray parallel to plane or behind camera)"), "GLFWSceneWindow");
         }
 #endif
     }

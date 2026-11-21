@@ -1,4 +1,5 @@
 #include <ivf/dir_light.h>
+#include <ivf/logger.h>
 
 #include <ivf/light_manager.h>
 #include <ivf/shader_manager.h>
@@ -25,7 +26,7 @@ void ivf::DirectionalLight::setDirection(glm::vec3 direction)
     if (glm::length(direction) > 0.0f)
         m_direction = glm::normalize(direction);
     else
-        std::cerr << "Warning: Directional light direction cannot be zero." << std::endl;
+        ivf::logWarning(std::string("Directional light direction cannot be zero."), "DirectionalLight");
 }
 
 glm::vec3 ivf::DirectionalLight::direction()

@@ -374,7 +374,7 @@ public:
         this->add(visualBox);
     }
 
-    void onKey(int key, int scancode, int action, int mods)
+    void onKey(int key, int scancode, int action, int mods) override
     {
         if (key == GLFW_KEY_R && action == GLFW_PRESS)
         {

@@ -62,12 +62,12 @@ protected:
     /**
      * @brief Load effect-specific resources (shaders, etc.).
      */
-    virtual void doLoad();
+    virtual void doLoad() override;
 
     /**
      * @brief Update effect-specific parameters (uniforms, etc.).
      */
-    virtual void doUpdateParams();
+    virtual void doUpdateParams() override;
 
     /**
      * @brief Register properties for inspection (editor integration).

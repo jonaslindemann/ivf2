@@ -180,7 +180,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {
         m_a1 += 0.1;
         m_a2 += 0.1;
@@ -194,7 +194,7 @@ public:
         m_grid->setEulerAngles(m_a1, m_a2, m_a3);
     }
 
-    virtual void onKey(int key, int scancode, int action, int mods)
+    virtual void onKey(int key, int scancode, int action, int mods) override
     {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         {

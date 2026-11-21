@@ -84,7 +84,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {}
 
     virtual void onAddMenuItems(UiMenu *menu) override
@@ -101,7 +101,7 @@ public:
         this->close();
     }
 
-    void onMousePosition3D(double x, double y, double z)
+    void onMousePosition3D(double x, double y, double z) override
     {
         std::cout << "3D Mouse Position: (" << x << ", " << y << ", " << z << ")\n";
 

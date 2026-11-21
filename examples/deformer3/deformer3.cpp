@@ -169,7 +169,7 @@ public:
         m_dirty = true;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {
         // Update the object inspector with the current object
 

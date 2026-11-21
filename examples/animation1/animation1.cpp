@@ -86,7 +86,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {
         // Updates the animation for each frame
 

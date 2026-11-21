@@ -166,7 +166,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {
         float time = this->elapsedTime();
 

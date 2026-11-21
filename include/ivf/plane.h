@@ -65,7 +65,7 @@ protected:
     /**
      * @brief Internal setup method for initializing the plane geometry.
      */
-    virtual void doSetup();
+    virtual void doSetup() override;
 
     virtual void setupProperties() override;
     virtual void onPropertyChanged(const std::string &name) override;

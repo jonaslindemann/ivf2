@@ -77,8 +77,8 @@ public:
     float horizonBlend() const;
 
 protected:
-    virtual void doLoad();
-    virtual void doUpdateParams();
+    virtual void doLoad() override;
+    virtual void doUpdateParams() override;
     virtual void setupProperties() override;
 };
 

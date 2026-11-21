@@ -135,7 +135,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {
         // Update twist parameters from the UI window
 

@@ -168,7 +168,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {
         // Update the spline animation for the sphere (advance by 1/60 second)
 

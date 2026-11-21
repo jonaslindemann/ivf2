@@ -50,12 +50,12 @@ protected:
     /**
      * @brief Load and initialize the blur effect resources (e.g., shaders).
      */
-    virtual void doLoad();
+    virtual void doLoad() override;
 
     /**
      * @brief Update the blur effect parameters (e.g., blur radius) in the shader or effect pipeline.
      */
-    virtual void doUpdateParams();
+    virtual void doUpdateParams() override;
 
     /**
      * @brief Setup properties for the blur effect, such as blur radius.

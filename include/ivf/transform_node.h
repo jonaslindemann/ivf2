@@ -206,12 +206,12 @@ protected:
     /**
      * @brief Called before drawing the node. Override to perform actions before drawing.
      */
-    virtual void doPreDraw();
+    virtual void doPreDraw() override;
 
     /**
      * @brief Called after drawing the node. Override to perform actions after drawing.
      */
-    virtual void doPostDraw();
+    virtual void doPostDraw() override;
 
     /**
      * @brief Register properties for inspection.

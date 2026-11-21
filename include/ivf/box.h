@@ -130,7 +130,7 @@ protected:
     /**
      * @brief Internal setup method for initializing the box geometry.
      */
-    virtual void doSetup();
+    virtual void doSetup() override;
 
     virtual void setupProperties() override;
     virtual void onPropertyChanged(const std::string &propertyName) override;

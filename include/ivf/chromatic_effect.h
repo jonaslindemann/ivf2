@@ -51,12 +51,12 @@ protected:
     /**
      * @brief Load and initialize the chromatic effect resources (e.g., shaders).
      */
-    virtual void doLoad();
+    virtual void doLoad() override;
 
     /**
      * @brief Update the chromatic effect parameters (e.g., offset) in the shader or effect pipeline.
      */
-    virtual void doUpdateParams();
+    virtual void doUpdateParams() override;
 
     /**
      * @brief Setup properties for the chromatic effect (e.g., offset).

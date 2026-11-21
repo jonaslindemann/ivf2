@@ -371,7 +371,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {
         // Update the function visitor to animate the nodes
 

@@ -176,14 +176,14 @@ protected:
     /**
      * @brief Draw the composite node and its children.
      */
-    virtual void doDraw();
+    virtual void doDraw() override;
 
     /**
      * @brief Enumerate object IDs for selection, starting from a given ID.
      * @param startId Starting object ID.
      * @return uint32_t Next available object ID after enumeration.
      */
-    virtual uint32_t doEnumerateIds(uint32_t startId);
+    virtual uint32_t doEnumerateIds(uint32_t startId) override;
 };
 
 // Template method implementation (must be in header)

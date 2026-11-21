@@ -50,12 +50,12 @@ protected:
     /**
      * @brief Load effect-specific resources (e.g., shaders).
      */
-    virtual void doLoad();
+    virtual void doLoad() override;
 
     /**
      * @brief Update effect-specific parameters (e.g., uniforms).
      */
-    virtual void doUpdateParams();
+    virtual void doUpdateParams() override;
 
     /**
      * @brief Setup properties for the effect, allowing configuration through a UI.

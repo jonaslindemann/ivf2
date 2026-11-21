@@ -70,12 +70,12 @@ protected:
     /**
      * @brief Load effect-specific resources (shaders, etc.).
      */
-    virtual void doLoad();
+    virtual void doLoad() override;
 
     /**
      * @brief Update effect-specific parameters (uniforms, etc.).
      */
-    virtual void doUpdateParams();
+    virtual void doUpdateParams() override;
 
     /**
      * @brief Setup properties for the effect, such as tint color and strength.

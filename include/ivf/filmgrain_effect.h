@@ -59,13 +59,13 @@ protected:
     /**
      * @brief Load and initialize the film grain effect resources (e.g., shaders).
      */
-    virtual void doLoad();
+    virtual void doLoad() override;
 
     /**
      * @brief Update the film grain effect parameters (e.g., noise intensity, grain blending) in the shader or effect
      * pipeline.
      */
-    virtual void doUpdateParams();
+    virtual void doUpdateParams() override;
 
     /**
      * @brief Setup properties for the film grain effect, such as noise intensity and grain blending.

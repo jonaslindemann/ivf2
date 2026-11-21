@@ -59,12 +59,12 @@ protected:
     /**
      * @brief Load and initialize the bloom effect resources (e.g., shaders).
      */
-    virtual void doLoad();
+    virtual void doLoad() override;
 
     /**
      * @brief Update the bloom effect parameters (threshold, intensity) in the shader or effect pipeline.
      */
-    virtual void doUpdateParams();
+    virtual void doUpdateParams() override;
 
     /**
      * @brief Setup properties for the bloom effect (e.g., threshold, intensity).

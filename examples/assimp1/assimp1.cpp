@@ -78,7 +78,7 @@ public:
         return 0;
     }
 
-    virtual void onUpdate()
+    virtual void onUpdate() override
     {}
 
     virtual void onAddMenuItems(UiMenu *menu) override

@@ -1,5 +1,7 @@
 #include <ivf/texture.h>
 
+#include <ivf/image_io.h>
+
 #include <ivf/shader_manager.h>
 #include <ivf/utils.h>
 #include <ivf/logger.h>
@@ -59,7 +61,7 @@ bool Texture::load(const std::string_view filename)
     logInfofc("Texture", "Loading texture from file: {}", filename);
 
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(std::string(filename).c_str(), &width, &height, &nrChannels, 0);
+    unsigned char *data = ivf::loadImage(std::string(filename).c_str(), &width, &height, &nrChannels, 0);
 
     if (data)
     {
@@ -84,10 +86,10 @@ bool Texture::load(const std::string_view filename)
     else
     {
         logErrorfc("Texture", "Failed to load texture from file: {}", filename);
-        stbi_image_free(data);
+        ivf::freeImage(data);
         return false;
     }
-    stbi_image_free(data);
+    ivf::freeImage(data);
 
     return true;
 }
@@ -114,10 +116,10 @@ void Texture::setAnisotropicFiltering(float level)
 
 bool Texture::loadHDR(std::string_view filename)
 {
-    stbi_set_flip_vertically_on_load(true);
+    ivf::setImageFlipVerticallyOnLoad(true);
     int width, height, nrChannels;
-    float* data = stbi_loadf(std::string(filename).c_str(), &width, &height, &nrChannels, 0);
-    stbi_set_flip_vertically_on_load(false);
+    float* data = ivf::loadImageF(std::string(filename).c_str(), &width, &height, &nrChannels, 0);
+    ivf::setImageFlipVerticallyOnLoad(false);
 
     if (!data) {
         logErrorfc("Texture", "Failed to load HDR: {}", filename);
@@ -132,7 +134,7 @@ bool Texture::loadHDR(std::string_view filename)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_FLOAT, data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    stbi_image_free(data);
+    ivf::freeImage(data);
     logInfofc("Texture", "Loaded HDR texture: {} ({}x{})", filename, width, height);
     return true;
 }

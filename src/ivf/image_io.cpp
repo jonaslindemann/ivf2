@@ -1,15 +1,65 @@
 /**
- * @file stb_impl.cpp
- * @brief Single translation unit holding the stb_image / stb_image_write implementations.
+ * @file image_io.cpp
+ * @brief ivf image I/O, implemented with a private copy of stb_image / stb_image_write.
  *
- * Lives in the ivf core library because ivf::Texture and ivf::Cubemap use stb_image;
- * ivfui (screenshots, frame export) links ivf and reuses these symbols.
- * This file is compiled without the precompiled header (see src/ivf/CMakeLists.txt)
- * so the *_IMPLEMENTATION defines are not swallowed by an earlier include.
+ * STB_IMAGE_STATIC / STB_IMAGE_WRITE_STATIC give every stb function internal
+ * linkage, so this copy cannot collide with stb symbols embedded in other
+ * static libraries (assimp ships its own stb_image on Linux/macOS).
+ * Compiled without the precompiled header (see src/ivf/CMakeLists.txt) so no
+ * earlier stb include can bypass the defines below.
  */
 
+#include <ivf/image_io.h>
+
+#if defined(__clang__) || defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function" // stb functions ivf does not call
+#endif
+
+#define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#define STB_IMAGE_WRITE_STATIC
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
+
+#if defined(__clang__) || defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+namespace ivf {
+
+unsigned char *loadImage(const char *filename, int *width, int *height, int *channels, int desiredChannels)
+{
+    int dummy = 0;
+    return stbi_load(filename, width, height, channels ? channels : &dummy, desiredChannels);
+}
+
+float *loadImageF(const char *filename, int *width, int *height, int *channels, int desiredChannels)
+{
+    int dummy = 0;
+    return stbi_loadf(filename, width, height, channels ? channels : &dummy, desiredChannels);
+}
+
+void freeImage(void *data)
+{
+    stbi_image_free(data);
+}
+
+void setImageFlipVerticallyOnLoad(bool flip)
+{
+    stbi_set_flip_vertically_on_load(flip ? 1 : 0);
+}
+
+const char *imageFailureReason()
+{
+    return stbi_failure_reason();
+}
+
+bool writePng(const char *filename, int width, int height, int channels, const void *data, int strideBytes)
+{
+    return stbi_write_png(filename, width, height, channels, data, strideBytes) != 0;
+}
+
+} // namespace ivf

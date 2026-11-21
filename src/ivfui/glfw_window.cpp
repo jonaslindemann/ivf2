@@ -1,8 +1,6 @@
 #include <ivfui/glfw_window.h>
 
-// stb_image / stb_image_write implementations live in src/ivf/stb_impl.cpp
-#include <stb_image.h>
-#include <stb_image_write.h>
+#include <ivf/image_io.h>
 
 #undef GLAD_GL_IMPLEMENTATION
 #include <glad/glad.h>
@@ -208,9 +206,14 @@ void GLFWWindow::getSize(int &width, int &height)
 void GLFWWindow::setWindowIcon(const std::string filename)
 {
     GLFWimage images[1];
-    images[0].pixels = stbi_load(filename.c_str(), &images[0].width, &images[0].height, 0, 4); // rgba channels
+    images[0].pixels = ivf::loadImage(filename.c_str(), &images[0].width, &images[0].height, nullptr, 4); // rgba
+    if (!images[0].pixels)
+    {
+        ivf::logError("Could not load window icon: " + filename, "GLFWWindow");
+        return;
+    }
     glfwSetWindowIcon(m_window, 1, images);
-    stbi_image_free(images[0].pixels);
+    ivf::freeImage(images[0].pixels);
 }
 
 void GLFWWindow::maximize()

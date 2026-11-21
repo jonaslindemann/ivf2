@@ -20,13 +20,12 @@ target_link_libraries(ivf
         Threads::Threads
         ${CMAKE_DL_LIBS})
 
-# stb_image.h is part of the public interface (ivf/texture.h). The installed
-# package re-adds this directory in ivf2Config.cmake.
-target_include_directories(ivf PUBLIC $<BUILD_INTERFACE:${Stb_INCLUDE_DIR}>)
+# stb is a private implementation detail of image_io.cpp (see ivf/image_io.h).
+target_include_directories(ivf PRIVATE ${Stb_INCLUDE_DIR})
 if(IVF2_MINIAUDIO_INCLUDE_DIR)
     target_include_directories(ivf PRIVATE ${IVF2_MINIAUDIO_INCLUDE_DIR})
 endif()
 
-# The stb implementation TU must not see the PCH (it would pre-include stb
-# without the *_IMPLEMENTATION defines).
-set_source_files_properties(stb_impl.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+# image_io.cpp must not see the PCH: an earlier stb include would bypass its
+# STB_*_STATIC / *_IMPLEMENTATION defines.
+set_source_files_properties(image_io.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)

@@ -2,7 +2,7 @@
 
 #include <ivf/logger.h>
 
-#include <stb_image.h>
+#include <ivf/image_io.h>
 #include <glm/glm.hpp>
 
 #include <filesystem>
@@ -32,7 +32,7 @@ std::shared_ptr<Cubemap> Cubemap::create()
 bool Cubemap::loadFace(GLenum target, std::string_view path)
 {
     int w, h, ch;
-    unsigned char* data = stbi_load(std::string(path).c_str(), &w, &h, &ch, 0);
+    unsigned char* data = ivf::loadImage(std::string(path).c_str(), &w, &h, &ch, 0);
     if (!data) {
         logErrorfc("Cubemap", "Cannot load face: {}", path);
         return false;
@@ -53,7 +53,7 @@ bool Cubemap::loadFace(GLenum target, std::string_view path)
 
     GLenum fmt = (ch == 4) ? GL_RGBA : (ch == 3) ? GL_RGB : GL_RED;
     glTexImage2D(target, 0, fmt, w, h, 0, fmt, GL_UNSIGNED_BYTE, data);
-    stbi_image_free(data);
+    ivf::freeImage(data);
     return true;
 }
 

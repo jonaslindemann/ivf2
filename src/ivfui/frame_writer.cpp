@@ -2,7 +2,7 @@
 
 #include <ivf/logger.h>
 
-#include <stb_image_write.h>
+#include <ivf/image_io.h>
 
 #include <algorithm>
 
@@ -71,8 +71,8 @@ void FrameWriter::workerLoop()
 
         // glReadPixels delivers the bottom row first; a negative stride flips it
         const int stride = job.width * 3;
-        bool ok = stbi_write_png(job.path.c_str(), job.width, job.height, 3,
-                                 job.rgb.data() + (job.height - 1) * stride, -stride) != 0;
+        bool ok = ivf::writePng(job.path.c_str(), job.width, job.height, 3,
+                                 job.rgb.data() + (job.height - 1) * stride, -stride);
         if (!ok)
             ivf::logError("Could not write frame: " + job.path, "FrameWriter");
 

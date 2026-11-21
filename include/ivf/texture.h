@@ -5,7 +5,6 @@
 
 #include <ivf/glbase.h>
 #include <ivf/field.h>
-#include <stb_image.h>
 
 #include <ivf/texture_manager.h>
 

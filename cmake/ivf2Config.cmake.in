@@ -28,19 +28,6 @@ endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/ivf2Targets.cmake")
 
-# stb_image.h is used by the public ivf headers but ships without a CMake target.
-find_package(Stb QUIET)
-if(NOT Stb_INCLUDE_DIR)
-    find_path(Stb_INCLUDE_DIR stb_image.h PATH_SUFFIXES stb)
-endif()
-if(Stb_INCLUDE_DIR)
-    set_property(TARGET ivf2::ivf APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${Stb_INCLUDE_DIR}")
-else()
-    set(ivf2_FOUND FALSE)
-    set(ivf2_NOT_FOUND_MESSAGE "ivf2 requires stb (stb_image.h) - install it or add it to CMAKE_PREFIX_PATH")
-    return()
-endif()
-
 set_and_check(IVF2_RUNTIME_DATA_DIR "@PACKAGE_IVF2_INSTALL_DATADIR@")
 
 include("${CMAKE_CURRENT_LIST_DIR}/ivf2Helpers.cmake")

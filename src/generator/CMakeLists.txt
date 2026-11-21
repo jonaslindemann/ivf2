@@ -138,3 +138,6 @@ ivf2_add_library(generator FOLDER "depends" SOURCES
     ${_gen_inc}/UvFlipMesh.hpp
     ${_gen_inc}/UvSwapMesh.hpp
 )
+
+# generator uses glm (GENERATOR_USE_GLM, see generator/math.hpp); glm types are in its API.
+target_link_libraries(generator PUBLIC glm::glm)

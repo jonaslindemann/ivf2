@@ -36,10 +36,8 @@ jobs:
           # Don't report on bundled third-party code.
           config: |
             paths-ignore:
-              - include/glm
               - include/glad
               - include/KHR
-              - include/dirent
               - src/glad
               - examples/assimp1/ImGuiFileDialog.cpp
               - examples/assimp1/ImGuiFileDialog.h

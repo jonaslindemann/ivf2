@@ -15,6 +15,7 @@ include(CMakeFindDependencyMacro)
 find_dependency(OpenGL)
 find_dependency(Threads)
 find_dependency(glfw3 CONFIG)
+find_dependency(glm CONFIG)
 find_dependency(imgui CONFIG)
 find_dependency(nlohmann_json CONFIG)
 

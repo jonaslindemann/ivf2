@@ -24,7 +24,7 @@ visualisation and creative coding. Based on a review of the code base in Novembe
 | Global state | 9 raw-pointer singletons (`ShaderManager`, `LightManager`, `TextureManager`, ...) - one GL context per process, managers never dropped (GL objects leak or are freed after the context is gone), hard to test |
 | Host coupling | `ivf` makes no GLFW calls, but context bootstrap does: the GL loader runs only in `GLFWWindow`, default shaders/font/light are set up in `GLFWSceneWindow::doSetup`, and `XxxNode::create()` uploads to the GPU immediately, so nodes need a current context. Public input APIs use GLFW key/button codes |
 | Dependency footprint | Public headers include assimp, FreeType, stb, nlohmann/json, GLFW, ImGui. Every consumer compiles against all of them; none can be made optional |
-| Bundled third-party code | glm 1.0, gml, glad and dirent are vendored in `include/`. Two math libraries (glm in ivf, gml in generator) |
+| Bundled third-party code | glm 1.0, gml, glad and dirent are vendored in `include/`. Two math libraries (glm in ivf, gml in generator) - *fixed: only glad/KHR remain, glm from vcpkg* |
 | Rendering core | Immediate, recursive draw with a global "current program"; no render queue, sorting, culling or uniform buffers; `glGetUniformLocation` per call with no cache |
 | Diagnostics | No `KHR_debug` callback, 4 `glGetError` calls in total; 50 `std::cout`/`std::cerr` calls bypass the existing `Logger` |
 | Testing / CI | No tests and no build CI (only CodeQL and docs workflows) - *unit test scaffold added in phase 0* |
@@ -138,8 +138,9 @@ Goal: make the library trustworthy to depend on.
    Verified by dumping 35 generator meshes/paths/shapes with the old (gml) and new (glm)
    build: identical structure, max difference 1e-12. Fixed on the way: `gml::length` alias
    (PolyLinePath) and a comparator for `SubdivideMesh` (glm vectors have no `operator<`).
-   *Remaining:* take glm from vcpkg instead of the bundled `include/glm` (1.0.0), and remove
-   `include/dirent` (use `std::filesystem`).
+   glm now comes from vcpkg (`glm::glm`, 1.0.3) instead of the bundled 1.0.0 copy (generator
+   output re-verified: identical); `include/dirent` removed - the only user, ImGuiFileDialog in
+   `assimp1`, uses `std::filesystem` (`USE_STD_FILESYSTEM`).
 5. **Diagnostics.** Debug-context option on `GLFWWindow`, `glDebugMessageCallback` routed
    to `Logger` (when GL 4.3 / `KHR_debug` is available), `glObjectLabel` for named
    resources, and replace all `std::cout`/`std::cerr` with `IVF_LOG_*`. Add an

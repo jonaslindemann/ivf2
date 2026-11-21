@@ -137,7 +137,7 @@ ReactPhysics3D integration is in `examples/rigid_body1/`. The framework does not
 
 ## Dependencies (vcpkg.json)
 
-GLFW3, OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options, GLM (header-only, bundled in `include/glm/`; also used by the generator library).
+GLFW3, GLM (`glm::glm`, the only math library — also used by the generator), OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options. Only glad/KHR are still vendored in `include/`.
 
 ## Shaders
 

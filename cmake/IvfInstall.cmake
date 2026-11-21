@@ -22,8 +22,8 @@ install(TARGETS ${_ivf2_targets}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     INCLUDES DESTINATION ${IVF2_INSTALL_INCLUDEDIR})
 
-# Public headers, including the bundled glm/glad/KHR, below include/ivf2/.
-foreach(_dir ivf ivfui ivfmath ivfmusic generator glad KHR glm)
+# Public headers, including the bundled glad/KHR, below include/ivf2/.
+foreach(_dir ivf ivfui ivfmath ivfmusic generator glad KHR)
     if(_dir STREQUAL "ivfmusic" AND NOT IVF2_BUILD_MUSIC)
         continue()
     endif()

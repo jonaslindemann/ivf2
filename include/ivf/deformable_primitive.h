@@ -1,7 +1,10 @@
 #pragma once
 
+#include <ivf/deformable_mesh_node.h>
 #include <ivf/deformer.h>
 #include <ivf/mesh_node.h>
+
+#include <memory>
 
 namespace ivf {
 

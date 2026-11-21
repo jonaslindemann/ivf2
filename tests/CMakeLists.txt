@@ -13,3 +13,12 @@ endfunction()
 ivf2_add_test(test_generator LIBS ivf2::generator)
 ivf2_add_test(test_ivfmath LIBS ivf2::ivfmath)
 ivf2_add_test(test_render_context LIBS ivf2::ivf)
+
+# Public headers must compile on their own with only public dependencies.
+include(${CMAKE_CURRENT_SOURCE_DIR}/header_check.cmake)
+ivf2_add_header_check(ivfmath)
+ivf2_add_header_check(ivf)
+ivf2_add_header_check(ivfui)
+if(TARGET ivf2::ivfmusic)
+    ivf2_add_header_check(ivfmusic)
+endif()

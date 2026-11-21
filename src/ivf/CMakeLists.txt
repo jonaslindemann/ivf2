@@ -11,9 +11,9 @@ target_link_libraries(ivf
         generator
         ivfmath
         OpenGL::GL
-        imgui::imgui
-        nlohmann_json::nlohmann_json
     PRIVATE
+        imgui::imgui                    # DebugDraw::drawUi() text labels
+        nlohmann_json::nlohmann_json    # SceneSerializer
         Threads::Threads
         ${CMAKE_DL_LIBS})
 

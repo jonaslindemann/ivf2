@@ -125,8 +125,14 @@ Goal: make the library trustworthy to depend on.
    miniaudio, RtMidi and stb are private to `ivf` (no public header includes them) and the
    first four are optional via `IVF2_WITH_ASSIMP/FREETYPE/AUDIO/MIDI` (default ON), with
    matching vcpkg features, a generated `ivf/config.h` and `find_package(ivf2 COMPONENTS ...)`.
-   *Remaining:* nlohmann/json in `scene_serializer.h` / `mesh_manager.h`; GLFW and ImGui in
-   ivfui headers (intended - they are part of that API).
+   nlohmann/json and ImGui are now private to `ivf` too (`SceneSerializer` helpers moved
+   into the .cpp, `MeshManager` state no longer stored as JSON; `ivfmusic` links json
+   privately). A build-only check (`tests/header_check.cmake`) compiles every public header
+   of ivfmath/ivf/ivfui/ivfmusic on its own with only public dependencies, so leaks and
+   non-self-contained headers fail CI.
+   *Remaining:* ImGui is still a (private) dependency of the core for
+   `DebugDraw::drawUi()` text labels - could move to ivfui; gml in public headers (see 4).
+   GLFW and ImGui in ivfui headers are intended - they are part of that API.
 4. **One math library.** Port `generator` from gml to glm (or provide glm adapters) and
    take glm from vcpkg instead of vendoring it; remove `include/gml` and `include/dirent`
    (use `std::filesystem`).

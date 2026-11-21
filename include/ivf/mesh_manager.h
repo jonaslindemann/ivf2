@@ -6,7 +6,6 @@
 #include <stack>
 #include <memory>
 
-#include <nlohmann/json.hpp>
 
 namespace ivf {
 
@@ -24,7 +23,11 @@ class MeshManager {
 private:
     MeshManager();                  ///< Private constructor for singleton pattern.
 
-    std::stack<nlohmann::json> m_stateStack; ///< Stack for storing mesh state (as JSON).
+    /** @brief Saved mesh state (see pushState()/popState()). */
+    struct State {
+        GLenum defaultMeshUsage;
+    };
+    std::stack<State> m_stateStack; ///< Stack for storing mesh state.
     size_t m_maxStackSize = 100;             ///< Maximum stack size to prevent memory bloat.
 
     GLenum m_defaultMeshUsage{GL_STATIC_DRAW}; ///< Default OpenGL usage for mesh buffers.

@@ -3,6 +3,8 @@
 #include <ivf/nodes.h>
 #include <ivf/logger.h>
 
+#include <nlohmann/json.hpp>
+
 #include <fstream>
 #include <typeindex>
 #include <unordered_map>
@@ -36,10 +38,6 @@ void SceneSerializer::registerType(std::string_view typeName, std::function<Node
 }
 
 // ---------------------------------------------------------------------------
-std::map<std::string, std::function<NodePtr()>>& SceneSerializer::typeRegistry()
-{
-    return reg().factories;
-}
 
 // ---------------------------------------------------------------------------
 void SceneSerializer::registerBuiltinTypes()
@@ -64,6 +62,9 @@ void SceneSerializer::registerBuiltinTypes()
 // ---------------------------------------------------------------------------
 // Helpers: vec3 / vec4 ↔ json
 // ---------------------------------------------------------------------------
+// nlohmann-json is private to this file: the helpers below are internal.
+namespace {
+
 static json vec3ToJson(const glm::vec3& v) { return json::array({v.x, v.y, v.z}); }
 static json vec4ToJson(const glm::vec4& v) { return json::array({v.x, v.y, v.z, v.w}); }
 
@@ -80,7 +81,7 @@ static glm::vec4 jsonToVec4(const json& j, glm::vec4 def = {1,1,1,1})
 }
 
 // ---------------------------------------------------------------------------
-void SceneSerializer::serializeTransform(TransformNodePtr tn, json& j)
+void serializeTransform(TransformNodePtr tn, json& j)
 {
     if (!tn) return;
     j["transform"]["pos"]        = vec3ToJson(tn->pos());
@@ -90,7 +91,7 @@ void SceneSerializer::serializeTransform(TransformNodePtr tn, json& j)
     j["transform"]["rotAngle"]   = tn->rotAngle();
 }
 
-void SceneSerializer::deserializeTransform(TransformNodePtr tn, const json& j)
+void deserializeTransform(TransformNodePtr tn, const json& j)
 {
     if (!tn || !j.contains("transform")) return;
     const auto& t = j["transform"];
@@ -102,7 +103,7 @@ void SceneSerializer::deserializeTransform(TransformNodePtr tn, const json& j)
 }
 
 // ---------------------------------------------------------------------------
-void SceneSerializer::serializeMaterial(MaterialPtr mat, json& j)
+void serializeMaterial(MaterialPtr mat, json& j)
 {
     if (!mat) return;
     j["material"]["diffuse"]     = vec4ToJson(mat->diffuseColor());
@@ -113,7 +114,7 @@ void SceneSerializer::serializeMaterial(MaterialPtr mat, json& j)
     j["material"]["useLighting"] = mat->useLighting();
 }
 
-void SceneSerializer::deserializeMaterial(MaterialPtr mat, const json& j)
+void deserializeMaterial(MaterialPtr mat, const json& j)
 {
     if (!mat || !j.contains("material")) return;
     const auto& m = j["material"];
@@ -126,7 +127,7 @@ void SceneSerializer::deserializeMaterial(MaterialPtr mat, const json& j)
 }
 
 // ---------------------------------------------------------------------------
-void SceneSerializer::serializeProperties(NodePtr node, json& j)
+void serializeProperties(NodePtr node, json& j)
 {
     if (!node) return;
     const auto& props = node->getProperties();
@@ -155,7 +156,7 @@ void SceneSerializer::serializeProperties(NodePtr node, json& j)
     if (!props_j.is_null()) j["properties"] = props_j;
 }
 
-void SceneSerializer::deserializeProperties(NodePtr node, const json& j)
+void deserializeProperties(NodePtr node, const json& j)
 {
     if (!node || !j.contains("properties")) return;
     const auto& props_j = j["properties"];
@@ -187,7 +188,7 @@ void SceneSerializer::deserializeProperties(NodePtr node, const json& j)
 }
 
 // ---------------------------------------------------------------------------
-json SceneSerializer::serializeNode(NodePtr node)
+json serializeNode(NodePtr node)
 {
     json j;
 
@@ -223,7 +224,7 @@ json SceneSerializer::serializeNode(NodePtr node)
 }
 
 // ---------------------------------------------------------------------------
-NodePtr SceneSerializer::deserializeNode(const json& j)
+NodePtr deserializeNode(const json& j)
 {
     if (!j.contains("type")) return nullptr;
     std::string typeName = j["type"].get<std::string>();
@@ -267,6 +268,8 @@ NodePtr SceneSerializer::deserializeNode(const json& j)
 
     return node;
 }
+
+} // namespace
 
 // ---------------------------------------------------------------------------
 bool SceneSerializer::save(CompositeNodePtr root, std::string_view path)

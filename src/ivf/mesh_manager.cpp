@@ -31,9 +31,7 @@ void ivf::MeshManager::pushState()
         m_stateStack.pop();
     }
 
-    nlohmann::json state;
-    state["defaultMeshUsage"] = m_defaultMeshUsage;
-    m_stateStack.push(state);
+    m_stateStack.push(State{m_defaultMeshUsage});
 }
 
 void MeshManager::setDefaultMeshUsage(GLenum usage)
@@ -50,12 +48,8 @@ void ivf::MeshManager::popState()
 {
     if (!m_stateStack.empty())
     {
-        nlohmann::json state = m_stateStack.top();
+        m_defaultMeshUsage = m_stateStack.top().defaultMeshUsage;
         m_stateStack.pop();
-        if (state.contains("defaultMeshUsage"))
-        {
-            m_defaultMeshUsage = state["defaultMeshUsage"].get<GLenum>();
-        }
     }
 }
 

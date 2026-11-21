@@ -2,7 +2,7 @@
 
 /**
  * @file scene_serializer.h
- * @brief JSON-based scene graph save/load using nlohmann-json.
+ * @brief JSON-based scene graph save/load (nlohmann-json is used internally only).
  *
  * Saves and loads the scene graph rooted at a CompositeNode.  Node-specific
  * geometry parameters (e.g., Sphere radius, Box size) are round-tripped via
@@ -27,8 +27,6 @@
 #include <ivf/composite_node.h>
 #include <ivf/transform_node.h>
 #include <ivf/material.h>
-
-#include <nlohmann/json.hpp>
 
 #include <functional>
 #include <map>
@@ -83,20 +81,6 @@ public:
      */
     static void registerBuiltinTypes();
 
-private:
-    static nlohmann::json    serializeNode(NodePtr node);
-    static NodePtr           deserializeNode(const nlohmann::json& j);
-
-    static void serializeTransform(TransformNodePtr tn, nlohmann::json& j);
-    static void deserializeTransform(TransformNodePtr tn, const nlohmann::json& j);
-
-    static void serializeMaterial(MaterialPtr mat, nlohmann::json& j);
-    static void deserializeMaterial(MaterialPtr mat, const nlohmann::json& j);
-
-    static void serializeProperties(NodePtr node, nlohmann::json& j);
-    static void deserializeProperties(NodePtr node, const nlohmann::json& j);
-
-    static std::map<std::string, std::function<NodePtr()>>& typeRegistry();
 };
 
 } // namespace ivf

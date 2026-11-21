@@ -7,6 +7,8 @@
 #ifndef GENERATOR_UTILS_HPP
 #define GENERATOR_UTILS_HPP
 
+#include <utility>
+
 namespace generator {
 
 
@@ -16,7 +18,7 @@ template <typename Generator>
 class GeneratedType {
 public:
 
-	using Type =  decltype(static_cast<const Generator*>(nullptr)->generate());
+	using Type =  decltype(std::declval<const Generator&>().generate());
 
 };
 
@@ -27,7 +29,7 @@ template <typename Primitive>
 class EdgeGeneratorType {
 public:
 
-	using Type =  decltype(static_cast<const Primitive*>(nullptr)->edges());
+	using Type =  decltype(std::declval<const Primitive&>().edges());
 
 };
 
@@ -38,7 +40,7 @@ template <typename Primitive>
 class TriangleGeneratorType {
 public:
 
-	using Type =  decltype(static_cast<const Primitive*>(nullptr)->triangles());
+	using Type =  decltype(std::declval<const Primitive&>().triangles());
 
 };
 
@@ -49,7 +51,7 @@ template <typename Primitive>
 class VertexGeneratorType {
 public:
 
-	using Type =  decltype(static_cast<const Primitive*>(nullptr)->vertices());
+	using Type =  decltype(std::declval<const Primitive&>().vertices());
 
 };
 

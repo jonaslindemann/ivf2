@@ -1,15 +1,6 @@
-INCLUDE_DIRECTORIES(${ivf2_SOURCE_DIR}/include)
-FILE(GLOB SOURCE_FILES *.cpp)
-FILE(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/ivfmath/*.h) 
+# ivfmath - keyframe/spline interpolation and spherical math
 
-add_library(ivfmath ${INCLUDE_FILES} ${SOURCE_FILES})
-target_include_directories(ivfmath PRIVATE ${GLM_INCLUDE_DIRS})
-target_precompile_headers(ivfmath PRIVATE pch.h)
-install_targets(/lib ivfmath)
-set_target_properties(ivfmath PROPERTIES 
-    FOLDER "ivf"
-    DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
-)
-    
+file(GLOB _sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB _headers CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/include/ivfmath/*.h)
 
- 
+ivf2_add_library(ivfmath PCH pch.h SOURCES ${_sources} ${_headers})

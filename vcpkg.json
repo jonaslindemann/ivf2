@@ -1,30 +1,42 @@
 {
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "ivf2",
-  "version": "0",
+  "version": "2.0.0",
+  "description": "Interactive Visualisation Framework 2 - a C++20 scene graph library for OpenGL",
+  "homepage": "https://github.com/jonaslindemann/ivf2",
+  "license": "MIT",
+  "builtin-baseline": "7d9f626ca8731fd54f4b51d770cb3fcb61a35c10",
   "dependencies": [
     "assimp",
     "freetype",
-    "glew",
     "glfw3",
     {
       "name": "imgui",
       "features": [
         "docking-experimental",
         "glfw-binding",
-        "opengl2-binding",
         "opengl3-binding"
       ]
     },
-    "libjpeg-turbo",
-    "libpng",
+    "miniaudio",
     "nlohmann-json",
     "opengl",
-    "stb",
-    "zlib",
-    "reactphysics3d",
-    "miniaudio",
     "rtmidi",
-    "miniz",
-    "pugixml"
-  ]
+    "stb"
+  ],
+  "features": {
+    "examples": {
+      "description": "Dependencies used only by the example programs",
+      "dependencies": [
+        "reactphysics3d"
+      ]
+    },
+    "renoise": {
+      "description": "Read Renoise songs (.xrns) in ivfmusic",
+      "dependencies": [
+        "miniz",
+        "pugixml"
+      ]
+    }
+  }
 }

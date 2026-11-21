@@ -1,9 +1,7 @@
 #include <ivfui/glfw_window.h>
 
-#define STB_IMAGE_IMPLEMENTATION
+// stb_image / stb_image_write implementations live in src/ivf/stb_impl.cpp
 #include <stb_image.h>
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image_write.h>
 
 #undef GLAD_GL_IMPLEMENTATION

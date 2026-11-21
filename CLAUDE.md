@@ -8,36 +8,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Commands
 
-**Requirements**: CMake 3.24+, vcpkg (auto-detected from `VCPKG_ROOT`), C++20 compiler.
+**Requirements**: CMake 3.24+, vcpkg (auto-detected: `CMAKE_TOOLCHAIN_FILE` > `VCPKG_ROOT` > common paths > VS-bundled), C++20 compiler. Build files live in `cmake/` (`IvfVcpkgBootstrap`, `IvfTargets`, `IvfInstall`, `ivf2Helpers`, `ivfmusic`).
 
-**Windows (Visual Studio 2022)**:
+**Windows (Visual Studio)**:
 ```
-cmake -B build-debug -S . -G "Visual Studio 17 2022"
-cmake -B build-release -S . -G "Visual Studio 17 2022"
-cmake --build build-debug --config Debug
-cmake --build build-release --config Release
-```
-
-**Linux/macOS**:
-```
-cmake -B build-debug -S . -DCMAKE_BUILD_TYPE=Debug
-cmake -B build-release -S . -DCMAKE_BUILD_TYPE=Release
-cmake --build build-debug
-cmake --build build-release
+cmake --preset vs
+cmake --build --preset vs-debug
+cmake --build --preset vs-release
+ctest --preset vs-debug
 ```
 
-Output libraries go to `lib/Debug/` or `lib/Release/`; executables and assets go to `bin/Debug/` or `bin/Release/`. Assets from `bin/shaders/`, `bin/fonts/`, and `bin/assets/` are automatically copied to the output directory by CMake.
+**Linux/macOS (Ninja)**:
+```
+cmake --preset debug        # or release, ninja (multi-config), lib-only
+cmake --build --preset debug
+ctest --preset debug
+```
+
+Everything is built under `build/<preset>/`: libraries in `lib/<Config>/`, executables plus copied runtime data (`shaders/`, `fonts/`, `assets/` from `bin/`) in `bin/<Config>/`. `-DIVF2_OUTPUT_IN_SOURCE_TREE=ON` restores the old `<source>/bin/<Config>` layout.
+
+Library targets are static, created with `ivf2_add_library()` and exported as `ivf2::<name>`; dependencies are linked per target (no global include dirs). New `.cpp`/`.h` files in `src/<lib>/` and `include/<lib>/` are picked up automatically (`CONFIGURE_DEPENDS` globs), except `src/generator`, which lists its files explicitly. Unit tests (GL-free) live in `tests/`.
 
 ## Running Examples
 
 Examples are the primary way to validate functionality. Each example is a standalone executable built alongside the library:
 
 ```
-bin/Debug/hello_ivf       # Basic primitives and scene setup
-bin/Debug/lighting1       # Lighting configuration
-bin/Debug/textures1       # Texture mapping
-bin/Debug/animation1      # Keyframe animation
-bin/Debug/procedural1     # Geometry generation
+build/vs/bin/Debug/hello_ivfd       # Basic primitives and scene setup
+build/vs/bin/Debug/lighting1d       # Lighting configuration
+build/vs/bin/Debug/textures1d       # Texture mapping
+build/vs/bin/Debug/animation1d      # Keyframe animation
+build/vs/bin/Debug/procedural1d     # Geometry generation
 bin/Debug/music_scene1    # ivfmusic: song-driven scene (--help for options)
 ```
 
@@ -131,11 +132,11 @@ ReactPhysics3D integration is in `examples/rigid_body1/`. The framework does not
 
 ## Dependencies (vcpkg.json)
 
-GLFW3, GLEW, OpenGL, ImGui (docking), Assimp, FreeType, libpng, libjpeg-turbo, stb, nlohmann-json, zlib, ReactPhysics3D, miniaudio, RtMidi, miniz and pugixml (ivfmusic Renoise reader), GLM (header-only, bundled in `include/glm/`).
+GLFW3, OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options, GLM (header-only, bundled in `include/glm/`).
 
 ## Shaders
 
-GLSL shaders live in `shaders/` (source) and are copied to `bin/shaders/` at build time. The `ShaderManager` loads them at runtime relative to the executable. When adding a new shader, register it in CMakeLists.txt asset copy rules.
+The library's built-in shaders are embedded as C++ string constants (`stock_shaders.h`, `pbr_shaders.h`, `post_shaders.h`, ...). File-based shaders used by examples live in `bin/shaders/` and are copied next to the executables at build time (`copy_example_assets` / `ivf2_copy_runtime_files`); `ShaderManager::loadProgramFromFiles` resolves them relative to the working directory. The root `shaders/` directory is an older, diverged copy and is not used by the build.
 
 ## Documentation
 

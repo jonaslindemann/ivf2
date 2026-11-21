@@ -1,14 +1,8 @@
-INCLUDE_DIRECTORIES(${ivf2_SOURCE_DIR}/include)
-FILE(GLOB SOURCE_FILES *.cpp)
-FILE(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/ivfui/*.h)
+# ivfui - GLFW windowing, input, camera manipulators and ImGui integration
 
-add_library(ivfui ${INCLUDE_FILES} ${SOURCE_FILES})
-target_include_directories(ivfui PRIVATE glm::glm)
-add_dependencies(ivfui ivf)
-target_precompile_headers(ivfui PRIVATE pch.h)
-install_targets(/lib ivfui)
-set_target_properties(ivfui PROPERTIES
-    FOLDER "ivf"
-    DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
-)
-     
+file(GLOB _sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+file(GLOB _headers CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/include/ivfui/*.h)
+
+ivf2_add_library(ivfui PCH pch.h SOURCES ${_sources} ${_headers})
+
+target_link_libraries(ivfui PUBLIC ivf glfw imgui::imgui)

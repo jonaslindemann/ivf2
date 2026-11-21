@@ -1,33 +1,37 @@
-# Create a custom target that copies all shared assets once to Debug and Release directories
-# This is more efficient than copying for each example individually
+# ivf2 examples
+#
+# All examples share one runtime directory (${IVF2_RUNTIME_OUTPUT_DIR}); the
+# shared runtime data and example assets are copied there once per build.
+
+if(CMAKE_VERSION VERSION_LESS 3.26)
+    set(_ivf2_copy copy_directory)
+else()
+    set(_ivf2_copy copy_directory_if_different)
+endif()
+
 add_custom_target(copy_example_assets ALL
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/shaders ${PROJECT_SOURCE_DIR}/bin/Debug/shaders
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/fonts ${PROJECT_SOURCE_DIR}/bin/Debug/fonts
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/assets ${PROJECT_SOURCE_DIR}/bin/Debug/assets
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/shaders ${PROJECT_SOURCE_DIR}/bin/Release/shaders
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/fonts ${PROJECT_SOURCE_DIR}/bin/Release/fonts
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/bin/assets ${PROJECT_SOURCE_DIR}/bin/Release/assets
-    COMMENT "Copying shared assets (shaders, fonts, assets) to bin/Debug and bin/Release directories"
-)
+    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/shaders" "${IVF2_RUNTIME_OUTPUT_DIR}/shaders"
+    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/fonts"   "${IVF2_RUNTIME_OUTPUT_DIR}/fonts"
+    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/assets"  "${IVF2_RUNTIME_OUTPUT_DIR}/assets"
+    COMMENT "Copying shared runtime data and example assets to ${IVF2_RUNTIME_OUTPUT_DIR}"
+    VERBATIM)
+set_target_properties(copy_example_assets PROPERTIES FOLDER "examples")
+
+# Optional example-only dependencies.
+find_package(ReactPhysics3D CONFIG QUIET)
 
 # Shared PCH holder: compiled once, reused by all examples that have no extra libs.
-# Examples with EXTRA_LIBS (assimp, ReactPhysics3D, …) get different include paths
-# and cannot safely REUSE_FROM this target; they compile their own PCH instead.
+# Examples with EXTRA_LIBS (assimp, ReactPhysics3D, ...) may get different include
+# paths and cannot safely REUSE_FROM this target; they compile their own PCH.
 add_library(ivf2_examples_pch STATIC pch_holder.cpp)
 target_link_libraries(ivf2_examples_pch PRIVATE ivf2::ivf2)
-target_precompile_headers(ivf2_examples_pch PRIVATE pch.h)
-set_target_properties(ivf2_examples_pch PROPERTIES
-    FOLDER "examples"
-    DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
-)
+ivf2_apply_compiler_settings(ivf2_examples_pch)
+if(IVF2_USE_PCH)
+    target_precompile_headers(ivf2_examples_pch PRIVATE pch.h)
+endif()
+set_target_properties(ivf2_examples_pch PROPERTIES FOLDER "examples")
 
-# Helper function to create ivf2 examples with simplified dependency management
+# add_ivf2_example(<name> [SOURCES <files...>] [EXTRA_LIBS <targets...>])
 function(add_ivf2_example name)
     cmake_parse_arguments(ARG "" "" "SOURCES;EXTRA_LIBS" ${ARGN})
 
@@ -37,23 +41,20 @@ function(add_ivf2_example name)
 
     add_executable(${name} ${ARG_SOURCES})
     target_link_libraries(${name} PRIVATE ivf2::ivf2 ${ARG_EXTRA_LIBS})
+    ivf2_apply_compiler_settings(${name})
     set_target_properties(${name} PROPERTIES
         FOLDER "examples"
         DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
-    )
-    add_dependencies(${name} glad generator ivf ivfui copy_example_assets)
+        VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${name}>")
+    add_dependencies(${name} copy_example_assets)
 
-    if(ARG_EXTRA_LIBS)
-        # Extra libs may add include paths that differ from the shared PCH holder,
-        # so compile a private PCH for this target.
-        # CMAKE_CURRENT_FUNCTION_LIST_DIR always resolves to the directory of this
-        # CMakeLists.txt (examples/), regardless of which subdirectory called the function.
-        target_precompile_headers(${name} PRIVATE
-            "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pch.h"
-        )
-    else()
-        # Standard examples: reuse the one PCH compiled by ivf2_examples_pch.
-        target_precompile_headers(${name} REUSE_FROM ivf2_examples_pch)
+    if(IVF2_USE_PCH)
+        if(ARG_EXTRA_LIBS)
+            # CMAKE_CURRENT_FUNCTION_LIST_DIR resolves to examples/ regardless of caller.
+            target_precompile_headers(${name} PRIVATE "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/pch.h")
+        else()
+            target_precompile_headers(${name} REUSE_FROM ivf2_examples_pch)
+        endif()
     endif()
 endfunction()
 
@@ -81,7 +82,11 @@ add_subdirectory(deformer1)
 add_subdirectory(deformer2)
 add_subdirectory(deformer3)
 add_subdirectory(editor1)
-add_subdirectory(rigid_body1)
+if(TARGET ReactPhysics3D::ReactPhysics3D)
+    add_subdirectory(rigid_body1)
+else()
+    message(STATUS "ivf2: ReactPhysics3D not found - skipping rigid_body1 example")
+endif()
 add_subdirectory(solar_system)
 add_subdirectory(bbox1)
 add_subdirectory(procedural1)
@@ -103,7 +108,9 @@ add_subdirectory(timeline1)
 add_subdirectory(shader_material1)
 add_subdirectory(fog1)
 add_subdirectory(mip_bloom1)
-add_subdirectory(music_scene1)
+if(IVF2_BUILD_MUSIC)
+    add_subdirectory(music_scene1)
+endif()
 add_subdirectory(instancing1)
 add_subdirectory(dof1)
 add_subdirectory(reflection1)

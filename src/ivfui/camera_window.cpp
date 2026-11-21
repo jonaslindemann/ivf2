@@ -213,7 +213,7 @@ void CameraWindow::doDraw()
                 auto size = bbox.size();
                 ImGui::Text("Scene center: (%.3f, %.3f, %.3f)", center.x, center.y, center.z);
                 ImGui::Text("Scene size: (%.3f, %.3f, %.3f)", size.x, size.y, size.z);
-                ImGui::Text("Scene extent: ±(%.3f, %.3f, %.3f)", size.x / 2, size.y / 2, size.z / 2);
+                ImGui::Text("Scene extent: Â±(%.3f, %.3f, %.3f)", size.x / 2, size.y / 2, size.z / 2);
             }
             else
             {

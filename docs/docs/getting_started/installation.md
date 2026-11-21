@@ -7,12 +7,12 @@ This guide will help you install and set up the ivf2 library.
 - **CMake** 3.24 or higher
 - **vcpkg** package manager (handles all library dependencies automatically)
 - **Compiler**:
-  - Windows: Visual Studio 2022 (MSVC with C++20 support)
+  - Windows: Visual Studio 2022 or 2026 (MSVC with C++20 support)
   - Linux: GCC or Clang with C++20 support
   - macOS: Xcode with C++20 support
 - **OpenGL** 3.3 or higher
 
-All library dependencies (GLFW3, GLEW, ImGui, Assimp, FreeType, stb, GLM, ReactPhysics3D, etc.) are managed automatically by vcpkg and do not need to be installed manually.
+All library dependencies (GLFW3, ImGui, Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi, ReactPhysics3D, etc.) are managed automatically by vcpkg and do not need to be installed manually.
 
 ## 1. Clone the Repository
 
@@ -27,9 +27,12 @@ ivf2 uses vcpkg for dependency management. Instructions for installing vcpkg can
 
 The build system detects vcpkg automatically in the following locations (in order):
 
-1. `VCPKG_ROOT` environment variable *(recommended)*
-2. Windows: `c:/vcpkg` or `e:/vcpkg`
-3. Linux/macOS: `$HOME/vcpkg` or `/usr/local/vcpkg`
+1. An explicit `-DCMAKE_TOOLCHAIN_FILE=...`
+2. `VCPKG_ROOT` environment variable *(recommended)*
+3. Windows: `c:/vcpkg` or `e:/vcpkg`; Linux/macOS: `$HOME/vcpkg`, `/usr/local/vcpkg` or `/opt/vcpkg`
+4. The vcpkg bundled with Visual Studio (last resort)
+
+Dependency versions are pinned by the `builtin-baseline` in `vcpkg.json`.
 
 Setting `VCPKG_ROOT` is the most portable approach:
 
@@ -53,54 +56,92 @@ cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/scripts/buildsystems/v
 
 ## 3. Configure and Build
 
-### Windows
+The repository ships `CMakePresets.json`. Each preset builds into `build/<preset>/`.
+
+### Windows (Visual Studio)
 
 ```powershell
-# Configure (creates both Debug and Release build trees)
-cmake -B build-debug   -S . -G "Visual Studio 17 2022"
-cmake -B build-release -S . -G "Visual Studio 17 2022"
-
-# Build
-cmake --build build-debug   --config Debug
-cmake --build build-release --config Release
+cmake --preset vs                 # newest installed Visual Studio, x64
+cmake --build --preset vs-debug
+cmake --build --preset vs-release
+ctest --preset vs-debug           # run the unit tests
 ```
 
-### Linux / macOS
+Open `build/vs/ivf2.sln` to work in the IDE.
+
+### Linux / macOS (Ninja)
 
 ```bash
-# Configure
-cmake -B build-debug   -S . -DCMAKE_BUILD_TYPE=Debug
-cmake -B build-release -S . -DCMAKE_BUILD_TYPE=Release
+cmake --preset release            # or: debug, ninja (multi-config), lib-only
+cmake --build --preset release
+ctest --preset release
+```
 
-# Build
-cmake --build build-debug
-cmake --build build-release
+Without presets the usual commands work as well:
+
+```bash
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
 ```
 
 vcpkg will download and compile all required dependencies on the first run. This may take several minutes depending on your internet connection and machine.
 
+### Build options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `IVF2_BUILD_EXAMPLES` | ON (top level) | Build the example programs |
+| `IVF2_BUILD_TESTS` | ON (top level) | Build the CTest unit tests |
+| `IVF2_BUILD_MUSIC` | ON | Build `ivfmusic` |
+| `IVF_WITH_RENOISE` | ON | Renoise (.xrns) support in ivfmusic |
+| `IVF2_INSTALL` | ON (top level) | Install rules and CMake package |
+| `IVF2_USE_PCH` | ON | Precompiled headers |
+| `IVF2_WARNINGS` | OFF | Extra compiler warnings |
+| `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: binaries in `<source>/bin/<config>` |
+
 ## Build Output
 
-| Artifact             | Location          |
-| -------------------- | ----------------- |
-| Libraries (Debug)    | `lib/Debug/`      |
-| Libraries (Release)  | `lib/Release/`    |
-| Executables (Debug)  | `bin/Debug/`      |
-| Executables (Release)| `bin/Release/`    |
+| Artifact     | Location                          |
+| ------------ | --------------------------------- |
+| Libraries    | `build/<preset>/lib/<Config>/`    |
+| Executables  | `build/<preset>/bin/<Config>/`    |
 
-On Linux and macOS the libraries and executables land directly in `lib/` and `bin/` without a configuration subdirectory.
+For single-config generators `<Config>` is the `CMAKE_BUILD_TYPE` (e.g. `build/release/bin/Release/`).
 
 Debug library names carry a `d` suffix (e.g. `ivfd.lib` vs `ivf.lib`).
 
-Shaders, fonts, and asset files from `bin/shaders/`, `bin/fonts/`, and `bin/assets/` are automatically copied to the output directory by CMake so examples work out of the box.
+Shaders, fonts, and asset files from `bin/shaders/`, `bin/fonts/`, and `bin/assets/` are copied next to the examples by CMake so they work out of the box.
 
 ## Integrating with Your Project
 
-ivf2 exposes a unified CMake target `ivf2::ivf2` that bundles all libraries and their transitive dependencies:
+All libraries are exported as `ivf2::` targets; `ivf2::ivf2` links everything except `ivf2::ivfmusic`.
+
+**Installed package:**
+
+```bash
+cmake --install build/release --prefix /path/to/ivf2-install
+```
 
 ```cmake
+find_package(ivf2 CONFIG REQUIRED)
+
 add_executable(my_app main.cpp)
 target_link_libraries(my_app PRIVATE ivf2::ivf2)
+ivf2_copy_runtime_files(my_app)   # shaders/ and fonts/ next to the executable
 ```
+
+**FetchContent:**
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(ivf2 GIT_REPOSITORY https://github.com/jonaslindemann/ivf2.git GIT_TAG main)
+FetchContent_MakeAvailable(ivf2)
+
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE ivf2::ivf2)
+ivf2_copy_runtime_files(my_app)
+```
+
+In both cases your project needs the same dependencies available (use the same vcpkg toolchain and add ivf2's dependencies to your own `vcpkg.json`).
 
 See [Your First App](your_first_app.md) for a complete getting-started example.

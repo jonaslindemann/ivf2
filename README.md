@@ -7,7 +7,7 @@ Lightweight scene graph library and wrapper over modern OpenGL.
 ## Features
 
 - **Modern OpenGL wrapper** with scene graph architecture
-- **Simplified build system** with automatic vcpkg detection
+- **Modern CMake build** - presets, automatic vcpkg detection, `find_package(ivf2)` / FetchContent support
 - **Unified library target** (`ivf2::ivf2`) for easy integration
 - **Automatic asset management** - shaders, fonts, and models copied automatically
 - **Cross-platform** - Windows, Linux, and macOS support
@@ -43,128 +43,136 @@ See the [Building ivf2](#building-ivf2) section below for detailed instructions.
 
 ## Prerequisites
 
-1. **CMake** 3.24 or higher
+1. **CMake** 3.24 or higher (3.26+ recommended)
 2. **vcpkg** package manager
-3. **Compiler**: 
-   - Windows: Visual Studio 2022 (or compatible MSVC compiler)
-   - Linux: GCC or Clang with C++20 support
-   - macOS: Xcode with C++20 support
+3. **Compiler** with C++20 support:
+   - Windows: Visual Studio 2022 or 2026
+   - Linux: GCC 12+ or Clang 15+
+   - macOS: Xcode 15+ / Apple Clang
+4. **Ninja** (optional, recommended on Linux/macOS)
 
-## Vcpkg Setup
+## vcpkg
 
-The build system automatically detects vcpkg in these locations:
+Dependencies are declared in `vcpkg.json` (manifest mode, pinned with a `builtin-baseline`) and
+installed automatically during configuration. The build finds vcpkg in this order:
 
-1. **VCPKG_ROOT environment variable** (recommended)
-2. **Windows**: `c:/vcpkg` or `e:/vcpkg`
-3. **Linux/macOS**: `$HOME/vcpkg` or `/usr/local/vcpkg`
+1. `-DCMAKE_TOOLCHAIN_FILE=...` if given
+2. The `VCPKG_ROOT` environment variable (recommended)
+3. Common locations: `c:/vcpkg`, `e:/vcpkg` (Windows), `~/vcpkg`, `/usr/local/vcpkg`, `/opt/vcpkg`
+4. The vcpkg bundled with Visual Studio, as a last resort
 
-### Setting VCPKG_ROOT (Recommended)
-
-**Windows (PowerShell):**
-```powershell
-$env:VCPKG_ROOT = "C:\path\to\vcpkg"
-```
-
-**Linux/macOS:**
-```bash
-export VCPKG_ROOT=/path/to/vcpkg
-```
-
-If vcpkg is in a custom location, you can also use:
-```bash
-cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/scripts/buildsystems/vcpkg.cmake
-```
-
-## Quick Start
-
-### Windows
-
-```powershell
-# Configure
-cmake -B build-debug -S . -G "Visual Studio 17 2022"
-cmake -B build-release -S . -G "Visual Studio 17 2022"
-
-# Build Debug
-cmake --build build-debug --config Debug
-
-# Build Release
-cmake --build build-release --config Release
-```
-
-### Linux/macOS
+## Quick start with presets
 
 ```bash
-# Configure Debug
-cmake -B build-debug -S . -DCMAKE_BUILD_TYPE=Debug
+cmake --list-presets              # show available presets
 
-# Configure Release
-cmake -B build-release -S . -DCMAKE_BUILD_TYPE=Release
+# Windows (Visual Studio)
+cmake --preset vs
+cmake --build --preset vs-debug
+cmake --build --preset vs-release
+ctest --preset vs-debug
 
-# Build
-cmake --build build-debug
-cmake --build build-release
+# Linux / macOS (Ninja)
+cmake --preset release            # or: debug, ninja (multi-config)
+cmake --build --preset release
+ctest --preset release
 ```
 
-## Build Output
+Each preset builds into `build/<preset>/`. Personal tweaks belong in a `CMakeUserPresets.json`
+(ignored by git).
 
-- **Libraries**: Located in `lib/Debug/` and `lib/Release/`
-  - `ivf[d].lib` - Core visualization framework
-  - `ivfui[d].lib` - UI components
-  - `ivfmath[d].lib` - Math utilities
-  - `ivfmusic[d].lib` - Music-driven scenes (separate target `ivf2::ivfmusic`)
-  - `generator[d].lib` - Geometry generation
-  - `glad[d].lib` - OpenGL loader
-  - *(Note: 'd' suffix indicates debug builds)*
+Without presets, the usual commands work too:
 
-- **Examples**: Located in `bin/Debug/` and `bin/Release/`
-  - All examples are automatically built with the library
-  - Assets (shaders, fonts, models) are automatically copied to output directories
+```bash
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+```
+
+## Build options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `IVF2_BUILD_EXAMPLES` | ON (top level) | Build the example programs |
+| `IVF2_BUILD_TESTS` | ON (top level) | Build the CTest unit tests |
+| `IVF2_BUILD_MUSIC` | ON | Build `ivfmusic` (music-driven scenes) |
+| `IVF_WITH_RENOISE` | ON | Renoise song (.xrns) support in ivfmusic (miniz, pugixml) |
+| `IVF2_INSTALL` | ON (top level) | Install rules and CMake package config |
+| `IVF2_USE_PCH` | ON | Precompiled headers |
+| `IVF2_WARNINGS` | OFF | Extra compiler warnings |
+| `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: put binaries in `<source>/bin/<config>` |
+
+## Build output
+
+Everything goes into the build directory:
+
+- **Executables** and runtime data (shaders, fonts, assets): `build/<preset>/bin/<Config>/`
+- **Libraries**: `build/<preset>/lib/<Config>/`
+  - `ivf` - core scene graph and rendering
+  - `ivfui` - windows, input, cameras, ImGui
+  - `ivfmath` - spline and keyframe math
+  - `ivfmusic` - music-driven scenes
+  - `generator` - procedural geometry
+  - `glad` - OpenGL loader
+  - Debug builds carry a `d` suffix (`ivfd.lib`)
 
 # Using ivf2 in your own projects
 
-The build system provides a unified `ivf2::ivf2` target that bundles all ivf libraries and their dependencies for easy integration.
+All libraries are exported as `ivf2::` targets. `ivf2::ivf2` links everything except
+`ivf2::ivfmusic`.
 
-## In CMake projects
+## As an installed package
+
+```bash
+cmake --install build/release --prefix /path/to/ivf2-install
+```
 
 ```cmake
-# Simple example
+find_package(ivf2 CONFIG REQUIRED)
+
 add_executable(my_app main.cpp)
 target_link_libraries(my_app PRIVATE ivf2::ivf2)
+ivf2_copy_runtime_files(my_app)          # copies shaders/ and fonts/ next to my_app
 ```
 
-## Creating examples
+Configure your project with the same vcpkg toolchain and add the install prefix to
+`CMAKE_PREFIX_PATH`.
 
-Use the `add_ivf2_example` helper function in the examples directory:
+## As a subproject (FetchContent / add_subdirectory)
 
 ```cmake
-# Simple example with default source file (example_name.cpp)
-add_ivf2_example(my_example)
+include(FetchContent)
+FetchContent_Declare(ivf2
+    GIT_REPOSITORY https://github.com/jonaslindemann/ivf2.git
+    GIT_TAG main)
+FetchContent_MakeAvailable(ivf2)       # examples/tests are off when not top level
 
-# With explicit source files
-add_ivf2_example(my_example SOURCES main.cpp utils.cpp)
-
-# With additional libraries (e.g., for physics examples)
-add_ivf2_example(physics_demo SOURCES demo.cpp EXTRA_LIBS ReactPhysics3D::ReactPhysics3D)
+add_executable(my_app main.cpp)
+target_link_libraries(my_app PRIVATE ivf2::ivf2)
+ivf2_copy_runtime_files(my_app)
 ```
 
-For scenes driven by a song, link `ivf2::ivfmusic` instead (it includes `ivf2::ivf2`), or use the `ivfmusic_add_executable()` helper from `cmake/ivfmusic.cmake`, which also copies the application's assets:
+The dependencies from ivf2's `vcpkg.json` must be available to the parent project (add them
+to your own manifest).
+
+## Music-driven scenes
+
+Link `ivf2::ivfmusic`, or use the `ivfmusic_add_executable()` helper, which also copies the
+application's assets:
 
 ```cmake
 ivfmusic_add_executable(my_scene SOURCES main.cpp ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/assets)
 ```
 
-Reading Renoise songs needs miniz and pugixml (in `vcpkg.json`) and can be switched off with `-DIVF_WITH_RENOISE=OFF`.
+## Adding an example to this repository
 
-The `add_ivf2_example` helper eliminates the need to manually list all dependencies (`ivfui`, `ivf`, `ivfmath`, `generator`, `glad`, `imgui::imgui`, etc.) for each project.
+```cmake
+add_ivf2_example(my_example)                                   # uses my_example.cpp
+add_ivf2_example(my_example SOURCES main.cpp utils.cpp)
+add_ivf2_example(physics_demo SOURCES demo.cpp EXTRA_LIBS ReactPhysics3D::ReactPhysics3D)
+```
 
-### Automatic Asset Management
-
-The `add_ivf2_example` helper automatically copies shared resources to the executable directory after each build:
-- **Shaders** (from `bin/shaders/`) - GLSL shader files
-- **Fonts** (from `bin/fonts/`) - TrueType fonts for text rendering  
-- **Assets** (from `bin/assets/`) - Models, textures, and other resources
-
-This ensures all examples have immediate access to required runtime assets without manual copying.
+Examples share one output directory; shaders, fonts and `bin/assets/` are copied there once
+per build.
 
 # Troubleshooting
 
@@ -193,13 +201,14 @@ cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/path/to/vcpkg/scripts/buildsystems/v
 
 ## Build fails with "cannot find library"
 
-Make sure you're using the correct compiler:
-- **Windows**: Use Visual Studio 2022 generator: `-G "Visual Studio 17 2022"`
-- **Linux/macOS**: Ensure your compiler supports C++20
+Make sure you're using a C++20 compiler and the same vcpkg triplet for ivf2 and your
+application. On Windows, the `vs` preset picks the newest installed Visual Studio.
 
 ## Examples can't find shaders or assets
 
-The `add_ivf2_example` helper automatically copies assets. If you created an example manually, make sure it's using the helper function or manually copy the `bin/shaders`, `bin/fonts`, and `bin/assets` directories to your executable's output directory.
+Inside this repository, use `add_ivf2_example`. In your own project, call
+`ivf2_copy_runtime_files(<target> [ASSETS <dirs...>])` so shaders, fonts and your assets are
+copied next to the executable.
 
 ## Library naming (Debug vs Release)
 

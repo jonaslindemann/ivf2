@@ -1,0 +1,49 @@
+# ivf2 CMake package configuration
+#
+# Targets:  ivf2::ivf2 (everything except ivfmusic), ivf2::ivf, ivf2::ivfui,
+#           ivf2::ivfmath, ivf2::generator, ivf2::glad, and ivf2::ivfmusic when built.
+# Functions: ivf2_copy_runtime_files(<target> [ASSETS <dirs...>])
+#            ivfmusic_add_executable(<name> SOURCES ... [ASSETS <dir>])
+# Variables: IVF2_RUNTIME_DATA_DIR (installed shaders/ and fonts/)
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+find_dependency(OpenGL)
+find_dependency(Threads)
+find_dependency(glfw3 CONFIG)
+find_dependency(imgui CONFIG)
+find_dependency(Freetype)
+find_dependency(assimp CONFIG)
+find_dependency(nlohmann_json CONFIG)
+find_dependency(RtMidi CONFIG)
+
+set(IVF2_HAS_MUSIC @IVF2_BUILD_MUSIC@)
+set(IVF2_HAS_RENOISE @IVF_WITH_RENOISE@)
+if(IVF2_HAS_MUSIC AND IVF2_HAS_RENOISE)
+    find_dependency(miniz CONFIG)
+    find_dependency(pugixml CONFIG)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/ivf2Targets.cmake")
+
+# stb_image.h is used by the public ivf headers but ships without a CMake target.
+find_package(Stb QUIET)
+if(NOT Stb_INCLUDE_DIR)
+    find_path(Stb_INCLUDE_DIR stb_image.h PATH_SUFFIXES stb)
+endif()
+if(Stb_INCLUDE_DIR)
+    set_property(TARGET ivf2::ivf APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${Stb_INCLUDE_DIR}")
+else()
+    set(ivf2_FOUND FALSE)
+    set(ivf2_NOT_FOUND_MESSAGE "ivf2 requires stb (stb_image.h) - install it or add it to CMAKE_PREFIX_PATH")
+    return()
+endif()
+
+set_and_check(IVF2_RUNTIME_DATA_DIR "@PACKAGE_IVF2_INSTALL_DATADIR@")
+
+include("${CMAKE_CURRENT_LIST_DIR}/ivf2Helpers.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/ivfmusic.cmake")
+
+check_required_components(ivf2)

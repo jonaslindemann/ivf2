@@ -27,6 +27,11 @@ function(ivfmusic_add_executable name)
         target_compile_options(${name} PRIVATE /utf-8)
     endif()
 
+    # ivf2 runtime data (shaders/, fonts/) next to the executable.
+    if(COMMAND ivf2_copy_runtime_files)
+        ivf2_copy_runtime_files(${name})
+    endif()
+
     if(ARG_ASSETS)
         get_filename_component(_assets "${ARG_ASSETS}" ABSOLUTE)
         target_compile_definitions(${name} PRIVATE IVFMUSIC_ASSET_SOURCE_DIR="${_assets}")

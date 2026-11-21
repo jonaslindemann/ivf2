@@ -1,13 +1,9 @@
-include_directories(${ivf2_SOURCE_DIR}/include)
-file(GLOB SOURCE_FILES *.c)
-file(GLOB INCLUDE_FILES ${ivf2_SOURCE_DIR}/include/glad/*.h)
+# glad - OpenGL function loader (generated, bundled)
 
-add_library(glad ${INCLUDE_FILES} ${SOURCE_FILES})
+ivf2_add_library(glad FOLDER "depends" SOURCES
+    glad.c
+    ${PROJECT_SOURCE_DIR}/include/glad/glad.h
+    ${PROJECT_SOURCE_DIR}/include/KHR/khrplatform.h)
+
 set_target_properties(glad PROPERTIES LINKER_LANGUAGE C)
-install_targets(/lib glad)
-set_target_properties(glad PROPERTIES 
-    FOLDER "depends"
-    DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
-)
-
-
+target_link_libraries(glad PUBLIC OpenGL::GL PRIVATE ${CMAKE_DL_LIBS})

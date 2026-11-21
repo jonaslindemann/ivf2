@@ -1,0 +1,14 @@
+# ivf2 unit tests - GL-free components only (generator, ivfmath).
+# Run with: ctest --preset <preset>   or   ctest --test-dir <build dir> -C <config>
+
+function(ivf2_add_test name)
+    cmake_parse_arguments(ARG "" "" "LIBS" ${ARGN})
+    add_executable(${name} ${name}.cpp test_main.h)
+    target_link_libraries(${name} PRIVATE ${ARG_LIBS})
+    ivf2_apply_compiler_settings(${name})
+    set_target_properties(${name} PROPERTIES FOLDER "tests")
+    add_test(NAME ${name} COMMAND ${name})
+endfunction()
+
+ivf2_add_test(test_generator LIBS ivf2::generator)
+ivf2_add_test(test_ivfmath LIBS ivf2::ivfmath)

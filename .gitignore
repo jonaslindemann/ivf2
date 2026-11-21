@@ -54,3 +54,9 @@ _CMakePresets.json
 /bin/Debug
 /bin/Debug
 /_vcpkg_installed
+
+# CMake presets output / local overrides
+/build/
+/install/
+CMakeUserPresets.json
+compile_commands.json

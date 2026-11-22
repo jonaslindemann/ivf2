@@ -95,6 +95,9 @@ These environment variables, read when a window is created, let you run any ivf2
 | `IVF2_HIDE_WINDOWS=1` | Create windows invisible |
 | `IVF2_EXIT_AFTER_FRAMES=N` | Close each window after N frames |
 | `IVF2_SCREENSHOT=file.png` | With `IVF2_EXIT_AFTER_FRAMES`, save the last frame (including the UI); further windows write `file_2.png`, ... |
+| `IVF2_SCREENSHOT_UI=0` | Leave the UI out of the `IVF2_SCREENSHOT` image |
+| `IVF2_FIXED_TIMESTEP=seconds` | Advance time by a fixed step per frame instead of the wall clock |
+| `IVF2_RANDOM_SEED=N` | Seed for `ivf::randomSeed()`, particle systems and other generators seeded with `ivf::automaticSeed()` |
 | `IVF2_GL_DEBUG=1` / `0` | Force OpenGL debug output on / off |
 
 For example, in PowerShell:
@@ -103,3 +106,27 @@ For example, in PowerShell:
 $env:IVF2_HIDE_WINDOWS = "1"; $env:IVF2_EXIT_AFTER_FRAMES = "90"; $env:IVF2_SCREENSHOT = "shot.png"
 .\lighting1.exe
 ```
+
+## Visual regression tests
+
+The visual tests run every example (except `embedding1` and `music_scene1`) hidden for 30 frames, save the last frame without the UI and compare it with a reference image in `tests/visual/reference/`. They are off by default:
+
+```
+cmake --preset release -DIVF2_VISUAL_TESTS=ON
+cmake --build --preset release
+ctest --preset release -L visual
+```
+
+Each run sets `IVF2_FIXED_TIMESTEP` and `IVF2_RANDOM_SEED`, so it renders the same image every time; it fails if the example exits with an error, logs an `ERROR` line, or if more than 1% of the pixels differ from the reference by more than 24 (of 255) in a colour channel (`IVF2_VISUAL_MAX_FRACTION`, `IVF2_VISUAL_THRESHOLD`). Rendered images and diff images (differing pixels in red) are written to `<build>/visual/`.
+
+The references are rendered by CI on Linux with Mesa's software renderer (llvmpipe under Xvfb); the CI job uploads its rendered images as the `visual-tests` artifact. When a change alters the look on purpose, copy the new images from that artifact into `tests/visual/reference/` and commit them.
+
+Other GPUs render slightly differently. To check your own changes locally, keep references of your own:
+
+```
+cmake --preset vs -DIVF2_VISUAL_TESTS=ON -DIVF2_VISUAL_REFERENCE_DIR=C:/temp/ivf2-ref
+$env:IVF2_UPDATE_REFERENCES = "1"; ctest --preset vs-release -L visual   # before the change
+Remove-Item Env:IVF2_UPDATE_REFERENCES; ctest --preset vs-release -L visual  # after
+```
+
+A new example is added to the list in `tests/visual/CMakeLists.txt`; it must not depend on the wall clock (use `frameTime()`/`elapsedTime()`) or on unseeded random numbers (use `ivf::automaticSeed()`).

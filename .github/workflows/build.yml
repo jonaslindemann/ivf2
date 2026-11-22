@@ -50,6 +50,7 @@ jobs:
             configure-preset: release
             build-preset: release
             build-dir: build/release
+            visual-tests: true             # rendered with Mesa llvmpipe under Xvfb
           - name: macOS (AppleClang)
             os: macos-15
             cache-id: macos-15
@@ -83,6 +84,10 @@ jobs:
             xorg-dev libxinerama-dev libxcursor-dev libxi-dev libxrandr-dev \
             libwayland-dev libxkbcommon-dev wayland-protocols extra-cmake-modules \
             libasound2-dev
+          # Visual regression tests: virtual X server and Mesa's software OpenGL (llvmpipe)
+          if [ "${{ matrix.visual-tests }}" = "true" ]; then
+            sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri mesa-utils
+          fi
 
       - name: Install system packages (macOS)
         if: runner.os == 'macOS'
@@ -124,7 +129,8 @@ jobs:
       # 5. Configure. vcpkg installs the dependencies during this step.
       #    Warnings in ivf2's own code fail the build, so they get fixed when they appear.
       - name: Configure
-        run: cmake --preset ${{ matrix.configure-preset }} -DIVF2_WARNINGS_AS_ERRORS=ON
+        run: |
+          cmake --preset ${{ matrix.configure-preset }} -DIVF2_WARNINGS_AS_ERRORS=ON             -DIVF2_VISUAL_TESTS=${{ matrix.visual-tests && 'ON' || 'OFF' }}
 
       # 6. Save the dependency cache right away, so it survives even if the
       #    build or tests below fail.
@@ -141,7 +147,28 @@ jobs:
 
       # 8. Run the unit tests with CTest.
       - name: Test
-        run: ctest --preset ${{ matrix.build-preset }}
+        run: ctest --preset ${{ matrix.build-preset }} -LE visual
+
+      # 8b. Visual regression tests: render the examples hidden on a virtual X server with
+      #     Mesa's software renderer and compare them with tests/visual/reference/.
+      #     The rendered images and diffs are uploaded as the "visual-tests" artifact; to
+      #     accept intended changes, copy the rendered images into tests/visual/reference/.
+      - name: Visual tests
+        if: matrix.visual-tests
+        env:
+          LIBGL_ALWAYS_SOFTWARE: 1
+        run: |
+          xvfb-run -a -s "-screen 0 1920x1080x24" glxinfo -B | grep -E "OpenGL (renderer|core profile version)"
+          xvfb-run -a -s "-screen 0 1920x1080x24" ctest --preset ${{ matrix.build-preset }} -L visual -j 2
+
+      - name: Upload visual test images
+        if: always() && matrix.visual-tests
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-tests
+          path: ${{ matrix.build-dir }}/visual/
+          if-no-files-found: ignore
+          retention-days: 14
 
       # 9. Install ivf2 and build a separate project against the installed package.
       - name: Install

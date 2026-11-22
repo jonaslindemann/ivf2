@@ -92,7 +92,7 @@ private:
     };
     std::vector<InstanceData> m_instanceData;
 
-    std::mt19937 m_rng{std::random_device{}()};
+    std::mt19937 m_rng; ///< Seeded with automaticSeed().
 
     void initGPU();
     void spawnParticle();

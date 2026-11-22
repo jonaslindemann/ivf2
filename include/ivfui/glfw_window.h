@@ -37,6 +37,9 @@ namespace ivfui {
  * - `IVF2_EXIT_AFTER_FRAMES=N` - close the window after N frames.
  * - `IVF2_SCREENSHOT=file.png` - with IVF2_EXIT_AFTER_FRAMES, save the last frame
  *   (including the UI); further windows write file_2.png, file_3.png, ...
+ * - `IVF2_SCREENSHOT_UI=0` - leave the UI out of the IVF2_SCREENSHOT image.
+ * - `IVF2_FIXED_TIMESTEP=seconds` - advance time by a fixed step per frame instead of
+ *   the wall clock (see setFixedTimeStep()), so scripted runs render the same frames.
  */
 class GLFWWindow {
 private:
@@ -60,6 +63,7 @@ private:
     bool m_hidden{false};          ///< IVF2_HIDE_WINDOWS: window created invisible.
     int m_autoExitFrames{0};       ///< IVF2_EXIT_AFTER_FRAMES: close after this many frames (0 = never).
     std::string m_autoScreenshot;  ///< IVF2_SCREENSHOT: PNG written from the last frame before closing.
+    bool m_autoScreenshotUi{true}; ///< IVF2_SCREENSHOT_UI: include the UI in the screenshot.
     int m_drawnFrames{0};          ///< Frames completed by draw().
     std::mutex m_mutex;         ///< Mutex for thread safety.
     double m_t0;                ///< Start time for frame timing.

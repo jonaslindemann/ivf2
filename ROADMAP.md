@@ -192,9 +192,13 @@ Goal: make the library trustworthy to depend on.
    deprecated aliases.
 8. **Visual regression tests.** Headless rendering (hidden GLFW window, or EGL on CI)
    rendering each example scene to an FBO and comparing with golden images within a
-   tolerance. *Groundwork done:* `IVF2_HIDE_WINDOWS` + `IVF2_EXIT_AFTER_FRAMES` +
-   `IVF2_SCREENSHOT` produce a screenshot of every example locally; CI still needs a GL
-   driver (xvfb + Mesa on Linux) and golden-image comparison.
+   tolerance.
+   *Done:* `IVF2_VISUAL_TESTS` (`ctest -L visual`, `tests/visual/`) renders 51 examples hidden
+   with `IVF2_FIXED_TIMESTEP` and `IVF2_RANDOM_SEED` and compares the last frame with
+   references (`image_compare`: per-pixel threshold, fraction of differing pixels, diff image).
+   The Linux CI job runs them with Mesa llvmpipe under Xvfb and uploads the rendered images.
+   *Later:* EGL/headless contexts instead of Xvfb; Windows/macOS references; music_scene1 via
+   its `--export` mode.
 9. **Repository hygiene.** Move runtime data from `bin/` to `data/` and example assets to
    `examples/assets/` (consider Git LFS for the 93 MB of assets); remove `test_span.cpp`,
    `include/ivf/logger.cpp`, the diverged root `shaders/` directory and `_example8`.

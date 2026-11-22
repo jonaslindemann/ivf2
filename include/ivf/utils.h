@@ -116,9 +116,20 @@ float random(float a, float b);
  */
 double random(double a, double b);
 
+/** @brief Seed random() with a fixed value. */
 void randomSeed(unsigned int seed);
 
+/** @brief Seed random() with automaticSeed(). */
 void randomSeed();
+
+/**
+ * @brief Seed for random number generators that are not seeded explicitly.
+ *
+ * A different value on every call, unless the environment variable `IVF2_RANDOM_SEED`
+ * is set: then that value, so scripted runs (visual regression tests) are repeatable.
+ * Used by randomSeed(), ParticleSystem and the camera shake of CameraAnimation.
+ */
+[[nodiscard]] unsigned int automaticSeed();
 
 
 /**

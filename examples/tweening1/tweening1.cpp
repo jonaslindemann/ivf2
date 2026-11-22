@@ -20,7 +20,7 @@
 using namespace ivf;
 using namespace ivfui;
 
-static std::mt19937 g_rng{std::random_device{}()};
+static std::mt19937 g_rng{automaticSeed()};
 static float randF(float lo, float hi)
 {
     std::uniform_real_distribution<float> d(lo, hi);

@@ -63,8 +63,9 @@ using namespace std;
 // Visitor to apply transformations and effects to nodes
 
 class FunctionVisitor : public NodeVisitor {
-private:
 public:
+    double time{0.0}; // animation time in seconds, set by the window each frame
+
     virtual void visit(Node *node) override
     {
         auto xfm = dynamic_cast<Transform *>(node);
@@ -78,7 +79,7 @@ public:
 
         auto l = glm::length(pos - center);
 
-        pos.y = static_cast<float>(storedPos.y + 0.5 * sin(0.5 * l + glfwGetTime()));
+        pos.y = static_cast<float>(storedPos.y + 0.5 * sin(0.5 * l + time));
 
         xfm->setPos(pos);
 
@@ -87,9 +88,9 @@ public:
         if (material)
         {
             auto color = material->diffuseColor();
-            color.r = static_cast<float>(0.5 + 0.5 * sin(l + glfwGetTime()));
-            color.g = static_cast<float>(0.5 + 0.5 * sin(l + glfwGetTime() + 2.0));
-            color.b = static_cast<float>(0.5 + 0.5 * sin(l + glfwGetTime() + 4.0));
+            color.r = static_cast<float>(0.5 + 0.5 * sin(l + time));
+            color.g = static_cast<float>(0.5 + 0.5 * sin(l + time + 2.0));
+            color.b = static_cast<float>(0.5 + 0.5 * sin(l + time + 4.0));
             material->setDiffuseColor(color);
         }
     }
@@ -375,6 +376,7 @@ public:
     {
         // Update the function visitor to animate the nodes
 
+        m_visitor.time = elapsedTime();
         m_nodes->accept(&m_visitor);
     }
 };

@@ -24,3 +24,8 @@ ivf2_add_header_check(ivfui)
 if(TARGET ivf2::ivfmusic)
     ivf2_add_header_check(ivfmusic)
 endif()
+
+# Rendered examples compared with reference images (needs IVF2_BUILD_EXAMPLES and a GL driver)
+if(IVF2_VISUAL_TESTS AND IVF2_BUILD_EXAMPLES)
+    add_subdirectory(visual)
+endif()

@@ -86,6 +86,10 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmoni
                    (path.stem().string() + "_" + std::to_string(g_windowCount + 1) + path.extension().string());
         m_autoScreenshot = path.string();
     }
+    if (const char *ui = envValue("IVF2_SCREENSHOT_UI"))
+        m_autoScreenshotUi = std::string_view(ui) != "0";
+    if (const char *step = envValue("IVF2_FIXED_TIMESTEP"))
+        setFixedTimeStep(std::atof(step));
     ++g_windowCount;
     if (m_hidden)
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
@@ -342,7 +346,7 @@ void GLFWWindow::draw()
 
     // IVF2_SCREENSHOT: capture the last frame before IVF2_EXIT_AFTER_FRAMES closes the window
     if (!m_autoScreenshot.empty() && m_autoExitFrames > 0 && m_drawnFrames == m_autoExitFrames - 1)
-        this->saveScreenshot(m_autoScreenshot, true);
+        this->saveScreenshot(m_autoScreenshot, m_autoScreenshotUi);
 
     // Frame time: wall-clock delta since the previous draw(), or the fixed step
     // when exporting frames, so animation is deterministic and independent of

@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <random>
 #include <string>
 
 #include <glad/glad.h>
@@ -193,5 +194,13 @@ void ivf::randomSeed(unsigned int seed)
 
 void ivf::randomSeed()
 {
-    srand((unsigned int)time(NULL));
+    srand(automaticSeed());
+}
+
+unsigned int ivf::automaticSeed()
+{
+    const char *value = std::getenv("IVF2_RANDOM_SEED");
+    if (value != nullptr && *value != '\0')
+        return static_cast<unsigned int>(std::strtoul(value, nullptr, 10));
+    return std::random_device{}();
 }

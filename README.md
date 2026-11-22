@@ -97,6 +97,7 @@ cmake --build build --parallel
 |--------|---------|-------------|
 | `IVF2_BUILD_EXAMPLES` | ON (top level) | Build the example programs |
 | `IVF2_BUILD_TESTS` | ON (top level) | Build the CTest unit tests |
+| `IVF2_VISUAL_TESTS` | OFF | Visual regression tests: render the examples and compare with reference images (`ctest -L visual`) |
 | `IVF2_BUILD_MUSIC` | ON | Build `ivfmusic` (music-driven scenes) |
 | `IVF_WITH_RENOISE` | ON | Renoise song (.xrns) support in ivfmusic (miniz, pugixml) |
 | `IVF2_WITH_ASSIMP` | ON | Model loading (`ivf::ModelLoader`) with assimp |

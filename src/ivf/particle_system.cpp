@@ -3,6 +3,7 @@
 #include <ivf/transform_manager.h>
 #include <ivf/shader_manager.h>
 #include <ivf/logger.h>
+#include <ivf/utils.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -93,7 +94,7 @@ static const float k_quad[] = {
 // ---- Ctor / Dtor -----------------------------------------------------------
 
 ParticleSystem::ParticleSystem(int maxParticles)
-    : m_maxParticles(maxParticles)
+    : m_maxParticles(maxParticles), m_rng(automaticSeed())
 {
     m_pool.resize(maxParticles);
     m_instanceData.resize(maxParticles);

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <random>
 
+#include <ivf/utils.h>
+
 using namespace ivfui;
 using namespace ivfmath;
 using namespace ivf;
@@ -10,7 +12,7 @@ using namespace ivf;
 // Simple thread-local RNG for shake noise
 static float randUnit()
 {
-    static thread_local std::mt19937 rng{std::random_device{}()};
+    static thread_local std::mt19937 rng{automaticSeed()};
     static thread_local std::uniform_real_distribution<float> dist(-1.0f, 1.0f);
     return dist(rng);
 }

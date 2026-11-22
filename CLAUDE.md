@@ -38,7 +38,8 @@ Expected failures (files, formats, compile errors) return `ivf::Result<T>` (`std
 ## Diagnostics and unattended runs
 
 - Debug builds (or `IVF2_GL_DEBUG=1`) get an OpenGL debug context; driver messages are logged with context `OpenGL` (`ivf/gl_debug.h`). Breakpoint on `ivf::logError` gives the stack of the offending GL call. Expect zero `ERROR`/`WARN` lines from examples. Log line format: `HH:MM:SS.mmm LEVEL Context16 message` (see `Logger::formatMessage`; `setShowDate`, `setContextWidth`, `setWrapColumn` - wraps at column 100 by default).
-- Run examples without showing windows: `IVF2_HIDE_WINDOWS=1 IVF2_EXIT_AFTER_FRAMES=90 IVF2_SCREENSHOT=out.png` (PowerShell: set `$env:...`). `embedding1` uses raw GLFW and ignores these.
+- Run examples without showing windows: `IVF2_HIDE_WINDOWS=1 IVF2_EXIT_AFTER_FRAMES=90 IVF2_SCREENSHOT=out.png` (PowerShell: set `$env:...`). `embedding1` uses raw GLFW and ignores these. `IVF2_FIXED_TIMESTEP`, `IVF2_RANDOM_SEED` and `IVF2_SCREENSHOT_UI=0` make runs repeatable.
+- Visual regression tests (`-DIVF2_VISUAL_TESTS=ON`, `ctest -L visual`, `tests/visual/`): every example except `embedding1`/`music_scene1` is compared with `tests/visual/reference/`, rendered by CI with Mesa llvmpipe (Linux job, artifact `visual-tests`). Examples must not use the wall clock (`glfwGetTime`) or unseeded randomness (use `ivf::automaticSeed()`); intended visual changes need updated references from that artifact.
 - Use the Logger (`ivf::logInfo/logWarning/logError/logDebug`, `ivf::logStr(...)` for mixed values) instead of `std::cout`; `std::cout` is only for explicit `print()`/dump helpers.
 - Label new GL objects with `ivf::glLabel(GL_TEXTURE, id, "name")` after they are first bound.
 

@@ -231,3 +231,8 @@ copied next to the executable.
 - Debug builds automatically append 'd' to library names: `ivfd.lib`, `generatord.lib`, etc.
 - Release builds use the base names: `ivf.lib`, `generator.lib`, etc.
 - The unified `ivf2::ivf2` target handles this automatically - no need to specify different libraries for different configurations.
+
+# Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for building, coding conventions and the release process,
+and [CHANGELOG.md](CHANGELOG.md) for the changes in each version.

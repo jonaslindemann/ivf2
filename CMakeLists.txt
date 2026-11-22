@@ -71,6 +71,16 @@ project(ivf2
     HOMEPAGE_URL "https://github.com/jonaslindemann/ivf2"
     LANGUAGES C CXX)
 
+# Semantic versioning (see CONTRIBUTING.md): the version above plus an optional
+# pre-release label ("alpha.2", "beta.1", "rc.1"; empty for a final release).
+# Releases are tagged v<version>, e.g. v2.0.0-alpha.2.
+set(IVF2_VERSION_PRERELEASE "alpha")
+if(IVF2_VERSION_PRERELEASE)
+    set(IVF2_VERSION_FULL "${PROJECT_VERSION}-${IVF2_VERSION_PRERELEASE}")
+else()
+    set(IVF2_VERSION_FULL "${PROJECT_VERSION}")
+endif()
+
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
 if(_ivf2_top_level)
@@ -191,7 +201,7 @@ endif()
 
 if(_ivf2_top_level)
     message(STATUS "")
-    message(STATUS "ivf2 ${PROJECT_VERSION}")
+    message(STATUS "ivf2 ${IVF2_VERSION_FULL}")
     message(STATUS "  Examples ............ ${IVF2_BUILD_EXAMPLES}")
     message(STATUS "  Tests ............... ${IVF2_BUILD_TESTS} (visual: ${IVF2_VISUAL_TESTS})")
     message(STATUS "  ivfmusic ............ ${IVF2_BUILD_MUSIC} (Renoise: ${IVF_WITH_RENOISE})")

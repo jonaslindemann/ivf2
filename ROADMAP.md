@@ -204,6 +204,11 @@ Goal: make the library trustworthy to depend on.
    `include/ivf/logger.cpp`, the diverged root `shaders/` directory and `_example8`.
    Add `CONTRIBUTING.md`, `CHANGELOG.md`, issue templates and semantic versioning with
    tagged releases.
+   *Done:* `data/` (`shaders/`, `fonts/`) and `examples/assets/`, `bin/` is build output only;
+   obsolete files removed; `CONTRIBUTING.md`, `CHANGELOG.md`, issue and PR templates; the version
+   comes from `CMakeLists.txt` (`IVF2_VERSION_PRERELEASE`, `<ivf/version.h>` generated from it)
+   and a `v*` tag creates the GitHub release from the changelog (`release.yml`).
+   *Later:* Git LFS for `examples/assets/` and `tests/visual/reference/`.
 
 ## Phase 2 - Rendering quality and performance (3-6 months)
 

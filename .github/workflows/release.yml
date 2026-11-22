@@ -1,0 +1,57 @@
+# Release: runs when a version tag (v2.0.0, v2.0.0-alpha.2, ...) is pushed.
+#
+# Checks that the tag matches the version in CMakeLists.txt and creates a GitHub
+# release whose notes are the tag's section of CHANGELOG.md. Pre-release versions
+# (with a "-label") are marked as pre-releases. See CONTRIBUTING.md.
+
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write   # create the release
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Check version
+        id: version
+        run: |
+          base=$(sed -nE 's/^[[:space:]]*VERSION[[:space:]]+([0-9]+\.[0-9]+\.[0-9]+).*/\1/p' CMakeLists.txt | head -1)
+          pre=$(sed -nE 's/^set\(IVF2_VERSION_PRERELEASE "([^"]*)"\).*/\1/p' CMakeLists.txt | head -1)
+          version="$base${pre:+-$pre}"
+          tag="${GITHUB_REF_NAME#v}"
+          echo "CMakeLists.txt: $version, tag: $GITHUB_REF_NAME"
+          if [ "$version" != "$tag" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match version $version in CMakeLists.txt"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          # Lines between "## [<version>]" and the next "## [" heading
+          awk -v v="${{ steps.version.outputs.version }}" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then
+            echo "::error::CHANGELOG.md has no section for ${{ steps.version.outputs.version }}"
+            exit 1
+          fi
+          cat notes.md
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          prerelease=""
+          case "$version" in *-*) prerelease="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" --title "ivf2 $version" --notes-file notes.md --verify-tag $prerelease

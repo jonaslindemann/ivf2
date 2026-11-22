@@ -17,7 +17,9 @@
 #define IVF2_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
 #define IVF2_VERSION_MINOR @PROJECT_VERSION_MINOR@
 #define IVF2_VERSION_PATCH @PROJECT_VERSION_PATCH@
-#define IVF2_VERSION_STRING "@PROJECT_VERSION@"
+#define IVF2_VERSION_PRERELEASE "@IVF2_VERSION_PRERELEASE@"
+/// Full semantic version, e.g. "2.0.0-alpha" (pre-release label included).
+#define IVF2_VERSION_STRING "@IVF2_VERSION_FULL@"
 
 /// Model loading with assimp (ivf::ModelLoader). CMake option IVF2_WITH_ASSIMP.
 #define IVF2_HAS_ASSIMP @IVF2_HAS_ASSIMP@

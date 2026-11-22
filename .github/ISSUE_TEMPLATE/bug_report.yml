@@ -1,0 +1,39 @@
+name: Bug report
+description: Something in ivf2 does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to reproduce
+      description: The smallest code or example that shows the problem (for example "run lighting1 and press L").
+      render: cpp
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log output
+      description: The ivf2 log output. Debug builds also log OpenGL driver messages (or set IVF2_GL_DEBUG=1).
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: ivf2 version or commit
+      placeholder: 2.0.0-alpha, or a commit hash
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: OS, compiler and GPU/driver
+      placeholder: Windows 11, MSVC 2022 17.12, NVIDIA RTX 4070 driver 566.36
+    validations:
+      required: true

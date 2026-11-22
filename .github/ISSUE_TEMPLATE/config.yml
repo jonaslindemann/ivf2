@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://interactive-visualisation-framework-2.readthedocs.io/
+    about: User guide, examples and API reference
+  - name: Security vulnerability
+    url: https://github.com/jonaslindemann/ivf2/security/policy
+    about: Please report security issues privately as described in SECURITY.md

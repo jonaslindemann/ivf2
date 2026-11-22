@@ -60,7 +60,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 ### Removed
 
 - Unused files: `test_span.cpp`, `include/ivf/logger.cpp`, the outdated root `shaders/`
-  directory and `examples/_example8`.
+  directory, `examples/_example8`, the embedded font `ivf_font.cpp` and the `python/` scripts.
+
+### Security
+
+- Vulnerabilities are reported privately through GitHub (see [SECURITY.md](SECURITY.md)).
 
 ## [2.0.0-alpha] - 2025-06-22
 

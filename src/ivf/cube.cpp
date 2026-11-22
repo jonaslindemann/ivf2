@@ -130,5 +130,5 @@ void ivf::Cube::setupProperties()
     addProperty("Size", &m_size, "Geometry");
 }
 
-void ivf::Cube::onPropertyChanged(const std::string &name)
+void ivf::Cube::onPropertyChanged(const std::string &/*name*/)
 {}

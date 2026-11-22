@@ -16,14 +16,14 @@ PointPath::PointPath(int segments, std::vector<glm::vec3> points)
 			for (auto& p : points)
 				interpFunc.addPoint(p);
 
-			glm::vec3 prev = interpFunc(t);
-			glm::vec3 next = interpFunc(t + 0.1);
+			glm::vec3 prev = interpFunc(static_cast<float>(t));
+			glm::vec3 next = interpFunc(static_cast<float>(t + 0.1));
 
 			glm::vec3 tangent = glm::normalize(next - prev);
 			glm::vec3 normal = glm::normalize(glm::cross(next - prev, next + prev));
 			//glm::vec3 normal = glm::normalize(glm::cross(tangent, glm::vec3(0.0, 1.0, 0.0)));
 
-			glm::vec3 v = interpFunc(t);
+			glm::vec3 v = interpFunc(static_cast<float>(t));
 
 			vertex.position[0] = v.x;
 			vertex.position[1] = v.y;

@@ -93,12 +93,12 @@ public:
         // Rotate the cube around a skewed axis (1,1,1)
 
         m_cube->setRotAxis(glm::vec3(1.0, 1.0, 1.0));
-        m_cube->setRotAngle(20.0 * elapsedTime()); // 20 degrees per second
+        m_cube->setRotAngle(static_cast<float>(20.0 * elapsedTime())); // 20 degrees per second
 
         // Orbit the sphere around the Y-axis
 
         m_sphereXfm->setRotAxis(glm::vec3(0.0, 1.0, 0.0));
-        m_sphereXfm->setRotAngle(20.0 * elapsedTime()); // 20 degrees per second
+        m_sphereXfm->setRotAngle(static_cast<float>(20.0 * elapsedTime())); // 20 degrees per second
     }
 };
 

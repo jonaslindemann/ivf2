@@ -4,7 +4,7 @@
 
 using namespace ivf;
 
-ivf::FilmgrainEffect::FilmgrainEffect() : m_noiseIntensity(0.1), m_grainBlending(0.1)
+ivf::FilmgrainEffect::FilmgrainEffect() : m_noiseIntensity(0.1f), m_grainBlending(0.1f)
 {
     setName("Grain");
 }

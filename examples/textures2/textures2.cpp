@@ -386,14 +386,14 @@ public:
         ImGui::End();
     }
 
-    void onResize(int width, int height)
+    void onResize(int /*width*/, int /*height*/)
     {
         // Update the camera manipulator with the new window size.
 
         m_camManip->update();
     }
 
-    void onKey(int key, int scancode, int action, int mods)
+    void onKey(int key, int /*scancode*/, int action, int /*mods*/)
     {
         // Handle key events for closing the window and toggling UI
 

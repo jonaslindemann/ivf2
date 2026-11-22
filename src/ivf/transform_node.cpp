@@ -107,7 +107,7 @@ void TransformNode::doPreDraw()
         xfmMgr()->translate(m_pos);
         if ((abs(m_eulerAngles.x) > 0.0) || (abs(m_eulerAngles.y) > 0.0) || (abs(m_eulerAngles.z) > 0.0))
             xfmMgr()->rotateDeg(m_eulerAngles.x, m_eulerAngles.y, m_eulerAngles.z);
-        if ((m_vecRot.x > 0.0) || (m_vecRot.y > 0.0) || (m_vecRot.z > 0.0))
+        if (m_vecRot != glm::vec3(0.0f))
             xfmMgr()->rotateToVector(m_vecRot);
         if (m_rotAngle != 0.0)
             xfmMgr()->rotateDeg(m_rotAxis.x, m_rotAxis.y, m_rotAxis.z, m_rotAngle);

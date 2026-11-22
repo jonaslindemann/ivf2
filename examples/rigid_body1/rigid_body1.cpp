@@ -139,7 +139,7 @@ public:
         rp3d::PhysicsWorld::WorldSettings settings;
         settings.defaultVelocitySolverNbIterations = 20; // Reduced from 60
         settings.defaultPositionSolverNbIterations = 10; // Reduced from 60
-        settings.gravity = rp3d::Vector3(0, -9.81, 0);
+        settings.gravity = rp3d::Vector3(0, -9.81f, 0);
         settings.isSleepingEnabled = true;
         settings.defaultSleepLinearVelocity = 0.1f;  // Lower threshold for sleeping
         settings.defaultSleepAngularVelocity = 0.2f; // Lower threshold for sleeping

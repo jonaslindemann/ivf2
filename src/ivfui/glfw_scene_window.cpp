@@ -911,7 +911,8 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
         m_bufferSelection->begin();
 
         this->drawScene();
-        auto m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
+        // Stored in the member: doMouseButton() sends click notifications to it.
+        m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
 
         if (m_currentNode != nullptr)
         {
@@ -938,6 +939,8 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
 
         m_bufferSelection->end();
     }
+    else
+        m_currentNode = nullptr;
     m_selectionRendering = false;
 
     GLFWWindow::doDrawComplete();
@@ -1061,7 +1064,7 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
         return;
     }
 
-    auto vec3 = this->cameraManipulator()->computeMouseRay(x, y);
+    auto vec3 = this->cameraManipulator()->computeMouseRay(static_cast<int>(x), static_cast<int>(y));
 
     // Compute intersection with XZ plane (ground plane at Y=0)
 
@@ -1217,19 +1220,19 @@ void ivfui::GLFWSceneWindow::onUpdateUi()
 void ivfui::GLFWSceneWindow::onUpdateEffects()
 {}
 
-void ivfui::GLFWSceneWindow::onEnterNode(ivf::Node *node)
+void ivfui::GLFWSceneWindow::onEnterNode(ivf::Node * /*node*/)
 {}
 
-void ivfui::GLFWSceneWindow::onOverNode(ivf::Node *node)
+void ivfui::GLFWSceneWindow::onOverNode(ivf::Node * /*node*/)
 {}
 
-void ivfui::GLFWSceneWindow::onLeaveNode(ivf::Node *node)
+void ivfui::GLFWSceneWindow::onLeaveNode(ivf::Node * /*node*/)
 {}
 
-void ivfui::GLFWSceneWindow::onAddMenuItems(ivfui::UiMenu *menu)
+void ivfui::GLFWSceneWindow::onAddMenuItems(ivfui::UiMenu * /*menu*/)
 {}
 
-void ivfui::GLFWSceneWindow::onMousePosition3D(double x, double y, double z)
+void ivfui::GLFWSceneWindow::onMousePosition3D(double /*x*/, double /*y*/, double /*z*/)
 {}
 
 void ivfui::GLFWSceneWindow::doEnterNode(ivf::Node *node)

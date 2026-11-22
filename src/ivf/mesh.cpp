@@ -302,8 +302,6 @@ void Mesh::end()
 
     if (m_primType == GL_TRIANGLES)
     {
-        int pos = 0;
-
         glm::vec3 points[3];
         glm::vec3 norm;
 
@@ -381,8 +379,6 @@ void ivf::Mesh::updateVertices()
 
 void ivf::Mesh::updateNormals()
 {
-    int pos = 0;
-
     glm::vec3 points[3];
     glm::vec3 norm;
 

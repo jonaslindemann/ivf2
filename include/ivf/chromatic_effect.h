@@ -16,7 +16,7 @@ namespace ivf {
  */
 class ChromaticEffect : public Effect {
 private:
-    float m_offset{0.01}; ///< Offset value for the chromatic aberration effect.
+    float m_offset{0.01f}; ///< Offset value for the chromatic aberration effect.
 
 public:
     /**

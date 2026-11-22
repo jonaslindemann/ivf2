@@ -169,12 +169,19 @@ Goal: make the library trustworthy to depend on.
    *Remaining:* `GpuProceduralTexture` and `ShaderWatcher` still use the low-level
    compile/link calls; `Effect::load()` could return a Result; remove deprecated wrappers
    in the next major release.
-7. **API polish.** Raise the MSVC warning level: CMake no longer adds `/W3`, so MSVC
-   builds run at `/W1` (only `/w14996` for deprecations was added); expect many conversion
-   warnings at `/W3`. Const-correct getters (`material() const`), `std::string_view`/`const&`
-   parameters instead of `const std::string` by value, consistent naming
-   (`texture(i)` vs `getTexture(i)`), `[[nodiscard]]` on factories. Generate
-   `ivf/version.h` from `project(VERSION)`.
+7. **API polish.** *Done (warnings):* `IVF2_WARNINGS` is on by default for top-level builds
+   (`/W4`, `-Wall -Wextra -Wpedantic`, ivf2's own targets only), plus `IVF2_WARNINGS_AS_ERRORS`.
+   MSVC builds everything warning-free at `/W4 /WX`. The cleanup found real bugs: `Capsule`
+   ignored its constructor arguments, `KeyframeData` ignored `tension`, `GridLayout` setters and
+   getters were empty stubs, `PolyLinePath::setSegments` did nothing (and copies read the
+   original's points), `rotateToVector` mixed degrees and radians and skipped vectors with a
+   negative component, node click callbacks never fired (a local shadowed
+   `GLFWSceneWindow::m_currentNode`), `clearError()` cleared only one error flag.
+   Version macros are generated in `ivf/config.h` (`IVF2_VERSION_*`).
+   *Remaining:* GCC/Clang warnings (measure in CI, then turn on warnings-as-errors per
+   platform); const-correct getters (`material() const`); `const std::string&` instead of
+   `const std::string` by value (~98 parameters, none virtual); consistent naming (~40 `get*`
+   methods -> `x()`, deprecated aliases); `[[nodiscard]]` on the 159 `create()` factories.
 8. **Visual regression tests.** Headless rendering (hidden GLFW window, or EGL on CI)
    rendering each example scene to an FBO and comparing with golden images within a
    tolerance. *Groundwork done:* `IVF2_HIDE_WINDOWS` + `IVF2_EXIT_AFTER_FRAMES` +

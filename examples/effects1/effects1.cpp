@@ -78,7 +78,7 @@ public:
 
         auto l = glm::length(pos - center);
 
-        pos.y = storedPos.y + 0.5 * sin(0.5 * l + glfwGetTime());
+        pos.y = static_cast<float>(storedPos.y + 0.5 * sin(0.5 * l + glfwGetTime()));
 
         xfm->setPos(pos);
 
@@ -87,9 +87,9 @@ public:
         if (material)
         {
             auto color = material->diffuseColor();
-            color.r = 0.5 + 0.5 * sin(l + glfwGetTime());
-            color.g = 0.5 + 0.5 * sin(l + glfwGetTime() + 2.0);
-            color.b = 0.5 + 0.5 * sin(l + glfwGetTime() + 4.0);
+            color.r = static_cast<float>(0.5 + 0.5 * sin(l + glfwGetTime()));
+            color.g = static_cast<float>(0.5 + 0.5 * sin(l + glfwGetTime() + 2.0));
+            color.b = static_cast<float>(0.5 + 0.5 * sin(l + glfwGetTime() + 4.0));
             material->setDiffuseColor(color);
         }
     }
@@ -136,7 +136,7 @@ public:
 
         // Set up a grid layout for the objects (30x30 grid, spacing 1.2)
 
-        GridLayout layout(30, 30, 1, 1.2, 0.0, 1.2);
+        GridLayout layout(30, 30, 1, 1.2f, 0.0f, 1.2f);
 
         // Create a rounded box geometry
 
@@ -225,14 +225,14 @@ public:
         // Chromatic aberration effect
 
         auto chromaticEffect = ChromaticEffect::create();
-        chromaticEffect->setOffset(0.01);
+        chromaticEffect->setOffset(0.01f);
         chromaticEffect->load();
 
         // Vignette effect
 
         auto vignetteEffect = VignetteEffect::create();
         vignetteEffect->setSize(1.0);
-        vignetteEffect->setSmoothness(0.7);
+        vignetteEffect->setSmoothness(0.7f);
         vignetteEffect->load();
 
         // Bloom effect

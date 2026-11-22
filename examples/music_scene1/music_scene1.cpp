@@ -92,7 +92,7 @@ protected:
         return 0;
     }
 
-    void onSceneUpdate(double time, double dt) override
+    void onSceneUpdate(double time, double /*dt*/) override
     {
         const float pulse = param("pulse", 0.5f);
         const float beatPulse = std::exp(-6.0f * float(transport().beatPhase()));

@@ -1,7 +1,7 @@
 #include "lissajou_window.h"
 
 LissajouWindow::LissajouWindow()
-    : UiWindow("Lissajou Control"), m_a(1.0), m_b(1.0), m_c(1.0), m_d(0.7), m_e(3.0), m_f(0.4), m_g(1.0), m_h(2.0),
+    : UiWindow("Lissajou Control"), m_a(1.0f), m_b(1.0f), m_c(1.0f), m_d(0.7f), m_e(3.0f), m_f(0.4f), m_g(1.0f), m_h(2.0f),
       m_i(1.0), m_dirty(true), m_speed(1.0), m_size(300)
 {}
 

@@ -358,21 +358,7 @@ float RandomDeformer::perlinNoise(const glm::vec3 &position) const
 
 float RandomDeformer::simplexNoise(const glm::vec3 &position) const
 {
-    // Simplified 3D simplex noise - for production use a proper noise library
-    const float F3 = 1.0f / 3.0f;
-    const float G3 = 1.0f / 6.0f;
-
-    float s = (position.x + position.y + position.z) * F3;
-    int i = (int)std::floor(position.x + s);
-    int j = (int)std::floor(position.y + s);
-    int k = (int)std::floor(position.z + s);
-
-    float t = (i + j + k) * G3;
-    float x0 = position.x - (i - t);
-    float y0 = position.y - (j - t);
-    float z0 = position.z - (k - t);
-
-    // For simplicity, return a basic noise value
+    // Placeholder: a hash-based value, not real simplex noise.
     return std::sin(position.x * 12.9898f + position.y * 78.233f + position.z * 37.719f) * 0.5f + 0.5f;
 }
 

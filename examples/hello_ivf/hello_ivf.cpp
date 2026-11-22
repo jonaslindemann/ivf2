@@ -173,7 +173,7 @@ public:
         m_scene->draw();
     }
 
-    void onResize(int width, int height)
+    void onResize(int /*width*/, int /*height*/)
     {
         // Update the camera manipulator with new window dimensions
 

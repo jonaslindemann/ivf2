@@ -171,7 +171,7 @@ void PropertyInspectable::setupProperties()
     // Override in derived classes to register properties
 }
 
-void PropertyInspectable::onPropertyChanged(const std::string &propertyName)
+void PropertyInspectable::onPropertyChanged(const std::string &/*propertyName*/)
 {
     // Default implementation does nothing
     // Override in derived classes to handle property changes
@@ -246,7 +246,10 @@ std::string PropertyEditor::getValueAsString(const Property &prop)
                 return "(" + std::to_string((*arg)[0]) + ", " + std::to_string((*arg)[1]) + ", " +
                        std::to_string((*arg)[2]) + ", " + std::to_string((*arg)[3]) + ")";
             }
-            return "";
+            else
+            {
+                return "";
+            }
         },
         prop.value);
 }
@@ -305,7 +308,10 @@ bool PropertyEditor::setValueFromString(const Property &prop, const std::string 
                 {
                     return parseUvec4(value, *arg);
                 }
-                return false;
+                else
+                {
+                    return false;
+                }
             },
             prop.value);
     } catch (...)
@@ -359,7 +365,10 @@ std::string PropertyEditor::getPropertyType(const Property &prop)
             {
                 return "uvec4";
             }
-            return "unknown";
+            else
+            {
+                return "unknown";
+            }
         },
         prop.value);
 }

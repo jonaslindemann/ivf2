@@ -80,7 +80,7 @@ void ivf::Dodecahedron::setupProperties()
     addProperty("Rings", &m_rings, "Geometry");
 }
 
-void ivf::Dodecahedron::onPropertyChanged(const std::string &name)
+void ivf::Dodecahedron::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

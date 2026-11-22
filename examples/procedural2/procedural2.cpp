@@ -472,12 +472,12 @@ public:
         ImGui::End();
     }
 
-    void onResize(int width, int height)
+    void onResize(int /*width*/, int /*height*/)
     {
         m_camManip->update();
     }
 
-    void onKey(int key, int scancode, int action, int mods)
+    void onKey(int key, int /*scancode*/, int action, int /*mods*/)
     {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             this->close();

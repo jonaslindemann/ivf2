@@ -113,9 +113,9 @@ void ivf::FloatField::print()
 {
     cout << "---------" << endl;
     cout << "Float field (" << this->rows() << ", " << this->cols() << ")" << endl;
-    for (auto i = 0; i < this->rows(); i++)
+    for (GLuint i = 0; i < this->rows(); i++)
     {
-        for (auto j = 0; j < this->cols(); j++)
+        for (GLuint j = 0; j < this->cols(); j++)
         {
             cout << this->at(i, j);
             if (j < this->cols() - 1)

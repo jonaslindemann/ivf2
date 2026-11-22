@@ -61,7 +61,7 @@ void ivfui::UiWindow::setSize(int width, int height)
 {
     m_width = width;
     m_height = height;
-    ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_width), static_cast<float>(m_height)), ImGuiCond_FirstUseEver);
 }
 
 int ivfui::UiWindow::width() const
@@ -78,7 +78,7 @@ void ivfui::UiWindow::setPosition(int x, int y)
 {
     m_x = x;
     m_y = y;
-    ImGui::SetNextWindowPos(ImVec2(x, y), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(static_cast<float>(x), static_cast<float>(y)), ImGuiCond_FirstUseEver);
 }
 
 int ivfui::UiWindow::x() const
@@ -109,12 +109,12 @@ void ivfui::UiWindow::doPreDraw()
     // Set initial size and position for the window
     if (m_width > 0 && m_height > 0)
     {
-        ImGui::SetNextWindowSize(ImVec2(m_width, m_height), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowSize(ImVec2(static_cast<float>(m_width), static_cast<float>(m_height)), ImGuiCond_FirstUseEver);
     }
 
     if (m_x >= 0 && m_y >= 0)
     {
-        ImGui::SetNextWindowPos(ImVec2(m_x, m_y), ImGuiCond_FirstUseEver);
+        ImGui::SetNextWindowPos(ImVec2(static_cast<float>(m_x), static_cast<float>(m_y)), ImGuiCond_FirstUseEver);
     }
 }
 

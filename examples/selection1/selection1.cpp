@@ -106,7 +106,7 @@ public:
         node->setMaterial(m_selectionMaterial);
     }
 
-    virtual void onOverNode(Node *node) override
+    virtual void onOverNode(Node * /*node*/) override
     {
         // Selection event when the mouse is over a node.
 

@@ -178,7 +178,7 @@ void ivf::Extrusion::setupProperties()
     addProperty("Tex (0=norm,1=length)", &m_texMode, "Surface");
 }
 
-void ivf::Extrusion::onPropertyChanged(const std::string &name)
+void ivf::Extrusion::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

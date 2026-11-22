@@ -105,7 +105,7 @@ public:
 
         // Set initial Lissajous parameters for the animation
 
-        m_lissajous.setParameters(1.0, 1.0, 1.0, 0.7, 3.0, 0.4, 1.0, 2.0, 1.0);
+        m_lissajous.setParameters(1.0f, 1.0f, 1.0f, 0.7f, 3.0f, 0.4f, 1.0f, 2.0f, 1.0f);
 
         this->add(m_trace);
 
@@ -133,7 +133,7 @@ public:
 
         // Calculate the current position on the Lissajous curve and update the sphere's position
 
-        auto pos = m_lissajous(elapsedTime() * m_speed);
+        auto pos = m_lissajous(static_cast<float>(elapsedTime() * m_speed));
         m_sphere->setPos(pos);
         m_trace->add(pos);
         m_trace->refresh();

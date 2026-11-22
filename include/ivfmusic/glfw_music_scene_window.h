@@ -184,7 +184,7 @@ protected:
      * @param time Song time in seconds.
      * @param dt Frame time in seconds.
      */
-    virtual void onSceneUpdate(double time, double dt) {}
+    virtual void onSceneUpdate(double /*time*/, double /*dt*/) {}
 
     /** @brief Draw scene-specific development UI (not called in presentation mode). */
     virtual void onSceneUi() {}
@@ -195,7 +195,7 @@ protected:
      * Triggers are also available through triggerAge(), which includes recorded
      * hits; prefer it for anything that should appear in exports.
      */
-    virtual void onLiveEvent(const LiveEvent &event) {}
+    virtual void onLiveEvent(const LiveEvent &/*event*/) {}
 
     int onSetup() final;
     void onUpdate() final;

@@ -62,7 +62,7 @@ void FlyCameraManipulator::updateProjection()
     auto* xfm = TransformManager::instance();
     xfm->enableProjectionMatrix();
     xfm->identity();
-    xfm->perspective(m_fov, float(m_width) / float(m_height), m_nearZ, m_farZ);
+    xfm->perspective(static_cast<float>(m_fov), float(m_width) / float(m_height), static_cast<float>(m_nearZ), static_cast<float>(m_farZ));
     xfm->enableModelMatrix();
 }
 

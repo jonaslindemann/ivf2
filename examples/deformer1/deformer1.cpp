@@ -142,7 +142,7 @@ public:
         m_deformableCube->applyDeformers();
     }
 
-    virtual void onKey(int key, int scancode, int action, int mods) override
+    virtual void onKey(int key, int /*scancode*/, int action, int /*mods*/) override
     {
         if (key == GLFW_KEY_W && action == GLFW_PRESS)
         {

@@ -40,7 +40,7 @@ void ivfui::CameraManipulator::updateProjectMatrix()
 
     xfmMgr->enableProjectionMatrix();
     xfmMgr->identity();
-    xfmMgr->perspective(m_fov, (GLfloat)width / (GLfloat)height, m_nearZ, m_farZ);
+    xfmMgr->perspective(static_cast<float>(m_fov), (GLfloat)width / (GLfloat)height, static_cast<float>(m_nearZ), static_cast<float>(m_farZ));
     xfmMgr->enableModelMatrix();
 }
 
@@ -70,7 +70,7 @@ void CameraManipulator::update()
 
         xfmMgr->enableProjectionMatrix();
         xfmMgr->identity();
-        xfmMgr->perspective(m_fov, (GLfloat)width / (GLfloat)height, m_nearZ, m_farZ);
+        xfmMgr->perspective(static_cast<float>(m_fov), (GLfloat)width / (GLfloat)height, static_cast<float>(m_nearZ), static_cast<float>(m_farZ));
         xfmMgr->enableModelMatrix();
         LightManager::instance()->apply();
     }
@@ -172,7 +172,6 @@ void CameraManipulator::update()
     }
     else if ((m_middleMouseButton) || ((m_rightMouseButton) && (m_shiftKey)))
     {
-        double movX = -m_mouseScaleX * (m_mouseX - m_mouseStartX);
         double movY = m_mouseScaleY * (m_mouseY - m_mouseStartY);
 
         glm::vec3 forward = glm::normalize(m_cameraPosition - m_cameraTarget);
@@ -343,7 +342,7 @@ void ivfui::CameraManipulator::zoomToExtent(ivf::CompositeNodePtr scene, bool in
 
     // Calculate distance needed to fit the object in view
     float maxDim = std::max({size.x, size.y, size.z});
-    float distance = maxDim / (2.0f * tan(glm::radians(m_fov * 0.5f))) * 1.2f; // Add 20% margin
+    float distance = maxDim / (2.0f * std::tan(glm::radians(static_cast<float>(m_fov) * 0.5f))) * 1.2f; // Add 20% margin
 
     // Position camera looking at center from a good angle
     glm::vec3 cameraPos = center + glm::vec3(distance * 0.7f, distance * 0.5f, distance);

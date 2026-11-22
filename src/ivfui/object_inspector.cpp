@@ -299,11 +299,12 @@ void ObjectInspector::drawScalarProperty(const ivf::Property &prop)
                 {
                     return *arg;
                 }
-                return 0.0f;
+                else
+                {
+                    return 0.0f;
+                }
             },
             prop.value);
-
-        float oldValue = value;
 
         if (prop.readOnly)
         {

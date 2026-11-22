@@ -134,7 +134,7 @@ void solar_ui::SolarWindow::onClearSuns()
     m_suns->clear();
 }
 
-void solar_ui::SolarWindow::onCreatePlanet(size_t idx, double x, double y, double z, double m)
+void solar_ui::SolarWindow::onCreatePlanet(size_t /*idx*/, double x, double y, double z, double m)
 {
     auto planet = Sphere::create(m, 20, 20);
     planet->setMaterial(m_planetMaterial);
@@ -150,7 +150,7 @@ void solar_ui::SolarWindow::onCreatePlanet(size_t idx, double x, double y, doubl
     m_tracers->add(tracer);
 }
 
-void solar_ui::SolarWindow::onCreateSun(size_t idx, double x, double y, double z, double m)
+void solar_ui::SolarWindow::onCreateSun(size_t /*idx*/, double x, double y, double z, double m)
 {
     auto sun = Sphere::create(m, 20, 20);
     sun->setMaterial(m_sunMaterial);

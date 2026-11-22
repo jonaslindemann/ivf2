@@ -85,12 +85,12 @@ void ivf::SplineAnimation::update(double dt)
         if (m_time > m_spline->size() - 1)
         {
             if (m_mode == SplineAnimMode::Once)
-                m_time = m_spline->size() - 1;
+                m_time = static_cast<double>(m_spline->size() - 1);
             else if (m_mode == SplineAnimMode::Loop)
                 m_time = 0.0;
             else if (m_mode == SplineAnimMode::PingPong)
             {
-                m_time = m_spline->size() - 1;
+                m_time = static_cast<double>(m_spline->size() - 1);
                 m_speed = -m_speed;
             }
         }
@@ -101,7 +101,7 @@ void ivf::SplineAnimation::update(double dt)
                 if (m_mode == SplineAnimMode::Once)
                     m_time = 0.0;
                 else if (m_mode == SplineAnimMode::Loop)
-                    m_time = m_spline->size() - 1;
+                    m_time = static_cast<double>(m_spline->size() - 1);
                 else if (m_mode == SplineAnimMode::PingPong)
                 {
                     m_time = 0.0;
@@ -111,7 +111,7 @@ void ivf::SplineAnimation::update(double dt)
         }
 
         if (m_animatedNode != nullptr)
-            m_animatedNode->setPos(m_spline->positionByT(m_time));
+            m_animatedNode->setPos(m_spline->positionByT(static_cast<float>(m_time)));
     }
     else
     {
@@ -144,6 +144,6 @@ void ivf::SplineAnimation::update(double dt)
             }
         }
         if (m_animatedNode != nullptr)
-            m_animatedNode->setPos(m_spline->positionByDistance(m_distance));
+            m_animatedNode->setPos(m_spline->positionByDistance(static_cast<float>(m_distance)));
     }
 }

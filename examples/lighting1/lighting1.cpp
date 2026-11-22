@@ -66,7 +66,7 @@ public:
         pointLight1->setEnabled(false);
         pointLight1->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
         pointLight1->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-        pointLight1->setAttenuation(1.0, 0.14, 0.07);
+        pointLight1->setAttenuation(1.0f, 0.14f, 0.07f);
         pointLight1->setPosition(glm::vec3(2.0, 2.0, 2.0));
 
         // Add and configure the second point light
@@ -74,7 +74,7 @@ public:
         auto pointLight2 = lightMgr->addPointLight();
         pointLight2->setEnabled(false);
         pointLight2->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-        pointLight2->setAttenuation(1.0, 0.14, 0.07);
+        pointLight2->setAttenuation(1.0f, 0.14f, 0.07f);
         pointLight2->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
         pointLight2->setPosition(glm::vec3(-2.0, -2.0, -2.0));
 
@@ -119,39 +119,21 @@ public:
             for (auto j = 0; j < 11; j++)
                 for (auto k = 0; k < 11; k++)
                 {
-                    if (true)
-                    {
-                        // Use instancing for efficiency
+                    // Use instancing for efficiency
 
-                        auto instSphere = InstanceNode::create();
-                        instSphere->setNode(sphere);
-                        instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
+                    auto instSphere = InstanceNode::create();
+                    instSphere->setNode(sphere);
+                    instSphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
 
-                        // Assign a random colored material to the instance
+                    // Assign a random colored material to the instance
 
-                        auto material = Material::create();
-                        material->setDiffuseColor(
-                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                        material->setShininess(40.0);
+                    auto material = Material::create();
+                    material->setDiffuseColor(
+                        glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
+                    material->setShininess(40.0);
 
-                        instSphere->setMaterial(material);
-                        this->add(instSphere);
-                    }
-                    else
-                    {
-                        // (Unused branch) Create individual spheres instead of instances
-
-                        auto sphere = Sphere::create(0.15);
-                        sphere->setPos(glm::vec3(-5.0 + i, -5.0 + j, -5.0 + k));
-
-                        auto material = Material::create();
-                        material->setDiffuseColor(
-                            glm::vec4(random(0.0, 1.0), random(0.0, 1.0), random(0.0, 1.0), 1.0f));
-                        material->setShininess(40.0);
-
-                        sphere->setMaterial(material);
-                        this->add(sphere);
-                    }
+                    instSphere->setMaterial(material);
+                    this->add(instSphere);
                 }
 
         // Add the axis to the scene

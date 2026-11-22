@@ -23,6 +23,13 @@ private:
     std::vector<gml::dvec3> points_;
     int segments_;
 
+    // The path reads points_ through 'this', so copies build their own path.
+    ParametricPath makePath(int segments);
+
+public:
+    PolyLinePath(const PolyLinePath &other);
+    PolyLinePath &operator=(const PolyLinePath &other);
+
 public:
     /// @param start Start point of the line.
     /// @param end End point of the line.

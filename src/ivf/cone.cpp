@@ -54,7 +54,7 @@ void ivf::Cone::setupProperties()
     addProperty("Sweep angle", &m_sweep, "Geometry");
 }
 
-void ivf::Cone::onPropertyChanged(const std::string &name)
+void ivf::Cone::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

@@ -10,51 +10,67 @@ GridLayout::~GridLayout()
 {}
 
 void GridLayout::setSpacing(float xSpacing, float ySpacing, float zSpacing)
-{}
+{
+    m_xSpacing = xSpacing;
+    m_ySpacing = ySpacing;
+    m_zSpacing = zSpacing;
+}
 
 void GridLayout::setSpacing(float spacing)
-{}
+{
+    setSpacing(spacing, spacing, spacing);
+}
 
 void GridLayout::setSize(size_t rows, size_t cols, size_t layers)
-{}
+{
+    m_rows = rows;
+    m_cols = cols;
+    m_layers = layers;
+}
 
 void GridLayout::setRows(size_t rows)
-{}
+{
+    m_rows = rows;
+}
 
 void GridLayout::setCols(size_t cols)
-{}
+{
+    m_cols = cols;
+}
 
 void GridLayout::setLayers(size_t layers)
-{}
+{
+    m_layers = layers;
+}
 
 size_t GridLayout::rows()
 {
-    return size_t();
+    return m_rows;
 }
 
 size_t GridLayout::cols()
 {
-    return size_t();
+    return m_cols;
 }
 
 size_t GridLayout::layers()
 {
-    return size_t();
+    return m_layers;
 }
 
 float GridLayout::xSpacing()
 {
-    return 0.0f;
+    return m_xSpacing;
 }
 
 float GridLayout::ySpacing()
 {
-    return 0.0f;
+    return m_ySpacing;
 }
 
 float GridLayout::zSpacing()
 {
-    return 0.0f;
+    return m_zSpacing;
 }
 
 size_t GridLayout::size()
@@ -76,12 +92,16 @@ void GridLayout::apply(ivf::CompositeNode *composite)
         {
             for (size_t k = 0; k < m_layers; k++)
             {
+                if (index >= composite->count())
+                    return;
+
                 auto node = composite->at(index);
                 auto transformNode = dynamic_cast<ivf::TransformNode *>(node.get());
 
                 if (transformNode)
-                    transformNode->setPos(
-                        glm::vec3(i * m_xSpacing - xOffset, k * m_ySpacing - yOffset, j * m_zSpacing - zOffset));
+                    transformNode->setPos(glm::vec3(static_cast<float>(i) * m_xSpacing - xOffset,
+                                                    static_cast<float>(k) * m_ySpacing - yOffset,
+                                                    static_cast<float>(j) * m_zSpacing - zOffset));
 
                 index++;
             }

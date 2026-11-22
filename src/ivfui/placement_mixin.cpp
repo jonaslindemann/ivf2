@@ -350,7 +350,7 @@ void PlacementMixin::handleMouseMove(double x, double y)
     }
 }
 
-void PlacementMixin::handleKey(int key, int scancode, int action, int mods)
+void PlacementMixin::handleKey(int key, int /*scancode*/, int action, int mods)
 {
     if (!m_placementActive)
         return;
@@ -585,12 +585,12 @@ void PlacementMixin::updatePlacementGrid()
     }
 }
 
-void PlacementMixin::onCursorMove(float x, float y, float z)
+void PlacementMixin::onCursorMove(float /*x*/, float /*y*/, float /*z*/)
 {
     updateCursorPosition();
 }
 
-void PlacementMixin::onCursorClick(float x, float y, float z, int button, int action, int mods)
+void PlacementMixin::onCursorClick(float /*x*/, float /*y*/, float /*z*/, int button, int action, int /*mods*/)
 {
     if (action != GLFW_PRESS)
         return;
@@ -621,7 +621,7 @@ void PlacementMixin::onCursorClick(float x, float y, float z, int button, int ac
     }
 }
 
-void PlacementMixin::onNodeDrag(float x, float y, float z, float dx, float dy, float dz)
+void PlacementMixin::onNodeDrag(float /*x*/, float /*y*/, float /*z*/, float /*dx*/, float /*dy*/, float /*dz*/)
 {
     // Node positions are updated automatically by the placement manipulator
     // This callback can be used for additional feedback or validation
@@ -691,7 +691,6 @@ void PlacementMixin::updateInteractionMode(int button, int action, int mods)
     bool hasSelection = !selectedNodes().empty();
     bool isCreateMode = (currentMode() == PlacementMode::CREATE);
     bool isLeftClick = (button == GLFW_MOUSE_BUTTON_LEFT);
-    bool isRightClick = (button == GLFW_MOUSE_BUTTON_RIGHT);
     bool hasModifiers = (mods & (GLFW_MOD_SHIFT | GLFW_MOD_CONTROL | GLFW_MOD_ALT)) != 0;
 
     // Determine if this should be placement or camera operation
@@ -722,7 +721,7 @@ void PlacementMixin::updateInteractionMode(int button, int action, int mods)
     }
 }
 
-bool PlacementMixin::shouldHandleInAutoMode(int button, int action, int mods) const
+bool PlacementMixin::shouldHandleInAutoMode(int button, int /*action*/, int mods) const
 {
     bool hasSelection = !selectedNodes().empty();
     bool isCreateMode = (currentMode() == PlacementMode::CREATE);

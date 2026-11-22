@@ -4,7 +4,7 @@
 
 using namespace ivf;
 
-ivf::ChromaticEffect::ChromaticEffect() : m_offset(0.01)
+ivf::ChromaticEffect::ChromaticEffect() : m_offset(0.01f)
 {
     setName("Chromatic");
 }

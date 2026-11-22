@@ -304,7 +304,7 @@ bool EffectInspector::drawEffectItem(std::shared_ptr<ivf::Effect> effect, int in
     return itemClicked;
 }
 
-std::string EffectInspector::getEffectDisplayName(std::shared_ptr<ivf::Effect> effect, int index) const
+std::string EffectInspector::getEffectDisplayName(std::shared_ptr<ivf::Effect> effect, int /*index*/) const
 {
     if (!effect)
         return "null";
@@ -537,7 +537,10 @@ void EffectInspector::drawScalarProperty(const ivf::Property &prop)
                 {
                     return *arg;
                 }
-                return 0.0f;
+                else
+                {
+                    return 0.0f;
+                }
             },
             prop.value);
 
@@ -772,13 +775,13 @@ void EffectInspector::drawStringProperty(const ivf::Property &prop)
     }
 }
 
-bool EffectInspector::isCategoryExpanded(const std::string &category) const
+bool EffectInspector::isCategoryExpanded(const std::string &/*category*/) const
 {
     // This method is no longer used since we removed category-based display
     return true;
 }
 
-void EffectInspector::setCategoryExpanded(const std::string &category, bool expanded)
+void EffectInspector::setCategoryExpanded(const std::string &/*category*/, bool /*expanded*/)
 {
     // This method is no longer used since we removed category-based display
     // No-op to maintain compatibility

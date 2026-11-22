@@ -53,7 +53,7 @@ void ivf::Tube::setupProperties()
     addProperty("Sweep Angle", &m_sweep, "Geometry");
 }
 
-void ivf::Tube::onPropertyChanged(const std::string &name)
+void ivf::Tube::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

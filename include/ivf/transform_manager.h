@@ -155,8 +155,8 @@ public:
     void rotateDeg(float ax, float ay, float az);
 
     /**
-     * @brief Rotate the current matrix to align with a given vector.
-     * @param v Target vector.
+     * @brief Rotate the current matrix so that the local +X axis points along a vector.
+     * @param v Target direction (need not be normalized; a zero vector does nothing).
      */
     void rotateToVector(glm::vec3 v);
 

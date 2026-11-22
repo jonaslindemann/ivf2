@@ -77,7 +77,7 @@ void ivf::Cylinder::setupProperties()
     addProperty("Sweep angle", &m_sweep, "Geometry");
 }
 
-void ivf::Cylinder::onPropertyChanged(const std::string &name)
+void ivf::Cylinder::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

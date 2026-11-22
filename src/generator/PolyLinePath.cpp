@@ -40,23 +40,39 @@ gml::dvec3 interpolate(const std::vector<gml::dvec3> &polyline, double t)
     return polyline.back();
 }
 
-PolyLinePath::PolyLinePath(int segments)
-    : parametricPath_{[this, segments](double t) {
-                          PathVertex vertex;
-
-                          vertex.position = interpolate(points_, t);
-                          gml::dvec3 start = interpolate(points_, t - 0.001);
-                          gml::dvec3 end = interpolate(points_, t + 0.001);
-                          vertex.tangent = normalize(end - start);
-                          // vertex.normal = vertex.tangent;
-                          vertex.normal = gml::cross(gml::dvec3(1.0, 1.0, 0.0), vertex.tangent);
-                          vertex.texCoord = t;
-
-                          return vertex;
-                      },
-                      segments},
-      segments_{segments}
+ParametricPath PolyLinePath::makePath(int segments)
 {
+    return ParametricPath{[this](double t) {
+                              PathVertex vertex;
+
+                              vertex.position = interpolate(points_, t);
+                              gml::dvec3 start = interpolate(points_, t - 0.001);
+                              gml::dvec3 end = interpolate(points_, t + 0.001);
+                              vertex.tangent = normalize(end - start);
+                              // vertex.normal = vertex.tangent;
+                              vertex.normal = gml::cross(gml::dvec3(1.0, 1.0, 0.0), vertex.tangent);
+                              vertex.texCoord = t;
+
+                              return vertex;
+                          },
+                          segments};
+}
+
+PolyLinePath::PolyLinePath(int segments) : parametricPath_{makePath(segments)}, segments_{segments}
+{
+}
+
+PolyLinePath::PolyLinePath(const PolyLinePath &other)
+    : parametricPath_{makePath(other.segments_)}, points_{other.points_}, segments_{other.segments_}
+{
+}
+
+PolyLinePath &PolyLinePath::operator=(const PolyLinePath &other)
+{
+    points_ = other.points_;
+    segments_ = other.segments_;
+    parametricPath_ = makePath(segments_);
+    return *this;
 }
 
 void generator::PolyLinePath::addPoint(const gml::dvec3 &point)
@@ -76,6 +92,8 @@ void generator::PolyLinePath::clearPoints()
 
 void generator::PolyLinePath::setSegments(int segments)
 {
+    segments_ = segments;
+    parametricPath_ = makePath(segments);
 }
 
 void generator::PolyLinePath::setPoint(int index, const gml::dvec3 &point)

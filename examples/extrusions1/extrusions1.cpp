@@ -229,7 +229,7 @@ public:
         m_camManip->update();
     }
 
-    void onResize(int width, int height)
+    void onResize(int /*width*/, int /*height*/)
     {
         // Update the camera manipulator with new window dimensions
 

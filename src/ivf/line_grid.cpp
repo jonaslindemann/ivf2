@@ -102,7 +102,7 @@ void ivf::LineGrid::doSetup()
     mesh()->begin(GL_LINES);
 
     for (auto i = 0; i <= m_xDivisions; i++) {
-        GLfloat x = -m_width / 2.0 + m_width * (GLfloat)i / (GLfloat)m_xDivisions;
+        GLfloat x = -m_width / 2.0f + m_width * (GLfloat)i / (GLfloat)m_xDivisions;
         if (m_align == GridAlign::XY) {
             if (m_useColor)
                 mesh()->color3f(m_color[0], m_color[1], m_color[2]);
@@ -136,7 +136,7 @@ void ivf::LineGrid::doSetup()
     }
 
     for (auto i = 0; i <= m_yDivisions; i++) {
-        GLfloat y = -m_height / 2.0 + m_height * (GLfloat)i / (GLfloat)m_yDivisions;
+        GLfloat y = -m_height / 2.0f + m_height * (GLfloat)i / (GLfloat)m_yDivisions;
         if (m_align == GridAlign::XY) {
             if (m_useColor)
                 mesh()->color3f(m_color[0], m_color[1], m_color[2]);

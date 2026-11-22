@@ -162,7 +162,7 @@ public:
         return 0;
     }
 
-    void onPropertiesChanged(const std::string &name)
+    void onPropertiesChanged(const std::string &/*name*/)
     {
         // Handle property changes if needed
 
@@ -173,14 +173,12 @@ public:
     {
         // Update the object inspector with the current object
 
-        float time = this->elapsedTime();
-
         m_defCylinder->applyDeformers();
         m_defPlane->applyDeformers();
         m_defSphere->applyDeformers();
     }
 
-    virtual void onKey(int key, int scancode, int action, int mods) override
+    virtual void onKey(int key, int /*scancode*/, int action, int mods) override
     {
         if (key == GLFW_KEY_1)
         {

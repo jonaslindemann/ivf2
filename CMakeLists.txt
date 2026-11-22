@@ -26,7 +26,8 @@ endif()
 
 option(IVF2_INSTALL "Generate install rules and a CMake package (find_package(ivf2))" ${_ivf2_top_level})
 option(IVF2_USE_PCH "Use precompiled headers" ON)
-option(IVF2_WARNINGS "Enable extra compiler warnings for ivf2 targets" OFF)
+option(IVF2_WARNINGS "Compiler warnings for ivf2's own targets (/W4, -Wall -Wextra -Wpedantic)" ${_ivf2_top_level})
+option(IVF2_WARNINGS_AS_ERRORS "Treat compiler warnings in ivf2's own targets as errors" OFF)
 option(IVF2_OUTPUT_IN_SOURCE_TREE "Place binaries in <source>/bin/<config> and <source>/lib/<config> (legacy layout)" OFF)
 
 if(_ivf2_top_level)

@@ -149,14 +149,14 @@ public:
         m_camManip->update();
     }
 
-    void onResize(int width, int height)
+    void onResize(int /*width*/, int /*height*/)
     {
         // Update the camera manipulator with the new window size.
 
         m_camManip->update();
     }
 
-    void onKey(int key, int scancode, int action, int mods)
+    void onKey(int key, int /*scancode*/, int action, int /*mods*/)
     {
         // Handle key events for closing the window, toggling the demo window, and changing texture blend modes.
 
@@ -190,7 +190,7 @@ public:
 
         if (key == GLFW_KEY_UP && action == GLFW_PRESS)
         {
-            m_blendFactor += 0.1;
+            m_blendFactor += 0.1f;
             if (m_blendFactor > 1.0)
                 m_blendFactor = 1.0;
             m_texMgr->setBlendFactor(m_blendFactor);
@@ -198,7 +198,7 @@ public:
 
         if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
         {
-            m_blendFactor -= 0.1;
+            m_blendFactor -= 0.1f;
             if (m_blendFactor < 0.0)
                 m_blendFactor = 0.0;
             m_texMgr->setBlendFactor(m_blendFactor);

@@ -72,7 +72,7 @@ void ivf::vectorToEuler(const glm::vec3 &unitVector, float &ax, float &ay)
 float LinearInterpolFunc::tri(float t)
 {
     if (abs(t) < 1)
-        return 1.0 - abs(t);
+        return 1.0f - std::abs(t);
     else
         return 0.0f;
 }
@@ -92,7 +92,7 @@ void ivf::LinearInterpolFunc::clear()
 
 int ivf::LinearInterpolFunc::size()
 {
-    return m_points.size();
+    return static_cast<int>(m_points.size());
 }
 
 glm::vec3 LinearInterpolFunc::operator()(float t)
@@ -114,7 +114,10 @@ glm::vec3 LinearInterpolFunc::operator()(float t)
 
 void ivf::clearError()
 {
-    GLenum err = glGetError();
+    // Drain all pending error flags
+    while (glGetError() != GL_NO_ERROR)
+    {
+    }
 }
 
 GLenum ivf::checkPrintError(const std::string context, const std::string file, const long line)

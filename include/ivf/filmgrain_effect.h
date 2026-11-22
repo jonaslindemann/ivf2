@@ -16,8 +16,8 @@ namespace ivf {
  */
 class FilmgrainEffect : public Effect {
 private:
-    float m_noiseIntensity{0.1}; ///< Intensity of the noise applied to the image.
-    float m_grainBlending{0.1};  ///< Blending factor for the grain effect.
+    float m_noiseIntensity{0.1f}; ///< Intensity of the noise applied to the image.
+    float m_grainBlending{0.1f};  ///< Blending factor for the grain effect.
 
 public:
     /**

@@ -186,7 +186,7 @@ void EnhancedSceneWindow::doPreSetup()
     });
 
     // Set up moved callback
-    m_placementMixin->setNodeMovedCallback([this](ivf::NodePtr node, float x, float y, float z) {
+    m_placementMixin->setNodeMovedCallback([this](ivf::NodePtr /*node*/, float x, float y, float z) {
         ivf::logDebug(ivf::logStr("Moved node to (", x, ", ", y, ", ", z, ")"), "EnhancedSceneWindow");
     });
 }

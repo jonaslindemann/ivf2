@@ -231,39 +231,39 @@ void Cursor::doSetup()
     if (m_useCustomColors)
         mesh()->color4f(m_xAxisColor[0], m_xAxisColor[1], m_xAxisColor[2], m_xAxisColor[3]);
     else
-        mesh()->color3f(0.8, 0.8, 0.8); // Red
+        mesh()->color3f(0.8f, 0.8f, 0.8f); // Red
 
     mesh()->vertex3d(m_size, 0.0, 0.0);
     if (m_useCustomColors)
         mesh()->color4f(m_xAxisColor[0], m_xAxisColor[1], m_xAxisColor[2], m_xAxisColor[3]);
     else
-        mesh()->color3f(0.8, 0.8, 0.8); // Red
+        mesh()->color3f(0.8f, 0.8f, 0.8f); // Red
 
     // Y-axis line
     mesh()->vertex3d(0.0, -m_size, 0.0);
     if (m_useCustomColors)
         mesh()->color4f(m_yAxisColor[0], m_yAxisColor[1], m_yAxisColor[2], m_yAxisColor[3]);
     else
-        mesh()->color3f(0.8, 0.8, 0.8); // Green
+        mesh()->color3f(0.8f, 0.8f, 0.8f); // Green
 
     mesh()->vertex3d(0.0, m_size, 0.0);
     if (m_useCustomColors)
         mesh()->color4f(m_yAxisColor[0], m_yAxisColor[1], m_yAxisColor[2], m_yAxisColor[3]);
     else
-        mesh()->color3f(0.8, 0.8, 0.8); // Green
+        mesh()->color3f(0.8f, 0.8f, 0.8f); // Green
 
     // Z-axis line
     mesh()->vertex3d(0.0, 0.0, -m_size);
     if (m_useCustomColors)
         mesh()->color4f(m_zAxisColor[0], m_zAxisColor[1], m_zAxisColor[2], m_zAxisColor[3]);
     else
-        mesh()->color3f(0.8, 0.8, 0.8); // Blue
+        mesh()->color3f(0.8f, 0.8f, 0.8f); // Blue
 
     mesh()->vertex3d(0.0, 0.0, m_size);
     if (m_useCustomColors)
         mesh()->color4f(m_zAxisColor[0], m_zAxisColor[1], m_zAxisColor[2], m_zAxisColor[3]);
     else
-        mesh()->color3f(0.8, 0.8, 0.8); // Blue
+        mesh()->color3f(0.8f, 0.8f, 0.8f); // Blue
 
     if (m_showGroundProjection)
     {

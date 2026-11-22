@@ -105,7 +105,8 @@ cmake --build build --parallel
 | `IVF2_WITH_MIDI` | ON | MIDI input (`ivf::MidiController`) with RtMidi |
 | `IVF2_INSTALL` | ON (top level) | Install rules and CMake package config |
 | `IVF2_USE_PCH` | ON | Precompiled headers |
-| `IVF2_WARNINGS` | OFF | Extra compiler warnings |
+| `IVF2_WARNINGS` | ON (top level) | Warnings for ivf2's own code: `/W4` (MSVC), `-Wall -Wextra -Wpedantic` |
+| `IVF2_WARNINGS_AS_ERRORS` | OFF | Treat those warnings as errors (`/WX`, `-Werror`) |
 | `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: put binaries in `<source>/bin/<config>` |
 
 The `IVF2_WITH_*` options switch optional dependencies. Each also selects the matching vcpkg

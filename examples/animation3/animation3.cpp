@@ -176,7 +176,7 @@ public:
 
         // Update the keyframe animation for the cube (advance by 1/60 second)
 
-        m_keyframeAnim->update(1.0 / 60.0);
+        m_keyframeAnim->update(1.0f / 60.0f);
 
         // Add the current position of the sphere to its trace and refresh the trace
 

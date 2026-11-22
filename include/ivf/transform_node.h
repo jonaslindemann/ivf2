@@ -115,8 +115,8 @@ public:
     void alignWithAxisAngle(glm::vec3 axis, float angle);
 
     /**
-     * @brief Rotate the node to align with a given vector.
-     * @param v The vector to align with.
+     * @brief Rotate the node so that its local +X axis points along a vector (e.g. an Arrow).
+     * @param v The direction to point along; a zero vector disables this rotation.
      */
     void rotateToVector(glm::vec3 v);
 

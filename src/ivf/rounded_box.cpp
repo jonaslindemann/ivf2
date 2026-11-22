@@ -114,7 +114,7 @@ void ivf::RoundedBox::setupProperties()
     addProperty("Slices", &m_slices, "Geometry");
 }
 
-void ivf::RoundedBox::onPropertyChanged(const std::string &name)
+void ivf::RoundedBox::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

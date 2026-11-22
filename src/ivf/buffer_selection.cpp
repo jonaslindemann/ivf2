@@ -63,7 +63,7 @@ void BufferSelection::initialize(int width, int height)
         // Already initialized — just update the node map and resize if needed
         if (m_width != width || m_height != height)
             resize(width, height);
-        auto startIdx = m_scene->enumerateIds(0);
+        static_cast<void>(m_scene->enumerateIds(0)); // assigns the selection ids
         MapVisitor mapVisitor;
         m_scene->accept(&mapVisitor);
         m_nodeMap = mapVisitor.takeMap();
@@ -73,7 +73,7 @@ void BufferSelection::initialize(int width, int height)
     m_width = width;
     m_height = height;
 
-    auto startIdx = m_scene->enumerateIds(0);
+    static_cast<void>(m_scene->enumerateIds(0)); // assigns the selection ids
 
     MapVisitor mapVisitor;
     m_scene->accept(&mapVisitor);

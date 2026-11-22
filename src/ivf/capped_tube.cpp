@@ -146,7 +146,7 @@ void ivf::CappedTube::setupProperties()
     addProperty("Sweep angle", &m_sweep, "Geometry");
 }
 
-void ivf::CappedTube::onPropertyChanged(const std::string &name)
+void ivf::CappedTube::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

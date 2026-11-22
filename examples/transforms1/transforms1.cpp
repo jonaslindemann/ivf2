@@ -63,8 +63,8 @@ public:
         auto arrow = Arrow::create();
         arrow->setArrowType(ArrowType::RightSided);
         arrow->setLength(0.5);
-        arrow->setBodyRadius(0.05);
-        arrow->setConeRadius(0.1);
+        arrow->setBodyRadius(0.05f);
+        arrow->setConeRadius(0.1f);
         arrow->setMaterial(redMat);
 
         // Create a 5x5x5 grid of arrows, each with a random orientation and position.

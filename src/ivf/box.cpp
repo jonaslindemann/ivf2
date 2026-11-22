@@ -146,7 +146,7 @@ void ivf::Box::setupProperties()
     addProperty("Segments", &m_segments, "Geometry");
 }
 
-void ivf::Box::onPropertyChanged(const std::string &propertyName)
+void ivf::Box::onPropertyChanged(const std::string &/*propertyName*/)
 {
     this->refresh();
 }

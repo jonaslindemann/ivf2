@@ -127,7 +127,7 @@ public:
         return 0;
     }
 
-    void onKey(int key, int scancode, int action, int mods)
+    void onKey(int key, int /*scancode*/, int action, int /*mods*/)
     {
         // Handle key events
 

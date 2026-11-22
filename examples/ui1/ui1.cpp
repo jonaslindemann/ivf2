@@ -178,7 +178,7 @@ public:
             m_exampleWindow2->hide();
     }
 
-    void onResize(int width, int height)
+    void onResize(int /*width*/, int /*height*/)
     {
         m_camManip->update();
     }

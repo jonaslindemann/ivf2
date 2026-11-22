@@ -11,7 +11,7 @@ using namespace ivf;
 
 using namespace std;
 
-Program::Program() : m_id(-1), m_name("generic"), m_enabled(true)
+Program::Program() : m_id(static_cast<GLuint>(-1)), m_name("generic"), m_enabled(true)
 {}
 
 Program::~Program()

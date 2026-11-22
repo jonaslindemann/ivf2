@@ -75,7 +75,7 @@ void collision3D(double R, double m1, double m2, double r1, double r2,
     
     
     double  pi,r12,m21,d,v,theta2,phi2,st,ct,sp,cp,vx1r,vy1r,vz1r,fvz1r,
-    thetav,phiv,dr,alpha,beta,sbeta,cbeta,dc,sqs,t,a,dvz2,
+    thetav,phiv,dr,alpha,beta,sbeta,cbeta,t,a,dvz2,
     vx2r,vy2r,vz2r,x21,y21,z21,vx21,vy21,vz21,vx_cm,vy_cm,vz_cm;
     
     //     **** initialize some variables ****

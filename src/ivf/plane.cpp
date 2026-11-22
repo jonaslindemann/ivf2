@@ -51,7 +51,7 @@ void ivf::Plane::setupProperties()
     addProperty("Columns", &m_cols, "Geometry");
 }
 
-void ivf::Plane::onPropertyChanged(const std::string &name)
+void ivf::Plane::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

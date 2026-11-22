@@ -77,7 +77,7 @@ void ivf::Light::setShadowMapSize(size_t width, size_t height)
     m_shadowMapWidth = width;
     m_shadowMapHeight = height;
     if (m_shadowMap)
-        m_shadowMap->resize(m_shadowMapWidth, m_shadowMapHeight);
+        m_shadowMap->resize(static_cast<int>(m_shadowMapWidth), static_cast<int>(m_shadowMapHeight));
 }
 
 void ivf::Light::setShadowMap(ShadowMapPtr shadowMap)
@@ -96,7 +96,7 @@ void ivf::Light::clearShadowMap()
         m_shadowMap = nullptr;
 }
 
-glm::mat4 ivf::Light::calculateLightSpaceMatrix(BoundingBox &sceneBBox)
+glm::mat4 ivf::Light::calculateLightSpaceMatrix(BoundingBox &/*sceneBBox*/)
 {
     return glm::mat4();
 }

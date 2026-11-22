@@ -59,7 +59,7 @@ void ivf::CappedCylinder::setupProperties()
     addProperty("Start angle", &m_start, "Geometry");
 }
 
-void ivf::CappedCylinder::onPropertyChanged(const std::string &name)
+void ivf::CappedCylinder::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

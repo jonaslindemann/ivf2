@@ -430,7 +430,7 @@ public:
         }
     }
 
-    void onKey(int key, int scancode, int action, int mods)
+    void onKey(int key, int /*scancode*/, int action, int /*mods*/)
     {
         if ((key == GLFW_KEY_1) && (action == GLFW_PRESS))
             m_window1 = !m_window1;
@@ -448,7 +448,7 @@ public:
             m_window5 = !m_window5;
     }
 
-    void onResize(int width, int height)
+    void onResize(int /*width*/, int /*height*/)
     {
         m_camManip->update();
     }

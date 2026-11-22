@@ -9,7 +9,7 @@ using namespace ivf;
 
 using namespace std;
 
-Shader::Shader(const std::string filename) : m_filename(filename), m_id(-1)
+Shader::Shader(const std::string filename) : m_filename(filename), m_id(static_cast<GLuint>(-1))
 {
     if (filename != "")
         this->read();

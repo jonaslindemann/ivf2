@@ -188,7 +188,7 @@ KeyframeData KeyframeInterpolator::interpolate(float time) const
 
 // Also modify getSplinePoints to use the correct points for the Catmull-Rom spline:
 std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3> KeyframeInterpolator::getSplinePoints(size_t currentIndex,
-                                                                                             float time) const
+                                                                                             float /*time*/) const
 {
     const size_t numKeyframes = m_keyframes.size();
 

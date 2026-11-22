@@ -236,7 +236,7 @@ void SceneInspector::drawNodeTree(std::shared_ptr<ivf::Node> node, bool isRoot)
             flags |= ImGuiTreeNodeFlags_Selected;
 
         std::string displayName = getNodeDisplayName(node);
-        bool isSelected = ImGui::TreeNodeEx(node.get(), flags, "%s", displayName.c_str());
+        ImGui::TreeNodeEx(node.get(), flags, "%s", displayName.c_str()); // leaf: nothing to pop
 
         // Handle selection
         if (ImGui::IsItemClicked())
@@ -633,11 +633,12 @@ void SceneInspector::drawScalarProperty(const ivf::Property &prop)
                 {
                     return *arg;
                 }
-                return 0.0f;
+                else
+                {
+                    return 0.0f;
+                }
             },
             prop.value);
-
-        float oldValue = value;
 
         if (prop.readOnly)
         {

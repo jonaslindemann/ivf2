@@ -60,7 +60,7 @@ int ivf::LineTrace::numVertices() const
 
 void ivf::LineTrace::setVertex(int idx, glm::vec3 &vertex)
 {
-    if (idx < mesh()->vertices()->size())
+    if (idx >= 0 && static_cast<GLuint>(idx) < mesh()->vertices()->size())
         mesh()->vertices()->setVertex(idx, vertex.x, vertex.y, vertex.z);
 }
 
@@ -102,7 +102,7 @@ void ivf::LineTrace::add(glm::vec3 vertex)
 
 void ivf::LineTrace::setSize(size_t size)
 {
-    m_numVertices = size;
+    m_numVertices = static_cast<int>(size);
     this->doSetup();
 }
 

@@ -129,7 +129,7 @@ public:
             m_exampleWindow2->hide();
     }
 
-    void onKey(int key, int scancode, int action, int mods)
+    void onKey(int key, int /*scancode*/, int action, int /*mods*/)
     {
         // Handle key events
 

@@ -569,8 +569,6 @@ void GLFWWindow::doDraw()
 
     this->getSize(width, height);
 
-    const float ratio = width / (float)height;
-
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -703,16 +701,16 @@ int GLFWWindow::doSetup()
 void ivfui::GLFWWindow::doPostSetup()
 {}
 
-void GLFWWindow::onKey(int key, int scancode, int action, int mods)
+void GLFWWindow::onKey(int /*key*/, int /*scancode*/, int /*action*/, int /*mods*/)
 {}
 
-void GLFWWindow::onMousePosition(double x, double y)
+void GLFWWindow::onMousePosition(double /*x*/, double /*y*/)
 {}
 
-void GLFWWindow::onMouseButton(int button, int action, int mods)
+void GLFWWindow::onMouseButton(int /*button*/, int /*action*/, int /*mods*/)
 {}
 
-void GLFWWindow::onResize(int width, int height)
+void GLFWWindow::onResize(int /*width*/, int /*height*/)
 {}
 
 void ivfui::GLFWWindow::onUpdate()

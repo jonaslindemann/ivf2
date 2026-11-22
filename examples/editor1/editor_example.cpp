@@ -87,7 +87,7 @@ public:
     virtual void onUpdate() override
     {}
 
-    virtual void onAddMenuItems(UiMenu *menu) override
+    virtual void onAddMenuItems(UiMenu * /*menu*/) override
     {}
 
     virtual void onDrawUi() override

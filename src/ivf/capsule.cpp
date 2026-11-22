@@ -6,7 +6,8 @@ using namespace ivf;
 using namespace generator;
 
 Capsule::Capsule(double radius, double size, int slices, int segments, int rings, double start, double sweep)
-    : m_radius(1.0), m_size(0.5), m_slices(32), m_segments(4), m_rings(8), m_start(0.0), m_sweep(gml::radians(360.0))
+    : m_radius(radius), m_size(size), m_slices(slices), m_segments(segments), m_rings(rings), m_start(start),
+      m_sweep(sweep)
 {
     this->doSetup();
     this->setName("Capsule");
@@ -53,7 +54,7 @@ void ivf::Capsule::setupProperties()
     addProperty("Sweep angle", &m_sweep, "Geometry");
 }
 
-void ivf::Capsule::onPropertyChanged(const std::string &name)
+void ivf::Capsule::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

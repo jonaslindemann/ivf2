@@ -72,12 +72,12 @@ void solar_ui::SolarPanel::update()
     m_showTracers = true;
     m_nTracersPerPlanet = 100;
 
-    m_planetMassMax = m_solarSystem->planetMassMax();
-    m_planetMassMin = m_solarSystem->planetMassMin();
-    m_planetRadiusMax = m_solarSystem->planetRadiusMax();
-    m_planetRadiusMin = m_solarSystem->planetRadiusMin();
-    m_planetSpeedMin = m_solarSystem->planetSpeedMin();
-    m_planetSpeedMax = m_solarSystem->planetSpeedMax();
+    m_planetMassMax = static_cast<float>(m_solarSystem->planetMassMax());
+    m_planetMassMin = static_cast<float>(m_solarSystem->planetMassMin());
+    m_planetRadiusMax = static_cast<float>(m_solarSystem->planetRadiusMax());
+    m_planetRadiusMin = static_cast<float>(m_solarSystem->planetRadiusMin());
+    m_planetSpeedMin = static_cast<float>(m_solarSystem->planetSpeedMin());
+    m_planetSpeedMax = static_cast<float>(m_solarSystem->planetSpeedMax());
 
     m_planetColor[0] = m_planetMaterial->diffuseColor().r;
     m_planetColor[1] = m_planetMaterial->diffuseColor().g;
@@ -96,8 +96,6 @@ void solar_ui::SolarPanel::update()
 
 void solar_ui::SolarPanel::doDraw()
 {
-    bool dirty = false;
-
     ImGui::SeparatorText("Simulation controls");
 
     if (ImGui::Button(m_solarSystem->isRunning() ? "Pause" : "Run"))

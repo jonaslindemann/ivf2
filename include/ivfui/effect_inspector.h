@@ -77,7 +77,7 @@ public:
      * @param toIndex Target index.
      * @return bool True if reordering is supported and was successful.
      */
-    virtual bool reorderEffect(int fromIndex, int toIndex)
+    virtual bool reorderEffect(int /*fromIndex*/, int /*toIndex*/)
     {
         return false;
     }

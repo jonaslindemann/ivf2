@@ -99,7 +99,7 @@ void ivf::TextNode::updateTextSize()
         CharacterInfo ch = m_charMap[*c];
         m_textWidth += (ch.glyphAdvance >> 6);
         if (ch.glyphSize.y > m_textHeight)
-            m_textHeight = ch.glyphSize.y;
+            m_textHeight = static_cast<float>(ch.glyphSize.y);
     }
 }
 

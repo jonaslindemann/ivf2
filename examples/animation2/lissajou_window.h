@@ -8,9 +8,9 @@ private:
     float m_a{1.0};
     float m_b{1.0};
     float m_c{1.0};
-    float m_d{0.7};
+    float m_d{0.7f};
     float m_e{3.0};
-    float m_f{0.4};
+    float m_f{0.4f};
     float m_g{1.0};
     float m_h{2.0};
     float m_i{1.0};

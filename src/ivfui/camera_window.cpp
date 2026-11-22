@@ -26,9 +26,9 @@ void ivfui::CameraWindow::updateControls()
     m_cameraTarget[1] = m_cameraManipulator->cameraTarget().y;
     m_cameraTarget[2] = m_cameraManipulator->cameraTarget().z;
 
-    m_fov = m_cameraManipulator->fov();
-    m_nearZ = m_cameraManipulator->nearZ();
-    m_farZ = m_cameraManipulator->farZ();
+    m_fov = static_cast<float>(m_cameraManipulator->fov());
+    m_nearZ = static_cast<float>(m_cameraManipulator->nearZ());
+    m_farZ = static_cast<float>(m_cameraManipulator->farZ());
 }
 
 void ivfui::CameraWindow::updateCamera()

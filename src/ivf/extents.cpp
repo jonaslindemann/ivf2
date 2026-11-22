@@ -105,7 +105,7 @@ void ivf::Extents::setupProperties()
     MeshNode::setupProperties();
 }
 
-void ivf::Extents::onPropertyChanged(const std::string &name)
+void ivf::Extents::onPropertyChanged(const std::string &/*name*/)
 {}
 
 void Extents::doPreDraw()

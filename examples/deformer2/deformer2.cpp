@@ -85,7 +85,7 @@ public:
         // Create a deformable plane primitive
 
         m_deformable = DeformablePrimitive<Plane>::create();
-        m_deformable->primitive()->set(20.0, 20.0, 200.0, 200.0); // width, depth, rows, cols
+        m_deformable->primitive()->set(20.0, 20.0, 200, 200); // width, depth, rows, cols
         m_deformable->refresh();                                  // Update geometry and deformer setup
         m_deformable->setMaterial(whiteMaterial);
         m_deformable->setWireframe(false);
@@ -168,7 +168,7 @@ public:
 
     virtual void onUpdate() override
     {
-        float time = this->elapsedTime();
+        float time = static_cast<float>(this->elapsedTime());
 
         // Update all wave systems
         for (auto &wave : m_waves)
@@ -181,7 +181,7 @@ public:
         m_deformable->applyDeformers();
     }
 
-    virtual void onKey(int key, int scancode, int action, int mods) override
+    virtual void onKey(int key, int /*scancode*/, int action, int /*mods*/) override
     {
         if (key == GLFW_KEY_W && action == GLFW_PRESS)
         {}

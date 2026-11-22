@@ -73,9 +73,9 @@ void ivf::IntField::print()
 {
     cout << "---------" << endl;
     cout << "Integer field (" << this->rows() << ", " << this->cols() << ")" << endl;
-    for (auto i = 0; i < this->rows(); i++)
+    for (GLuint i = 0; i < this->rows(); i++)
     {
-        for (auto j = 0; j < this->cols(); j++)
+        for (GLuint j = 0; j < this->cols(); j++)
         {
             cout << this->at(i, j);
             if (j < this->cols() - 1)
@@ -91,7 +91,7 @@ GLuint IntField::at(GLuint row, GLuint col)
     if ((col + m_size[1] * row) < (m_size[0] * m_size[1]))
         return m_data[col + m_size[1] * row];
     else
-        return -1;
+        return static_cast<GLuint>(-1); // out of range
 }
 
 GLuint ivf::IntField::at(GLuint pos)
@@ -99,7 +99,7 @@ GLuint ivf::IntField::at(GLuint pos)
     if (pos < (m_size[0] * m_size[1]))
         return m_data[pos];
     else
-        return -1;
+        return static_cast<GLuint>(-1); // out of range
 }
 
 void IntField::set(GLuint row, GLuint col, GLuint value)

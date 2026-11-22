@@ -105,12 +105,12 @@ void solar::SolarSystem::setSunCount(int value)
 
 int SolarSystem::planetCount()
 {
-    return m_planets.size();
+    return static_cast<int>(m_planets.size());
 }
 
 int SolarSystem::sunCount()
 {
-    return m_suns.size();
+    return static_cast<int>(m_suns.size());
 }
 
 void SolarSystem::setSize(int planets, int suns)

@@ -195,18 +195,24 @@ void ivf::TransformManager::rotateDeg(float ax, float ay, float az)
 
 void ivf::TransformManager::rotateToVector(glm::vec3 v)
 {
-    float yaw = glm::degrees(atan2(v.y, v.x));
+    // Rotate the local +X axis onto v (the shortest rotation).
+    const float len = glm::length(v);
+    if (len < 1e-6f)
+        return;
 
-    // Pitch (around Y axis)
-    float lengthYZ = sqrt(v.x * v.x + v.y * v.y);
-    float pitch = glm::degrees(atan2(-v.z, lengthYZ));
+    const glm::vec3 xAxis(1.0f, 0.0f, 0.0f);
+    const glm::vec3 dir = v / len;
+    const glm::vec3 axis = glm::cross(xAxis, dir);
+    const float cosAngle = glm::clamp(glm::dot(xAxis, dir), -1.0f, 1.0f);
 
-    // Yaw (around Z axis)
-    float sin_yaw = sin(yaw);
-    float cos_yaw = cos(yaw);
-    float roll = glm::degrees(atan2(cos_yaw * v.y + sin_yaw * v.x, v.z));
+    glm::mat4 m(1.0f);
+    if (glm::length(axis) > 1e-6f)
+        m = glm::rotate(m, std::acos(cosAngle), glm::normalize(axis));
+    else if (cosAngle < 0.0f)
+        m = glm::rotate(m, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f)); // v points along -X
 
-    this->rotateDeg(0.0, -yaw, roll);
+    m_modelMatrix = m_modelMatrix * m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void ivf::TransformManager::scale(float sx, float sy, float sz)

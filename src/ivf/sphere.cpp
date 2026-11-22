@@ -44,7 +44,7 @@ void ivf::Sphere::setupProperties()
     addProperty("Slice Sweep", &m_sliceSweep, "Geometry");
 }
 
-void ivf::Sphere::onPropertyChanged(const std::string &name)
+void ivf::Sphere::onPropertyChanged(const std::string &/*name*/)
 {
     this->refresh();
 }

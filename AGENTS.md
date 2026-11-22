@@ -27,7 +27,7 @@ ctest --preset debug
 
 Everything is built under `build/<preset>/`: libraries in `lib/<Config>/`, executables plus copied runtime data (`shaders/`, `fonts/`, `assets/` from `bin/`) in `bin/<Config>/`. `-DIVF2_OUTPUT_IN_SOURCE_TREE=ON` restores the old `<source>/bin/<Config>` layout.
 
-Library targets are static, created with `ivf2_add_library()` and exported as `ivf2::<name>`; dependencies are linked per target (no global include dirs). New `.cpp`/`.h` files in `src/<lib>/` and `include/<lib>/` are picked up automatically (`CONFIGURE_DEPENDS` globs), except `src/generator`, which lists its files explicitly. Unit tests (GL-free) live in `tests/`.
+Library targets are static, created with `ivf2_add_library()` and exported as `ivf2::<name>`; dependencies are linked per target (no global include dirs). New `.cpp`/`.h` files in `src/<lib>/` and `include/<lib>/` are picked up automatically (`CONFIGURE_DEPENDS` globs), except `src/generator`, which lists its files explicitly. Unit tests (GL-free) live in `tests/`. Builds use `/W4` (MSVC) or `-Wall -Wextra -Wpedantic` (`IVF2_WARNINGS`, on for top-level builds); keep new code warning-free (unused parameters: comment out the name; narrowing: `static_cast`).
 
 ## Running Examples
 

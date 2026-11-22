@@ -90,7 +90,7 @@ void ivf::MeshNode::createFromGenerator(generator::AnyGenerator<generator::MeshV
 
         mesh()->vertex3f(GLfloat(vertex.position[0]), GLfloat(vertex.position[2]), GLfloat(vertex.position[1]));
         mesh()->normal3f(GLfloat(vertex.normal[0]), GLfloat(vertex.normal[2]), GLfloat(vertex.normal[1]));
-        mesh()->tex2f(vertex.texCoord[0], vertex.texCoord[1]);
+        mesh()->tex2f(static_cast<float>(vertex.texCoord[0]), static_cast<float>(vertex.texCoord[1]));
 
         vertices.next();
     }
@@ -147,9 +147,6 @@ void ivf::MeshNode::createFromMeshData(const MeshData &data)
 void ivf::MeshNode::debugFromGenerator(generator::AnyGenerator<generator::MeshVertex> &vertices,
                                        generator::AnyGenerator<generator::Triangle> &triangles)
 {
-    GLuint nVertices = count(vertices);
-    GLuint nTriangles = count(triangles);
-
     while (!vertices.done())
     {
         MeshVertex vertex = vertices.generate();
@@ -232,7 +229,7 @@ void ivf::MeshNode::updateNormalVisualization()
         if (!mesh->vertices() || !mesh->normals())
             continue;
 
-        for (int i = 0; i < mesh->vertices()->rows(); ++i)
+        for (GLuint i = 0; i < mesh->vertices()->rows(); ++i)
         {
             glm::vec3 vertex = mesh->vertices()->vertex(i);
             glm::vec3 normal = mesh->normals()->normal(i);
@@ -284,7 +281,7 @@ void ivf::MeshNode::updateBoundingBox()
         if (mesh && mesh->vertices())
         {
             auto vertices = mesh->vertices();
-            for (int i = 0; i < vertices->rows(); ++i)
+            for (GLuint i = 0; i < vertices->rows(); ++i)
             {
                 glm::vec3 vertex = vertices->vertex(i);
                 combinedBbox.add(vertex);

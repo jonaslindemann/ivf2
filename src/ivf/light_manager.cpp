@@ -188,9 +188,9 @@ void ivf::LightManager::setupDefaultColors()
 
 void ivf::LightManager::apply()
 {
-    ShaderManager::instance()->currentProgram()->uniformInt(m_pointLightCountId, m_pointLights.size());
-    ShaderManager::instance()->currentProgram()->uniformInt(m_directionalLightCountId, m_dirLights.size());
-    ShaderManager::instance()->currentProgram()->uniformInt(m_spotLightCountId, m_spotLights.size());
+    ShaderManager::instance()->currentProgram()->uniformInt(m_pointLightCountId, static_cast<int>(m_pointLights.size()));
+    ShaderManager::instance()->currentProgram()->uniformInt(m_directionalLightCountId, static_cast<int>(m_dirLights.size()));
+    ShaderManager::instance()->currentProgram()->uniformInt(m_spotLightCountId, static_cast<int>(m_spotLights.size()));
 
     for (auto i = 0; i < m_pointLights.size(); i++)
     {
@@ -252,11 +252,11 @@ void ivf::LightManager::apply()
     if (!shadowMapTextureUnits.empty())
     {
         // Set the array of shadow map samplers
-        ShaderManager::instance()->currentProgram()->uniformIntArray("shadowMaps", shadowMapTextureUnits.size(),
+        ShaderManager::instance()->currentProgram()->uniformIntArray("shadowMaps", static_cast<int>(shadowMapTextureUnits.size()),
                                                                      shadowMapTextureUnits.data());
 
         ShaderManager::instance()->currentProgram()->uniformMatrix4Array(
-            "lightSpaceMatrices", lightSpaceMatrices.size(), lightSpaceMatrices.data());
+            "lightSpaceMatrices", static_cast<int>(lightSpaceMatrices.size()), lightSpaceMatrices.data());
     }
 }
 
@@ -387,7 +387,7 @@ void ivf::LightManager::setDiffuseColor(glm::vec4 color)
     ShaderManager::instance()->currentProgram()->uniformVec3(m_diffuseColorId, glm::vec3(color.r, color.g, color.b));
 }
 
-void ivf::LightManager::setDiffuseColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+void ivf::LightManager::setDiffuseColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat /*alpha*/)
 {
     ShaderManager::instance()->currentProgram()->uniformVec3(m_diffuseColorId, glm::vec3(red, green, blue));
 }
@@ -402,7 +402,7 @@ void ivf::LightManager::setSpecularColor(glm::vec4 color)
     ShaderManager::instance()->currentProgram()->uniformVec3(m_specularColorId, glm::vec3(color.r, color.g, color.b));
 }
 
-void ivf::LightManager::setSpecularColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+void ivf::LightManager::setSpecularColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat /*alpha*/)
 {
     ShaderManager::instance()->currentProgram()->uniformVec3(m_specularColorId, glm::vec3(red, green, blue));
 }
@@ -417,7 +417,7 @@ void ivf::LightManager::setAmbientColor(glm::vec4 color)
     ShaderManager::instance()->currentProgram()->uniformVec3(m_ambientColorId, glm::vec3(color.r, color.g, color.b));
 }
 
-void ivf::LightManager::setAmbientColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+void ivf::LightManager::setAmbientColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat /*alpha*/)
 {
     ShaderManager::instance()->currentProgram()->uniformVec3(m_ambientColorId, glm::vec3(red, green, blue));
 }

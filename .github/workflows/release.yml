@@ -1,8 +1,9 @@
 # Release: runs when a version tag (v2.0.0, v2.0.0-alpha.2, ...) is pushed.
 #
 # Checks that the tag matches the version in CMakeLists.txt and creates a GitHub
-# release whose notes are the tag's section of CHANGELOG.md. Pre-release versions
-# (with a "-label") are marked as pre-releases. See CONTRIBUTING.md.
+# release whose notes are the tag's section of CHANGELOG.md. Releases are published
+# as normal releases (also alpha/beta versions) and become the latest release.
+# See CONTRIBUTING.md.
 
 name: Release
 
@@ -52,6 +53,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version="${{ steps.version.outputs.version }}"
-          prerelease=""
-          case "$version" in *-*) prerelease="--prerelease" ;; esac
-          gh release create "$GITHUB_REF_NAME" --title "ivf2 $version" --notes-file notes.md --verify-tag $prerelease
+          gh release create "$GITHUB_REF_NAME" --title "ivf2 $version" --notes-file notes.md --verify-tag --latest

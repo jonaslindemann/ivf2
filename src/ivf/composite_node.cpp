@@ -180,7 +180,7 @@ void CompositeNode::getTransformNodes(std::vector<std::shared_ptr<TransformNode>
     }
 }
 
-std::vector<glm::vec3> CompositeNode::getChildWorldPositions(bool includeInvisible) const
+std::vector<glm::vec3> CompositeNode::childWorldPositions(bool includeInvisible) const
 {
     std::vector<glm::vec3> positions;
     std::vector<std::shared_ptr<TransformNode>> transformNodes;

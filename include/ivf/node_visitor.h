@@ -86,13 +86,15 @@ public:
      * @brief Get a const reference to the internal map.
      * @return Const reference to the NodeMap.
      */
-    const NodeMap &getMap() const;
+    const NodeMap &map() const;
+    [[deprecated("Use map() instead")]] const NodeMap &getMap() const { return map(); }
 
     /**
      * @brief Get a copy of the internal map.
      * @return A copy of the NodeMap.
      */
-    NodeMap getMapCopy() const;
+    NodeMap mapCopy() const;
+    [[deprecated("Use mapCopy() instead")]] NodeMap getMapCopy() const { return mapCopy(); }
 };
 
 } // namespace ivf

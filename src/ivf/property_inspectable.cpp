@@ -13,12 +13,12 @@ Property::Property(const std::string &n, PropertyValue v, double min, double max
 {}
 
 // PropertyInspectable implementations
-const std::vector<Property> &PropertyInspectable::getProperties() const
+const std::vector<Property> &PropertyInspectable::properties() const
 {
     return m_properties;
 }
 
-const std::vector<Property> &PropertyInspectable::getProperties()
+const std::vector<Property> &PropertyInspectable::properties()
 {
     if (m_properties.empty())
     {
@@ -27,7 +27,7 @@ const std::vector<Property> &PropertyInspectable::getProperties()
     return m_properties;
 }
 
-std::vector<Property> PropertyInspectable::getPropertiesByCategory(const std::string &category) const
+std::vector<Property> PropertyInspectable::propertiesByCategory(const std::string &category) const
 {
     std::vector<Property> result;
     for (const auto &prop : m_properties)
@@ -40,7 +40,7 @@ std::vector<Property> PropertyInspectable::getPropertiesByCategory(const std::st
     return result;
 }
 
-std::vector<std::string> PropertyInspectable::getCategories() const
+std::vector<std::string> PropertyInspectable::categories() const
 {
     std::vector<std::string> categories;
     for (const auto &prop : m_properties)
@@ -197,7 +197,7 @@ void PropertyInspectable::notifyPropertyChanged(const std::string &propertyName)
 }
 
 // PropertyEditor implementations
-std::string PropertyEditor::getValueAsString(const Property &prop)
+std::string PropertyEditor::valueAsString(const Property &prop)
 {
     return std::visit(
         [](auto &&arg) -> std::string {
@@ -320,7 +320,7 @@ bool PropertyEditor::setValueFromString(const Property &prop, const std::string 
     }
 }
 
-std::string PropertyEditor::getPropertyType(const Property &prop)
+std::string PropertyEditor::propertyType(const Property &prop)
 {
     return std::visit(
         [](auto &&arg) -> std::string {
@@ -373,9 +373,9 @@ std::string PropertyEditor::getPropertyType(const Property &prop)
         prop.value);
 }
 
-std::string PropertyEditor::getComponentName(const Property &prop, int component)
+std::string PropertyEditor::componentName(const Property &prop, int component)
 {
-    std::string type = getPropertyType(prop);
+    std::string type = propertyType(prop);
     if (type == "vec3" || type == "vec4" || type == "uvec3" || type == "uvec4")
     {
         const char *components[] = {"X", "Y", "Z", "W"};
@@ -387,7 +387,7 @@ std::string PropertyEditor::getComponentName(const Property &prop, int component
     return prop.name;
 }
 
-float PropertyEditor::getComponentValue(const Property &prop, int component)
+float PropertyEditor::componentValue(const Property &prop, int component)
 {
     return std::visit(
         [component](auto &&arg) -> float {

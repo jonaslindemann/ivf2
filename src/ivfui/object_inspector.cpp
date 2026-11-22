@@ -28,7 +28,7 @@ void ObjectInspector::setObject(std::shared_ptr<ivf::PropertyInspectable> object
         m_currentObject->initializeProperties();
 
         // Auto-expand all categories initially
-        auto categories = m_currentObject->getCategories();
+        auto categories = m_currentObject->categories();
         for (const auto &category : categories)
         {
             setCategoryExpanded(category, true);
@@ -48,7 +48,7 @@ bool ObjectInspector::hasObject() const
     return m_currentObject != nullptr;
 }
 
-std::shared_ptr<ivf::PropertyInspectable> ObjectInspector::getCurrentObject() const
+std::shared_ptr<ivf::PropertyInspectable> ObjectInspector::currentObject() const
 {
     return m_currentObject;
 }
@@ -82,7 +82,7 @@ void ObjectInspector::doDraw()
             {
                 m_currentObject->refreshProperties();
                 // Re-expand categories
-                auto categories = m_currentObject->getCategories();
+                auto categories = m_currentObject->categories();
                 for (const auto &category : categories)
                 {
                     setCategoryExpanded(category, true);
@@ -94,8 +94,8 @@ void ObjectInspector::doDraw()
     }
 
     // Get properties and categories
-    const auto &properties = m_currentObject->getProperties();
-    auto categories = m_currentObject->getCategories();
+    const auto &properties = m_currentObject->properties();
+    auto categories = m_currentObject->categories();
 
     if (properties.empty())
     {
@@ -114,12 +114,12 @@ void ObjectInspector::doDraw()
             setCategoryExpanded(category, true);
 
             // Get properties for this category
-            auto categoryProps = m_currentObject->getPropertiesByCategory(category);
+            auto categoryProps = m_currentObject->propertiesByCategory(category);
 
             // Draw each property in the category
             for (const auto &prop : categoryProps)
             {
-                ImGui::PushID(getPropertyId(prop).c_str());
+                ImGui::PushID(propertyId(prop).c_str());
                 drawProperty(prop);
                 ImGui::PopID();
             }
@@ -140,7 +140,7 @@ void ObjectInspector::doUpdate()
 
 void ObjectInspector::drawProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
 
     // Skip read-only properties if not showing advanced
     if (prop.readOnly && !m_showAdvanced)
@@ -194,7 +194,7 @@ void ObjectInspector::drawProperty(const ivf::Property &prop)
 
 void ObjectInspector::drawVectorProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
     int componentCount = (type == "vec3" || type == "uvec3") ? 3 : 4;
     bool isUnsigned = (type == "uvec3" || type == "uvec4");
 
@@ -209,7 +209,7 @@ void ObjectInspector::drawVectorProperty(const ivf::Property &prop)
 
     for (int i = 0; i < componentCount; ++i)
     {
-        float value = ivf::PropertyEditor::getComponentValue(prop, i);
+        float value = ivf::PropertyEditor::componentValue(prop, i);
         float oldValue = value;
 
         std::string componentId = std::string("##") + prop.name + "_" + componentLabels[i];
@@ -284,7 +284,7 @@ void ObjectInspector::drawVectorProperty(const ivf::Property &prop)
 
 void ObjectInspector::drawScalarProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
 
     if (type == "double" || type == "float")
     {
@@ -530,7 +530,7 @@ void ObjectInspector::notifyPropertyChanged(const std::string &propertyName)
     }
 }
 
-std::string ObjectInspector::getPropertyId(const ivf::Property &prop) const
+std::string ObjectInspector::propertyId(const ivf::Property &prop) const
 {
     return prop.name + "_" + prop.category;
 }

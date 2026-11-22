@@ -825,7 +825,7 @@ void PlacementMixin::applyCursorPlaneLocking()
     }
 }
 
-void PlacementMixin::getRayFromScreen(double screenX, double screenY, glm::vec3 &rayOrigin, glm::vec3 &rayDirection)
+void PlacementMixin::rayFromScreen(double screenX, double screenY, glm::vec3 &rayOrigin, glm::vec3 &rayDirection)
 {
     // Convert screen coordinates to normalized device coordinates (NDC)
     float x = (2.0f * static_cast<float>(screenX)) / m_viewportWidth - 1.0f;
@@ -864,7 +864,7 @@ glm::vec3 PlacementMixin::calculatePerpendicularMovement()
     glfwGetCursorPos(m_window->ref(), &mouseX, &mouseY);
 
     glm::vec3 rayOrigin, rayDirection;
-    getRayFromScreen(mouseX, mouseY, rayOrigin, rayDirection);
+    rayFromScreen(mouseX, mouseY, rayOrigin, rayDirection);
 
     // Calculate perpendicular line based on current plane
     PlacementPlane plane = currentPlane();
@@ -900,7 +900,7 @@ glm::vec3 PlacementMixin::calculatePerpendicularMovementFromMouse()
 
     // Get current mouse ray
     glm::vec3 rayOrigin, rayDirection;
-    getRayFromScreen(mouseX, mouseY, rayOrigin, rayDirection);
+    rayFromScreen(mouseX, mouseY, rayOrigin, rayDirection);
 
     // Get the current placement plane and its properties
     PlacementPlane plane = currentPlane();
@@ -1085,7 +1085,7 @@ void PlacementMixin::setPlaneLocked(bool locked)
             break;
         }
 
-        ivf::logDebug(ivf::logStr("Plane constraint ENABLED - cursor constrained to ", getPlaneDescription(), " at offset ", m_planeConstraintOffset), "PlacementMixin");
+        ivf::logDebug(ivf::logStr("Plane constraint ENABLED - cursor constrained to ", planeDescription(), " at offset ", m_planeConstraintOffset), "PlacementMixin");
     }
     else
     {
@@ -1113,7 +1113,7 @@ float PlacementMixin::planeConstraintOffset() const
     return m_planeConstraintOffset;
 }
 
-std::string PlacementMixin::getPlaneDescription() const
+std::string PlacementMixin::planeDescription() const
 {
     PlacementPlane plane = currentPlane();
     switch (plane)

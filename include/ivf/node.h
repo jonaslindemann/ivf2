@@ -125,7 +125,8 @@ public:
      * @param index Texture index.
      * @return std::shared_ptr<Texture> Texture pointer or nullptr.
      */
-    [[nodiscard]] std::shared_ptr<Texture> getTexture(size_t index);
+    [[nodiscard]] std::shared_ptr<Texture> texture(size_t index);
+    [[deprecated("Use texture() instead")]] std::shared_ptr<Texture> getTexture(size_t index) { return texture(index); }
     
     /**
      * @brief Get the number of active textures.

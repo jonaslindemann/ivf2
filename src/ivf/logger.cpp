@@ -94,7 +94,7 @@ std::string Logger::levelToString(LogLevel level) const {
     } 
 }
 
-std::string Logger::getTimestamp() const { 
+std::string Logger::timestamp() const { 
     auto now = std::chrono::system_clock::now(); 
     auto timeT = std::chrono::system_clock::to_time_t(now); 
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000; 
@@ -143,8 +143,8 @@ std::string Logger::formatMessage(LogLevel level, const std::string &message, co
     std::string prefix;
     if (m_showTimestamp)
     {
-        const std::string timestamp = getTimestamp();
-        prefix += fitColumn(timestamp, std::max(m_timestampWidth, static_cast<int>(timestamp.size()))) + ' ';
+        const std::string stamp = timestamp();
+        prefix += fitColumn(stamp, std::max(m_timestampWidth, static_cast<int>(stamp.size()))) + ' ';
     }
     prefix += fitColumn(levelToString(level), m_levelWidth) + ' ';
     if (m_showContext)

@@ -131,11 +131,11 @@ private:
     glm::vec3 snapToGrid(const glm::vec3& position);
     
     // Helper methods
-    glm::vec3 getPlaneNormal() const;
-    glm::vec3 getPlaneOrigin() const;
+    glm::vec3 planeNormal() const;
+    glm::vec3 planeOrigin() const;
     
     // Ray casting for intersection
-    void getRayFromScreen(double screenX, double screenY, glm::vec3& rayOrigin, glm::vec3& rayDirection);
+    void rayFromScreen(double screenX, double screenY, glm::vec3& rayOrigin, glm::vec3& rayDirection);
 };
 
 using PlacementManipulatorPtr = std::shared_ptr<PlacementManipulator>;

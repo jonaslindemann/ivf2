@@ -63,7 +63,7 @@ bool KeyframeAnimation::isPlaying() const
     return m_playing;
 }
 
-float KeyframeAnimation::getCurrentTime() const
+float KeyframeAnimation::currentTime() const
 {
     return m_currentTime;
 }

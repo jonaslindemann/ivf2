@@ -173,14 +173,14 @@ private:
      * @param node Node to get name for.
      * @return std::string Display name for the node.
      */
-    std::string getNodeDisplayName(std::shared_ptr<ivf::Node> node) const;
+    std::string nodeDisplayName(std::shared_ptr<ivf::Node> node) const;
 
     /**
      * @brief Get the type name of a node.
      * @param node Node to get type for.
      * @return std::string Type name of the node.
      */
-    std::string getNodeTypeName(std::shared_ptr<ivf::Node> node) const;
+    std::string nodeTypeName(std::shared_ptr<ivf::Node> node) const;
 
     /**
      * @brief Check if a node has children.
@@ -194,7 +194,7 @@ private:
      * @param node Node to get children for.
      * @return std::vector<std::shared_ptr<ivf::Node>> Vector of child nodes.
      */
-    std::vector<std::shared_ptr<ivf::Node>> getNodeChildren(std::shared_ptr<ivf::Node> node) const;
+    std::vector<std::shared_ptr<ivf::Node>> nodeChildren(std::shared_ptr<ivf::Node> node) const;
 
     /**
      * @brief Draw the inspector options/settings.
@@ -255,7 +255,7 @@ private:
      * @param prop Property to generate ID for.
      * @return std::string Unique ImGui ID.
      */
-    std::string getPropertyId(const ivf::Property &prop) const;
+    std::string propertyId(const ivf::Property &prop) const;
 };
 
 /**

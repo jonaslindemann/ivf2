@@ -166,7 +166,7 @@ void EffectInspector::doDraw()
         ImGui::Spacing();
         if (m_selectedEffect)
         {
-            ImGui::Text("Selected: %s", getEffectDisplayName(m_selectedEffect, -1).c_str());
+            ImGui::Text("Selected: %s", effectDisplayName(m_selectedEffect, -1).c_str());
         }
         else
         {
@@ -228,7 +228,7 @@ bool EffectInspector::drawEffectItem(std::shared_ptr<ivf::Effect> effect, int in
     if (!effect)
         return false;
 
-    std::string displayName = getEffectDisplayName(effect, index);
+    std::string displayName = effectDisplayName(effect, index);
     bool isEnabled = m_effectProvider->isEffectEnabled(index);
     bool isSelected = (effect == m_selectedEffect);
 
@@ -304,7 +304,7 @@ bool EffectInspector::drawEffectItem(std::shared_ptr<ivf::Effect> effect, int in
     return itemClicked;
 }
 
-std::string EffectInspector::getEffectDisplayName(std::shared_ptr<ivf::Effect> effect, int /*index*/) const
+std::string EffectInspector::effectDisplayName(std::shared_ptr<ivf::Effect> effect, int /*index*/) const
 {
     if (!effect)
         return "null";
@@ -339,7 +339,7 @@ void EffectInspector::drawPropertiesPanel()
     }
 
     // Effect header
-    ImGui::Text("Effect: %s", getEffectDisplayName(m_selectedEffect, -1).c_str());
+    ImGui::Text("Effect: %s", effectDisplayName(m_selectedEffect, -1).c_str());
     ImGui::Separator();
 
     // Check if the effect implements PropertyInspectable
@@ -354,7 +354,7 @@ void EffectInspector::drawPropertiesPanel()
     inspectable->initializeProperties();
 
     // Get all properties
-    const auto &properties = inspectable->getProperties();
+    const auto &properties = inspectable->properties();
 
     if (properties.empty())
     {
@@ -365,7 +365,7 @@ void EffectInspector::drawPropertiesPanel()
     // Draw all properties directly without categories
     for (const auto &prop : properties)
     {
-        ImGui::PushID(getPropertyId(prop).c_str());
+        ImGui::PushID(propertyId(prop).c_str());
         drawProperty(prop);
         ImGui::PopID();
     }
@@ -373,7 +373,7 @@ void EffectInspector::drawPropertiesPanel()
 
 void EffectInspector::drawProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
 
     // Skip read-only properties if not showing advanced
     if (prop.readOnly && !m_showAdvancedProperties)
@@ -427,7 +427,7 @@ void EffectInspector::drawProperty(const ivf::Property &prop)
 
 void EffectInspector::drawVectorProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
     int componentCount = (type == "vec3" || type == "uvec3") ? 3 : 4;
     bool isUnsigned = (type == "uvec3" || type == "uvec4");
 
@@ -442,7 +442,7 @@ void EffectInspector::drawVectorProperty(const ivf::Property &prop)
 
     for (int i = 0; i < componentCount; ++i)
     {
-        float value = ivf::PropertyEditor::getComponentValue(prop, i);
+        float value = ivf::PropertyEditor::componentValue(prop, i);
         float oldValue = value;
 
         std::string componentId = std::string("##") + prop.name + "_" + componentLabels[i];
@@ -522,7 +522,7 @@ void EffectInspector::drawVectorProperty(const ivf::Property &prop)
 
 void EffectInspector::drawScalarProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
 
     if (type == "double" || type == "float")
     {
@@ -787,7 +787,7 @@ void EffectInspector::setCategoryExpanded(const std::string &/*category*/, bool 
     // No-op to maintain compatibility
 }
 
-std::string EffectInspector::getPropertyId(const ivf::Property &prop) const
+std::string EffectInspector::propertyId(const ivf::Property &prop) const
 {
     // Simplified since we no longer need category in the ID
     return prop.name;

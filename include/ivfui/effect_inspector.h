@@ -235,7 +235,7 @@ private:
      * @param index Index of the effect in the list.
      * @return std::string Display name for the effect.
      */
-    std::string getEffectDisplayName(std::shared_ptr<ivf::Effect> effect, int index) const;
+    std::string effectDisplayName(std::shared_ptr<ivf::Effect> effect, int index) const;
 
     /**
      * @brief Draw the inspector options/settings.
@@ -296,7 +296,7 @@ private:
      * @param prop Property to generate ID for.
      * @return std::string Unique ImGui ID.
      */
-    std::string getPropertyId(const ivf::Property &prop) const;
+    std::string propertyId(const ivf::Property &prop) const;
 
     /**
      * @brief Get the number of effects from the provider.

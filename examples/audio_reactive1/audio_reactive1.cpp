@@ -147,8 +147,8 @@ public:
         if (m_source == Source::None) return;
 
         auto audio = AudioManager::instance();
-        auto bands = audio->getFFT(m_bandCount);
-        float amp  = audio->getAmplitude();
+        auto bands = audio->fft(m_bandCount);
+        float amp  = audio->amplitude();
 
         // Attack/release smoothing — bars jump up fast, fall slowly
         // This gives a musical "ballistic" feel rather than uniform smoothing

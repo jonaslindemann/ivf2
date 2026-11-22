@@ -123,7 +123,7 @@ void ivf::Node::clearTextures()
     m_useTexture = false;
 }
 
-std::shared_ptr<Texture> ivf::Node::getTexture(size_t index)
+std::shared_ptr<Texture> ivf::Node::texture(size_t index)
 {
     if (index < m_textures.size()) {
         return m_textures[index];

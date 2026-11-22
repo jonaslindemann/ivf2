@@ -186,13 +186,12 @@ private:
 
     // Plane locking helpers
     void applyCursorPlaneLocking();
-    std::string getPlaneDescription() const;
+    std::string planeDescription() const;
     void setCursorWorldPosition(const glm::vec3& position);
     void updatePlacementManipulatorPosition(const glm::vec3& position);
     glm::vec3 calculatePerpendicularMovement();
     glm::vec3 calculatePerpendicularMovementFromMouse();
-    PlacementPlane getBestPerpendicularPlane(const glm::vec3& cameraDirection);
-    void getRayFromScreen(double screenX, double screenY, glm::vec3& rayOrigin, glm::vec3& rayDirection);
+    void rayFromScreen(double screenX, double screenY, glm::vec3& rayOrigin, glm::vec3& rayDirection);
     void createPerpendicularPlane(PlacementPlane plane, glm::vec3& planePoint, glm::vec3& planeNormal);
     glm::vec3 rayPlaneIntersection(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, 
                                    const glm::vec3& planePoint, const glm::vec3& planeNormal);

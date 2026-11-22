@@ -90,12 +90,12 @@ void KeyframeInterpolator::setInterpolationType(InterpolationType type)
     m_interpolationType = type;
 }
 
-float KeyframeInterpolator::getDuration() const
+float KeyframeInterpolator::duration() const
 {
     return m_duration;
 }
 
-const std::string &KeyframeInterpolator::getName() const
+const std::string &KeyframeInterpolator::name() const
 {
     return m_name;
 }
@@ -113,7 +113,7 @@ void KeyframeInterpolator::setKeyframeTension(size_t index, float tension)
     }
 }
 
-float KeyframeInterpolator::getKeyframeTension(size_t index) const
+float KeyframeInterpolator::keyframeTension(size_t index) const
 {
     if (index < m_keyframes.size())
     {
@@ -159,7 +159,7 @@ KeyframeData KeyframeInterpolator::interpolate(float time) const
 
     if (m_interpolationType == InterpolationType::CatmullRom)
     {
-        auto [p0, p1, p2, p3] = getSplinePoints(prevIndex, time);
+        auto [p0, p1, p2, p3] = splinePoints(prevIndex, time);
 
         // Get tensions from the two keyframes being interpolated between
         float tension1 = m_keyframes[prevIndex].tension;
@@ -187,7 +187,7 @@ KeyframeData KeyframeInterpolator::interpolate(float time) const
 }
 
 // Also modify getSplinePoints to use the correct points for the Catmull-Rom spline:
-std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3> KeyframeInterpolator::getSplinePoints(size_t currentIndex,
+std::tuple<glm::vec3, glm::vec3, glm::vec3, glm::vec3> KeyframeInterpolator::splinePoints(size_t currentIndex,
                                                                                              float /*time*/) const
 {
     const size_t numKeyframes = m_keyframes.size();

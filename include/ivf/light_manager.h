@@ -102,21 +102,24 @@ public:
      * @param idx Index of the point light.
      * @return PointLightPtr Shared pointer to the point light.
      */
-    PointLightPtr getPointLight(int idx);
+    PointLightPtr pointLight(int idx);
+    [[deprecated("Use pointLight() instead")]] PointLightPtr getPointLight(int idx) { return pointLight(idx); }
 
     /**
      * @brief Get a directional light by index.
      * @param idx Index of the directional light.
      * @return DirectionalLightPtr Shared pointer to the directional light.
      */
-    DirectionalLightPtr getDirectionalLight(int idx);
+    DirectionalLightPtr directionalLight(int idx);
+    [[deprecated("Use directionalLight() instead")]] DirectionalLightPtr getDirectionalLight(int idx) { return directionalLight(idx); }
 
     /**
      * @brief Get a spot light by index.
      * @param idx Index of the spot light.
      * @return SpotLightPtr Shared pointer to the spot light.
      */
-    SpotLightPtr getSpotLight(int idx);
+    SpotLightPtr spotLight(int idx);
+    [[deprecated("Use spotLight() instead")]] SpotLightPtr getSpotLight(int idx) { return spotLight(idx); }
 
     /**
      * @brief Get the number of point lights in the scene.

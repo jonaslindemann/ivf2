@@ -115,7 +115,8 @@ public:
      * @param includeInvisible Whether to include invisible nodes.
      * @return std::vector<glm::vec3> Vector of world positions.
      */
-    [[nodiscard]] std::vector<glm::vec3> getChildWorldPositions(bool includeInvisible = false) const;
+    [[nodiscard]] std::vector<glm::vec3> childWorldPositions(bool includeInvisible = false) const;
+    [[deprecated("Use childWorldPositions() instead")]] std::vector<glm::vec3> getChildWorldPositions(bool includeInvisible = false) const { return childWorldPositions(includeInvisible); }
 
     /**
      * @brief Get the world-space bounding box of this composite node, including all children.

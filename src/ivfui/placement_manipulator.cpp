@@ -176,7 +176,7 @@ glm::vec3 PlacementManipulator::screenToWorld(double screenX, double screenY)
 {
     // Get ray from camera through screen point
     glm::vec3 rayOrigin, rayDirection;
-    getRayFromScreen(screenX, screenY, rayOrigin, rayDirection);
+    rayFromScreen(screenX, screenY, rayOrigin, rayDirection);
     
     // Project ray onto current placement plane
     return projectToPlane(rayOrigin, rayDirection);
@@ -184,21 +184,21 @@ glm::vec3 PlacementManipulator::screenToWorld(double screenX, double screenY)
 
 glm::vec3 PlacementManipulator::projectToPlane(const glm::vec3& rayOrigin, const glm::vec3& rayDirection)
 {
-    glm::vec3 planeNormal = getPlaneNormal();
-    glm::vec3 planeOrigin = getPlaneOrigin();
+    const glm::vec3 normal = planeNormal();
+    const glm::vec3 origin = planeOrigin();
     
     // Calculate intersection with plane
     // Ray: P = rayOrigin + t * rayDirection
-    // Plane: dot(P - planeOrigin, planeNormal) = 0
-    // Solving: t = dot(planeOrigin - rayOrigin, planeNormal) / dot(rayDirection, planeNormal)
+    // Plane: dot(P - origin, normal) = 0
+    // Solving: t = dot(origin - rayOrigin, normal) / dot(rayDirection, normal)
     
-    float denominator = glm::dot(rayDirection, planeNormal);
+    float denominator = glm::dot(rayDirection, normal);
     if (std::abs(denominator) < 1e-6f) {
         // Ray is parallel to plane, return a default position
-        return planeOrigin;
+        return origin;
     }
     
-    float t = glm::dot(planeOrigin - rayOrigin, planeNormal) / denominator;
+    float t = glm::dot(origin - rayOrigin, normal) / denominator;
     return rayOrigin + t * rayDirection;
 }
 
@@ -216,7 +216,7 @@ glm::vec3 PlacementManipulator::snapToGrid(const glm::vec3& position)
     return snapped;
 }
 
-glm::vec3 PlacementManipulator::getPlaneNormal() const
+glm::vec3 PlacementManipulator::planeNormal() const
 {
     switch (m_currentPlane) {
         case PlacementPlane::XZ:
@@ -230,7 +230,7 @@ glm::vec3 PlacementManipulator::getPlaneNormal() const
     }
 }
 
-glm::vec3 PlacementManipulator::getPlaneOrigin() const
+glm::vec3 PlacementManipulator::planeOrigin() const
 {
     switch (m_currentPlane) {
         case PlacementPlane::XZ:
@@ -244,7 +244,7 @@ glm::vec3 PlacementManipulator::getPlaneOrigin() const
     }
 }
 
-void PlacementManipulator::getRayFromScreen(double screenX, double screenY, glm::vec3& rayOrigin, glm::vec3& rayDirection)
+void PlacementManipulator::rayFromScreen(double screenX, double screenY, glm::vec3& rayOrigin, glm::vec3& rayDirection)
 {
     // Convert screen coordinates to normalized device coordinates (NDC)
     float x = (2.0f * static_cast<float>(screenX)) / m_viewportWidth - 1.0f;

@@ -23,11 +23,11 @@
  * audio->startCapture();
  * // in onUpdate():
  * AudioManager::instance()->update();
- * float amp = AudioManager::instance()->getAmplitude();
- * auto fft = AudioManager::instance()->getFFT(16);
+ * float amp = AudioManager::instance()->amplitude();
+ * auto fft = AudioManager::instance()->fft(16);
  *
  * // Music with transport control (e.g. a scene driven by the song);
- * // getAmplitude() / getFFT() then react to the music:
+ * // amplitude() / fft() then react to the music:
  * audio->startMusic("music/song.mp3", false);
  * audio->seekMusic(42.0);
  * double t = audio->musicPosition();
@@ -166,7 +166,7 @@ public:
      *
      * There is one music stream. It is played through its own playback device,
      * whose callback both outputs audio to the speakers and feeds mono samples
-     * into the analysis ring-buffer, so getAmplitude() / getFFT() react to the
+     * into the analysis ring-buffer, so amplitude() / fft() react to the
      * music. Unlike loadSound(), the stream offers a sample-accurate position,
      * seeking, pausing and an end-of-file state, which makes it suitable as the
      * master clock of a music-driven scene (see ivfmusic::SongTransport).
@@ -231,7 +231,7 @@ public:
     /**
      * @brief Set the output volume of the music.
      *
-     * Only affects what is heard; analysis (getAmplitude(), getFFT()) uses the
+     * Only affects what is heard; analysis (amplitude(), fft()) uses the
      * unscaled signal. The volume is kept when a new file is started.
      * @param volume Volume in [0, 1].
      */
@@ -294,7 +294,8 @@ public:
      * @brief Get the RMS amplitude of the most-recent capture window.
      * @return Amplitude in [0, 1].
      */
-    float getAmplitude();
+    float amplitude();
+    [[deprecated("Use amplitude() instead")]] float getAmplitude() { return amplitude(); }
 
     /**
      * @brief Compute a frequency spectrum of the most recent analysis samples.
@@ -308,7 +309,8 @@ public:
      * @param bands Number of frequency bands (1–64).
      * @return Vector of @p bands magnitudes.
      */
-    std::vector<float> getFFT(int bands = 32);
+    std::vector<float> fft(int bands = 32);
+    [[deprecated("Use fft() instead")]] std::vector<float> getFFT(int bands = 32) { return fft(bands); }
 
     /**
      * @brief Per-frame update. Call once per frame from your window's onUpdate().

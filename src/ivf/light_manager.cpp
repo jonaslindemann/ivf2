@@ -68,7 +68,7 @@ SpotLightPtr ivf::LightManager::addSpotLight()
     return spotLight;
 }
 
-PointLightPtr ivf::LightManager::getPointLight(int idx)
+PointLightPtr ivf::LightManager::pointLight(int idx)
 {
     if ((idx >= 0) && (static_cast<size_t>(idx) < m_pointLights.size()))
         return m_pointLights[idx];
@@ -76,7 +76,7 @@ PointLightPtr ivf::LightManager::getPointLight(int idx)
         return nullptr;
 }
 
-DirectionalLightPtr ivf::LightManager::getDirectionalLight(int idx)
+DirectionalLightPtr ivf::LightManager::directionalLight(int idx)
 {
     if ((idx >= 0) && (static_cast<size_t>(idx) < m_dirLights.size()))
         return m_dirLights[idx];
@@ -84,7 +84,7 @@ DirectionalLightPtr ivf::LightManager::getDirectionalLight(int idx)
         return nullptr;
 }
 
-SpotLightPtr ivf::LightManager::getSpotLight(int idx)
+SpotLightPtr ivf::LightManager::spotLight(int idx)
 {
     if ((idx >= 0) && (static_cast<size_t>(idx) < m_spotLights.size()))
         return m_spotLights[idx];

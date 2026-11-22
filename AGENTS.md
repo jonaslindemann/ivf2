@@ -81,6 +81,7 @@ Global state is managed via singleton managers, accessed through static `instanc
 ### Key Patterns
 
 - **Factory methods**: All major classes use `ClassName::create(...)` returning `std::shared_ptr<ClassName>`. Never use raw `new`.
+- **Naming**: getters are named after the property and are `const` where they only read (`texture()`, `material() const`), setters `setX()`; a `get` prefix only for functions that return through reference parameters (`getColor(r, g, b, a)`). Factories are `[[nodiscard]]`; strings are passed as `const std::string &` or `std::string_view`. Renamed APIs keep a `[[deprecated]]` alias.
 - **Smart pointers**: `std::shared_ptr` throughout. Type aliases follow the pattern `using NodePtr = std::shared_ptr<Node>`.
 - **Property inspection**: `PropertyInspectable` interface enables runtime editor integration.
 - **Visitor pattern**: `NodeVisitor` for scene traversal.

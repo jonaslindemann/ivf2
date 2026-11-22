@@ -182,9 +182,14 @@ Goal: make the library trustworthy to depend on.
    virtual destructors in `PropertyInspectable`, `UiMenuItem`, `UiMenu`, `NodeVisitor`, and
    property pointers that dangled after copying/moving a `PropertyInspectable`), and CI builds
    with `IVF2_WARNINGS_AS_ERRORS=ON` on all platforms.
-   *Remaining:* const-correct getters (`material() const`); `const std::string&` instead of
-   `const std::string` by value (~98 parameters, none virtual); consistent naming (~40 `get*`
-   methods -> `x()`, deprecated aliases); `[[nodiscard]]` on the 159 `create()` factories.
+   *Done (API):* `[[nodiscard]]` on 173 `create()` factories; 78 `const std::string` by-value
+   parameters are `const std::string &`; 101 simple getters are `const`; 21 public `get*`
+   methods renamed (`getTexture(i)` -> `texture(i)`, `getAmplitude()` -> `amplitude()`, ...)
+   with `[[deprecated]]` aliases. Kept on purpose: functions returning through reference
+   parameters (`getColor(r, g, b, a)`), lazily-creating accessors (non-const).
+   *Next major:* virtual `get*` functions (`Deformer::getOutput`, `ProceduralTexture::getPixel`,
+   `getEffect`/`getEffectCount`) - renaming them would silently break user overrides; remove the
+   deprecated aliases.
 8. **Visual regression tests.** Headless rendering (hidden GLFW window, or EGL on CI)
    rendering each example scene to an FBO and comparing with golden images within a
    tolerance. *Groundwork done:* `IVF2_HIDE_WINDOWS` + `IVF2_EXIT_AFTER_FRAMES` +

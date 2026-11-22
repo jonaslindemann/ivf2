@@ -69,7 +69,7 @@ private:
     int m_nextSinkId{1};
 
     std::string levelToString(LogLevel level) const;
-    std::string getTimestamp() const;
+    std::string timestamp() const;
     void writeLog(LogLevel level, const std::string &message, const std::string &context = "");
 
 public:

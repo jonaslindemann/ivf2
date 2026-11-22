@@ -176,7 +176,7 @@ void SceneInspector::doDraw()
         ImGui::Spacing();
         if (m_selectedNode)
         {
-            ImGui::Text("Selected: %s", getNodeDisplayName(m_selectedNode).c_str());
+            ImGui::Text("Selected: %s", nodeDisplayName(m_selectedNode).c_str());
         }
         else
         {
@@ -218,7 +218,7 @@ void SceneInspector::drawNodeTree(std::shared_ptr<ivf::Node> node, bool isRoot)
         if (isRoot)
             flags |= ImGuiTreeNodeFlags_DefaultOpen;
 
-        std::string displayName = getNodeDisplayName(node);
+        std::string displayName = nodeDisplayName(node);
         nodeOpened = ImGui::TreeNodeEx(node.get(), flags, "%s", displayName.c_str());
 
         // Handle selection
@@ -235,7 +235,7 @@ void SceneInspector::drawNodeTree(std::shared_ptr<ivf::Node> node, bool isRoot)
         if (node == m_selectedNode)
             flags |= ImGuiTreeNodeFlags_Selected;
 
-        std::string displayName = getNodeDisplayName(node);
+        std::string displayName = nodeDisplayName(node);
         ImGui::TreeNodeEx(node.get(), flags, "%s", displayName.c_str()); // leaf: nothing to pop
 
         // Handle selection
@@ -270,7 +270,7 @@ void SceneInspector::drawNodeTree(std::shared_ptr<ivf::Node> node, bool isRoot)
     {
         m_treeDepth++;
 
-        auto children = getNodeChildren(node);
+        auto children = nodeChildren(node);
         for (auto child : children)
         {
             drawNodeTree(child, false);
@@ -283,7 +283,7 @@ void SceneInspector::drawNodeTree(std::shared_ptr<ivf::Node> node, bool isRoot)
 
 bool SceneInspector::drawNodeItem(std::shared_ptr<ivf::Node> node, bool hasChildren, bool isRoot)
 {
-    std::string displayName = getNodeDisplayName(node);
+    std::string displayName = nodeDisplayName(node);
 
     ImGuiTreeNodeFlags flags = 0;
 
@@ -308,7 +308,7 @@ bool SceneInspector::drawNodeItem(std::shared_ptr<ivf::Node> node, bool hasChild
     return nodeOpen;
 }
 
-std::string SceneInspector::getNodeDisplayName(std::shared_ptr<ivf::Node> node) const
+std::string SceneInspector::nodeDisplayName(std::shared_ptr<ivf::Node> node) const
 {
     if (!node)
         return "null";
@@ -322,7 +322,7 @@ std::string SceneInspector::getNodeDisplayName(std::shared_ptr<ivf::Node> node) 
     // Add type information if enabled
     if (m_showNodeTypes)
     {
-        std::string typeName = getNodeTypeName(node);
+        std::string typeName = nodeTypeName(node);
         displayName += " (" + typeName + ")";
     }
 
@@ -339,7 +339,7 @@ std::string SceneInspector::getNodeDisplayName(std::shared_ptr<ivf::Node> node) 
     return displayName;
 }
 
-std::string SceneInspector::getNodeTypeName(std::shared_ptr<ivf::Node> node) const
+std::string SceneInspector::nodeTypeName(std::shared_ptr<ivf::Node> node) const
 {
     if (!node)
         return "Unknown";
@@ -370,7 +370,7 @@ bool SceneInspector::nodeHasChildren(std::shared_ptr<ivf::Node> node) const
     return false;
 }
 
-std::vector<std::shared_ptr<ivf::Node>> SceneInspector::getNodeChildren(std::shared_ptr<ivf::Node> node) const
+std::vector<std::shared_ptr<ivf::Node>> SceneInspector::nodeChildren(std::shared_ptr<ivf::Node> node) const
 {
     std::vector<std::shared_ptr<ivf::Node>> children;
 
@@ -413,7 +413,7 @@ void SceneInspector::drawPropertiesPanel()
     }
 
     // Node header
-    ImGui::Text("Node: %s", getNodeDisplayName(m_selectedNode).c_str());
+    ImGui::Text("Node: %s", nodeDisplayName(m_selectedNode).c_str());
     ImGui::Separator();
 
     // Check if the node implements PropertyInspectable
@@ -428,8 +428,8 @@ void SceneInspector::drawPropertiesPanel()
     inspectable->initializeProperties();
 
     // Get properties and categories
-    const auto &properties = inspectable->getProperties();
-    auto categories = inspectable->getCategories();
+    const auto &properties = inspectable->properties();
+    auto categories = inspectable->categories();
 
     if (properties.empty())
     {
@@ -448,12 +448,12 @@ void SceneInspector::drawPropertiesPanel()
             setCategoryExpanded(category, true);
 
             // Get properties for this category
-            auto categoryProps = inspectable->getPropertiesByCategory(category);
+            auto categoryProps = inspectable->propertiesByCategory(category);
 
             // Draw each property in the category
             for (const auto &prop : categoryProps)
             {
-                ImGui::PushID(getPropertyId(prop).c_str());
+                ImGui::PushID(propertyId(prop).c_str());
                 drawProperty(prop);
                 ImGui::PopID();
             }
@@ -469,7 +469,7 @@ void SceneInspector::drawPropertiesPanel()
 
 void SceneInspector::drawProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
 
     // Skip read-only properties if not showing advanced
     if (prop.readOnly && !m_showAdvancedProperties)
@@ -523,7 +523,7 @@ void SceneInspector::drawProperty(const ivf::Property &prop)
 
 void SceneInspector::drawVectorProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
     int componentCount = (type == "vec3" || type == "uvec3") ? 3 : 4;
     bool isUnsigned = (type == "uvec3" || type == "uvec4");
 
@@ -538,7 +538,7 @@ void SceneInspector::drawVectorProperty(const ivf::Property &prop)
 
     for (int i = 0; i < componentCount; ++i)
     {
-        float value = ivf::PropertyEditor::getComponentValue(prop, i);
+        float value = ivf::PropertyEditor::componentValue(prop, i);
         float oldValue = value;
 
         std::string componentId = std::string("##") + prop.name + "_" + componentLabels[i];
@@ -618,7 +618,7 @@ void SceneInspector::drawVectorProperty(const ivf::Property &prop)
 
 void SceneInspector::drawScalarProperty(const ivf::Property &prop)
 {
-    std::string type = ivf::PropertyEditor::getPropertyType(prop);
+    std::string type = ivf::PropertyEditor::propertyType(prop);
 
     if (type == "double" || type == "float")
     {
@@ -889,7 +889,7 @@ void SceneInspector::setCategoryExpanded(const std::string &category, bool expan
     }
 }
 
-std::string SceneInspector::getPropertyId(const ivf::Property &prop) const
+std::string SceneInspector::propertyId(const ivf::Property &prop) const
 {
     return prop.name + "_" + prop.category;
 }

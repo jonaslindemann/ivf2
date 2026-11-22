@@ -80,7 +80,8 @@ public:
      * @brief Get the current object being inspected.
      * @return std::shared_ptr<ivf::PropertyInspectable> Inspected object.
      */
-    std::shared_ptr<ivf::PropertyInspectable> getCurrentObject() const;
+    std::shared_ptr<ivf::PropertyInspectable> currentObject() const;
+    [[deprecated("Use currentObject() instead")]] std::shared_ptr<ivf::PropertyInspectable> getCurrentObject() const { return currentObject(); }
 
 protected:
     /**
@@ -149,7 +150,7 @@ private:
      * @param prop Property to generate ID for.
      * @return std::string Unique ImGui ID.
      */
-    std::string getPropertyId(const ivf::Property &prop) const;
+    std::string propertyId(const ivf::Property &prop) const;
 };
 
 /**

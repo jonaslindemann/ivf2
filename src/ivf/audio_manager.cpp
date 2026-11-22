@@ -593,7 +593,7 @@ void AudioManager::stopCapture()
 // Analysis — snapshot the ring-buffer then release the lock before computing
 // ---------------------------------------------------------------------------
 
-float AudioManager::getAmplitude()
+float AudioManager::amplitude()
 {
     // Snapshot write-cursor, then read the whole ring buffer without a lock
     // (floats are written atomically on all target platforms for 4-byte alignment)
@@ -620,7 +620,7 @@ static float dftBin(const float* samples, int n, float freq, float sampleRate)
     return std::sqrt(re * re + im * im) / n;
 }
 
-std::vector<float> AudioManager::getFFT(int bands)
+std::vector<float> AudioManager::fft(int bands)
 {
     bands = std::max(1, std::min(bands, 64));
     std::vector<float> result(bands, 0.0f);

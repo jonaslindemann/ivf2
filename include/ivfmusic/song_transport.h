@@ -27,7 +27,7 @@ namespace ivfmusic {
  *
  * Playback goes through the music stream of ivf::AudioManager (startMusic()),
  * which is initialised on first use. Because the stream also feeds the analyser,
- * AudioManager::getAmplitude() and getFFT() react to the song as well.
+ * AudioManager::amplitude() and fft() react to the song as well.
  */
 class SongTransport {
 public:

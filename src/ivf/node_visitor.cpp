@@ -22,13 +22,13 @@ NodeMap MapVisitor::takeMap()
     return std::move(m_nodeMap);
 }
 
-const NodeMap &MapVisitor::getMap() const
+const NodeMap &MapVisitor::map() const
 {
     return m_nodeMap;
 }
 
 // Return copy if caller needs their own version
-NodeMap MapVisitor::getMapCopy() const
+NodeMap MapVisitor::mapCopy() const
 {
     return m_nodeMap;
 }

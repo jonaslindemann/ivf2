@@ -79,7 +79,8 @@ public:
      * @brief Get the current animation time.
      * @return float Current time in seconds.
      */
-    float getCurrentTime() const;
+    float currentTime() const;
+    [[deprecated("Use currentTime() instead")]] float getCurrentTime() const { return currentTime(); }
 
 private:
     bool m_playing; ///< Whether the animation is currently playing.

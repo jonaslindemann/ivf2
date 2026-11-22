@@ -300,7 +300,7 @@ void ivfui::GLFWSceneWindow::enableHeadlight()
     }
     else
     {
-        auto dirLight = lightMgr->getDirectionalLight(0);
+        auto dirLight = lightMgr->directionalLight(0);
         dirLight->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
         dirLight->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
         dirLight->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));

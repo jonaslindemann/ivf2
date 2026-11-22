@@ -131,7 +131,7 @@ void deserializeMaterial(MaterialPtr mat, const json& j)
 void serializeProperties(NodePtr node, json& j)
 {
     if (!node) return;
-    const auto& props = node->getProperties();
+    const auto& props = node->properties();
     json props_j;
     for (const auto& prop : props) {
         if (prop.readOnly) continue;
@@ -161,7 +161,7 @@ void deserializeProperties(NodePtr node, const json& j)
 {
     if (!node || !j.contains("properties")) return;
     const auto& props_j = j["properties"];
-    const auto& props = node->getProperties();
+    const auto& props = node->properties();
     for (const auto& prop : props) {
         if (prop.readOnly || !props_j.contains(prop.name)) continue;
         const auto& val = props_j[prop.name];

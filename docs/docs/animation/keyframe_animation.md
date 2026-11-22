@@ -72,7 +72,7 @@ void onUpdate() override
 |--------|-------------|
 | `play()` / `stop()` | Start or pause the clock |
 | `isPlaying()` | Whether the clock is running |
-| `getCurrentTime()` | Seconds since the animation started |
+| `currentTime()` | Seconds since the animation started |
 | `setNode()` / `setInterpolator()` | Swap the target node or the keyframes |
 
 !!! note "Looping"

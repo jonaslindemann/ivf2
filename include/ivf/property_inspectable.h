@@ -79,26 +79,30 @@ public:
      * @brief Get all properties for this object (const).
      * @return const std::vector<Property>& List of properties.
      */
-    const std::vector<Property> &getProperties() const;
+    const std::vector<Property> &properties() const;
+    [[deprecated("Use properties() instead")]] const std::vector<Property> &getProperties() const { return properties(); }
 
     /**
      * @brief Get all properties, ensuring they are initialized.
      * @return const std::vector<Property>& List of properties.
      */
-    const std::vector<Property> &getProperties();
+    const std::vector<Property> &properties();
+    [[deprecated("Use properties() instead")]] const std::vector<Property> &getProperties() { return properties(); }
 
     /**
      * @brief Get properties by category.
      * @param category Category name.
      * @return std::vector<Property> Properties in the given category.
      */
-    std::vector<Property> getPropertiesByCategory(const std::string &category) const;
+    std::vector<Property> propertiesByCategory(const std::string &category) const;
+    [[deprecated("Use propertiesByCategory() instead")]] std::vector<Property> getPropertiesByCategory(const std::string &category) const { return propertiesByCategory(category); }
 
     /**
      * @brief Get all unique property categories.
      * @return std::vector<std::string> List of category names.
      */
-    std::vector<std::string> getCategories() const;
+    std::vector<std::string> categories() const;
+    [[deprecated("Use categories() instead")]] std::vector<std::string> getCategories() const { return categories(); }
 
     /**
      * @brief Initialize properties for inspection (public wrapper).
@@ -217,7 +221,8 @@ public:
      * @param prop Property to convert.
      * @return std::string String representation.
      */
-    static std::string getValueAsString(const Property &prop);
+    static std::string valueAsString(const Property &prop);
+    [[deprecated("Use valueAsString() instead")]] static std::string getValueAsString(const Property &prop) { return valueAsString(prop); }
 
     /**
      * @brief Set property value from a string.
@@ -232,7 +237,8 @@ public:
      * @param prop Property to query.
      * @return std::string Type name.
      */
-    static std::string getPropertyType(const Property &prop);
+    static std::string propertyType(const Property &prop);
+    [[deprecated("Use propertyType() instead")]] static std::string getPropertyType(const Property &prop) { return propertyType(prop); }
 
     /**
      * @brief Get the name of a vector component.
@@ -240,7 +246,8 @@ public:
      * @param component Component index.
      * @return std::string Component name.
      */
-    static std::string getComponentName(const Property &prop, int component);
+    static std::string componentName(const Property &prop, int component);
+    [[deprecated("Use componentName() instead")]] static std::string getComponentName(const Property &prop, int component) { return componentName(prop, component); }
 
     /**
      * @brief Get the value of a vector component as a float.
@@ -248,7 +255,8 @@ public:
      * @param component Component index.
      * @return float Component value.
      */
-    static float getComponentValue(const Property &prop, int component);
+    static float componentValue(const Property &prop, int component);
+    [[deprecated("Use componentValue() instead")]] static float getComponentValue(const Property &prop, int component) { return componentValue(prop, component); }
 
     /**
      * @brief Set the value of a vector component.

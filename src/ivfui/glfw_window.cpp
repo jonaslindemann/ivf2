@@ -388,7 +388,13 @@ void GLFWWindow::draw()
 
         setError(result);
         if (result != 0)
-            this->close(); // close window if setup failed
+        {
+            // Setup failed (the reason is logged): close without updating or drawing,
+            // since onUpdate()/onDraw() may use objects onSetup() did not create.
+            m_runSetup = false;
+            this->close();
+            return;
+        }
 
         // If maximized called we need to do a resize
 

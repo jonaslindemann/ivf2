@@ -105,7 +105,7 @@ vcpkg will download and compile all required dependencies on the first run. This
 | `IVF2_USE_PCH` | ON | Precompiled headers |
 | `IVF2_WARNINGS` | ON (top level) | Warnings for ivf2's own code: `/W4` (MSVC), `-Wall -Wextra -Wpedantic` |
 | `IVF2_WARNINGS_AS_ERRORS` | OFF | Treat those warnings as errors (`/WX`, `-Werror`) |
-| `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: binaries in `<source>/bin/<config>` |
+| `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: `bin/` and `lib/` in the source tree |
 
 The `IVF2_WITH_*` options switch optional dependencies. Each also selects the matching vcpkg
 feature, so a disabled library is not downloaded or built. With a feature off, its classes still
@@ -118,10 +118,10 @@ preset turns all of them off.
 
 | Artifact     | Location                          |
 | ------------ | --------------------------------- |
-| Libraries    | `build/<preset>/lib/<Config>/`    |
-| Executables  | `build/<preset>/bin/<Config>/`    |
+| Libraries    | `build/<preset>/lib/`             |
+| Executables  | `build/<preset>/bin/`             |
 
-For single-config generators `<Config>` is the `CMAKE_BUILD_TYPE` (e.g. `build/release/bin/Release/`).
+Multi-config generators (Visual Studio, Xcode, Ninja Multi-Config) build several configurations into one tree and add a `<Config>` level, e.g. `build/vs/bin/Debug/` and `build/vs/bin/Release/`.
 
 Debug library names carry a `d` suffix (e.g. `ivfd.lib` vs `ivf.lib`).
 

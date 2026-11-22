@@ -25,8 +25,9 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - Public headers no longer include assimp, FreeType, miniaudio, RtMidi, stb, nlohmann-json or ImGui
   (ivf core); stb is available through `ivf/image_io.h`.
 - Repository layout: library runtime data moved from `bin/` to `data/` (`shaders/`, `fonts/`),
-  example assets to `examples/assets/`. Build output goes to `build/<preset>/bin/<Config>/`
-  (`IVF2_OUTPUT_IN_SOURCE_TREE=ON` restores the old layout).
+  example assets to `examples/assets/`. Build output goes to `build/<preset>/bin/` and `lib/`, with a
+  `<Config>` level only for multi-config generators such as Visual Studio
+  (`IVF2_OUTPUT_IN_SOURCE_TREE=ON` puts them in the source tree).
 
 ### Added
 
@@ -51,6 +52,9 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 ### Fixed
 
 - Crash on exit on Linux: windows and their scenes are now destroyed before `glfwTerminate()`.
+- High-DPI displays (macOS Retina): the camera manipulator mixed window and framebuffer sizes,
+  so the mouse ray for the 3D cursor was wrong and the projection was recomputed every frame
+  while a mouse button was held.
 - Bugs found by enabling `/W4` and `-Wall -Wextra`: `Capsule` ignored its constructor
   arguments, keyframe tension was ignored, `GridLayout` setters were stubs,
   `PolyLinePath::setSegments` did nothing, `TransformManager::rotateToVector` used the wrong axis,

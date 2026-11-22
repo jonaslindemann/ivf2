@@ -101,19 +101,25 @@ if(_ivf2_top_level)
     endif()
 endif()
 
-# Output layout: <root>/bin/<Config> for executables and runtime data,
-# <root>/lib/<Config> for libraries. Using $<CONFIG> keeps single- and
-# multi-config generators identical.
+# Output layout: <root>/bin for executables and runtime data, <root>/lib for libraries.
+# Multi-config generators (Visual Studio, Xcode, Ninja Multi-Config) build several
+# configurations into one tree and get a <Config> subdirectory (bin/Debug, bin/Release).
 if(IVF2_OUTPUT_IN_SOURCE_TREE)
     set(IVF2_OUTPUT_ROOT "${PROJECT_SOURCE_DIR}")
 else()
     set(IVF2_OUTPUT_ROOT "${PROJECT_BINARY_DIR}")
 endif()
-set(IVF2_RUNTIME_OUTPUT_DIR "${IVF2_OUTPUT_ROOT}/bin/$<CONFIG>")
+get_property(_ivf2_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+if(_ivf2_multi_config)
+    set(_ivf2_config_dir "/$<CONFIG>")
+else()
+    set(_ivf2_config_dir "")
+endif()
+set(IVF2_RUNTIME_OUTPUT_DIR "${IVF2_OUTPUT_ROOT}/bin${_ivf2_config_dir}")
 if(_ivf2_top_level)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${IVF2_RUNTIME_OUTPUT_DIR}")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${IVF2_OUTPUT_ROOT}/lib/$<CONFIG>")
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${IVF2_OUTPUT_ROOT}/lib/$<CONFIG>")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${IVF2_OUTPUT_ROOT}/lib${_ivf2_config_dir}")
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${IVF2_OUTPUT_ROOT}/lib${_ivf2_config_dir}")
 endif()
 
 # Runtime data (shaders, fonts) shipped with the library; example assets are in examples/assets.

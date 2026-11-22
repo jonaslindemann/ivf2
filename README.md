@@ -108,7 +108,7 @@ cmake --build build --parallel
 | `IVF2_USE_PCH` | ON | Precompiled headers |
 | `IVF2_WARNINGS` | ON (top level) | Warnings for ivf2's own code: `/W4` (MSVC), `-Wall -Wextra -Wpedantic` |
 | `IVF2_WARNINGS_AS_ERRORS` | OFF | Treat those warnings as errors (`/WX`, `-Werror`) |
-| `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: put binaries in `<source>/bin/<config>` |
+| `IVF2_OUTPUT_IN_SOURCE_TREE` | OFF | Legacy layout: put `bin/` and `lib/` in the source tree |
 
 The `IVF2_WITH_*` options switch optional dependencies. Each also selects the matching vcpkg
 feature, so a disabled library is not downloaded or built. With a feature off, its classes still
@@ -121,8 +121,11 @@ preset turns all of them off.
 
 Everything goes into the build directory:
 
-- **Executables** and runtime data (shaders, fonts, assets): `build/<preset>/bin/<Config>/`
-- **Libraries**: `build/<preset>/lib/<Config>/`
+- **Executables** and runtime data (shaders, fonts, assets): `build/<preset>/bin/`
+- **Libraries**: `build/<preset>/lib/`
+
+Multi-config generators (Visual Studio, Xcode, Ninja Multi-Config) build several configurations
+into one tree and add a `<Config>` level: `build/vs/bin/Debug/`, `build/vs/bin/Release/`.
   - `ivf` - core scene graph and rendering
   - `ivfui` - windows, input, cameras, ImGui
   - `ivfmath` - spline and keyframe math

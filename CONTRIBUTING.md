@@ -20,7 +20,7 @@ cmake --build --preset vs-debug   #                       cmake --build --preset
 ctest --preset vs-debug           #                       ctest --preset debug
 ```
 
-Executables and their runtime data end up in `build/<preset>/bin/<Config>/`. See the
+Executables and their runtime data end up in `build/<preset>/bin/` (`build/vs/bin/Debug/` with Visual Studio). See the
 [installation guide](https://interactive-visualisation-framework-2.readthedocs.io/) for all
 options.
 

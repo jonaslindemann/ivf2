@@ -103,8 +103,6 @@ void CameraManipulator::update()
 
     if (m_anyMouseButton)
     {
-        glfwGetWindowSize(m_window, &m_width, &m_height);
-
         if (m_firstClick)
         {
             glfwGetCursorPos(m_window, &m_mouseStartX, &m_mouseStartY);
@@ -416,11 +414,15 @@ bool ivfui::CameraManipulator::isManipulationBlocked() const
 
 glm::vec3 ivfui::CameraManipulator::computeMouseRay(int mouseX, int mouseY)
 {
-    if (m_width <= 0 || m_height <= 0)
+    // Mouse positions are in screen coordinates (points), which differ from framebuffer
+    // pixels (m_width/m_height) on high-DPI displays such as macOS Retina.
+    int width = 0, height = 0;
+    glfwGetWindowSize(m_window, &width, &height);
+    if (width <= 0 || height <= 0)
         return glm::vec3(0.0f, 0.0f, -1.0f); // Default forward vector
     // Convert mouse coordinates to normalized device coordinates (NDC)
-    float x = (2.0f * mouseX) / m_width - 1.0f;
-    float y = 1.0f - (2.0f * mouseY) / m_height; // Invert Y for OpenGL
+    float x = (2.0f * mouseX) / width - 1.0f;
+    float y = 1.0f - (2.0f * mouseY) / height; // Invert Y for OpenGL
     float z = 1.0f;                              // Forward direction in NDC
     glm::vec3 rayNDC(x, y, z);
     // Convert NDC to clip space

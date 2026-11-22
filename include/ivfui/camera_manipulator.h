@@ -24,8 +24,8 @@ namespace ivfui {
 class CameraManipulator {
 private:
     GLFWwindow *m_window;                 ///< Associated GLFW window.
-    int m_width;                          ///< Window width.
-    int m_height;                         ///< Window height.
+    int m_width;                          ///< Framebuffer width in pixels.
+    int m_height;                         ///< Framebuffer height in pixels.
     bool m_firstClick;                    ///< True if the next mouse click is the first.
     bool m_firstTime;                     ///< True if the manipulator is being used for the first time.
     bool m_leftMouseButton;               ///< Left mouse button state.

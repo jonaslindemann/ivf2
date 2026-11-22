@@ -48,14 +48,14 @@ public:
      * @brief Factory method to create a shared pointer to a FunctionDeformer instance.
      * @return std::shared_ptr<FunctionDeformer> New FunctionDeformer instance.
      */
-    static std::shared_ptr<FunctionDeformer> create();
+    [[nodiscard]] static std::shared_ptr<FunctionDeformer> create();
 
     /**
      * @brief Factory method to create a shared pointer to a FunctionDeformer instance with a custom function.
      * @param func Displacement function to use.
      * @return std::shared_ptr<FunctionDeformer> New FunctionDeformer instance.
      */
-    static std::shared_ptr<FunctionDeformer> create(const DisplacementFunction &func);
+    [[nodiscard]] static std::shared_ptr<FunctionDeformer> create(const DisplacementFunction &func);
 
     /**
      * @brief Set the displacement function.
@@ -137,7 +137,7 @@ public:
      * @param direction Direction of the wave.
      * @return DisplacementFunction Sine wave function.
      */
-    static DisplacementFunction createSineWave(float frequency = 1.0f, float amplitude = 1.0f,
+    [[nodiscard]] static DisplacementFunction createSineWave(float frequency = 1.0f, float amplitude = 1.0f,
                                                const glm::vec3 &direction = glm::vec3(0, 1, 0));
 
     /**
@@ -147,7 +147,7 @@ public:
      * @param center Center of the ripple.
      * @return DisplacementFunction Ripple function.
      */
-    static DisplacementFunction createRipple(float frequency = 1.0f, float amplitude = 1.0f,
+    [[nodiscard]] static DisplacementFunction createRipple(float frequency = 1.0f, float amplitude = 1.0f,
                                              const glm::vec3 &center = glm::vec3(0, 0, 0));
 
     /**
@@ -157,7 +157,7 @@ public:
      * @param octaves Number of octaves for noise.
      * @return DisplacementFunction Turbulence function.
      */
-    static DisplacementFunction createTurbulence(float scale = 1.0f, float intensity = 1.0f, int octaves = 4);
+    [[nodiscard]] static DisplacementFunction createTurbulence(float scale = 1.0f, float intensity = 1.0f, int octaves = 4);
 
     /**
      * @brief Create a spiral displacement function.
@@ -165,7 +165,7 @@ public:
      * @param radius Radius of the spiral.
      * @return DisplacementFunction Spiral function.
      */
-    static DisplacementFunction createSpiral(float pitch = 1.0f, float radius = 1.0f);
+    [[nodiscard]] static DisplacementFunction createSpiral(float pitch = 1.0f, float radius = 1.0f);
 
     /**
      * @brief Create a twirl displacement function.
@@ -174,7 +174,7 @@ public:
      * @param falloff Falloff of the twirl effect.
      * @return DisplacementFunction Twirl function.
      */
-    static DisplacementFunction createTwirl(const glm::vec3 &center = glm::vec3(0, 0, 0), float strength = 1.0f,
+    [[nodiscard]] static DisplacementFunction createTwirl(const glm::vec3 &center = glm::vec3(0, 0, 0), float strength = 1.0f,
                                             float falloff = 1.0f);
 
     /**
@@ -184,7 +184,7 @@ public:
      * @param radius Radius of influence.
      * @return DisplacementFunction Gravity well function.
      */
-    static DisplacementFunction createGravityWell(const glm::vec3 &center = glm::vec3(0, 0, 0), float strength = 1.0f,
+    [[nodiscard]] static DisplacementFunction createGravityWell(const glm::vec3 &center = glm::vec3(0, 0, 0), float strength = 1.0f,
                                                   float radius = 5.0f);
 
 protected:

@@ -61,7 +61,7 @@ public:
      * @param sweep Sweep angle (in radians) for the cylinder.
      * @return std::shared_ptr<CappedCylinder> New CappedCylinder instance.
      */
-    static std::shared_ptr<CappedCylinder> create(double radius = 1.0, double size = 1.0, int slices = 32,
+    [[nodiscard]] static std::shared_ptr<CappedCylinder> create(double radius = 1.0, double size = 1.0, int slices = 32,
                                                   int segments = 8, int rings = 4, double start = 0.0,
                                                   double sweep = 2 * glm::pi<double>());
 

@@ -104,7 +104,7 @@ public:
      * @param monitor Optional monitor for fullscreen mode.
      * @param shared Optional shared OpenGL context.
      */
-    GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor = nullptr,
+    GLFWSceneWindow(int width, int height, const std::string &title, GLFWmonitor *monitor = nullptr,
                     GLFWwindow *shared = nullptr);
 
     /**
@@ -121,7 +121,7 @@ public:
      * @param shared Optional shared OpenGL context.
      * @return std::shared_ptr<GLFWSceneWindow> New GLFWSceneWindow instance.
      */
-    static std::shared_ptr<GLFWSceneWindow> create(int width, int height, const std::string title,
+    [[nodiscard]] static std::shared_ptr<GLFWSceneWindow> create(int width, int height, const std::string &title,
                                                    GLFWmonitor *monitor = nullptr, GLFWwindow *shared = nullptr);
 
     /**

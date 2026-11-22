@@ -13,7 +13,7 @@ public:
     KaleidoscopeEffect();
     virtual ~KaleidoscopeEffect() = default;
 
-    static std::shared_ptr<KaleidoscopeEffect> create();
+    [[nodiscard]] static std::shared_ptr<KaleidoscopeEffect> create();
 
     void setSegments(float segments);
     void setRotation(float rotation);

@@ -39,7 +39,7 @@ public:
      * @param segments Number of segments around the tube.
      * @return std::shared_ptr<SolidPath> New SolidPath instance.
      */
-    static std::shared_ptr<SolidPath> create(double radius = 0.1, int segments = 64);
+    [[nodiscard]] static std::shared_ptr<SolidPath> create(double radius = 0.1, int segments = 64);
 
     /**
      * @brief Add a point to the path.

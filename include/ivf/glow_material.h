@@ -45,7 +45,7 @@ public:
      * @param mode       Blend mode; Alpha gives a translucent glow with the core opaque.
      * @return The material, or nullptr if the glow shader failed to compile.
      */
-    static std::shared_ptr<GlowMaterial> create(glm::vec3 color = glm::vec3(1.0f), float brightness = 1.0f,
+    [[nodiscard]] static std::shared_ptr<GlowMaterial> create(glm::vec3 color = glm::vec3(1.0f), float brightness = 1.0f,
                                                 BlendMode mode = BlendMode::Additive);
 
     /** @brief Glow color. */

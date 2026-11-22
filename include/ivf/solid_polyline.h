@@ -39,7 +39,7 @@ public:
      * @param segments Number of segments around the tube.
      * @return std::shared_ptr<SolidPolyLine> New SolidPolyLine instance.
      */
-    static std::shared_ptr<SolidPolyLine> create(double radius = 0.1, int segments = 8);
+    [[nodiscard]] static std::shared_ptr<SolidPolyLine> create(double radius = 0.1, int segments = 8);
 
     /**
      * @brief Set the tube radius.

@@ -174,14 +174,14 @@ Result<ProgramPtr> ShaderManager::compileProgramFromStrings(const std::string &v
     return buildProgram(vertexShader, fragmentShader, name, makeCurrent);
 }
 
-ProgramPtr ShaderManager::loadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
-                                               const std::string name, bool makeCurrent)
+ProgramPtr ShaderManager::loadProgramFromFiles(const std::string &vertexShader, const std::string &fragmentShader,
+                                               const std::string &name, bool makeCurrent)
 {
     return compileProgramFromFiles(vertexShader, fragmentShader, name, makeCurrent).value_or(nullptr);
 }
 
-ProgramPtr ShaderManager::loadProgramFromStrings(const std::string vertexShaderSource,
-                                                 const std::string fragmentShaderSource, const std::string name,
+ProgramPtr ShaderManager::loadProgramFromStrings(const std::string &vertexShaderSource,
+                                                 const std::string &fragmentShaderSource, const std::string &name,
                                                  bool makeCurrent)
 {
     return compileProgramFromStrings(vertexShaderSource, fragmentShaderSource, name, makeCurrent).value_or(nullptr);
@@ -270,7 +270,7 @@ std::shared_ptr<Program> ShaderManager::currentProgram()
     return m_currentProgram;
 }
 
-bool ivf::ShaderManager::setCurrentProgram(const std::string name)
+bool ivf::ShaderManager::setCurrentProgram(const std::string &name)
 {
     auto it = m_programs.find(name);
     if (it != m_programs.end())
@@ -295,7 +295,7 @@ bool ivf::ShaderManager::setCurrentProgram(ProgramPtr program)
     return true;
 }
 
-ProgramPtr ivf::ShaderManager::program(const std::string name)
+ProgramPtr ivf::ShaderManager::program(const std::string &name)
 {
     auto it = m_programs.find(name);
     if (it != m_programs.end())
@@ -309,7 +309,7 @@ void ShaderManager::apply()
     m_currentProgram->use();
 }
 
-void ivf::ShaderManager::applyProgram(const std::string name)
+void ivf::ShaderManager::applyProgram(const std::string &name)
 {
     this->setCurrentProgram(name);
     this->apply();
@@ -320,16 +320,16 @@ bool ivf::ShaderManager::compileLinkErrors()
     return m_linkErrors || m_vertexCompileErrors || m_fragCompileErrors;
 }
 
-ProgramPtr ivf::smLoadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
-                                       const std::string name, bool makeCurrent)
+ProgramPtr ivf::smLoadProgramFromFiles(const std::string &vertexShader, const std::string &fragmentShader,
+                                       const std::string &name, bool makeCurrent)
 {
     return ShaderManager::instance()
         ->compileProgramFromFiles(vertexShader, fragmentShader, name, makeCurrent)
         .value_or(nullptr);
 }
 
-ProgramPtr ivf::smLoadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
-                                         const std::string name, bool makeCurrent)
+ProgramPtr ivf::smLoadProgramFromStrings(const std::string &vertexShaderSource, const std::string &fragmentShaderSource,
+                                         const std::string &name, bool makeCurrent)
 {
     return ShaderManager::instance()
         ->compileProgramFromStrings(vertexShaderSource, fragmentShaderSource, name, makeCurrent)
@@ -361,7 +361,7 @@ ProgramPtr ivf::smCurrentProgram()
     return ShaderManager::instance()->currentProgram();
 }
 
-bool ivf::smSetCurrentProgram(const std::string name)
+bool ivf::smSetCurrentProgram(const std::string &name)
 {
     return ShaderManager::instance()->setCurrentProgram(name);
 }
@@ -371,7 +371,7 @@ void ivf::smApply()
     return ShaderManager::instance()->apply();
 }
 
-void ivf::smApplyProgram(const std::string name)
+void ivf::smApplyProgram(const std::string &name)
 {
     return ShaderManager::instance()->applyProgram(name);
 }

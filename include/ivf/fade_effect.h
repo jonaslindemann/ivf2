@@ -28,7 +28,7 @@ public:
      * @brief Factory method to create a shared pointer to a FadeEffect instance.
      * @return std::shared_ptr<FadeEffect> New FadeEffect instance.
      */
-    static std::shared_ptr<FadeEffect> create();
+    [[nodiscard]] static std::shared_ptr<FadeEffect> create();
 
     /**
      * @brief Set the color the image fades toward.

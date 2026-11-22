@@ -56,7 +56,7 @@ public:
      * @param sceneWindow Pointer to the associated GLFWSceneWindow.
      * @return std::shared_ptr<SceneControlPanel> New SceneControlPanel instance.
      */
-    static std::shared_ptr<SceneControlPanel> create(std::string caption, GLFWSceneWindow *sceneWindow);
+    [[nodiscard]] static std::shared_ptr<SceneControlPanel> create(std::string caption, GLFWSceneWindow *sceneWindow);
 
     /**
      * @brief Check if the panel settings have been modified via the UI.

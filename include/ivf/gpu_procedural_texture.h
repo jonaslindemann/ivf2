@@ -134,7 +134,7 @@ public:
      * @brief Factory method to create a shared pointer.
      * @return std::shared_ptr<GPUCheckerboardTexture> New instance.
      */
-    static std::shared_ptr<GPUCheckerboardTexture> create();
+    [[nodiscard]] static std::shared_ptr<GPUCheckerboardTexture> create();
     
     /**
      * @brief Set the checker colors.
@@ -176,7 +176,7 @@ public:
      * @brief Factory method to create a shared pointer.
      * @return std::shared_ptr<GPUNoiseTexture> New instance.
      */
-    static std::shared_ptr<GPUNoiseTexture> create();
+    [[nodiscard]] static std::shared_ptr<GPUNoiseTexture> create();
     
     /**
      * @brief Set noise scale.
@@ -238,7 +238,7 @@ public:
      * @brief Factory method to create a shared pointer.
      * @return std::shared_ptr<GPUGradientTexture> New instance.
      */
-    static std::shared_ptr<GPUGradientTexture> create();
+    [[nodiscard]] static std::shared_ptr<GPUGradientTexture> create();
     
     /**
      * @brief Set gradient type.

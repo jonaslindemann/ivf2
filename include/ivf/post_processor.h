@@ -100,7 +100,7 @@ public:
      * @param height Height of the render target.
      * @return std::shared_ptr<PostProcessor> New PostProcessor instance.
      */
-    static std::shared_ptr<PostProcessor> create(int width, int height);
+    [[nodiscard]] static std::shared_ptr<PostProcessor> create(int width, int height);
 
     /**
      * @brief Initialize the screen quad geometry.

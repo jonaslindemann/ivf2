@@ -99,7 +99,7 @@ private:
     bool m_loop{false};
 
 public:
-    static std::shared_ptr<SceneTimeline> create();
+    [[nodiscard]] static std::shared_ptr<SceneTimeline> create();
 
     TimelineScene& addScene(std::string_view name, double duration);
     void clear();

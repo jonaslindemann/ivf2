@@ -34,7 +34,7 @@ public:
      * @brief Construct a UiWindow with the given name.
      * @param name Window name.
      */
-    UiWindow(const std::string name);
+    UiWindow(const std::string &name);
 
     /**
      * @brief Virtual destructor.
@@ -46,7 +46,7 @@ public:
      * @param name Window name.
      * @return std::shared_ptr<UiWindow> New UiWindow instance.
      */
-    static std::shared_ptr<UiWindow> create(const std::string name);
+    [[nodiscard]] static std::shared_ptr<UiWindow> create(const std::string &name);
 
     /**
      * @brief Draw the window (calls doDraw if visible).

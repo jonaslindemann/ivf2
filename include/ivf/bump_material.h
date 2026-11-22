@@ -42,7 +42,7 @@ public:
     BumpMaterial() = default;
     ~BumpMaterial() override = default;
 
-    static std::shared_ptr<BumpMaterial> create();
+    [[nodiscard]] static std::shared_ptr<BumpMaterial> create();
 
     // ---- Normal map --------------------------------------------------------
     void setNormalMap(std::shared_ptr<Texture> tex) { m_normalMap = tex; }

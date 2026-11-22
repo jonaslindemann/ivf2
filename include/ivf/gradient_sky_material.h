@@ -49,7 +49,7 @@ public:
      * @param horizonColor Color at the horizon; also used below it until setGroundColor() is called.
      * @return The material, or nullptr if the sky shader failed to compile.
      */
-    static std::shared_ptr<GradientSkyMaterial> create(glm::vec3 zenithColor = glm::vec3(0.1f, 0.25f, 0.6f),
+    [[nodiscard]] static std::shared_ptr<GradientSkyMaterial> create(glm::vec3 zenithColor = glm::vec3(0.1f, 0.25f, 0.6f),
                                                        glm::vec3 horizonColor = glm::vec3(0.7f, 0.8f, 0.9f));
 
     /** @brief Color straight up. */

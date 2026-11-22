@@ -52,7 +52,7 @@ public:
      * @param segmentSweep Sweep angle for segments (radians).
      * @return std::shared_ptr<Sphere> New Sphere instance.
      */
-    static std::shared_ptr<Sphere> create(double radius = 1.0, int slices = 32, int segments = 16,
+    [[nodiscard]] static std::shared_ptr<Sphere> create(double radius = 1.0, int slices = 32, int segments = 16,
                                           double sliceStart = 0.0, double sliceSweep = 2 * glm::pi<double>(),
                                           double segmentStart = 0.0, double segmentSweep = glm::pi<double>());
 

@@ -43,7 +43,7 @@ public:
      * @param height Height of the shadow map.
      * @return std::shared_ptr<ShadowMap> New ShadowMap instance.
      */
-    static std::shared_ptr<ShadowMap> create(int width = 1024, int height = 1024);
+    [[nodiscard]] static std::shared_ptr<ShadowMap> create(int width = 1024, int height = 1024);
 
     /**
      * @brief Initialize the shadow map resources (FBO and depth texture).

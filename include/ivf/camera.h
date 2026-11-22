@@ -47,7 +47,7 @@ public:
      * @brief Factory method to create a shared pointer to a Camera instance.
      * @return std::shared_ptr<Camera> New Camera instance.
      */
-    static std::shared_ptr<Camera> create();
+    [[nodiscard]] static std::shared_ptr<Camera> create();
 
     /**
      * @brief Apply the camera's view and projection matrices to the rendering context.

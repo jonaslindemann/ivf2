@@ -45,7 +45,7 @@ private:
 public:
     DepthOfFieldEffect();
 
-    static std::shared_ptr<DepthOfFieldEffect> create();
+    [[nodiscard]] static std::shared_ptr<DepthOfFieldEffect> create();
 
     void setFocusDistance(float distance);
     float focusDistance() const;

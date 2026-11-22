@@ -17,7 +17,7 @@ public:
     ColorGradingEffect();
     virtual ~ColorGradingEffect() = default;
 
-    static std::shared_ptr<ColorGradingEffect> create();
+    [[nodiscard]] static std::shared_ptr<ColorGradingEffect> create();
 
     void setShadows(glm::vec3 shadows);
     void setMidtones(glm::vec3 midtones);

@@ -83,7 +83,7 @@ public:
      * @param mode Deformation mode.
      * @return std::shared_ptr<RandomDeformer> New RandomDeformer instance.
      */
-    static std::shared_ptr<RandomDeformer> create(NoiseType noiseType = NoiseType::PERLIN,
+    [[nodiscard]] static std::shared_ptr<RandomDeformer> create(NoiseType noiseType = NoiseType::PERLIN,
                                                   DeformationMode mode = DeformationMode::ADDITIVE);
 
     // Noise configuration

@@ -62,7 +62,7 @@ private:
 public:
     CameraAnimation(CameraManipulatorPtr cam);
 
-    static std::shared_ptr<CameraAnimation> create(CameraManipulatorPtr cam);
+    [[nodiscard]] static std::shared_ptr<CameraAnimation> create(CameraManipulatorPtr cam);
 
     /** Add a paired eye-position and look-at-target keyframe. */
     void addKeyframe(glm::vec3 pos, glm::vec3 target);

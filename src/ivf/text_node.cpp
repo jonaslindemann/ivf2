@@ -46,7 +46,7 @@ std::shared_ptr<TextNode> ivf::TextNode::create()
     return std::make_shared<TextNode>();
 }
 
-void ivf::TextNode::setText(const std::string text)
+void ivf::TextNode::setText(const std::string &text)
 {
     m_text = text;
     updateTextSize();

@@ -14,7 +14,7 @@ public:
     WaveDistortionEffect();
     virtual ~WaveDistortionEffect() = default;
 
-    static std::shared_ptr<WaveDistortionEffect> create();
+    [[nodiscard]] static std::shared_ptr<WaveDistortionEffect> create();
 
     void setFrequency(float frequency);
     void setAmplitude(float amplitude);

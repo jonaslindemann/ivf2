@@ -40,7 +40,7 @@ public:
      * @param window Pointer to the GLFW window.
      * @return std::shared_ptr<UiRenderer> New UiRenderer instance.
      */
-    static std::shared_ptr<UiRenderer> create(GLFWwindow *window);
+    [[nodiscard]] static std::shared_ptr<UiRenderer> create(GLFWwindow *window);
 
     /**
      * @brief Make this renderer's ImGui context current (needed with several windows).

@@ -51,7 +51,7 @@ private:
 public:
     FlowField() = default;
 
-    static std::shared_ptr<FlowField> create();
+    [[nodiscard]] static std::shared_ptr<FlowField> create();
 
     // ---- Configuration ---------------------------------------------------
 

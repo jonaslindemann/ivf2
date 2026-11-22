@@ -37,7 +37,7 @@ public:
      * @brief Factory method to create a shared pointer to a FeedbackEffect instance.
      * @return std::shared_ptr<FeedbackEffect> New FeedbackEffect instance.
      */
-    static std::shared_ptr<FeedbackEffect> create();
+    [[nodiscard]] static std::shared_ptr<FeedbackEffect> create();
 
     void setFeedbackAmount(float amount); ///< Set how much of the previous frame persists [0..1].
     float feedbackAmount() const;

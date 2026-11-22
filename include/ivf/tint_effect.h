@@ -28,7 +28,7 @@ public:
      * @brief Factory method to create a shared pointer to a TintEffect instance.
      * @return std::shared_ptr<TintEffect> New TintEffect instance.
      */
-    static std::shared_ptr<TintEffect> create();
+    [[nodiscard]] static std::shared_ptr<TintEffect> create();
 
     /**
      * @brief Set the tint color.

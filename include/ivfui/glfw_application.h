@@ -45,7 +45,7 @@ public:
      * @brief Factory method to create a shared pointer to a GLFWApplication instance.
      * @return std::shared_ptr<GLFWApplication> New GLFWApplication instance.
      */
-    static std::shared_ptr<GLFWApplication> create();
+    [[nodiscard]] static std::shared_ptr<GLFWApplication> create();
 
     /**
      * @brief Add a window to the application.

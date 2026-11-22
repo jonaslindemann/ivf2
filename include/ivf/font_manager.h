@@ -67,7 +67,7 @@ public:
      * @param name Name to associate with the loaded font face.
      * @return Success, or an Error (FileNotFound, UnsupportedFormat, NotSupported). Errors are also logged.
      */
-    Result<void> loadFace(const std::string filename, const std::string name);
+    Result<void> loadFace(const std::string &filename, const std::string &name);
 
     /**
      * @brief Get the currently active font face.
@@ -80,7 +80,7 @@ public:
      * @param name Name of the font face.
      * @return Handle to the requested font face, or nullptr if not found.
      */
-    FontFace face(const std::string name);
+    FontFace face(const std::string &name);
 };
 
 /**

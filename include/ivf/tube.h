@@ -56,7 +56,7 @@ public:
      * @param sweep Sweep angle in radians (default 2*glm::pi<double>()).
      * @return std::shared_ptr<Tube> New Tube instance.
      */
-    static std::shared_ptr<Tube> create(double radius = 1.0, double innerRadius = 0.75, double size = 1.0,
+    [[nodiscard]] static std::shared_ptr<Tube> create(double radius = 1.0, double innerRadius = 0.75, double size = 1.0,
                                         int slices = 32, int segments = 8, double start = 0.0,
                                         double sweep = 2 * glm::pi<double>());
 

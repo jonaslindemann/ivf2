@@ -22,7 +22,7 @@ public:
      * @brief Constructor.
      * @param filename Path to the fragment shader source file (optional).
      */
-    FragmentShader(const std::string filename = "");
+    FragmentShader(const std::string &filename = "");
 
     /**
      * @brief Destructor.
@@ -34,7 +34,7 @@ public:
      * @param filename Path to the fragment shader source file (optional).
      * @return std::shared_ptr<FragmentShader> New FragmentShader instance.
      */
-    static std::shared_ptr<FragmentShader> create(const std::string filename = "");
+    [[nodiscard]] static std::shared_ptr<FragmentShader> create(const std::string &filename = "");
 
     /**
      * @brief Compile the fragment shader from source.

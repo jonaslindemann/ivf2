@@ -64,7 +64,7 @@ public:
      * @brief Factory method to create a shared pointer to a Grid instance.
      * @return std::shared_ptr<Grid> New Grid instance.
      */
-    static std::shared_ptr<Grid> create();
+    [[nodiscard]] static std::shared_ptr<Grid> create();
 
     /**
      * @brief Set the number of ticks along each axis.

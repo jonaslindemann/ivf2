@@ -47,7 +47,7 @@ public:
      * @brief Factory method to create a shared pointer to a Material instance.
      * @return std::shared_ptr<Material> New Material instance.
      */
-    static std::shared_ptr<Material> create(MaterialProps props = MaterialProps{});
+    [[nodiscard]] static std::shared_ptr<Material> create(MaterialProps props = MaterialProps{});
 
     /**
      * @brief Set the diffuse color.

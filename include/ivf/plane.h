@@ -50,7 +50,7 @@ public:
      * @param cols Number of subdivisions along the depth.
      * @return std::shared_ptr<Plane> New Plane instance.
      */
-    static std::shared_ptr<Plane> create(double width = 1.0, double depth = 1.0, int rows = 8, int cols = 8);
+    [[nodiscard]] static std::shared_ptr<Plane> create(double width = 1.0, double depth = 1.0, int rows = 8, int cols = 8);
 
     /**
      * @brief Set the plane parameters.

@@ -41,7 +41,7 @@ public:
      * @param reflection Reflection rendered for the surface.
      * @return The material, or nullptr if the water shader failed to compile.
      */
-    static std::shared_ptr<WaterMaterial> create(PlanarReflectionPtr reflection = nullptr);
+    [[nodiscard]] static std::shared_ptr<WaterMaterial> create(PlanarReflectionPtr reflection = nullptr);
 
     void setReflection(PlanarReflectionPtr reflection);
     [[nodiscard]] PlanarReflectionPtr reflection() const;

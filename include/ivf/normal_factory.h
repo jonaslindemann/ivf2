@@ -26,7 +26,7 @@ public:
      * @brief Factory method to create a shared pointer to a NormalFactory instance.
      * @return std::shared_ptr<NormalFactory> New NormalFactory instance.
      */
-    static std::shared_ptr<NormalFactory> create();
+    [[nodiscard]] static std::shared_ptr<NormalFactory> create();
 
     /**
      * @brief Generate or recalculate normals for the given mesh node.

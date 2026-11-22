@@ -47,7 +47,7 @@ public:
      * @brief Factory method to create a shared pointer to a Light instance.
      * @return std::shared_ptr<Light> New Light instance.
      */
-    static std::shared_ptr<Light> create();
+    [[nodiscard]] static std::shared_ptr<Light> create();
 
     /**
      * @brief Set the position of the light.

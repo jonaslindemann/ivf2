@@ -32,7 +32,7 @@ public:
      * @param size Length of the axis lines (default is 1.0).
      * @return std::shared_ptr<Axis> New Axis instance.
      */
-    static std::shared_ptr<Axis> create(GLfloat size = 1.0);
+    [[nodiscard]] static std::shared_ptr<Axis> create(GLfloat size = 1.0);
 
     /**
      * @brief Set the length of the axis lines.

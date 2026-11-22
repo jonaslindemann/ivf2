@@ -9,7 +9,7 @@ using namespace ivf;
 
 using namespace std;
 
-VertexShader::VertexShader(const std::string filename) : Shader(filename)
+VertexShader::VertexShader(const std::string &filename) : Shader(filename)
 {}
 
 VertexShader::~VertexShader()
@@ -18,7 +18,7 @@ VertexShader::~VertexShader()
         glDeleteShader(m_id);
 }
 
-std::shared_ptr<VertexShader> ivf::VertexShader::create(const std::string filename)
+std::shared_ptr<VertexShader> ivf::VertexShader::create(const std::string &filename)
 {
     return std::make_shared<VertexShader>(filename);
 }

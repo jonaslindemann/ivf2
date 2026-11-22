@@ -55,7 +55,7 @@ public:
      * @param animationSpeed Speed of turbulence animation (default 1.0f).
      * @return std::shared_ptr<TurbulenceDeformer> New TurbulenceDeformer instance.
      */
-    static std::shared_ptr<TurbulenceDeformer> create(float scale = 1.0f, float intensity = 1.0f, int octaves = 4,
+    [[nodiscard]] static std::shared_ptr<TurbulenceDeformer> create(float scale = 1.0f, float intensity = 1.0f, int octaves = 4,
                                                       float persistence = 0.5f, float animationSpeed = 1.0f);
 
     /**

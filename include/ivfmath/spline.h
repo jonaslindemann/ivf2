@@ -11,7 +11,7 @@ class Spline {
 public:
     Spline();
 
-    static std::shared_ptr<Spline> create();
+    [[nodiscard]] static std::shared_ptr<Spline> create();
 
     // Add a point to the spline
     void addPoint(const glm::vec3 &point);

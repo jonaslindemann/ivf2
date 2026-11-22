@@ -53,7 +53,7 @@ public:
      * @brief Factory method to create a shared pointer to a Texture instance.
      * @return std::shared_ptr<Texture> New Texture instance.
      */
-    static std::shared_ptr<Texture> create();
+    [[nodiscard]] static std::shared_ptr<Texture> create();
 
     /**
      * @brief Create a texture from an image file (PNG, JPEG, BMP, TGA, ...).

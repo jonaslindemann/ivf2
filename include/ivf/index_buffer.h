@@ -31,7 +31,7 @@ public:
      * @brief Factory method to create a shared pointer to an IndexBuffer instance.
      * @return std::shared_ptr<IndexBuffer> New IndexBuffer instance.
      */
-    static std::shared_ptr<IndexBuffer> create();
+    [[nodiscard]] static std::shared_ptr<IndexBuffer> create();
 
     /**
      * @brief Bind the index buffer for use in OpenGL.

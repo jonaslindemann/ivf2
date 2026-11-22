@@ -52,7 +52,7 @@ public:
      * @param waveVector Wave vector (default (0, 1, 0)).
      * @return std::shared_ptr<WaveDeformer> New WaveDeformer instance.
      */
-    static std::shared_ptr<WaveDeformer> create(float amplitude = 1.0f, float frequency = 1.0f, float speed = 1.0f,
+    [[nodiscard]] static std::shared_ptr<WaveDeformer> create(float amplitude = 1.0f, float frequency = 1.0f, float speed = 1.0f,
                                                 const glm::vec3 &direction = glm::vec3(1, 0, 0),
                                                 const glm::vec3 &waveVector = glm::vec3(0, 1, 0));
 

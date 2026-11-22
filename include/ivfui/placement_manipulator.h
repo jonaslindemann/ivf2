@@ -84,7 +84,7 @@ public:
     PlacementManipulator(CameraManipulatorPtr cameraManip);
     virtual ~PlacementManipulator() = default;
     
-    static std::shared_ptr<PlacementManipulator> create(CameraManipulatorPtr cameraManip);
+    [[nodiscard]] static std::shared_ptr<PlacementManipulator> create(CameraManipulatorPtr cameraManip);
     
     // Plane management
     void setPlane(PlacementPlane plane);

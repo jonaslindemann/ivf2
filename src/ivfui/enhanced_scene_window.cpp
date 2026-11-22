@@ -9,7 +9,7 @@
 using namespace ivfui;
 using namespace ivf;
 
-EnhancedSceneWindow::EnhancedSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
+EnhancedSceneWindow::EnhancedSceneWindow(int width, int height, const std::string &title, GLFWmonitor *monitor,
                                          GLFWwindow *shared)
     : GLFWSceneWindow(width, height, title, monitor, shared), m_placementEnabled(false)
 {}
@@ -19,7 +19,7 @@ EnhancedSceneWindow::~EnhancedSceneWindow()
     // Cleanup is handled by unique_ptr
 }
 
-std::shared_ptr<EnhancedSceneWindow> EnhancedSceneWindow::create(int width, int height, const std::string title,
+std::shared_ptr<EnhancedSceneWindow> EnhancedSceneWindow::create(int width, int height, const std::string &title,
                                                                  GLFWmonitor *monitor, GLFWwindow *shared)
 {
     return std::make_shared<EnhancedSceneWindow>(width, height, title, monitor, shared);

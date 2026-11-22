@@ -109,7 +109,7 @@ public:
      * @param isize Number of indices (default 0).
      * @return std::shared_ptr<Mesh> New Mesh instance.
      */
-    static std::shared_ptr<Mesh> create(GLuint vsize, GLuint isize = 0);
+    [[nodiscard]] static std::shared_ptr<Mesh> create(GLuint vsize, GLuint isize = 0);
 
     /**
      * @brief Set the number of vertices and indices.

@@ -63,7 +63,7 @@ public:
      * @param caption Window caption.
      * @return std::shared_ptr<SpotLightWindow> New SpotLightWindow instance.
      */
-    static std::shared_ptr<SpotLightWindow> create(ivf::SpotLightPtr spotLight, std::string caption);
+    [[nodiscard]] static std::shared_ptr<SpotLightWindow> create(ivf::SpotLightPtr spotLight, std::string caption);
 
     /**
      * @brief Draw the spot light window UI (called per frame).

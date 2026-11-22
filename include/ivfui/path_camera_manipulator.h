@@ -70,7 +70,7 @@ public:
 
     PathCameraManipulator() = default;
 
-    static std::shared_ptr<PathCameraManipulator> create();
+    [[nodiscard]] static std::shared_ptr<PathCameraManipulator> create();
 
     [[nodiscard]] Settings &settings();
     [[nodiscard]] const Settings &settings() const;

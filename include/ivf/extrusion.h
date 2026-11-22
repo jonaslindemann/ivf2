@@ -54,7 +54,7 @@ private:
 public:
     Extrusion();
 
-    static std::shared_ptr<Extrusion> create();
+    [[nodiscard]] static std::shared_ptr<Extrusion> create();
 
     /// @name Configuration
     /// @{

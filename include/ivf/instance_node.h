@@ -26,7 +26,7 @@ public:
      * @brief Factory method to create a shared pointer to an InstanceNode instance.
      * @return std::shared_ptr<InstanceNode> New InstanceNode instance.
      */
-    static std::shared_ptr<InstanceNode> create();
+    [[nodiscard]] static std::shared_ptr<InstanceNode> create();
 
     /**
      * @brief Set the node to be instanced.

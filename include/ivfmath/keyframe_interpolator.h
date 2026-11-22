@@ -20,7 +20,7 @@ class KeyframeInterpolator {
 public:
     explicit KeyframeInterpolator(const std::string &name = "");
 
-    static std::shared_ptr<KeyframeInterpolator> create(const std::string &name = "");
+    [[nodiscard]] static std::shared_ptr<KeyframeInterpolator> create(const std::string &name = "");
 
     void addKeyframe(const KeyframeData &keyframe);
     KeyframeData interpolate(float time) const;

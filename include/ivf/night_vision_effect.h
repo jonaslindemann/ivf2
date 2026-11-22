@@ -15,7 +15,7 @@ public:
     NightVisionEffect();
     virtual ~NightVisionEffect() = default;
 
-    static std::shared_ptr<NightVisionEffect> create();
+    [[nodiscard]] static std::shared_ptr<NightVisionEffect> create();
 
     void setNoiseIntensity(float noiseIntensity);
     void setGlowStrength(float glowStrength);

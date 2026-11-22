@@ -30,7 +30,7 @@ public:
      * @brief Factory method to create a shared pointer to a Cube instance.
      * @return std::shared_ptr<Cube> New Cube instance.
      */
-    static std::shared_ptr<Cube> create();
+    [[nodiscard]] static std::shared_ptr<Cube> create();
 
     /**
      * @brief Set the size of the cube.

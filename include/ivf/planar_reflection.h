@@ -60,7 +60,7 @@ public:
      */
     PlanarReflection(glm::vec3 point = glm::vec3(0.0f), glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f));
 
-    static std::shared_ptr<PlanarReflection> create(glm::vec3 point = glm::vec3(0.0f),
+    [[nodiscard]] static std::shared_ptr<PlanarReflection> create(glm::vec3 point = glm::vec3(0.0f),
                                                     glm::vec3 normal = glm::vec3(0.0f, 1.0f, 0.0f));
 
     /**

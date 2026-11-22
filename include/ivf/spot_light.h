@@ -32,7 +32,7 @@ public:
      * @brief Factory method to create a shared pointer to a SpotLight instance.
      * @return std::shared_ptr<SpotLight> New SpotLight instance.
      */
-    static std::shared_ptr<SpotLight> create();
+    [[nodiscard]] static std::shared_ptr<SpotLight> create();
 
     /**
      * @brief Set the direction of the spot light.

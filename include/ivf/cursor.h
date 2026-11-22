@@ -50,7 +50,7 @@ public:
      * @param showGroundProjection Whether to show ground projection line (default is true).
      * @return std::shared_ptr<Cursor> New Cursor instance.
      */
-    static std::shared_ptr<Cursor> create(GLfloat size = 1.0, GLfloat gap = 0.1, bool showGroundProjection = true);
+    [[nodiscard]] static std::shared_ptr<Cursor> create(GLfloat size = 1.0, GLfloat gap = 0.1, bool showGroundProjection = true);
 
     /**
      * @brief Set the length of the cursor axis lines.

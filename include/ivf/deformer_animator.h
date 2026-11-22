@@ -51,7 +51,7 @@ public:
      * @param target Shared pointer to the target deformer to animate.
      * @return std::shared_ptr<DeformerAnimator> New DeformerAnimator instance.
      */
-    static std::shared_ptr<DeformerAnimator> create(std::shared_ptr<Deformer> target);
+    [[nodiscard]] static std::shared_ptr<DeformerAnimator> create(std::shared_ptr<Deformer> target);
 
     /**
      * @brief Add a keyframe at the specified time using the given deformer state.

@@ -55,7 +55,7 @@ public:
      * @param yDiv Number of divisions along Y.
      * @return std::shared_ptr<LineGrid> New LineGrid instance.
      */
-    static std::shared_ptr<LineGrid> create(GLfloat width = 2.0, GLfloat height = 2.0, GLint xDiv = 10,
+    [[nodiscard]] static std::shared_ptr<LineGrid> create(GLfloat width = 2.0, GLfloat height = 2.0, GLint xDiv = 10,
                                             GLint yDiv = 10);
 
     /**

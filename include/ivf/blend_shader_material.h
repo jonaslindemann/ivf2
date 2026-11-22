@@ -55,7 +55,7 @@ public:
      * @param program Shader program to render with.
      * @param mode    Blend mode.
      */
-    static std::shared_ptr<BlendShaderMaterial> create(ProgramPtr program = nullptr,
+    [[nodiscard]] static std::shared_ptr<BlendShaderMaterial> create(ProgramPtr program = nullptr,
                                                        BlendMode mode = BlendMode::Additive);
 
     /**
@@ -70,7 +70,7 @@ public:
      * @param watch    If true, the files are reloaded on change via ShaderWatcher.
      * @return The material, or nullptr if the shaders failed to compile or link.
      */
-    static std::shared_ptr<BlendShaderMaterial> createFromFiles(const std::string &vertPath,
+    [[nodiscard]] static std::shared_ptr<BlendShaderMaterial> createFromFiles(const std::string &vertPath,
                                                                 const std::string &fragPath, const std::string &name,
                                                                 BlendMode mode = BlendMode::Additive,
                                                                 bool watch = false);
@@ -81,7 +81,7 @@ public:
      * The program is registered with ShaderManager under @p name.
      * @return The material, or nullptr if the shaders failed to compile or link.
      */
-    static std::shared_ptr<BlendShaderMaterial> createFromStrings(const std::string &vertSource,
+    [[nodiscard]] static std::shared_ptr<BlendShaderMaterial> createFromStrings(const std::string &vertSource,
                                                                   const std::string &fragSource,
                                                                   const std::string &name,
                                                                   BlendMode mode = BlendMode::Additive);

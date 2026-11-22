@@ -58,7 +58,7 @@ public:
      * @param cols Number of columns in the field.
      * @return std::shared_ptr<IntField> New IntField instance.
      */
-    static std::shared_ptr<IntField> create(GLuint rows, GLuint cols);
+    [[nodiscard]] static std::shared_ptr<IntField> create(GLuint rows, GLuint cols);
 
     /**
      * @brief Get the value at the specified row and column.

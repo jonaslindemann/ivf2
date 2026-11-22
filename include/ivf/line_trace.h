@@ -37,7 +37,7 @@ public:
      * @param numVertices Number of vertices in the trace.
      * @return std::shared_ptr<LineTrace> New LineTrace instance.
      */
-    static std::shared_ptr<LineTrace> create(int numVertices, bool useColor);
+    [[nodiscard]] static std::shared_ptr<LineTrace> create(int numVertices, bool useColor);
 
     /**
      * @brief Set the color of the trace.

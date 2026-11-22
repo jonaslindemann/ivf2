@@ -52,7 +52,7 @@ public:
      * @param scene Root composite node of the scene to be used for selection.
      * @return std::shared_ptr<BufferSelection> New BufferSelection instance.
      */
-    static std::shared_ptr<BufferSelection> create(CompositeNodePtr scene);
+    [[nodiscard]] static std::shared_ptr<BufferSelection> create(CompositeNodePtr scene);
 
     /**
      * @brief Initialize the selection buffer with the given dimensions.

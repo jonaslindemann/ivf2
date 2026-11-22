@@ -44,7 +44,7 @@ public:
      * @param radius  Distance from the node's origin where the mist has faded out.
      * @return The material, or nullptr if the mist shader failed to compile.
      */
-    static std::shared_ptr<MistMaterial> create(glm::vec3 color = glm::vec3(1.0f), float opacity = 0.5f,
+    [[nodiscard]] static std::shared_ptr<MistMaterial> create(glm::vec3 color = glm::vec3(1.0f), float opacity = 0.5f,
                                                 float radius = 1.0f);
 
     /** @brief Mist color. */

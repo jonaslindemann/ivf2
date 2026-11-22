@@ -134,7 +134,7 @@ public:
      * @param monitor Optional monitor for fullscreen mode.
      * @param shared Optional shared OpenGL context.
      */
-    GLFWWindow(int width, int height, const std::string title, GLFWmonitor *monitor = nullptr,
+    GLFWWindow(int width, int height, const std::string &title, GLFWmonitor *monitor = nullptr,
                GLFWwindow *shared = nullptr);
 
     /**
@@ -151,7 +151,7 @@ public:
      * @param shared Optional shared OpenGL context.
      * @return std::shared_ptr<GLFWWindow> New GLFWWindow instance.
      */
-    static std::shared_ptr<GLFWWindow> create(int width, int height, const std::string title,
+    [[nodiscard]] static std::shared_ptr<GLFWWindow> create(int width, int height, const std::string &title,
                                               GLFWmonitor *monitor = nullptr, GLFWwindow *shared = nullptr);
 
     /**
@@ -205,7 +205,7 @@ public:
      * @brief Set the window icon from an image file.
      * @param filename Path to the icon image.
      */
-    void setWindowIcon(const std::string filename);
+    void setWindowIcon(const std::string &filename);
 
     /**
      * @brief Maximize the window.

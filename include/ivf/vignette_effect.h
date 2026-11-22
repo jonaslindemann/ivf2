@@ -32,7 +32,7 @@ public:
      * @brief Factory method to create a shared pointer to a VignetteEffect instance.
      * @return std::shared_ptr<VignetteEffect> New VignetteEffect instance.
      */
-    static std::shared_ptr<VignetteEffect> create();
+    [[nodiscard]] static std::shared_ptr<VignetteEffect> create();
 
     /**
      * @brief Set the size (radius) of the vignette effect.

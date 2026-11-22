@@ -55,7 +55,7 @@ private:
 public:
     DynamicMesh();
 
-    static std::shared_ptr<DynamicMesh> create();
+    [[nodiscard]] static std::shared_ptr<DynamicMesh> create();
 
     // ---- Builder API -------------------------------------------------------
 

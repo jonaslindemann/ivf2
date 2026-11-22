@@ -57,7 +57,7 @@ public:
      * @param caption Window caption.
      * @return std::shared_ptr<CameraWindow> New CameraWindow instance.
      */
-    static std::shared_ptr<CameraWindow> create(CameraManipulatorPtr camManip, std::string caption);
+    [[nodiscard]] static std::shared_ptr<CameraWindow> create(CameraManipulatorPtr camManip, std::string caption);
 
     /**
      * @brief Set the scene reference for extent calculation.

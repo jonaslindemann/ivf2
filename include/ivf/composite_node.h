@@ -35,7 +35,7 @@ public:
      * @brief Factory method to create a shared pointer to a CompositeNode instance.
      * @return std::shared_ptr<CompositeNode> New CompositeNode instance.
      */
-    static std::shared_ptr<CompositeNode> create();
+    [[nodiscard]] static std::shared_ptr<CompositeNode> create();
 
     /**
      * @brief Add a child node to the composite node.

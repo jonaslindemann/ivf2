@@ -30,7 +30,7 @@ public:
     PBRMeshNode();
     ~PBRMeshNode() override = default;
 
-    static std::shared_ptr<PBRMeshNode> create();
+    [[nodiscard]] static std::shared_ptr<PBRMeshNode> create();
 
     /**
      * @brief Assign a PBRMaterial and register it as the node's material.

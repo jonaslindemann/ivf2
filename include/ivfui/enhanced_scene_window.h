@@ -25,11 +25,11 @@ private:
     bool m_placementEnabled;
 
 public:
-    EnhancedSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor = nullptr,
+    EnhancedSceneWindow(int width, int height, const std::string &title, GLFWmonitor *monitor = nullptr,
                         GLFWwindow *shared = nullptr);
     virtual ~EnhancedSceneWindow();
 
-    static std::shared_ptr<EnhancedSceneWindow> create(int width, int height, const std::string title,
+    [[nodiscard]] static std::shared_ptr<EnhancedSceneWindow> create(int width, int height, const std::string &title,
                                                        GLFWmonitor *monitor = nullptr, GLFWwindow *shared = nullptr);
 
     // Placement functionality

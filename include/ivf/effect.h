@@ -36,7 +36,7 @@ public:
      * @brief Factory method to create a shared pointer to an Effect instance.
      * @return std::shared_ptr<Effect> New Effect instance.
      */
-    static std::shared_ptr<Effect> create();
+    [[nodiscard]] static std::shared_ptr<Effect> create();
 
     /**
      * @brief Set the current time for the effect (useful for animated effects).

@@ -13,7 +13,7 @@ public:
     SwirlEffect();
     virtual ~SwirlEffect() = default;
 
-    static std::shared_ptr<SwirlEffect> create();
+    [[nodiscard]] static std::shared_ptr<SwirlEffect> create();
 
     void setRadius(float radius);
     void setAngle(float angle);

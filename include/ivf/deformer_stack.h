@@ -29,7 +29,7 @@ public:
      * @brief Factory method to create a shared pointer to a DeformerStack instance.
      * @return std::shared_ptr<DeformerStack> New DeformerStack instance.
      */
-    static std::shared_ptr<DeformerStack> create();
+    [[nodiscard]] static std::shared_ptr<DeformerStack> create();
 
     /**
      * @brief Add a deformer to the stack.

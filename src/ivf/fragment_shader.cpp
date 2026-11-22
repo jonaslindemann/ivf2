@@ -9,7 +9,7 @@ using namespace ivf;
 
 using namespace std;
 
-FragmentShader::FragmentShader(const std::string filename)
+FragmentShader::FragmentShader(const std::string &filename)
 :Shader(filename)
 {
 }
@@ -20,7 +20,7 @@ FragmentShader::~FragmentShader()
         glDeleteShader(m_id);
 }
 
-std::shared_ptr<FragmentShader> ivf::FragmentShader::create(const std::string filename)
+std::shared_ptr<FragmentShader> ivf::FragmentShader::create(const std::string &filename)
 {
     return std::make_shared<FragmentShader>(filename);
 }

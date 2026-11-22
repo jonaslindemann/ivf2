@@ -28,7 +28,7 @@ public:
      * @brief Factory method to create a shared pointer to a MotionBlurEffect instance.
      * @return std::shared_ptr<MotionBlurEffect> New MotionBlurEffect instance.
      */
-    static std::shared_ptr<MotionBlurEffect> create();
+    [[nodiscard]] static std::shared_ptr<MotionBlurEffect> create();
 
     void setBlendFactor(float blendFactor); ///< Set the temporal blend factor [0..1].
     float blendFactor() const;

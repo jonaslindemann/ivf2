@@ -120,7 +120,7 @@ void ivf::clearError()
     }
 }
 
-GLenum ivf::checkPrintError(const std::string context, const std::string file, const long line)
+GLenum ivf::checkPrintError(const std::string &context, const std::string &file, const long line)
 {
     GLenum err = glGetError();
 

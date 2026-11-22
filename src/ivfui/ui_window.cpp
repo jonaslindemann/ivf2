@@ -4,13 +4,13 @@
 
 using namespace ivfui;
 
-UiWindow::UiWindow(const std::string name) : m_name(name), m_visible(true)
+UiWindow::UiWindow(const std::string &name) : m_name(name), m_visible(true)
 {}
 
 UiWindow::~UiWindow()
 {}
 
-std::shared_ptr<UiWindow> ivfui::UiWindow::create(const std::string name)
+std::shared_ptr<UiWindow> ivfui::UiWindow::create(const std::string &name)
 {
     return std::make_shared<UiWindow>(name);
 }

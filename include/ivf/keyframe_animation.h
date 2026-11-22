@@ -27,7 +27,7 @@ public:
      * @param node The TransformNode to animate.
      * @return std::shared_ptr<KeyframeAnimation> New KeyframeAnimation instance.
      */
-    static std::shared_ptr<KeyframeAnimation> create(TransformNodePtr node);
+    [[nodiscard]] static std::shared_ptr<KeyframeAnimation> create(TransformNodePtr node);
 
     /**
      * @brief Set the node to be animated.

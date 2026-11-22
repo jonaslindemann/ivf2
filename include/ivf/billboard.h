@@ -29,7 +29,7 @@ public:
     Billboard(float width = 1.0f, float height = 1.0f);
     ~Billboard() override;
 
-    static std::shared_ptr<Billboard> create(float width = 1.0f, float height = 1.0f);
+    [[nodiscard]] static std::shared_ptr<Billboard> create(float width = 1.0f, float height = 1.0f);
 
     void setTexture(TexturePtr tex)        { m_texture  = tex; }
     void setColor(glm::vec4 color)         { m_color    = color; }

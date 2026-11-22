@@ -88,7 +88,7 @@ public:
      * @param window Pointer to the GLFW window.
      * @return std::shared_ptr<CameraManipulator> New CameraManipulator instance.
      */
-    static std::shared_ptr<CameraManipulator> create(GLFWwindow *window);
+    [[nodiscard]] static std::shared_ptr<CameraManipulator> create(GLFWwindow *window);
 
     /**
      * @brief Update the camera manipulator state (should be called per frame).

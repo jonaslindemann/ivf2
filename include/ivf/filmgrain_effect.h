@@ -29,7 +29,7 @@ public:
      * @brief Factory method to create a shared pointer to a FilmgrainEffect instance.
      * @return std::shared_ptr<FilmgrainEffect> New FilmgrainEffect instance.
      */
-    static std::shared_ptr<FilmgrainEffect> create();
+    [[nodiscard]] static std::shared_ptr<FilmgrainEffect> create();
 
     /**
      * @brief Set the intensity of the film grain noise.

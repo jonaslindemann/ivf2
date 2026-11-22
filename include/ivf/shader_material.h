@@ -89,7 +89,7 @@ public:
      * @brief Factory method.
      * @param program Shader program to render with.
      */
-    static std::shared_ptr<ShaderMaterial> create(ProgramPtr program = nullptr);
+    [[nodiscard]] static std::shared_ptr<ShaderMaterial> create(ProgramPtr program = nullptr);
 
     /**
      * @brief Load a program from vertex and fragment shader files.
@@ -103,7 +103,7 @@ public:
      *                 (GLFWSceneWindow updates the watcher every frame).
      * @return The material, or nullptr if the shaders failed to compile or link.
      */
-    static std::shared_ptr<ShaderMaterial> createFromFiles(const std::string &vertPath, const std::string &fragPath,
+    [[nodiscard]] static std::shared_ptr<ShaderMaterial> createFromFiles(const std::string &vertPath, const std::string &fragPath,
                                                            const std::string &name, bool watch = false);
 
     /**
@@ -112,7 +112,7 @@ public:
      * The program is registered with ShaderManager under @p name.
      * @return The material, or nullptr if the shaders failed to compile or link.
      */
-    static std::shared_ptr<ShaderMaterial> createFromStrings(const std::string &vertSource,
+    [[nodiscard]] static std::shared_ptr<ShaderMaterial> createFromStrings(const std::string &vertSource,
                                                              const std::string &fragSource, const std::string &name);
 
     void setProgram(ProgramPtr program);

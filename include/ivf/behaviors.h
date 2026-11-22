@@ -194,7 +194,7 @@ public:
 
     explicit LambdaBehavior(UpdateFn fn) : m_fn(std::move(fn)) {}
 
-    static std::shared_ptr<LambdaBehavior> create(UpdateFn fn)
+    [[nodiscard]] static std::shared_ptr<LambdaBehavior> create(UpdateFn fn)
     {
         return std::make_shared<LambdaBehavior>(std::move(fn));
     }

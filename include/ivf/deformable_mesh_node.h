@@ -31,7 +31,7 @@ public:
      * @brief Factory method to create a shared pointer to a DeformableMeshNode instance.
      * @return std::shared_ptr<DeformableMeshNode> New DeformableMeshNode instance.
      */
-    static std::shared_ptr<DeformableMeshNode> create();
+    [[nodiscard]] static std::shared_ptr<DeformableMeshNode> create();
 
     /**
      * @brief Add a deformer to the stack.

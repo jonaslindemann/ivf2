@@ -136,7 +136,7 @@ public:
      * @brief Factory method to create a shared pointer to a CheckerboardTexture instance.
      * @return std::shared_ptr<CheckerboardTexture> New CheckerboardTexture instance.
      */
-    static std::shared_ptr<CheckerboardTexture> create();
+    [[nodiscard]] static std::shared_ptr<CheckerboardTexture> create();
 
     /**
      * @brief Set the size of each checker.
@@ -185,7 +185,7 @@ public:
      * @brief Factory method to create a shared pointer to a PerlinNoiseTexture instance.
      * @return std::shared_ptr<PerlinNoiseTexture> New PerlinNoiseTexture instance.
      */
-    static std::shared_ptr<PerlinNoiseTexture> create();
+    [[nodiscard]] static std::shared_ptr<PerlinNoiseTexture> create();
 
     /**
      * @brief Set the noise scale.
@@ -257,7 +257,7 @@ public:
      * @brief Factory method to create a shared pointer to a GradientTexture instance.
      * @return std::shared_ptr<GradientTexture> New GradientTexture instance.
      */
-    static std::shared_ptr<GradientTexture> create();
+    [[nodiscard]] static std::shared_ptr<GradientTexture> create();
 
     /**
      * @brief Set the gradient type.
@@ -316,7 +316,7 @@ public:
      * @brief Factory method to create a shared pointer to a MarbleTexture instance.
      * @return std::shared_ptr<MarbleTexture> New MarbleTexture instance.
      */
-    static std::shared_ptr<MarbleTexture> create();
+    [[nodiscard]] static std::shared_ptr<MarbleTexture> create();
 
     /**
      * @brief Set the pattern scale.
@@ -369,7 +369,7 @@ public:
      * @brief Factory method to create a shared pointer to a WoodTexture instance.
      * @return std::shared_ptr<WoodTexture> New WoodTexture instance.
      */
-    static std::shared_ptr<WoodTexture> create();
+    [[nodiscard]] static std::shared_ptr<WoodTexture> create();
 
     /**
      * @brief Set the pattern scale.

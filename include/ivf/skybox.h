@@ -26,7 +26,7 @@ public:
     explicit Skybox(CubemapPtr cubemap = nullptr);
     ~Skybox() override;
 
-    static std::shared_ptr<Skybox> create(CubemapPtr cubemap = nullptr);
+    [[nodiscard]] static std::shared_ptr<Skybox> create(CubemapPtr cubemap = nullptr);
 
     void setCubemap(CubemapPtr cubemap)    { m_cubemap  = cubemap; }
     void setExposure(float exposure)       { m_exposure = exposure; }

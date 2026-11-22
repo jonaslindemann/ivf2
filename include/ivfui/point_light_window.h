@@ -56,7 +56,7 @@ public:
      * @param caption Window caption.
      * @return std::shared_ptr<PointLightWindow> New PointLightWindow instance.
      */
-    static std::shared_ptr<PointLightWindow> create(ivf::PointLightPtr pointLight, std::string caption);
+    [[nodiscard]] static std::shared_ptr<PointLightWindow> create(ivf::PointLightPtr pointLight, std::string caption);
 
     /**
      * @brief Draw the point light window UI (called per frame).

@@ -36,7 +36,7 @@ static void updateSceneBehaviors(ivf::CompositeNode* composite, float dt)
     }
 }
 
-GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
+GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string &title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
     : GLFWWindow(width, height, title, monitor, shared), m_scene(nullptr), m_camManip(nullptr), m_uiWindows(),
       m_bufferSelection(nullptr), m_frameBuffer(nullptr), m_postProcessor(nullptr), m_mainMenu(nullptr),
@@ -58,7 +58,7 @@ GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title,
 GLFWSceneWindow::~GLFWSceneWindow()
 {}
 
-std::shared_ptr<GLFWSceneWindow> GLFWSceneWindow::create(int width, int height, const std::string title,
+std::shared_ptr<GLFWSceneWindow> GLFWSceneWindow::create(int width, int height, const std::string &title,
                                                          GLFWmonitor *monitor, GLFWwindow *shared)
 {
     return std::make_shared<GLFWSceneWindow>(width, height, title, monitor, shared);

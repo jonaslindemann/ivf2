@@ -104,7 +104,7 @@ public:
      * @return The program, or nullptr if it could not be built (the reason is logged).
      */
     [[deprecated("Use compileProgramFromFiles(), which returns an ivf::Result")]] ProgramPtr loadProgramFromFiles(
-        const std::string vertexShader, const std::string fragmentShader, const std::string name,
+        const std::string &vertexShader, const std::string &fragmentShader, const std::string &name,
         bool makeCurrent = true);
 
     /**
@@ -112,7 +112,7 @@ public:
      * @return The program, or nullptr if it could not be built (the reason is logged).
      */
     [[deprecated("Use compileProgramFromStrings(), which returns an ivf::Result")]] ProgramPtr loadProgramFromStrings(
-        const std::string vertexShaderSource, const std::string fragmentShaderSource, const std::string name,
+        const std::string &vertexShaderSource, const std::string &fragmentShaderSource, const std::string &name,
         bool makeCurrent = true);
 
     /**
@@ -152,7 +152,7 @@ public:
      * @param name Name of the program.
      * @return bool True if the program was found and set.
      */
-    bool setCurrentProgram(const std::string name);
+    bool setCurrentProgram(const std::string &name);
 
     /**
      * @brief Set the current shader program directly.
@@ -168,7 +168,7 @@ public:
      * @param name Name of the program.
      * @return ProgramPtr Shared pointer to the program.
      */
-    ProgramPtr program(const std::string name);
+    ProgramPtr program(const std::string &name);
 
     /**
      * @brief Apply the current shader program (bind for use).
@@ -179,7 +179,7 @@ public:
      * @brief Apply a specific shader program by name (bind for use).
      * @param name Name of the program.
      */
-    void applyProgram(const std::string name);
+    void applyProgram(const std::string &name);
 
     /**
      * @brief Deprecated: check the Result returned when the program is built instead.
@@ -204,15 +204,15 @@ typedef ShaderManager *ShaderManagerPtr;
  * @brief Deprecated: use ShaderManager::compileProgramFromFiles().
  */
 [[deprecated("Use ShaderManager::compileProgramFromFiles(), which returns an ivf::Result")]] ProgramPtr
-smLoadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader, const std::string name,
+smLoadProgramFromFiles(const std::string &vertexShader, const std::string &fragmentShader, const std::string &name,
                        bool makeCurrent = true);
 
 /**
  * @brief Deprecated: use ShaderManager::compileProgramFromStrings().
  */
 [[deprecated("Use ShaderManager::compileProgramFromStrings(), which returns an ivf::Result")]] ProgramPtr
-smLoadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
-                         const std::string name, bool makeCurrent = true);
+smLoadProgramFromStrings(const std::string &vertexShaderSource, const std::string &fragmentShaderSource,
+                         const std::string &name, bool makeCurrent = true);
 
 /**
  * @brief Load a basic default shader program using the global ShaderManager.
@@ -242,7 +242,7 @@ ProgramPtr smCurrentProgram();
 /**
  * @brief Set the current shader program by name using the global ShaderManager.
  */
-bool smSetCurrentProgram(const std::string name);
+bool smSetCurrentProgram(const std::string &name);
 
 /**
  * @brief Apply the current shader program using the global ShaderManager.
@@ -252,7 +252,7 @@ void smApply();
 /**
  * @brief Apply a specific shader program by name using the global ShaderManager.
  */
-void smApplyProgram(const std::string name);
+void smApplyProgram(const std::string &name);
 
 /**
  * @brief Deprecated: check the Result returned when the program is built instead.

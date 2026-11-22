@@ -159,7 +159,7 @@ void clearError();
  * @param line Source line number (optional).
  * @return GLenum Error code (GL_NO_ERROR if none).
  */
-GLenum checkPrintError(const std::string context, const std::string file = "", const long line = 0);
+GLenum checkPrintError(const std::string &context, const std::string &file = "", const long line = 0);
 
 #ifdef _DEBUG
 

@@ -102,7 +102,7 @@ public:
      * @param type Type of input expected.
      * @return std::shared_ptr<UiInputDialog> New UiInputDialog instance.
      */
-    static std::shared_ptr<UiInputDialog> create(const std::string& title = "Input",
+    [[nodiscard]] static std::shared_ptr<UiInputDialog> create(const std::string& title = "Input",
                                                   const std::string& label = "Value:",
                                                   InputType type = InputType::Float);
 

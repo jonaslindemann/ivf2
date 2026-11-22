@@ -32,7 +32,7 @@ public:
      * @brief Factory method to create a shared pointer to a BlurEffect instance.
      * @return std::shared_ptr<BlurEffect> New BlurEffect instance.
      */
-    static std::shared_ptr<BlurEffect> create();
+    [[nodiscard]] static std::shared_ptr<BlurEffect> create();
 
     /**
      * @brief Set the blur radius.

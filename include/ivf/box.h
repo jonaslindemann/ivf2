@@ -77,7 +77,7 @@ public:
      * @param segments Number of segments along each axis. Default is (8, 8, 8).
      * @return std::shared_ptr<Box> New Box instance.
      */
-    static std::shared_ptr<Box> create(glm::vec3 size = {1.0f, 1.0f, 1.0f}, glm::vec3 segments = {8, 8, 8});
+    [[nodiscard]] static std::shared_ptr<Box> create(glm::vec3 size = {1.0f, 1.0f, 1.0f}, glm::vec3 segments = {8, 8, 8});
 
     /**
      * @brief Set the size and segments of the box.

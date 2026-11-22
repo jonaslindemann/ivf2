@@ -57,7 +57,7 @@ public:
      * @param sweep Sweep angle (in radians) for the disk.
      * @return std::shared_ptr<Disk> New Disk instance.
      */
-    static std::shared_ptr<Disk> create(double radius = 1.0, double innerRadius = 0.0, int slices = 32, int rings = 4,
+    [[nodiscard]] static std::shared_ptr<Disk> create(double radius = 1.0, double innerRadius = 0.0, int slices = 32, int rings = 4,
                                         double start = 0.0, double sweep = 2 * glm::pi<double>());
 
     /**

@@ -128,7 +128,7 @@ public:
      * @param name Window name.
      * @return std::shared_ptr<EffectInspector> New EffectInspector instance.
      */
-    static std::shared_ptr<EffectInspector> create(const std::string &name);
+    [[nodiscard]] static std::shared_ptr<EffectInspector> create(const std::string &name);
 
     /**
      * @brief Factory method to create a shared pointer to an EffectInspector instance with effect provider.
@@ -136,7 +136,7 @@ public:
      * @param effectProvider Pointer to the EffectListProvider.
      * @return std::shared_ptr<EffectInspector> New EffectInspector instance.
      */
-    static std::shared_ptr<EffectInspector> create(const std::string &name, EffectListProvider *effectProvider);
+    [[nodiscard]] static std::shared_ptr<EffectInspector> create(const std::string &name, EffectListProvider *effectProvider);
 
     /**
      * @brief Set the effect provider for accessing effects.

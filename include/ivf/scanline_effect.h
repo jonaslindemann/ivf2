@@ -14,7 +14,7 @@ public:
     ScanlineEffect();
     virtual ~ScanlineEffect() = default;
 
-    static std::shared_ptr<ScanlineEffect> create();
+    [[nodiscard]] static std::shared_ptr<ScanlineEffect> create();
 
     void setLineSpacing(float lineSpacing);
     void setLineIntensity(float lineIntensity);

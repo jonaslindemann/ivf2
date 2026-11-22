@@ -42,7 +42,7 @@ public:
      * @param slices Number of slices for rounded corners.
      * @return std::shared_ptr<RoundedBox> New RoundedBox instance.
      */
-    static std::shared_ptr<RoundedBox> create(glm::vec3 size = {0.75f, 0.75f, 0.75f}, glm::vec3 segments = {8, 8, 8},
+    [[nodiscard]] static std::shared_ptr<RoundedBox> create(glm::vec3 size = {0.75f, 0.75f, 0.75f}, glm::vec3 segments = {8, 8, 8},
                                               double radius = 0.25, int slices = 4);
 
     /**

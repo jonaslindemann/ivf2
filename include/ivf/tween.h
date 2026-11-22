@@ -103,7 +103,7 @@ private:
     {}
 
 public:
-    static std::shared_ptr<Tween<T>> create(T& target, T to, float duration,
+    [[nodiscard]] static std::shared_ptr<Tween<T>> create(T& target, T to, float duration,
                                              Easing easing = Easing::Linear)
     {
         return std::shared_ptr<Tween<T>>(new Tween<T>(target, to, duration, easing));

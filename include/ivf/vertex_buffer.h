@@ -39,7 +39,7 @@ public:
      * @brief Factory method to create a shared pointer to a VertexBuffer instance.
      * @return std::shared_ptr<VertexBuffer> New VertexBuffer instance.
      */
-    static std::shared_ptr<VertexBuffer> create();
+    [[nodiscard]] static std::shared_ptr<VertexBuffer> create();
 
     /**
      * @brief Set the OpenGL buffer usage hint.

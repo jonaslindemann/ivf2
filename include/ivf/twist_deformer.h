@@ -35,7 +35,7 @@ public:
      * @param center The center point of the twist (default: origin).
      * @return Shared pointer to a new TwistDeformer.
      */
-    static std::shared_ptr<TwistDeformer> create(const glm::vec3 &axis = glm::vec3(0, 1, 0),
+    [[nodiscard]] static std::shared_ptr<TwistDeformer> create(const glm::vec3 &axis = glm::vec3(0, 1, 0),
                                                  const glm::vec3 &center = glm::vec3(0, 0, 0));
 
     /**

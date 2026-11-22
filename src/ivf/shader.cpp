@@ -9,7 +9,7 @@ using namespace ivf;
 
 using namespace std;
 
-Shader::Shader(const std::string filename) : m_filename(filename), m_id(static_cast<GLuint>(-1))
+Shader::Shader(const std::string &filename) : m_filename(filename), m_id(static_cast<GLuint>(-1))
 {
     if (filename != "")
         this->read();
@@ -19,7 +19,7 @@ Shader::~Shader()
 {
 }
 
-std::shared_ptr<Shader> ivf::Shader::create(const std::string filename)
+std::shared_ptr<Shader> ivf::Shader::create(const std::string &filename)
 {
     return std::make_shared<Shader>(filename);
 }

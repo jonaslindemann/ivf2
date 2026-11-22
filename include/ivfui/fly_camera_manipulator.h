@@ -34,7 +34,7 @@ class FlyCameraManipulator {
 public:
     explicit FlyCameraManipulator(GLFWwindow* window);
 
-    static std::shared_ptr<FlyCameraManipulator> create(GLFWwindow* window);
+    [[nodiscard]] static std::shared_ptr<FlyCameraManipulator> create(GLFWwindow* window);
 
     // ---- Camera parameters -----------------------------------------------
 

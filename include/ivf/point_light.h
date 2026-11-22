@@ -29,7 +29,7 @@ public:
      * @brief Factory method to create a shared pointer to a PointLight instance.
      * @return std::shared_ptr<PointLight> New PointLight instance.
      */
-    static std::shared_ptr<PointLight> create();
+    [[nodiscard]] static std::shared_ptr<PointLight> create();
 
     /**
      * @brief Set the attenuation factors for the point light.

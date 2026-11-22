@@ -40,7 +40,7 @@ public:
      * @brief Factory method to create a shared pointer to a MeshNode instance.
      * @return std::shared_ptr<MeshNode> New MeshNode instance.
      */
-    static std::shared_ptr<MeshNode> create();
+    [[nodiscard]] static std::shared_ptr<MeshNode> create();
 
     /**
      * @brief Add a mesh to the node.

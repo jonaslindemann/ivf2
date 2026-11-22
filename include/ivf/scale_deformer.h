@@ -32,7 +32,7 @@ public:
      * @param scale Scale factors for each axis.
      * @return std::shared_ptr<ScaleDeformer> New ScaleDeformer instance.
      */
-    static std::shared_ptr<ScaleDeformer> create(const glm::vec3 &center = glm::vec3(0, 0, 0),
+    [[nodiscard]] static std::shared_ptr<ScaleDeformer> create(const glm::vec3 &center = glm::vec3(0, 0, 0),
                                                  const glm::vec3 &scale = glm::vec3(1, 1, 1));
 
     /**

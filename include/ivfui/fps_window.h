@@ -29,7 +29,7 @@ public:
      * @brief Factory method to create a shared pointer to an FpsWindow instance.
      * @return std::shared_ptr<FpsWindow> New FpsWindow instance.
      */
-    static std::shared_ptr<FpsWindow> create();
+    [[nodiscard]] static std::shared_ptr<FpsWindow> create();
 
     /**
      * @brief Draw the FPS window UI (called per frame).

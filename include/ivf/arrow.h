@@ -50,7 +50,7 @@ public:
      * @brief Factory method to create a shared pointer to an Arrow instance.
      * @return std::shared_ptr<Arrow> New Arrow instance.
      */
-    static std::shared_ptr<Arrow> create();
+    [[nodiscard]] static std::shared_ptr<Arrow> create();
 
     /**
      * @brief Set the type of the arrow (double-sided, left-sided, right-sided).

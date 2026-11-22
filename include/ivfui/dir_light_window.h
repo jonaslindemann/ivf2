@@ -50,7 +50,7 @@ public:
      * @param caption Window caption.
      * @return std::shared_ptr<DirectionalLightWindow> New DirectionalLightWindow instance.
      */
-    static std::shared_ptr<DirectionalLightWindow> create(ivf::DirectionalLightPtr dirLight, std::string caption);
+    [[nodiscard]] static std::shared_ptr<DirectionalLightWindow> create(ivf::DirectionalLightPtr dirLight, std::string caption);
 
     /**
      * @brief Draw the directional light window UI (called per frame).

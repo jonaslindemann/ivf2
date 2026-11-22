@@ -31,7 +31,7 @@ public:
      * @param nVertices Number of 3D vertices.
      * @return std::shared_ptr<Vertices> New Vertices instance.
      */
-    static std::shared_ptr<Vertices> create(GLuint nVertices);
+    [[nodiscard]] static std::shared_ptr<Vertices> create(GLuint nVertices);
 
     /**
      * @brief Set the coordinates of a vertex.

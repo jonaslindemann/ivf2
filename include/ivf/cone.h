@@ -58,7 +58,7 @@ public:
      * @param sweep Sweep angle (in radians) for the cone.
      * @return std::shared_ptr<Cone> New Cone instance.
      */
-    static std::shared_ptr<Cone> create(double radius = 1.0, double size = 1.0, int slices = 32, int segments = 8,
+    [[nodiscard]] static std::shared_ptr<Cone> create(double radius = 1.0, double size = 1.0, int slices = 32, int segments = 8,
                                         double start = 0.0, double sweep = 2 * glm::pi<double>());
 
     /**

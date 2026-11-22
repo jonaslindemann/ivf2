@@ -47,7 +47,7 @@ private:
 public:
     FogEffect();
 
-    static std::shared_ptr<FogEffect> create();
+    [[nodiscard]] static std::shared_ptr<FogEffect> create();
 
     void setColor(glm::vec3 color);
     glm::vec3 color() const;

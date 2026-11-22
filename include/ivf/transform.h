@@ -25,7 +25,7 @@ public:
      * @brief Factory method to create a shared pointer to a Transform instance.
      * @return std::shared_ptr<Transform> New Transform instance.
      */
-    static std::shared_ptr<Transform> create();
+    [[nodiscard]] static std::shared_ptr<Transform> create();
 };
 
 /**

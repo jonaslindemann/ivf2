@@ -25,7 +25,7 @@ public:
      * @brief Factory method to create a shared pointer to a Extents instance.
      * @return std::shared_ptr<Extents> New Extents instance.
      */
-    static std::shared_ptr<Extents> create(BoundingBox bbox);
+    [[nodiscard]] static std::shared_ptr<Extents> create(BoundingBox bbox);
 
     /**
      * @brief Set the size of the cube.

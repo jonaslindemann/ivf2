@@ -32,7 +32,7 @@ public:
      * @brief Factory method to create a shared pointer to a PixelationEffect instance.
      * @return std::shared_ptr<PixelationEffect> New PixelationEffect instance.
      */
-    static std::shared_ptr<PixelationEffect> create();
+    [[nodiscard]] static std::shared_ptr<PixelationEffect> create();
 
     /**
      * @brief Set the pixel size for the effect.

@@ -33,7 +33,7 @@ public:
      * @brief Factory method to create a shared pointer to a ChromaticEffect instance.
      * @return std::shared_ptr<ChromaticEffect> New ChromaticEffect instance.
      */
-    static std::shared_ptr<ChromaticEffect> create();
+    [[nodiscard]] static std::shared_ptr<ChromaticEffect> create();
 
     /**
      * @brief Set the offset for the chromatic aberration effect.

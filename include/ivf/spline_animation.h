@@ -56,7 +56,7 @@ public:
      * @param spline Spline path to animate along.
      * @return std::shared_ptr<SplineAnimation> New SplineAnimation instance.
      */
-    static std::shared_ptr<SplineAnimation> create(ivfmath::SplinePtr spline = nullptr);
+    [[nodiscard]] static std::shared_ptr<SplineAnimation> create(ivfmath::SplinePtr spline = nullptr);
 
     /**
      * @brief Set the spline path to animate along.

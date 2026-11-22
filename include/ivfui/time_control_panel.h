@@ -26,7 +26,7 @@ class TimeControlPanel : public UiWindow {
 public:
     TimeControlPanel();
 
-    static std::shared_ptr<TimeControlPanel> create();
+    [[nodiscard]] static std::shared_ptr<TimeControlPanel> create();
 
 protected:
     void doDraw() override;

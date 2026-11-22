@@ -110,13 +110,13 @@ public:
      * @brief Factory method to create a shared pointer to a TextNode instance.
      * @return std::shared_ptr<TextNode> New TextNode instance.
      */
-    static std::shared_ptr<TextNode> create();
+    [[nodiscard]] static std::shared_ptr<TextNode> create();
 
     /**
      * @brief Set the text string to render.
      * @param text New text string.
      */
-    void setText(const std::string text);
+    void setText(const std::string &text);
 
     /**
      * @brief Get the current text string.

@@ -25,7 +25,7 @@ public:
      * @param nColors Number of colors to allocate.
      * @return std::shared_ptr<Colors> New Colors instance.
      */
-    static std::shared_ptr<Colors> create(GLuint nColors);
+    [[nodiscard]] static std::shared_ptr<Colors> create(GLuint nColors);
 
     /**
      * @brief Set the RGBA value for a specific color index.

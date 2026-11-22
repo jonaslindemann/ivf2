@@ -58,7 +58,7 @@ public:
      * @param cols Number of columns in the field.
      * @return std::shared_ptr<FloatField> New FloatField instance.
      */
-    static std::shared_ptr<FloatField> create(GLuint rows, GLuint cols);
+    [[nodiscard]] static std::shared_ptr<FloatField> create(GLuint rows, GLuint cols);
 
     /**
      * @brief Get the value at the specified row and column.

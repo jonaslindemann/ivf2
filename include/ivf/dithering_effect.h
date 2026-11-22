@@ -25,7 +25,7 @@ public:
      * @brief Factory method to create a shared pointer to a DitheringEffect instance.
      * @return std::shared_ptr<DitheringEffect> New DitheringEffect instance.
      */
-    static std::shared_ptr<DitheringEffect> create();
+    [[nodiscard]] static std::shared_ptr<DitheringEffect> create();
 
 protected:
     /**

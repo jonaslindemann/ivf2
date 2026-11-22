@@ -38,7 +38,7 @@ public:
      * @brief Factory method to create a shared pointer to a DeformablePrimitive instance.
      * @return std::shared_ptr<DeformablePrimitive<PrimitiveType>> New DeformablePrimitive instance.
      */
-    static std::shared_ptr<DeformablePrimitive<PrimitiveType>> create()
+    [[nodiscard]] static std::shared_ptr<DeformablePrimitive<PrimitiveType>> create()
     {
         return std::make_shared<DeformablePrimitive<PrimitiveType>>();
     }

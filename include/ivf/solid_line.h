@@ -39,7 +39,7 @@ public:
      * @param radius Radius of the solid line.
      * @return std::shared_ptr<SolidLine> New SolidLine instance.
      */
-    static std::shared_ptr<SolidLine> create(glm::vec3 p0, glm::vec3 p1, double radius = 0.1);
+    [[nodiscard]] static std::shared_ptr<SolidLine> create(glm::vec3 p0, glm::vec3 p1, double radius = 0.1);
 
     /**
      * @brief Set the start and end points and radius of the line.

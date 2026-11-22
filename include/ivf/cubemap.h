@@ -26,7 +26,7 @@ public:
     Cubemap();
     ~Cubemap() override;
 
-    static std::shared_ptr<Cubemap> create();
+    [[nodiscard]] static std::shared_ptr<Cubemap> create();
 
     /**
      * @brief Load 6 face images (right, left, top, bottom, front, back).

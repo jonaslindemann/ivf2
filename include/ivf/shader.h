@@ -28,7 +28,7 @@ public:
      * @brief Constructor.
      * @param filename Optional filename to load shader source from.
      */
-    Shader(const std::string filename = "");
+    Shader(const std::string &filename = "");
 
     /**
      * @brief Destructor.
@@ -40,7 +40,7 @@ public:
      * @param filename Optional filename to load shader source from.
      * @return std::shared_ptr<Shader> New Shader instance.
      */
-    static std::shared_ptr<Shader> create(const std::string filename = "");
+    [[nodiscard]] static std::shared_ptr<Shader> create(const std::string &filename = "");
 
     /**
      * @brief Set the filename for the shader source.

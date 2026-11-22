@@ -12,7 +12,7 @@ public:
     PosterizeEffect();
     virtual ~PosterizeEffect() = default;
 
-    static std::shared_ptr<PosterizeEffect> create();
+    [[nodiscard]] static std::shared_ptr<PosterizeEffect> create();
 
     void setLevels(float levels);
     float levels() const;

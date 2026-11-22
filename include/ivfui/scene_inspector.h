@@ -58,7 +58,7 @@ public:
      * @param name Window name.
      * @return std::shared_ptr<SceneInspector> New SceneInspector instance.
      */
-    static std::shared_ptr<SceneInspector> create(const std::string &name = "Scene Inspector");
+    [[nodiscard]] static std::shared_ptr<SceneInspector> create(const std::string &name = "Scene Inspector");
 
     /**
      * @brief Set the root node to inspect.

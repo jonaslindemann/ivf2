@@ -103,7 +103,7 @@ public:
     explicit ParticleSystem(int maxParticles = 10000);
     ~ParticleSystem() override;
 
-    static std::shared_ptr<ParticleSystem> create(int maxParticles = 10000);
+    [[nodiscard]] static std::shared_ptr<ParticleSystem> create(int maxParticles = 10000);
 
     // ---- Emitter config ------------------------------------------------
 

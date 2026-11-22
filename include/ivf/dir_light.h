@@ -29,7 +29,7 @@ public:
      * @brief Factory method to create a shared pointer to a DirectionalLight instance.
      * @return std::shared_ptr<DirectionalLight> New DirectionalLight instance.
      */
-    static std::shared_ptr<DirectionalLight> create();
+    [[nodiscard]] static std::shared_ptr<DirectionalLight> create();
 
     /**
      * @brief Set the direction of the light.

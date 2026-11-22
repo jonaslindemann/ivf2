@@ -42,7 +42,7 @@ public:
      * @param rings Number of rings for mesh refinement.
      * @return std::shared_ptr<Dodecahedron> New Dodecahedron instance.
      */
-    static std::shared_ptr<Dodecahedron> create(double radius = 1.0, int segments = 1, int rings = 1);
+    [[nodiscard]] static std::shared_ptr<Dodecahedron> create(double radius = 1.0, int segments = 1, int rings = 1);
 
     /**
      * @brief Set the parameters of the dodecahedron.

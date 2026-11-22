@@ -48,7 +48,7 @@ public:
      * @brief Factory method to create a shared pointer to a Program instance.
      * @return std::shared_ptr<Program> New Program instance.
      */
-    static std::shared_ptr<Program> create();
+    [[nodiscard]] static std::shared_ptr<Program> create();
 
     /**
      * @brief Attach a shader to the program.

@@ -27,7 +27,7 @@ public:
      * @param nVertices Number of vertices (texture coordinate pairs).
      * @return std::shared_ptr<TexCoords> New TexCoords instance.
      */
-    static std::shared_ptr<TexCoords> create(GLuint nVertices);
+    [[nodiscard]] static std::shared_ptr<TexCoords> create(GLuint nVertices);
 
     /**
      * @brief Set the texture coordinate for a given vertex.

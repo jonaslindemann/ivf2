@@ -27,7 +27,7 @@ public:
      * @param cols Number of indices per entry (columns).
      * @return std::shared_ptr<Indices> New Indices instance.
      */
-    static std::shared_ptr<Indices> create(GLuint nIndices, GLuint cols);
+    [[nodiscard]] static std::shared_ptr<Indices> create(GLuint nIndices, GLuint cols);
 
     /**
      * @brief Set a single index value at the specified entry.

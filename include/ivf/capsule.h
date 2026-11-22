@@ -61,7 +61,7 @@ public:
      * @param sweep Sweep angle (in radians) for the capsule.
      * @return std::shared_ptr<Capsule> New Capsule instance.
      */
-    static std::shared_ptr<Capsule> create(double radius = 1.0, double size = 0.5, int slices = 32, int segments = 4,
+    [[nodiscard]] static std::shared_ptr<Capsule> create(double radius = 1.0, double size = 0.5, int slices = 32, int segments = 4,
                                            int rings = 8, double start = 0.0, double sweep = gml::radians(360.0));
 
     /**

@@ -77,7 +77,7 @@ public:
      * @brief Factory method.
      * @param source MeshNode providing the geometry.
      */
-    static std::shared_ptr<InstancedMeshNode> create(MeshNodePtr source = nullptr);
+    [[nodiscard]] static std::shared_ptr<InstancedMeshNode> create(MeshNodePtr source = nullptr);
 
     /**
      * @brief Build an instance transform from position, rotation and scale.

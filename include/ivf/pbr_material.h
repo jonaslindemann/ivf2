@@ -35,7 +35,7 @@ public:
     PBRMaterial();
     ~PBRMaterial() override = default;
 
-    static std::shared_ptr<PBRMaterial> create();
+    [[nodiscard]] static std::shared_ptr<PBRMaterial> create();
 
     // ---- Scalar properties -------------------------------------------------
     void setAlbedo(glm::vec4 color)   { m_albedo = color; }

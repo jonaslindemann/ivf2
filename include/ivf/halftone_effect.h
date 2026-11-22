@@ -31,7 +31,7 @@ public:
      * @brief Factory method to create a shared pointer to a HalftoneEffect instance.
      * @return std::shared_ptr<HalftoneEffect> New HalftoneEffect instance.
      */
-    static std::shared_ptr<HalftoneEffect> create();
+    [[nodiscard]] static std::shared_ptr<HalftoneEffect> create();
 
     void setDotSize(float dotSize); ///< Set the halftone cell size in pixels.
     float dotSize() const;

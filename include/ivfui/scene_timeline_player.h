@@ -25,7 +25,7 @@ private:
 public:
     SceneTimelinePlayer(GLFWSceneWindow* window, ivf::SceneTimelinePtr timeline);
 
-    static std::shared_ptr<SceneTimelinePlayer> create(GLFWSceneWindow* window, ivf::SceneTimelinePtr timeline);
+    [[nodiscard]] static std::shared_ptr<SceneTimelinePlayer> create(GLFWSceneWindow* window, ivf::SceneTimelinePtr timeline);
 
     void setTimeline(ivf::SceneTimelinePtr timeline);
     ivf::SceneTimelinePtr timeline() const;

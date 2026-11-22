@@ -26,7 +26,7 @@ public:
      * @brief Construct a VertexShader, optionally loading source from a file.
      * @param filename Path to the vertex shader source file (default "").
      */
-    VertexShader(const std::string filename = "");
+    VertexShader(const std::string &filename = "");
 
     /**
      * @brief Destructor. Cleans up the OpenGL vertex shader object.
@@ -38,7 +38,7 @@ public:
      * @param filename Path to the vertex shader source file (default "").
      * @return std::shared_ptr<VertexShader> New VertexShader instance.
      */
-    static std::shared_ptr<VertexShader> create(const std::string filename = "");
+    [[nodiscard]] static std::shared_ptr<VertexShader> create(const std::string &filename = "");
 
     /**
      * @brief Compile the vertex shader from its source code.

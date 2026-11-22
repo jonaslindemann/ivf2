@@ -29,7 +29,7 @@ public:
      * @brief Factory method to create a shared pointer to a BloomEffect instance.
      * @return std::shared_ptr<BloomEffect> New BloomEffect instance.
      */
-    static std::shared_ptr<BloomEffect> create();
+    [[nodiscard]] static std::shared_ptr<BloomEffect> create();
 
     /**
      * @brief Set the brightness threshold for the bloom effect.

@@ -27,7 +27,7 @@ public:
      * @param nNormals Number of normals to allocate.
      * @return std::shared_ptr<Normals> New Normals instance.
      */
-    static std::shared_ptr<Normals> create(GLuint nNormals);
+    [[nodiscard]] static std::shared_ptr<Normals> create(GLuint nNormals);
 
     /**
      * @brief Set the normal vector at the specified index.

@@ -52,7 +52,7 @@ public:
      * @param action Callback to invoke when selected (optional).
      * @return std::shared_ptr<UiMenuItem> New UiMenuItem instance.
      */
-    static std::shared_ptr<UiMenuItem> create(const std::string &name, const std::string &shortcut = "",
+    [[nodiscard]] static std::shared_ptr<UiMenuItem> create(const std::string &name, const std::string &shortcut = "",
                                               const std::function<void()> action = nullptr,
                                               const std::function<bool()> selected = nullptr,
                                               const bool isSeparator = false);
@@ -150,7 +150,7 @@ public:
      * @param name Menu name.
      * @return std::shared_ptr<UiMenu> New UiMenu instance.
      */
-    static std::shared_ptr<UiMenu> create(const std::string &name);
+    [[nodiscard]] static std::shared_ptr<UiMenu> create(const std::string &name);
 
     /**
      * @brief Add a menu item to the menu.
@@ -216,7 +216,7 @@ public:
      * @brief Factory method to create a shared pointer to a UiMainMenu instance.
      * @return std::shared_ptr<UiMainMenu> New UiMainMenu instance.
      */
-    static std::shared_ptr<UiMainMenu> create();
+    [[nodiscard]] static std::shared_ptr<UiMainMenu> create();
 
     /**
      * @brief Add a menu to the main menu bar.

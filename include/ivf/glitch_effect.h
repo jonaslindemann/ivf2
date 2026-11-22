@@ -14,7 +14,7 @@ public:
     GlitchEffect();
     virtual ~GlitchEffect() = default;
 
-    static std::shared_ptr<GlitchEffect> create();
+    [[nodiscard]] static std::shared_ptr<GlitchEffect> create();
 
     void setIntensity(float intensity);
     void setBlockSize(float blockSize);

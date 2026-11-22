@@ -34,7 +34,7 @@ private:
 public:
     MipBloomEffect();
 
-    static std::shared_ptr<MipBloomEffect> create();
+    [[nodiscard]] static std::shared_ptr<MipBloomEffect> create();
 
     void setThreshold(float threshold);
     void setIntensity(float intensity);

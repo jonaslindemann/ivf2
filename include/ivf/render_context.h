@@ -64,7 +64,7 @@ public:
      *               host has already loaded them (e.g. called gladLoadGL itself).
      * @return The new context, or nullptr if OpenGL could not be loaded.
      */
-    static std::shared_ptr<RenderContext> create(GLLoadProc loader = nullptr);
+    [[nodiscard]] static std::shared_ptr<RenderContext> create(GLLoadProc loader = nullptr);
 
     /**
      * @brief Release all resources. The owning OpenGL context should be current.

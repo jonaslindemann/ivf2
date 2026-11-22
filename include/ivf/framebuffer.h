@@ -53,7 +53,7 @@ public:
      * @param height Framebuffer height in pixels.
      * @return std::shared_ptr<FrameBuffer> New FrameBuffer instance.
      */
-    static std::shared_ptr<FrameBuffer> create(int width, int height);
+    [[nodiscard]] static std::shared_ptr<FrameBuffer> create(int width, int height);
 
     /**
      * @brief Initialize the screen quad for post-processing.

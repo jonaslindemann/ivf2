@@ -35,7 +35,7 @@ public:
      * @brief Factory method to create a shared pointer to a VertexArray instance.
      * @return std::shared_ptr<VertexArray> New VertexArray instance.
      */
-    static std::shared_ptr<VertexArray> create();
+    [[nodiscard]] static std::shared_ptr<VertexArray> create();
 
     /**
      * @brief Bind the vertex array object to the OpenGL context.

@@ -56,7 +56,7 @@ public:
      * @param name Window name.
      * @return std::shared_ptr<ObjectInspector> New ObjectInspector instance.
      */
-    static std::shared_ptr<ObjectInspector> create(const std::string &name);
+    [[nodiscard]] static std::shared_ptr<ObjectInspector> create(const std::string &name);
 
     /**
      * @brief Set the object to inspect.

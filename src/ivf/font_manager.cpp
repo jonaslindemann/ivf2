@@ -52,7 +52,7 @@ FontManager::~FontManager()
         FT_Done_FreeType(m_freetype);
 }
 
-Result<void> FontManager::loadFace(const std::string filename, const std::string name)
+Result<void> FontManager::loadFace(const std::string &filename, const std::string &name)
 {
     if (m_freetype == nullptr)
         return makeError(ErrorCode::NotSupported, "Could not load font '" + filename + "': FreeType is not initialised",
@@ -91,7 +91,7 @@ FontManager::FontManager()
 
 FontManager::~FontManager() = default;
 
-Result<void> FontManager::loadFace(const std::string filename, const std::string /*name*/)
+Result<void> FontManager::loadFace(const std::string &filename, const std::string &/*name*/)
 {
     return makeError(ErrorCode::NotSupported,
                      "Could not load font '" + filename + "': ivf2 was built without FreeType (IVF2_WITH_FREETYPE=OFF)",
@@ -105,7 +105,7 @@ FontFace FontManager::currentFace()
     return m_currentFace;
 }
 
-FontFace FontManager::face(const std::string name)
+FontFace FontManager::face(const std::string &name)
 {
     auto it = m_faces.find(name);
     return it != m_faces.end() ? it->second : nullptr;

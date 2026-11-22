@@ -54,13 +54,13 @@ int g_windowCount = 0; // numbers IVF2_SCREENSHOT files when there are several w
 using namespace std;
 using namespace ivfui;
 
-std::shared_ptr<GLFWWindow> GLFWWindow::create(int width, int height, const std::string title, GLFWmonitor *monitor,
+std::shared_ptr<GLFWWindow> GLFWWindow::create(int width, int height, const std::string &title, GLFWmonitor *monitor,
                                                GLFWwindow *shared)
 {
     return GLFWWindowPtr(new GLFWWindow(width, height, title, monitor, shared));
 }
 
-GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonitor *monitor, GLFWwindow *shared)
+GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmonitor *monitor, GLFWwindow *shared)
     : m_width(width), m_height(height), m_title(title), m_mouseButton(-1),
       m_mouseAction(-1), m_mouseMods(-1), m_mouseX(-1), m_mouseY(-1), m_shiftDown(false), m_ctrlDown(false),
       m_altDown(false), m_escQuit(true), m_enabled(true), m_runSetup(true), m_closeNotified(false),
@@ -293,7 +293,7 @@ void GLFWWindow::getSize(int &width, int &height)
     }
 }
 
-void GLFWWindow::setWindowIcon(const std::string filename)
+void GLFWWindow::setWindowIcon(const std::string &filename)
 {
     GLFWimage images[1];
     images[0].pixels = ivf::loadImage(filename.c_str(), &images[0].width, &images[0].height, nullptr, 4); // rgba

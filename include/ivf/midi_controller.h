@@ -69,7 +69,7 @@ public:
     /**
      * @brief Create a MidiController instance.
      */
-    static MidiControllerPtr create();
+    [[nodiscard]] static MidiControllerPtr create();
 
     /**
      * @brief List the names of available MIDI input ports.

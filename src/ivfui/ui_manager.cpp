@@ -5,6 +5,9 @@
 
 #include <ivfui/ui_font.h>
 
+#include <cstdlib>
+#include <string_view>
+
 using namespace ivfui;
 
 UiRenderer::UiRenderer(GLFWwindow *window)
@@ -23,7 +26,11 @@ UiRenderer::UiRenderer(GLFWwindow *window)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+    // Multi-Viewport / Platform Windows (ImGui windows can leave the main window);
+    // IVF2_IMGUI_VIEWPORTS=0 turns them off.
+    const char *viewports = std::getenv("IVF2_IMGUI_VIEWPORTS");
+    if (viewports == nullptr || std::string_view(viewports) != "0")
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();

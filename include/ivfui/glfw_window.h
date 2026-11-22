@@ -40,6 +40,9 @@ namespace ivfui {
  * - `IVF2_SCREENSHOT_UI=0` - leave the UI out of the IVF2_SCREENSHOT image.
  * - `IVF2_FIXED_TIMESTEP=seconds` - advance time by a fixed step per frame instead of
  *   the wall clock (see setFixedTimeStep()), so scripted runs render the same frames.
+ * - `IVF2_TRACE_INPUT=1` - log mouse button events and, while a button is down, per frame
+ *   whether the UI captures input (blocking the camera) and how long the frame's parts take.
+ * - `IVF2_IMGUI_VIEWPORTS=0` - keep ImGui windows inside the main window (no platform windows).
  */
 class GLFWWindow {
 private:
@@ -64,6 +67,8 @@ private:
     int m_autoExitFrames{0};       ///< IVF2_EXIT_AFTER_FRAMES: close after this many frames (0 = never).
     std::string m_autoScreenshot;  ///< IVF2_SCREENSHOT: PNG written from the last frame before closing.
     bool m_autoScreenshotUi{true}; ///< IVF2_SCREENSHOT_UI: include the UI in the screenshot.
+    bool m_traceInput{false};      ///< IVF2_TRACE_INPUT: log input handling per frame.
+    double m_tracePressTime{0.0};  ///< IVF2_TRACE_INPUT: glfwGetTime() of the last button press.
     int m_drawnFrames{0};          ///< Frames completed by draw().
     std::mutex m_mutex;         ///< Mutex for thread safety.
     double m_t0;                ///< Start time for frame timing.

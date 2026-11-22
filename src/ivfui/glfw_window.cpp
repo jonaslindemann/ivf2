@@ -88,6 +88,7 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmoni
     }
     if (const char *ui = envValue("IVF2_SCREENSHOT_UI"))
         m_autoScreenshotUi = std::string_view(ui) != "0";
+    m_traceInput = envFlag("IVF2_TRACE_INPUT");
     if (const char *step = envValue("IVF2_FIXED_TIMESTEP"))
         setFixedTimeStep(std::atof(step));
     ++g_windowCount;
@@ -415,11 +416,15 @@ void GLFWWindow::draw()
 
     // Create user interfacee
 
+    const double traceUiStart = glfwGetTime();
     m_uiRenderer->beginFrame();
     this->doDrawUi();
-    if ((!m_uiRenderer->wantCaptureMouse()) && (!m_uiRenderer->wantCaptureKeyboard()))
+    const bool uiWantsMouse = m_uiRenderer->wantCaptureMouse();
+    const bool uiWantsKeyboard = m_uiRenderer->wantCaptureKeyboard();
+    if (!uiWantsMouse && !uiWantsKeyboard)
         this->doUpdateOtherUi();
     m_uiRenderer->endFrame();
+    const double traceDrawStart = glfwGetTime();
 
     // Render scene
 
@@ -455,6 +460,7 @@ void GLFWWindow::draw()
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
 
+    const double traceViewportStart = glfwGetTime();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
         GLFWwindow *backup_current_context = glfwGetCurrentContext();
@@ -465,7 +471,30 @@ void GLFWWindow::draw()
 
     // Swap buffers
 
+    const double traceSwapStart = glfwGetTime();
     this->swapBuffers();
+
+    // IVF2_TRACE_INPUT: per-frame report while a mouse button is held
+    if (m_traceInput)
+    {
+        const bool left = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+        const bool right = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
+        const bool middle = glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
+        if (left || right || middle)
+        {
+            const double end = glfwGetTime();
+            auto ms = [](double seconds) { return std::to_string(int(seconds * 1000.0 + 0.5)); };
+            ivf::logInfo(std::string("frame ") + std::to_string(m_drawnFrames) + (left ? " L" : "") +
+                             (right ? " R" : "") + (middle ? " M" : "") + " +" + ms(end - m_tracePressTime) +
+                             "ms since press | camera " + (uiWantsMouse || uiWantsKeyboard ? "BLOCKED" : "active") +
+                             " (ui mouse " + (uiWantsMouse ? "1" : "0") + ", keyboard " +
+                             (uiWantsKeyboard ? "1" : "0") + ") | ui " + ms(traceDrawStart - traceUiStart) +
+                             " draw " + ms(traceViewportStart - traceDrawStart) + " viewports " +
+                             ms(traceSwapStart - traceViewportStart) + " swap " + ms(end - traceSwapStart) +
+                             " ms",
+                         "InputTrace");
+        }
+    }
 
     // IVF2_EXIT_AFTER_FRAMES
     ++m_drawnFrames;
@@ -527,6 +556,15 @@ void GLFWWindow::doMousePosition(double x, double y)
 
 void GLFWWindow::doMouseButton(int button, int action, int mods)
 {
+    if (m_traceInput)
+    {
+        if (action == GLFW_PRESS)
+            m_tracePressTime = glfwGetTime();
+        ivf::logInfo(std::string("button ") + std::to_string(button) + (action == GLFW_PRESS ? " press" : " release") +
+                         " (frame " + std::to_string(m_drawnFrames) + ")",
+                     "InputTrace");
+    }
+
     m_mouseButton = button;
     m_mouseAction = action;
     m_mouseMods = mods;

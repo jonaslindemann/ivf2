@@ -99,6 +99,8 @@ These environment variables, read when a window is created, let you run any ivf2
 | `IVF2_FIXED_TIMESTEP=seconds` | Advance time by a fixed step per frame instead of the wall clock |
 | `IVF2_RANDOM_SEED=N` | Seed for `ivf::randomSeed()`, particle systems and other generators seeded with `ivf::automaticSeed()` |
 | `IVF2_GL_DEBUG=1` / `0` | Force OpenGL debug output on / off |
+| `IVF2_TRACE_INPUT=1` | Log mouse button events and, while a button is held, per frame whether the UI blocks the camera and how long the UI, drawing, ImGui viewports and buffer swap take |
+| `IVF2_IMGUI_VIEWPORTS=0` | Keep ImGui windows inside the main window (no separate platform windows) |
 
 For example, in PowerShell:
 

@@ -212,13 +212,72 @@ Goal: make the library trustworthy to depend on.
 
 ## Phase 2 - Rendering quality and performance (3-6 months)
 
-1. **Render queue.** Separate scene traversal from drawing: collect draw items
-   (mesh, material, transform, flags), frustum-cull with the existing bounding boxes, sort
-   opaque front-to-back by program/material and transparent back-to-front. Shadow and
-   reflection passes reuse the same list instead of re-traversing. The `RenderContext`
-   (1.2) is passed explicitly through the new drawing path (step B), and geometry is
-   uploaded lazily on first draw instead of in `create()`, so scenes can be built
-   without a current GL context (before the window exists, in tests, on worker threads).
+1. **Render queue.** Separate scene traversal from drawing: one traversal per frame collects
+   a flat list of draw items, which every pass (shadows, reflections, main, selection)
+   then culls, sorts and draws. Design (agreed in principle, not yet implemented):
+
+   ```
+   frame:  scene --collect()--> RenderQueue [DrawItem, ...]
+           Renderer(ctx): shadow pass per light | reflection pass | main pass | selection pass
+                          each pass: filter -> frustum-cull -> sort -> draw
+   ```
+
+   - **Today:** `Node::draw()` applies material and textures in `doPreDraw()` and draws
+     while traversing. A parent's material stays applied while its children draw
+     (inheritance through leftover GL state). `TransformNode` uses a matrix stack that
+     uploads the model matrix on every `translate`/`rotate`/`pop`. Each shadow light and
+     each planar reflection does its own `scene->draw()`, and with selection enabled
+     `doDrawComplete()` repeats the whole `doDraw()` every frame, shadow maps included.
+     No culling, insertion order only (blended nodes must be added last by hand),
+     `Material::setAlpha()` has no visible effect (stock materials never enable `GL_BLEND`),
+     and constructors/setters upload geometry immediately (`Cube::Cube()` -> `doSetup()`).
+   - **DrawItem:** geometry (`Mesh`), world matrix (accumulated during traversal, so
+     `InstanceNode` works - world matrices cannot come from `parent()`), effective
+     material (inheritance resolved), textures, object id, world bounding box, flags
+     (casts shadows, transparent/blend mode, selectable, layer) and a 64-bit sort key.
+   - **Collect:** new virtual `Node::collect(collector, state)`. `TransformNode` multiplies
+     its matrix into the state, `CompositeNode` recurses, `Node` passes its material down
+     explicitly, `MeshNode` emits one item per mesh.
+   - **Passes:** shadow map per light (casters only, light frustum), planar reflection
+     (all but the mirror, mirrored camera), main (camera frustum), selection (selectable
+     items, object ids). Culling tests world bounding boxes against the pass frustum;
+     items without a valid box are never culled.
+   - **Sorting:** buckets background (skybox) -> opaque (by program, material, then
+     front-to-back) -> transparent (`BlendShaderMaterial`, alpha < 1, particles,
+     billboards; back-to-front) -> overlay. Program and material change only when they
+     differ from the previous item; the model matrix is set once per item.
+   - **RenderContext step B:** the renderer and the functions it calls
+     (`Material::apply`, `Mesh::draw`) take a `RenderContext&`; `XxxManager::instance()`
+     remains for user code.
+   - **Lazy GPU upload:** `Mesh` keeps CPU data, `setup()` and shape setters only mark it
+     dirty, buffers are created on first draw. Scenes can then be built without a current
+     GL context (before the window exists, in GL-free tests, on worker threads).
+   - **Compatibility:** `Node::draw()` stays (collect into a temporary queue and execute),
+     so examples calling `m_scene->draw()` keep working. Nodes with their own drawing
+     (`TextNode`, `Billboard`, `Skybox`, `ParticleSystem`, `InstancedMeshNode`,
+     `DeformableMeshNode`, user `doDraw()` overrides) emit a *callback item*: the renderer
+     sets matrix and material and calls their `doDraw()`; library nodes get real
+     `collect()` implementations over time. Behaviour changes: sorted draw order, no GL
+     state carried between nodes, GPU objects not available directly after `create()`.
+   - **Steps** (each its own commit, CI and visual tests green):
+     1. Lazy GPU upload in `Mesh`.
+     2. `DrawItem`, `RenderQueue`, `collect()`, main pass only, no culling or sorting -
+        pixel-identical to today.
+     3. Shadow, reflection and selection passes from the queue (removes the extra
+        traversals; fixes the shadow scene box, whose `ExtentVisitor` result is unused).
+     4. Frustum culling.
+     5. Sorting and transparency buckets (intended image changes: update references).
+     6. Explicit `RenderContext&` through the new path.
+     7. Docs and a stats readout (draw calls, culled items, state changes).
+   - **Open decisions** (recommendation first):
+     - Material inheritance: keep, but explicit | drop (breaks scenes coloured via a
+       parent material).
+     - Materials with alpha < 1 become transparent automatically | stay opaque.
+     - Meshes used by several windows: one GPU copy per context, created on demand |
+       one copy, documented as not shareable.
+     - Selection rendered only on mouse movement/clicks | every frame.
+     - Callback items for custom `doDraw()` nodes kept permanently | deprecated once the
+       library nodes have `collect()`.
 2. **Uniform handling.** Cache uniform locations in `Program`; move camera, lights and
    fog into std140 uniform buffers shared by all programs; automatic instancing of
    identical meshes.

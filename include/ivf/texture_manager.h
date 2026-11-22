@@ -92,19 +92,19 @@ public:
      * @brief Get the current texture blend mode.
      * @return TextureBlendMode Blend mode value.
      */
-    TextureBlendMode textureBlendMode();
+    TextureBlendMode textureBlendMode() const;
 
     /**
      * @brief Get the current blend factor.
      * @return GLfloat Blend factor value.
      */
-    GLfloat blendFactor();
+    GLfloat blendFactor() const;
 
     /**
      * @brief Get whether texture usage is enabled.
      * @return GLboolean 1 if enabled, 0 otherwise.
      */
-    GLboolean useTexture();
+    GLboolean useTexture() const;
 
     /**
      * @brief Enable or disable global multitexturing support.

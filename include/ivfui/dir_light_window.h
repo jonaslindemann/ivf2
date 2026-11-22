@@ -61,7 +61,7 @@ public:
      * @brief Check if the light parameters have been modified via the UI.
      * @return bool True if dirty, false otherwise.
      */
-    bool isDirty();
+    bool isDirty() const;
 };
 
 /**

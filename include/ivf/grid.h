@@ -104,19 +104,19 @@ public:
      * @brief Get the spacing between ticks along the X axis.
      * @return GLfloat Spacing along X.
      */
-    GLfloat tickSpacingX();
+    GLfloat tickSpacingX() const;
 
     /**
      * @brief Get the spacing between ticks along the Y axis.
      * @return GLfloat Spacing along Y.
      */
-    GLfloat tickSpacingY();
+    GLfloat tickSpacingY() const;
 
     /**
      * @brief Get the spacing between ticks along the Z axis.
      * @return GLfloat Spacing along Z.
      */
-    GLfloat tickSpacingZ();
+    GLfloat tickSpacingZ() const;
 
     /**
      * @brief Set the grid rendering type.
@@ -216,7 +216,7 @@ public:
      * @brief Get the current color for grid lines as glm::vec4.
      * @return glm::vec4 RGBA color.
      */
-    glm::vec4 lineColor();
+    glm::vec4 lineColor() const;
 
     /**
      * @brief Get the current color for grid lines as glm::vec3.
@@ -234,7 +234,7 @@ public:
      * @brief Get the current marker size.
      * @return float Marker size.
      */
-    float markerSize();
+    float markerSize() const;
 
 protected:
     /**

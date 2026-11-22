@@ -59,7 +59,7 @@ void PointLightWindow::doDraw()
 	m_pointLight->setEnabled(m_enabled);
 }
  
-bool ivfui::PointLightWindow::isDirty()
+bool ivfui::PointLightWindow::isDirty() const
 {
 	return m_isDirty;
 }

@@ -29,7 +29,7 @@ void DeformableMeshNode::clearDeformers()
     m_deformerStack->clear();
 }
 
-std::shared_ptr<DeformerStack> DeformableMeshNode::deformerStack()
+std::shared_ptr<DeformerStack> DeformableMeshNode::deformerStack() const
 {
     return m_deformerStack;
 }

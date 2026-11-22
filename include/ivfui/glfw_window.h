@@ -250,31 +250,31 @@ public:
      * @brief Get the last mouse button event.
      * @return int Mouse button code.
      */
-    int mouseButton();
+    int mouseButton() const;
 
     /**
      * @brief Get the last mouse action event.
      * @return int Mouse action code.
      */
-    int mouseAction();
+    int mouseAction() const;
 
     /**
      * @brief Get the last mouse modifier flags.
      * @return int Modifier flags.
      */
-    int mouseMods();
+    int mouseMods() const;
 
     /**
      * @brief Get the last mouse X position.
      * @return int Mouse X position.
      */
-    int mouseX();
+    int mouseX() const;
 
     /**
      * @brief Get the last mouse Y position.
      * @return int Mouse Y position.
      */
-    int mouseY();
+    int mouseY() const;
 
     /**
      * @brief Check if any mouse button is currently pressed.

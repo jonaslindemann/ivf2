@@ -38,7 +38,7 @@ void RoundedBox::setSize(glm::vec3 size)
     m_size = size;
 }
 
-glm::vec3 RoundedBox::size()
+glm::vec3 RoundedBox::size() const
 {
     return glm::vec3();
 }
@@ -55,7 +55,7 @@ void RoundedBox::setSegments(glm::uvec3 segments)
     m_segments = segments;
 }
 
-glm::uvec3 RoundedBox::segments()
+glm::uvec3 RoundedBox::segments() const
 {
     return m_segments;
 }
@@ -65,7 +65,7 @@ void RoundedBox::setRadius(double radius)
     m_radius = radius;
 }
 
-double RoundedBox::radius()
+double RoundedBox::radius() const
 {
     return m_radius;
 }
@@ -75,7 +75,7 @@ void RoundedBox::setSlices(int slices)
     m_slices = slices;
 }
 
-int RoundedBox::slices()
+int RoundedBox::slices() const
 {
     return m_slices;
 }

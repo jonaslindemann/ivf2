@@ -272,7 +272,7 @@ void ivf::TransformManager::setMatrixMode(MatrixMode mode)
     m_matrixMode = mode;
 }
 
-TransformManager::MatrixMode ivf::TransformManager::matrixMode()
+TransformManager::MatrixMode ivf::TransformManager::matrixMode() const
 {
     return m_matrixMode;
 }

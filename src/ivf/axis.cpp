@@ -24,7 +24,7 @@ void Axis::setSize(GLfloat size)
     this->refresh();
 }
 
-GLfloat Axis::size()
+GLfloat Axis::size() const
 {
     return m_size;
 }

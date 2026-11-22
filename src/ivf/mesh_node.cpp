@@ -27,7 +27,7 @@ void MeshNode::addMesh(std::shared_ptr<Mesh> mesh)
     m_meshes.push_back(mesh);
 }
 
-std::vector<std::shared_ptr<Mesh>> ivf::MeshNode::meshes()
+std::vector<std::shared_ptr<Mesh>> ivf::MeshNode::meshes() const
 {
     return m_meshes;
 }

@@ -61,7 +61,7 @@ public:
      * @brief Get the current object ID for selection.
      * @return uint32_t Object ID value.
      */
-    uint32_t objectId();
+    uint32_t objectId() const;
 
     /**
      * @brief Enable or disable selection rendering.
@@ -73,7 +73,7 @@ public:
      * @brief Check if selection rendering is enabled.
      * @return bool True if selection rendering is enabled.
      */
-    bool selectionRendering();
+    bool selectionRendering() const;
 
     /**
      * @brief Apply the selection parameters to the rendering context or shader.

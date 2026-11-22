@@ -27,7 +27,7 @@ void ivf::PointLight::setAttenuation(float cnst, float linear, float quadratic)
     m_quadraticAttenuation = quadratic;
 }
 
-float ivf::PointLight::constAttenuation()
+float ivf::PointLight::constAttenuation() const
 {
     return m_constAttenuation;
 }
@@ -37,7 +37,7 @@ float ivf::PointLight::linearAttenutation()
     return m_linearAttenuation;
 }
 
-float ivf::PointLight::quadraticAttenuation()
+float ivf::PointLight::quadraticAttenuation() const
 {
     return m_quadraticAttenuation;
 }

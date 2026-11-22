@@ -52,7 +52,7 @@ public:
      * @brief Get the list of meshes managed by this node.
      * @return std::vector<std::shared_ptr<Mesh>> Vector of mesh pointers.
      */
-    std::vector<std::shared_ptr<Mesh>> meshes();
+    std::vector<std::shared_ptr<Mesh>> meshes() const;
 
     /**
      * @brief Create and add a new mesh to the node.

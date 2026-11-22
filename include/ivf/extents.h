@@ -37,7 +37,7 @@ public:
      * @brief Get the current size of the cube.
      * @return GLfloat Length of each edge of the cube.
      */
-    BoundingBox bbox();
+    BoundingBox bbox() const;
 
 protected:
     /**

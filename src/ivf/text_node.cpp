@@ -52,7 +52,7 @@ void ivf::TextNode::setText(const std::string &text)
     updateTextSize();
 }
 
-std::string ivf::TextNode::text()
+std::string ivf::TextNode::text() const
 {
     return m_text;
 }

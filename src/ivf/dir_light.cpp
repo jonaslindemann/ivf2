@@ -29,7 +29,7 @@ void ivf::DirectionalLight::setDirection(glm::vec3 direction)
         ivf::logWarning(std::string("Directional light direction cannot be zero."), "DirectionalLight");
 }
 
-glm::vec3 ivf::DirectionalLight::direction()
+glm::vec3 ivf::DirectionalLight::direction() const
 {
     return m_direction;
 }

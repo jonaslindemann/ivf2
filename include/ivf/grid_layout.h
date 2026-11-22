@@ -83,37 +83,37 @@ public:
      * @brief Get the number of rows.
      * @return size_t Number of rows.
      */
-    size_t rows();
+    size_t rows() const;
 
     /**
      * @brief Get the number of columns.
      * @return size_t Number of columns.
      */
-    size_t cols();
+    size_t cols() const;
 
     /**
      * @brief Get the number of layers.
      * @return size_t Number of layers.
      */
-    size_t layers();
+    size_t layers() const;
 
     /**
      * @brief Get the spacing along the X axis.
      * @return float Spacing along X.
      */
-    float xSpacing();
+    float xSpacing() const;
 
     /**
      * @brief Get the spacing along the Y axis.
      * @return float Spacing along Y.
      */
-    float ySpacing();
+    float ySpacing() const;
 
     /**
      * @brief Get the spacing along the Z axis.
      * @return float Spacing along Z.
      */
-    float zSpacing();
+    float zSpacing() const;
 
     /**
      * @brief Get the total number of grid positions (rows * cols * layers).

@@ -44,7 +44,7 @@ public:
      * @brief Get the current blur radius.
      * @return float The current blur radius.
      */
-    float blurRadius();
+    float blurRadius() const;
 
 protected:
     /**

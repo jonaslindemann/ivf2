@@ -22,7 +22,7 @@ void Extents::setBoundingBox(BoundingBox bbox)
     this->refresh();
 }
 
-BoundingBox Extents::bbox()
+BoundingBox Extents::bbox() const
 {
     return m_bbox;
 }

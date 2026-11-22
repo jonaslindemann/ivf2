@@ -39,12 +39,12 @@ void ivf::SpotLight::setCutoff(float inner, float outer)
     m_outerCutoff = outer;
 }
 
-glm::vec3 ivf::SpotLight::direction()
+glm::vec3 ivf::SpotLight::direction() const
 {
     return m_direction;
 }
 
-float ivf::SpotLight::constAttenuation()
+float ivf::SpotLight::constAttenuation() const
 {
     return m_constAttenuation;
 }
@@ -54,7 +54,7 @@ float ivf::SpotLight::linearAttenutation()
     return m_linearAttenuation;
 }
 
-float ivf::SpotLight::quadraticAttenuation()
+float ivf::SpotLight::quadraticAttenuation() const
 {
     return m_quadraticAttenuation;
 }
@@ -64,7 +64,7 @@ float ivf::SpotLight::innerCutoff()
     return m_cutoff;
 }
 
-float ivf::SpotLight::outerCutoff()
+float ivf::SpotLight::outerCutoff() const
 {
     return m_outerCutoff;
 }

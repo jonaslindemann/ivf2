@@ -23,7 +23,7 @@ void Cube::setSize(GLfloat size)
     this->refresh();
 }
 
-GLfloat Cube::size()
+GLfloat Cube::size() const
 {
     return m_size;
 }

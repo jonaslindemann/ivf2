@@ -73,7 +73,7 @@ void SpotLightWindow::doDraw()
 	m_spotLight->setEnabled(m_enabled);
 }
  
-bool ivfui::SpotLightWindow::isDirty()
+bool ivfui::SpotLightWindow::isDirty() const
 {
 	return m_isDirty;
 }

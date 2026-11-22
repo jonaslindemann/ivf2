@@ -99,13 +99,13 @@ public:
      * @brief Get the current camera target (look-at point).
      * @return glm::vec3 Camera target.
      */
-    glm::vec3 cameraTarget();
+    glm::vec3 cameraTarget() const;
 
     /**
      * @brief Get the current camera position.
      * @return glm::vec3 Camera position.
      */
-    glm::vec3 cameraPosition();
+    glm::vec3 cameraPosition() const;
 
     /**
      * @brief Set the camera target (look-at point).
@@ -141,19 +141,19 @@ public:
      * @brief Get the camera field of view (FOV).
      * @return double Field of view in degrees.
      */
-    double fov();
+    double fov() const;
 
     /**
      * @brief Get the near clipping plane distance.
      * @return double Near plane distance.
      */
-    double nearZ();
+    double nearZ() const;
 
     /**
      * @brief Get the far clipping plane distance.
      * @return double Far plane distance.
      */
-    double farZ();
+    double farZ() const;
 
     /**
      * @brief Reset the camera to its default state.
@@ -187,7 +187,7 @@ public:
      * @brief Get the current headlight (directional light).
      * @return ivf::DirectionalLightPtr Shared pointer to the headlight.
      */
-    ivf::DirectionalLightPtr headlight();
+    ivf::DirectionalLightPtr headlight() const;
 
     /**
      * @brief Zoom the camera to fit the entire scene extent.

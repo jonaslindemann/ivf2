@@ -104,7 +104,7 @@ public:
      * @brief Get the current size of the box.
      * @return glm::vec3 The current size (width, height, depth).
      */
-    glm::vec3 size();
+    glm::vec3 size() const;
 
     /**
      * @brief Set the number of segments along each axis.
@@ -124,7 +124,7 @@ public:
      * @brief Get the current number of segments along each axis.
      * @return glm::uvec3 The current segment counts.
      */
-    glm::uvec3 segments();
+    glm::uvec3 segments() const;
 
 protected:
     /**

@@ -44,7 +44,7 @@ public:
      * @brief Get the current pixel size for the effect.
      * @return float Pixel block size.
      */
-    float pixelSize();
+    float pixelSize() const;
 
 protected:
     /**

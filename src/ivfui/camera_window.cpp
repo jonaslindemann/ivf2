@@ -231,7 +231,7 @@ void ivfui::CameraWindow::doUpdate()
         return;
 }
 
-bool ivfui::CameraWindow::isDirty()
+bool ivfui::CameraWindow::isDirty() const
 {
     return m_isDirty;
 }

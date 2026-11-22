@@ -25,17 +25,17 @@ void ivf::Effect::setResolution(int width, int height)
     m_height = height;
 }
 
-float ivf::Effect::time()
+float ivf::Effect::time() const
 {
     return m_time;
 }
 
-int ivf::Effect::width()
+int ivf::Effect::width() const
 {
     return m_width;
 }
 
-int ivf::Effect::height()
+int ivf::Effect::height() const
 {
     return m_height;
 }
@@ -77,12 +77,12 @@ ProgramPtr ivf::Effect::compileProgram(const std::string &vertexSource, const st
     return program.value_or(nullptr);
 }
 
-ProgramPtr ivf::Effect::program()
+ProgramPtr ivf::Effect::program() const
 {
     return m_program;
 }
 
-ProgramPtr ivf::Effect::prePassProgram()
+ProgramPtr ivf::Effect::prePassProgram() const
 {
     return m_prePassProgram;
 }

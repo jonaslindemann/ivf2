@@ -261,7 +261,7 @@ public:
      * @brief Get the current matrix mode.
      * @return MatrixMode Current matrix mode.
      */
-    MatrixMode matrixMode();
+    MatrixMode matrixMode() const;
 
     /**
      * @brief Enable the model matrix for subsequent operations.

@@ -151,7 +151,7 @@ public:
      * @brief Check if selection mode is enabled.
      * @return bool True if selection is enabled.
      */
-    bool selectionEnabled();
+    bool selectionEnabled() const;
 
     /**
      * @brief Enable or disable render-to-texture mode.
@@ -163,7 +163,7 @@ public:
      * @brief Check if render-to-texture mode is enabled.
      * @return bool True if enabled.
      */
-    bool renderToTexture();
+    bool renderToTexture() const;
 
     /**
      * @brief Add a custom UI window to the scene window.
@@ -354,13 +354,13 @@ public:
      */
     void setGridSpacing(float x, float y, float z);
 
-    ivf::GridPtr grid();
+    ivf::GridPtr grid() const;
 
     /**
      * @brief Get the cursor node.
      * @return ivf::CursorPtr Shared pointer to the cursor.
      */
-    ivf::CursorPtr cursor();
+    ivf::CursorPtr cursor() const;
 
     /**
      * @brief Enable the cursor overlay.
@@ -408,7 +408,7 @@ public:
      * @brief Get the current grid snapping value.
      * @return float Snapping value.
      */
-    float gridSnapValue();
+    float gridSnapValue() const;
 
     /**
      * @brief Enable or disable snapping to the grid during transformations.
@@ -420,7 +420,7 @@ public:
      * @brief Check if snapping to the grid is enabled.
      * @return bool True if snapping is enabled.
      */
-    bool snapToGrid();
+    bool snapToGrid() const;
 
     /**
      * @brief Reset the camera view to the default state.
@@ -480,7 +480,7 @@ public:
      * @brief Get the root scene node.
      * @return ivf::CompositeNodePtr Shared pointer to the scene.
      */
-    ivf::CompositeNodePtr scene();
+    ivf::CompositeNodePtr scene() const;
 
     /**
      * @brief Get the camera manipulator.
@@ -492,7 +492,7 @@ public:
      * @brief Get the main menu UI.
      * @return ivfui::UiMainMenu* Pointer to the main menu.
      */
-    ivfui::UiMainMenu *mainMenu();
+    ivfui::UiMainMenu *mainMenu() const;
 
     /**
      * @brief Called when the UI should be updated (override for custom behavior).

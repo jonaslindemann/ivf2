@@ -68,7 +68,7 @@ public:
      * @brief Get the current spline path.
      * @return ivfmath::SplinePtr Spline pointer.
      */
-    ivfmath::SplinePtr spline();
+    ivfmath::SplinePtr spline() const;
 
     /**
      * @brief Set the node to animate.
@@ -80,7 +80,7 @@ public:
      * @brief Get the currently animated node.
      * @return TransformNodePtr Animated node pointer.
      */
-    TransformNodePtr animatedNode();
+    TransformNodePtr animatedNode() const;
 
     /**
      * @brief Set the animation speed.
@@ -92,7 +92,7 @@ public:
      * @brief Get the current animation speed.
      * @return double Speed value.
      */
-    double speed();
+    double speed() const;
 
     /**
      * @brief Set the animation playback mode.
@@ -116,7 +116,7 @@ public:
      * @brief Get the current interpolation mode.
      * @return SplineInterpolationMode Interpolation mode.
      */
-    SplineInterpolationMode interpolationMode();
+    SplineInterpolationMode interpolationMode() const;
 
     /**
      * @brief Set the current animation time.
@@ -128,7 +128,7 @@ public:
      * @brief Get the current animation time.
      * @return double Time value.
      */
-    double time();
+    double time() const;
 
     /**
      * @brief Update the animation by a time step.

@@ -199,27 +199,27 @@ GLFWwindow *GLFWWindow::ref()
     return m_window;
 }
 
-int GLFWWindow::mouseButton()
+int GLFWWindow::mouseButton() const
 {
     return m_mouseButton;
 }
 
-int GLFWWindow::mouseAction()
+int GLFWWindow::mouseAction() const
 {
     return m_mouseAction;
 }
 
-int GLFWWindow::mouseMods()
+int GLFWWindow::mouseMods() const
 {
     return m_mouseMods;
 }
 
-int GLFWWindow::mouseX()
+int GLFWWindow::mouseX() const
 {
     return m_mouseX;
 }
 
-int GLFWWindow::mouseY()
+int GLFWWindow::mouseY() const
 {
     return m_mouseY;
 }

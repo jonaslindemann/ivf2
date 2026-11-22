@@ -133,13 +133,13 @@ public:
      * @brief Check if multisampling is enabled.
      * @return bool True if multisampling is enabled.
      */
-    bool multisample();
+    bool multisample() const;
 
     /**
      * @brief Get the number of samples for multisampling.
      * @return int Number of samples.
      */
-    int samples();
+    int samples() const;
 
     /**
      * @brief Check the status of the framebuffer (completeness, etc.).
@@ -165,7 +165,7 @@ public:
      * @brief Get the color texture attached to the framebuffer.
      * @return GLuint Texture ID.
      */
-    GLuint colorTexture();
+    GLuint colorTexture() const;
 
     /**
      * @brief Get the depth texture of the framebuffer.

@@ -36,7 +36,7 @@ void ivf::SelectionManager::setObjectId(uint32_t objectId)
     ShaderManager::instance()->currentProgram()->uniformUInt(m_objectIdId, m_objectId);
 }
 
-uint32_t ivf::SelectionManager::objectId()
+uint32_t ivf::SelectionManager::objectId() const
 {
     return m_objectId;
 }
@@ -47,7 +47,7 @@ void ivf::SelectionManager::setSelectionRendering(bool selectionRendering)
     ShaderManager::instance()->currentProgram()->uniformBool(m_selectionRenderingId, m_selectionRendering);
 }
 
-bool ivf::SelectionManager::selectionRendering()
+bool ivf::SelectionManager::selectionRendering() const
 {
     return m_selectionRendering;
 }

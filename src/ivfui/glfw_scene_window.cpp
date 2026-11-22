@@ -101,7 +101,7 @@ void ivfui::GLFWSceneWindow::setSelectionEnabled(bool enabled)
         m_bufferSelection->initialize(width(), height());
 }
 
-bool ivfui::GLFWSceneWindow::selectionEnabled()
+bool ivfui::GLFWSceneWindow::selectionEnabled() const
 {
     return m_selectionEnabled;
 }
@@ -111,7 +111,7 @@ void ivfui::GLFWSceneWindow::setRenderToTexture(bool renderToTexture)
     m_renderToTexture = renderToTexture;
 }
 
-bool ivfui::GLFWSceneWindow::renderToTexture()
+bool ivfui::GLFWSceneWindow::renderToTexture() const
 {
     return m_renderToTexture;
 }
@@ -397,12 +397,12 @@ void ivfui::GLFWSceneWindow::setGridSpacing(float x, float y, float z)
     m_grid->setSpacing(x, y, z);
 }
 
-ivf::GridPtr ivfui::GLFWSceneWindow::grid()
+ivf::GridPtr ivfui::GLFWSceneWindow::grid() const
 {
     return m_grid;
 }
 
-ivf::CursorPtr ivfui::GLFWSceneWindow::cursor()
+ivf::CursorPtr ivfui::GLFWSceneWindow::cursor() const
 {
     return m_cursor;
 }
@@ -458,7 +458,7 @@ void ivfui::GLFWSceneWindow::setGridSnapValue(float value)
     m_gridSnapValue = value;
 }
 
-float ivfui::GLFWSceneWindow::gridSnapValue()
+float ivfui::GLFWSceneWindow::gridSnapValue() const
 {
     return m_gridSnapValue;
 }
@@ -468,7 +468,7 @@ void ivfui::GLFWSceneWindow::setSnapToGrid(bool snap)
     m_snapToGrid = snap;
 }
 
-bool ivfui::GLFWSceneWindow::snapToGrid()
+bool ivfui::GLFWSceneWindow::snapToGrid() const
 {
     return m_snapToGrid;
 }
@@ -523,7 +523,7 @@ bool ivfui::GLFWSceneWindow::isMainMenuVisible() const
     return m_showMainMenu;
 }
 
-ivf::CompositeNodePtr ivfui::GLFWSceneWindow::scene()
+ivf::CompositeNodePtr ivfui::GLFWSceneWindow::scene() const
 {
     return m_scene;
 }
@@ -533,7 +533,7 @@ ivfui::CameraManipulatorPtr ivfui::GLFWSceneWindow::cameraManipulator()
     return m_camManip;
 }
 
-ivfui::UiMainMenu *ivfui::GLFWSceneWindow::mainMenu()
+ivfui::UiMainMenu *ivfui::GLFWSceneWindow::mainMenu() const
 {
     return m_mainMenu.get();
 }

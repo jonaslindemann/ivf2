@@ -73,7 +73,7 @@ public:
      * @brief Get the currently active font face.
      * @return Handle to the current font face, or nullptr if none is loaded.
      */
-    FontFace currentFace();
+    FontFace currentFace() const;
 
     /**
      * @brief Get a font face by name.

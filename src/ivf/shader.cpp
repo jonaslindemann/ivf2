@@ -29,7 +29,7 @@ void Shader::setFilename(std::string_view filename)
     m_filename = filename;
 }
 
-const std::string Shader::filename()
+const std::string Shader::filename() const
 {
     return m_filename;
 }
@@ -74,7 +74,7 @@ const std::string &Shader::infoLog() const
     return m_infoLog;
 }
 
-GLuint Shader::id()
+GLuint Shader::id() const
 {
     return m_id;
 }

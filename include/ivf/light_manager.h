@@ -172,7 +172,7 @@ public:
      * @brief Check if lighting is enabled.
      * @return bool True if lighting is enabled.
      */
-    bool useLighting();
+    bool useLighting() const;
 
     /**
      * @brief Enable lighting.

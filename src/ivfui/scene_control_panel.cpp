@@ -99,7 +99,7 @@ void SceneControlPanel::doDraw()
         ImGui::Text("GPU: %.2f ms (max %.1f FPS)", gpu * 1000.0, 1.0 / gpu);
 }
 
-bool ivfui::SceneControlPanel::isDirty()
+bool ivfui::SceneControlPanel::isDirty() const
 {
     return m_isDirty;
 }

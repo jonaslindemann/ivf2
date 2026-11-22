@@ -100,7 +100,7 @@ Result<void> FontManager::loadFace(const std::string &filename, const std::strin
 
 #endif // IVF2_HAS_FREETYPE
 
-FontFace FontManager::currentFace()
+FontFace FontManager::currentFace() const
 {
     return m_currentFace;
 }

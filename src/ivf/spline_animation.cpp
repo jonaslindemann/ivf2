@@ -18,7 +18,7 @@ void ivf::SplineAnimation::setSpline(ivfmath::SplinePtr spline)
     m_spline = spline;
 }
 
-ivfmath::SplinePtr ivf::SplineAnimation::spline()
+ivfmath::SplinePtr ivf::SplineAnimation::spline() const
 {
     return m_spline;
 }
@@ -28,7 +28,7 @@ void ivf::SplineAnimation::setAnimatedNode(TransformNodePtr node)
     m_animatedNode = node;
 }
 
-ivf::TransformNodePtr ivf::SplineAnimation::animatedNode()
+ivf::TransformNodePtr ivf::SplineAnimation::animatedNode() const
 {
     return m_animatedNode;
 }
@@ -38,7 +38,7 @@ void ivf::SplineAnimation::setSpeed(double speed)
     m_speed = speed;
 }
 
-double ivf::SplineAnimation::speed()
+double ivf::SplineAnimation::speed() const
 {
     return m_speed;
 }
@@ -58,7 +58,7 @@ void ivf::SplineAnimation::setInterpolationMode(SplineInterpolationMode mode)
     m_interpolationMode = mode;
 }
 
-SplineInterpolationMode ivf::SplineAnimation::interpolationMode()
+SplineInterpolationMode ivf::SplineAnimation::interpolationMode() const
 {
     return m_interpolationMode;
 }
@@ -68,7 +68,7 @@ void ivf::SplineAnimation::setTime(double time)
     m_time = time;
 }
 
-double ivf::SplineAnimation::time()
+double ivf::SplineAnimation::time() const
 {
     return m_time;
 }

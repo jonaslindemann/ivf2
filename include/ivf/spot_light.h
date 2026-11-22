@@ -59,13 +59,13 @@ public:
      * @brief Get the direction of the spot light.
      * @return glm::vec3 Direction vector.
      */
-    glm::vec3 direction();
+    glm::vec3 direction() const;
 
     /**
      * @brief Get the constant attenuation factor.
      * @return float Constant attenuation.
      */
-    float constAttenuation();
+    float constAttenuation() const;
 
     /**
      * @brief Get the linear attenuation factor.
@@ -77,7 +77,7 @@ public:
      * @brief Get the quadratic attenuation factor.
      * @return float Quadratic attenuation.
      */
-    float quadraticAttenuation();
+    float quadraticAttenuation() const;
 
     /**
      * @brief Get the inner cutoff angle.
@@ -89,7 +89,7 @@ public:
      * @brief Get the outer cutoff angle.
      * @return float Outer cutoff angle.
      */
-    float outerCutoff();
+    float outerCutoff() const;
 
     /**
      * @brief Apply the spot light's parameters to the rendering context.

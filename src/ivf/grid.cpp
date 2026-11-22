@@ -455,17 +455,17 @@ void Grid::setSpacing(GLfloat dx, GLfloat dy, GLfloat dz)
     this->refresh();
 }
 
-GLfloat Grid::tickSpacingX()
+GLfloat Grid::tickSpacingX() const
 {
     return m_tickSpacingX;
 }
 
-GLfloat Grid::tickSpacingY()
+GLfloat Grid::tickSpacingY() const
 {
     return m_tickSpacingY;
 }
 
-GLfloat Grid::tickSpacingZ()
+GLfloat Grid::tickSpacingZ() const
 {
     return m_tickSpacingZ;
 }
@@ -563,7 +563,7 @@ void ivf::Grid::setLineColor(float r, float g, float b)
     this->refresh();
 }
 
-glm::vec4 ivf::Grid::lineColor()
+glm::vec4 ivf::Grid::lineColor() const
 {
     return glm::vec4(m_lineColor[0], m_lineColor[1], m_lineColor[2], m_lineColor[3]);
 }
@@ -579,7 +579,7 @@ void ivf::Grid::setMarkerSize(float size)
     this->refresh();
 }
 
-float ivf::Grid::markerSize()
+float ivf::Grid::markerSize() const
 {
     return m_markerSize;
 }

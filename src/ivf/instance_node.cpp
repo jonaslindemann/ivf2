@@ -20,7 +20,7 @@ void InstanceNode::setNode(std::shared_ptr<TransformNode> node)
 	m_node->setUseTransform(false);
 }
 
-std::shared_ptr<TransformNode> ivf::InstanceNode::node()
+std::shared_ptr<TransformNode> ivf::InstanceNode::node() const
 {
 	return m_node;
 }

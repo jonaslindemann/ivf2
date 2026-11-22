@@ -63,7 +63,7 @@ public:
      * @brief Check if the window is visible.
      * @return bool True if visible.
      */
-    bool visible();
+    bool visible() const;
 
     /**
      * @brief Toggle the window visibility.

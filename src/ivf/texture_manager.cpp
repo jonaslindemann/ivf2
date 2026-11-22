@@ -49,17 +49,17 @@ void TextureManager::setUseTexture(bool flag)
     ShaderManager::instance()->currentProgram()->uniformBool(m_useTextureId, m_useTexture);
 }
 
-TextureBlendMode ivf::TextureManager::textureBlendMode()
+TextureBlendMode ivf::TextureManager::textureBlendMode() const
 {
     return m_textureBlendMode;
 }
 
-GLfloat ivf::TextureManager::blendFactor()
+GLfloat ivf::TextureManager::blendFactor() const
 {
     return m_blendFactor;
 }
 
-GLboolean ivf::TextureManager::useTexture()
+GLboolean ivf::TextureManager::useTexture() const
 {
     return m_useTexture;
 }

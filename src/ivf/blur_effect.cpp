@@ -22,7 +22,7 @@ void ivf::BlurEffect::setBlurRadius(float radius)
     m_blurRadius = radius;
 }
 
-float ivf::BlurEffect::blurRadius()
+float ivf::BlurEffect::blurRadius() const
 {
     return m_blurRadius;
 }

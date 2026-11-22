@@ -73,7 +73,7 @@ public:
      * @brief Get the current size of the box.
      * @return glm::vec3 Size vector.
      */
-    glm::vec3 size();
+    glm::vec3 size() const;
 
     /**
      * @brief Set the number of segments along each axis.
@@ -93,7 +93,7 @@ public:
      * @brief Get the current segment count.
      * @return glm::uvec3 Segment count vector.
      */
-    glm::uvec3 segments();
+    glm::uvec3 segments() const;
 
     /**
      * @brief Set the rounding radius.
@@ -105,7 +105,7 @@ public:
      * @brief Get the current rounding radius.
      * @return double Rounding radius.
      */
-    double radius();
+    double radius() const;
 
     /**
      * @brief Set the number of slices for rounded corners.
@@ -117,7 +117,7 @@ public:
      * @brief Get the current number of slices for rounded corners.
      * @return int Number of slices.
      */
-    int slices();
+    int slices() const;
 
 protected:
     /**

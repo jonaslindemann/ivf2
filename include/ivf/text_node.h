@@ -122,7 +122,7 @@ public:
      * @brief Get the current text string.
      * @return std::string Text string.
      */
-    std::string text();
+    std::string text() const;
 
     /**
      * @brief Set the text size (scale).

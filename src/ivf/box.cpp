@@ -92,7 +92,7 @@ void Box::setSize(glm::vec3 size)
     m_size = size;
 }
 
-glm::vec3 Box::size()
+glm::vec3 Box::size() const
 {
     return glm::vec3();
 }
@@ -109,7 +109,7 @@ void Box::setSegments(glm::uvec3 segments)
     m_segments = segments;
 }
 
-glm::uvec3 Box::segments()
+glm::uvec3 Box::segments() const
 {
     return m_segments;
 }

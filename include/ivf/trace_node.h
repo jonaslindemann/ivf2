@@ -46,7 +46,7 @@ public:
      * @brief Get the currently traced node.
      * @return TransformNodePtr Traced node pointer.
      */
-    TransformNodePtr node();
+    TransformNodePtr node() const;
 
 protected:
     /**

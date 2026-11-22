@@ -23,7 +23,7 @@ void ivf::TraceNode::setNode(TransformNodePtr node)
     m_node = node;
 }
 
-TransformNodePtr ivf::TraceNode::node()
+TransformNodePtr ivf::TraceNode::node() const
 {
     return m_node;
 }

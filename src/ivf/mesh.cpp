@@ -97,7 +97,7 @@ void ivf::Mesh::setEnabled(bool flag)
     m_enabled = flag;
 }
 
-bool ivf::Mesh::enabled()
+bool ivf::Mesh::enabled() const
 {
     return m_enabled;
 }
@@ -107,7 +107,7 @@ void ivf::Mesh::setGenerateNormals(bool flag)
     m_generateNormals = flag;
 }
 
-bool ivf::Mesh::generateNormals()
+bool ivf::Mesh::generateNormals() const
 {
     return m_generateNormals;
 }
@@ -118,12 +118,12 @@ void ivf::Mesh::setPolygonOffset(float factor, float units)
     m_polygonOffsetUnits = units;
 }
 
-float ivf::Mesh::polygonOffsetFactor()
+float ivf::Mesh::polygonOffsetFactor() const
 {
     return m_polygonOffsetFactor;
 }
 
-float ivf::Mesh::polygonOffsetUnits()
+float ivf::Mesh::polygonOffsetUnits() const
 {
     return m_polygonOffsetUnits;
 }
@@ -133,7 +133,7 @@ void ivf::Mesh::setDepthFunc(GLenum func)
     m_depthFunc = func;
 }
 
-GLenum ivf::Mesh::depthFunc()
+GLenum ivf::Mesh::depthFunc() const
 {
     return m_depthFunc;
 }
@@ -143,7 +143,7 @@ void ivf::Mesh::setLineWidth(GLfloat width)
     m_lineWidth = width;
 }
 
-GLfloat ivf::Mesh::lineWidth()
+GLfloat ivf::Mesh::lineWidth() const
 {
     return m_lineWidth;
 }
@@ -153,7 +153,7 @@ void ivf::Mesh::setWireframe(bool flag)
     m_wireframe = flag;
 }
 
-bool ivf::Mesh::wireframe()
+bool ivf::Mesh::wireframe() const
 {
     return m_wireframe;
 }
@@ -533,7 +533,7 @@ GLuint ivf::Mesh::currentIndexPos()
     return m_indexPos;
 }
 
-std::shared_ptr<Normals> ivf::Mesh::normals()
+std::shared_ptr<Normals> ivf::Mesh::normals() const
 {
     return m_normals;
 }
@@ -543,7 +543,7 @@ std::shared_ptr<Vertices> ivf::Mesh::vertices()
     return m_verts;
 }
 
-std::shared_ptr<Indices> ivf::Mesh::indices()
+std::shared_ptr<Indices> ivf::Mesh::indices() const
 {
     return m_indices;
 }

@@ -187,12 +187,12 @@ void ivf::FrameBuffer::setSamples(int samples)
     this->initialize();
 }
 
-bool ivf::FrameBuffer::multisample()
+bool ivf::FrameBuffer::multisample() const
 {
     return m_multisample;
 }
 
-int ivf::FrameBuffer::samples()
+int ivf::FrameBuffer::samples() const
 {
     return m_samples;
 }
@@ -247,7 +247,7 @@ void ivf::FrameBuffer::draw()
     glEnable(GL_DEPTH_TEST);
 }
 
-GLuint ivf::FrameBuffer::colorTexture()
+GLuint ivf::FrameBuffer::colorTexture() const
 {
     return m_colorTexture;
 }

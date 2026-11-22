@@ -44,12 +44,12 @@ void ivf::Light::setLightArrayName(std::string name)
     m_lightArrayName = name;
 }
 
-std::string ivf::Light::lightArrayName()
+std::string ivf::Light::lightArrayName() const
 {
     return m_lightArrayName;
 }
 
-int ivf::Light::index()
+int ivf::Light::index() const
 {
     return m_index;
 }
@@ -85,7 +85,7 @@ void ivf::Light::setShadowMap(ShadowMapPtr shadowMap)
     m_shadowMap = shadowMap;
 }
 
-ShadowMapPtr ivf::Light::shadowMap()
+ShadowMapPtr ivf::Light::shadowMap() const
 {
     return m_shadowMap;
 }
@@ -114,22 +114,22 @@ float ivf::Light::shadowStrength() const
 void ivf::Light::apply()
 {}
 
-glm::vec3 ivf::Light::position()
+glm::vec3 ivf::Light::position() const
 {
     return m_position;
 }
 
-glm::vec3 ivf::Light::diffuseColor()
+glm::vec3 ivf::Light::diffuseColor() const
 {
     return m_diffuseColor;
 }
 
-glm::vec3 ivf::Light::specularColor()
+glm::vec3 ivf::Light::specularColor() const
 {
     return m_specularColor;
 }
 
-glm::vec3 ivf::Light::ambientColor()
+glm::vec3 ivf::Light::ambientColor() const
 {
     return m_ambientColor;
 }
@@ -139,7 +139,7 @@ void ivf::Light::setEnabled(bool flag)
     m_enabled = flag;
 }
 
-bool ivf::Light::enabled()
+bool ivf::Light::enabled() const
 {
     return m_enabled;
 }

@@ -211,12 +211,12 @@ void CameraManipulator::update()
     }
 }
 
-glm::vec3 ivfui::CameraManipulator::cameraTarget()
+glm::vec3 ivfui::CameraManipulator::cameraTarget() const
 {
     return m_cameraNewTarget;
 }
 
-glm::vec3 ivfui::CameraManipulator::cameraPosition()
+glm::vec3 ivfui::CameraManipulator::cameraPosition() const
 {
     return m_cameraNewPos;
 }
@@ -253,17 +253,17 @@ void ivfui::CameraManipulator::setFarZ(double farZ)
     updateProjectMatrix();
 }
 
-double ivfui::CameraManipulator::fov()
+double ivfui::CameraManipulator::fov() const
 {
     return m_fov;
 }
 
-double ivfui::CameraManipulator::nearZ()
+double ivfui::CameraManipulator::nearZ() const
 {
     return m_nearZ;
 }
 
-double ivfui::CameraManipulator::farZ()
+double ivfui::CameraManipulator::farZ() const
 {
     return m_farZ;
 }
@@ -307,7 +307,7 @@ void ivfui::CameraManipulator::setHeadlight(ivf::DirectionalLightPtr dirLight)
     }
 }
 
-ivf::DirectionalLightPtr ivfui::CameraManipulator::headlight()
+ivf::DirectionalLightPtr ivfui::CameraManipulator::headlight() const
 {
     return m_headlight;
 }

@@ -158,7 +158,7 @@ void ivf::LightManager::setUseVertexColors(bool flag)
     ShaderManager::instance()->currentProgram()->uniformBool(m_useVertexColorsId, m_useVertexColors);
 }
 
-bool LightManager::useLighting()
+bool LightManager::useLighting() const
 {
     return m_useLighting;
 }

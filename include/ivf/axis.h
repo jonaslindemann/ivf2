@@ -44,7 +44,7 @@ public:
      * @brief Get the current length of the axis lines.
      * @return GLfloat The current axis size.
      */
-    GLfloat size();
+    GLfloat size() const;
 
 protected:
     /**

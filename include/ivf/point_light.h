@@ -43,7 +43,7 @@ public:
      * @brief Get the constant attenuation factor.
      * @return float Constant attenuation.
      */
-    float constAttenuation();
+    float constAttenuation() const;
 
     /**
      * @brief Get the linear attenuation factor.
@@ -55,7 +55,7 @@ public:
      * @brief Get the quadratic attenuation factor.
      * @return float Quadratic attenuation.
      */
-    float quadraticAttenuation();
+    float quadraticAttenuation() const;
 
     /**
      * @brief Apply the point light's parameters to the rendering context.

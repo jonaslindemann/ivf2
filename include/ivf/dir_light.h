@@ -41,7 +41,7 @@ public:
      * @brief Get the current direction of the light.
      * @return glm::vec3 Direction vector.
      */
-    glm::vec3 direction();
+    glm::vec3 direction() const;
 
     /**
      * @brief Calculate the light space transformation matrix for shadow mapping.

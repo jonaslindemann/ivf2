@@ -22,7 +22,7 @@ void ivf::PixelationEffect::setPixelSize(float size)
     m_pixelSize = size;
 }
 
-float ivf::PixelationEffect::pixelSize()
+float ivf::PixelationEffect::pixelSize() const
 {
     return m_pixelSize;
 }

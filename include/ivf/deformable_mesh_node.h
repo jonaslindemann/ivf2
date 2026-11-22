@@ -54,7 +54,7 @@ public:
      * @brief Get the deformer stack.
      * @return std::shared_ptr<DeformerStack> The current deformer stack.
      */
-    std::shared_ptr<DeformerStack> deformerStack();
+    std::shared_ptr<DeformerStack> deformerStack() const;
 
     /**
      * @brief Enable or disable automatic deformation updates.

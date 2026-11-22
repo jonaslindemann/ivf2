@@ -67,19 +67,19 @@ public:
      * @brief Get the current effect time.
      * @return float Current time value.
      */
-    float time();
+    float time() const;
 
     /**
      * @brief Get the current render target width.
      * @return int Width in pixels.
      */
-    int width();
+    int width() const;
 
     /**
      * @brief Get the current render target height.
      * @return int Height in pixels.
      */
-    int height();
+    int height() const;
 
     /**
      * @brief Load and initialize the effect's resources (e.g., shaders).
@@ -95,7 +95,7 @@ public:
      * @brief Get the shader program associated with this effect.
      * @return ProgramPtr Shared pointer to the shader program.
      */
-    ProgramPtr program();
+    ProgramPtr program() const;
 
     /**
      * @brief Get the optional program run just before program() in the effect chain.
@@ -106,7 +106,7 @@ public:
      * invProjection, ...) but not the effect's own parameters.
      * @return ProgramPtr Pre-pass program, or nullptr if the effect has none.
      */
-    ProgramPtr prePassProgram();
+    ProgramPtr prePassProgram() const;
 
 protected:
     ProgramPtr m_program;        ///< Shader program used by the effect.

@@ -32,7 +32,7 @@ void ivfui::UiWindow::setVisible(bool flag)
     m_visible = flag;
 }
 
-bool ivfui::UiWindow::visible()
+bool ivfui::UiWindow::visible() const
 {
     return m_visible;
 }

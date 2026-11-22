@@ -42,7 +42,7 @@ public:
      * @brief Get the current size of the cube.
      * @return GLfloat Length of each edge of the cube.
      */
-    GLfloat size();
+    GLfloat size() const;
 
 protected:
     /**

@@ -128,7 +128,7 @@ public:
      * @brief Check if the mesh is enabled for rendering.
      * @return bool True if enabled.
      */
-    bool enabled();
+    bool enabled() const;
 
     /**
      * @brief Enable or disable automatic normal generation.
@@ -140,7 +140,7 @@ public:
      * @brief Check if automatic normal generation is enabled.
      * @return bool True if enabled.
      */
-    bool generateNormals();
+    bool generateNormals() const;
 
     /**
      * @brief Set the polygon offset for depth bias.
@@ -153,13 +153,13 @@ public:
      * @brief Get the polygon offset factor.
      * @return float Offset factor.
      */
-    float polygonOffsetFactor();
+    float polygonOffsetFactor() const;
 
     /**
      * @brief Get the polygon offset units.
      * @return float Offset units.
      */
-    float polygonOffsetUnits();
+    float polygonOffsetUnits() const;
 
     /**
      * @brief Set the OpenGL depth test function.
@@ -171,7 +171,7 @@ public:
      * @brief Get the OpenGL depth test function.
      * @return GLenum Depth function.
      */
-    GLenum depthFunc();
+    GLenum depthFunc() const;
 
     /**
      * @brief Set the line width for wireframe rendering.
@@ -183,7 +183,7 @@ public:
      * @brief Get the line width for wireframe rendering.
      * @return GLfloat Line width.
      */
-    GLfloat lineWidth();
+    GLfloat lineWidth() const;
 
     /**
      * @brief Enable or disable wireframe rendering.
@@ -195,7 +195,7 @@ public:
      * @brief Check if wireframe rendering is enabled.
      * @return bool True if wireframe is enabled.
      */
-    bool wireframe();
+    bool wireframe() const;
 
     /**
      * @brief Set the shader attribute location for vertex position.
@@ -449,7 +449,7 @@ public:
      * @brief Get the normals array.
      * @return std::shared_ptr<Normals> Normals array.
      */
-    std::shared_ptr<Normals> normals();
+    std::shared_ptr<Normals> normals() const;
 
     /**
      * @brief Get the vertices array.
@@ -461,7 +461,7 @@ public:
      * @brief Get the indices array.
      * @return std::shared_ptr<Indices> Indices array.
      */
-    std::shared_ptr<Indices> indices();
+    std::shared_ptr<Indices> indices() const;
 
     ivf::MaterialPtr material() const;
     void setMaterial(ivf::MaterialPtr material);

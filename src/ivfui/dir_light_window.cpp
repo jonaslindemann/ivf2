@@ -46,7 +46,7 @@ void DirectionalLightWindow::doDraw()
 	m_dirLight->setEnabled(m_enabled);
 }
  
-bool ivfui::DirectionalLightWindow::isDirty()
+bool ivfui::DirectionalLightWindow::isDirty() const
 {
 	return m_isDirty;
 }

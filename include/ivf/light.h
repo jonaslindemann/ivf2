@@ -89,31 +89,31 @@ public:
      * @brief Get the name of the light array in shaders.
      * @return std::string Array name.
      */
-    std::string lightArrayName();
+    std::string lightArrayName() const;
 
     /**
      * @brief Get the position of the light.
      * @return glm::vec3 Position vector.
      */
-    glm::vec3 position();
+    glm::vec3 position() const;
 
     /**
      * @brief Get the diffuse color of the light.
      * @return glm::vec3 Diffuse color.
      */
-    glm::vec3 diffuseColor();
+    glm::vec3 diffuseColor() const;
 
     /**
      * @brief Get the specular color of the light.
      * @return glm::vec3 Specular color.
      */
-    glm::vec3 specularColor();
+    glm::vec3 specularColor() const;
 
     /**
      * @brief Get the ambient color of the light.
      * @return glm::vec3 Ambient color.
      */
-    glm::vec3 ambientColor();
+    glm::vec3 ambientColor() const;
 
     /**
      * @brief Enable or disable the light.
@@ -125,13 +125,13 @@ public:
      * @brief Check if the light is enabled.
      * @return bool True if enabled.
      */
-    bool enabled();
+    bool enabled() const;
 
     /**
      * @brief Get the index of the light.
      * @return int Light index.
      */
-    int index();
+    int index() const;
 
     /**
      * @brief Enable or disable shadow casting for the light.
@@ -162,7 +162,7 @@ public:
      * @brief Get the shadow map resource.
      * @return ShadowMapPtr Shared pointer to the shadow map.
      */
-    ShadowMapPtr shadowMap();
+    ShadowMapPtr shadowMap() const;
 
     /**
      * @brief Clear the shadow map resource.

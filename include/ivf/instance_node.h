@@ -38,7 +38,7 @@ public:
      * @brief Get the currently instanced node.
      * @return std::shared_ptr<TransformNode> The instanced node.
      */
-    std::shared_ptr<TransformNode> node();
+    std::shared_ptr<TransformNode> node() const;
 
 protected:
     /**

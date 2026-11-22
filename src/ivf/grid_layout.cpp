@@ -43,32 +43,32 @@ void GridLayout::setLayers(size_t layers)
     m_layers = layers;
 }
 
-size_t GridLayout::rows()
+size_t GridLayout::rows() const
 {
     return m_rows;
 }
 
-size_t GridLayout::cols()
+size_t GridLayout::cols() const
 {
     return m_cols;
 }
 
-size_t GridLayout::layers()
+size_t GridLayout::layers() const
 {
     return m_layers;
 }
 
-float GridLayout::xSpacing()
+float GridLayout::xSpacing() const
 {
     return m_xSpacing;
 }
 
-float GridLayout::ySpacing()
+float GridLayout::ySpacing() const
 {
     return m_ySpacing;
 }
 
-float GridLayout::zSpacing()
+float GridLayout::zSpacing() const
 {
     return m_zSpacing;
 }

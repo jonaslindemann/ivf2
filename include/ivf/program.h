@@ -291,13 +291,13 @@ public:
      * @brief Get the OpenGL program object ID.
      * @return GLuint Program ID.
      */
-    GLuint id();
+    GLuint id() const;
 
     /**
      * @brief Get the name of the program.
      * @return std::string Program name.
      */
-    std::string name();
+    std::string name() const;
 
     /**
      * @brief Set the name of the program.

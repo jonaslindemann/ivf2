@@ -52,7 +52,7 @@ public:
      * @brief Get the filename of the shader source.
      * @return const std::string Shader source filename.
      */
-    const std::string filename();
+    const std::string filename() const;
 
     /**
      * @brief Set the shader source code directly.
@@ -87,7 +87,7 @@ public:
      * @brief Get the OpenGL shader object ID.
      * @return GLuint Shader object ID.
      */
-    GLuint id();
+    GLuint id() const;
 };
 
 /**

@@ -272,12 +272,12 @@ void ivf::Program::printAttribs()
     free(name);
 }
 
-GLuint Program::id()
+GLuint Program::id() const
 {
     return m_id;
 }
 
-std::string ivf::Program::name()
+std::string ivf::Program::name() const
 {
     return m_name;
 }

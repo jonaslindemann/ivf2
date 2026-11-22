@@ -69,6 +69,8 @@ private:
     bool m_autoScreenshotUi{true}; ///< IVF2_SCREENSHOT_UI: include the UI in the screenshot.
     bool m_traceInput{false};      ///< IVF2_TRACE_INPUT: log input handling per frame.
     double m_tracePressTime{0.0};  ///< IVF2_TRACE_INPUT: glfwGetTime() of the last button press.
+    double m_tracePressX{0.0};     ///< IVF2_TRACE_INPUT: cursor position at the last button press.
+    double m_tracePressY{0.0};
     int m_drawnFrames{0};          ///< Frames completed by draw().
     std::mutex m_mutex;         ///< Mutex for thread safety.
     double m_t0;                ///< Start time for frame timing.

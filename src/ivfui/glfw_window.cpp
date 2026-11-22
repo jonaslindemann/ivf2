@@ -484,9 +484,12 @@ void GLFWWindow::draw()
         {
             const double end = glfwGetTime();
             auto ms = [](double seconds) { return std::to_string(int(seconds * 1000.0 + 0.5)); };
+            double cx = 0.0, cy = 0.0;
+            glfwGetCursorPos(m_window, &cx, &cy);
             ivf::logInfo(std::string("frame ") + std::to_string(m_drawnFrames) + (left ? " L" : "") +
                              (right ? " R" : "") + (middle ? " M" : "") + " +" + ms(end - m_tracePressTime) +
-                             "ms since press | camera " + (uiWantsMouse || uiWantsKeyboard ? "BLOCKED" : "active") +
+                             "ms | cursor moved " + std::to_string(int(cx - m_tracePressX)) + "," +
+                             std::to_string(int(cy - m_tracePressY)) + " | camera " + (uiWantsMouse || uiWantsKeyboard ? "BLOCKED" : "active") +
                              " (ui mouse " + (uiWantsMouse ? "1" : "0") + ", keyboard " +
                              (uiWantsKeyboard ? "1" : "0") + ") | ui " + ms(traceDrawStart - traceUiStart) +
                              " draw " + ms(traceViewportStart - traceDrawStart) + " viewports " +
@@ -559,7 +562,10 @@ void GLFWWindow::doMouseButton(int button, int action, int mods)
     if (m_traceInput)
     {
         if (action == GLFW_PRESS)
+        {
             m_tracePressTime = glfwGetTime();
+            glfwGetCursorPos(m_window, &m_tracePressX, &m_tracePressY);
+        }
         ivf::logInfo(std::string("button ") + std::to_string(button) + (action == GLFW_PRESS ? " press" : " release") +
                          " (frame " + std::to_string(m_drawnFrames) + ")",
                      "InputTrace");

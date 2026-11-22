@@ -22,10 +22,9 @@ void SelectionManager::drop()
     // Managers are released together with their RenderContext.
 }
 
-
 SelectionManager::SelectionManager()
-    : m_objectId(0), m_objectIdId(-1), m_selectionRendering(false), m_selectionRenderingId(-1), m_savedObjectId(0),
-      m_savedSelectionRendering(false)
+    : m_objectId(0), m_savedObjectId(0), m_objectIdId(-1), m_selectionRendering(false),
+      m_savedSelectionRendering(false), m_selectionRenderingId(-1)
 {
     m_objectIdId = ShaderManager::instance()->currentProgram()->uniformLoc("objectId");
     m_selectionRenderingId = ShaderManager::instance()->currentProgram()->uniformLoc("selectionRendering");

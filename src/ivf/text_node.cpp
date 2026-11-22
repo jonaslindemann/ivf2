@@ -19,9 +19,9 @@ using namespace std;
 using namespace ivf;
 
 TextNode::TextNode()
-    : m_text(""), m_VAO(0), m_vertexVBO(0), m_texVBO(0), m_textColor(1.0f, 1.0f, 0.0f), m_textRendering(true),
-      m_useFixedTextColor(false), m_maxPixels(400), m_scale(1.0), m_textAlignX(TextAlignX::LEFT),
-      m_textAlignY(TextAlignY::BOTTOM), m_textHeight(-1.0), m_textWidth(-1.0)
+    : m_text(""), m_textRendering(true), m_useFixedTextColor(false), m_textColor(1.0f, 1.0f, 0.0f), m_maxPixels(400),
+      m_scale(1.0), m_textAlignX(TextAlignX::LEFT), m_textAlignY(TextAlignY::BOTTOM), m_textWidth(-1.0),
+      m_textHeight(-1.0), m_VAO(0), m_vertexVBO(0), m_texVBO(0)
 {
     m_textRenderingId = ShaderManager::instance()->currentProgram()->uniformLoc("textRendering");
     m_useFixedTextColorId = ShaderManager::instance()->currentProgram()->uniformLoc("useFixedTextColor");

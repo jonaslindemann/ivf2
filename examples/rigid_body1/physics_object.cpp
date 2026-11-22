@@ -9,7 +9,7 @@
 
 PhysicsObject::PhysicsObject(rp3d::PhysicsWorld *world, const glm::vec3 &position, const glm::quat &rotation,
                              float mass)
-    : m_world(world), m_body(nullptr), m_collider(nullptr), m_position(position), m_rotation(rotation), m_mass(mass),
+    : m_body(nullptr), m_collider(nullptr), m_world(world), m_position(position), m_rotation(rotation), m_mass(mass),
       m_restitution(0.5f), m_friction(0.3f), m_isStatic(mass == 0.0f)
 {}
 

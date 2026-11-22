@@ -4,8 +4,8 @@ using namespace ivf;
 using namespace ivfmath;
 
 ivf::SplineAnimation::SplineAnimation(ivfmath::SplinePtr spline)
-    : m_spline(spline), m_time(0.0f), m_speed(1.0f), m_animatedNode(nullptr), m_mode(SplineAnimMode::Once),
-      m_interpolationMode(SplineInterpolationMode::Time)
+    : m_spline(spline), m_time(0.0f), m_speed(1.0f), m_mode(SplineAnimMode::Once),
+      m_interpolationMode(SplineInterpolationMode::Time), m_animatedNode(nullptr)
 {}
 
 std::shared_ptr<SplineAnimation> ivf::SplineAnimation::create(ivfmath::SplinePtr spline)

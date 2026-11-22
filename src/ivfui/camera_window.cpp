@@ -6,8 +6,9 @@ using namespace ivfui;
 using namespace ivf;
 
 CameraWindow::CameraWindow(CameraManipulatorPtr camManip, std::string caption)
-    : UiWindow(caption), m_cameraManipulator(camManip), m_scene(nullptr), m_isDirty(false), m_fov(45.0f), m_nearZ(0.1f),
-      m_farZ(100.0f), m_cameraPosition{0.0f, 0.0f, 0.0f}, m_cameraTarget{0.0f, 0.0f, 0.0f}, m_includeInvisible(false)
+    : UiWindow(caption), m_cameraManipulator(camManip), m_scene(nullptr), m_cameraTarget{0.0f, 0.0f, 0.0f},
+      m_cameraPosition{0.0f, 0.0f, 0.0f}, m_fov(45.0f), m_nearZ(0.1f), m_farZ(100.0f), m_isDirty(false),
+      m_includeInvisible(false)
 {
     updateControls();
 }

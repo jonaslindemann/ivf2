@@ -21,7 +21,6 @@ namespace ivf {
  */
 class PointPath {
 private:
-    int m_segments; ///< Number of segments in the path.
 
     using Impl = generator::ParametricPath;
     Impl parametricPath_; ///< Underlying parametric path implementation.

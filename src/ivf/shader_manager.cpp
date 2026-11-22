@@ -67,7 +67,7 @@ void bindDefaultCubemap(GLuint unit)
 }
 
 ShaderManager::ShaderManager()
-    : m_currentProgram(nullptr), m_linkErrors(false), m_vertexCompileErrors(false), m_fragCompileErrors(false)
+    : m_linkErrors(false), m_vertexCompileErrors(false), m_fragCompileErrors(false), m_currentProgram(nullptr)
 {
     logDebug("ShaderManager Constructor", "ShaderManager");
 }

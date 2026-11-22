@@ -20,9 +20,8 @@ glm::vec3 computeNormal(glm::vec3 const &a, glm::vec3 const &b, glm::vec3 const 
 }
 
 Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType, GLenum usage)
-    : m_position(0.0f), m_generateNormals(true), m_enabled(true), m_polygonOffsetFactor(0.0f),
-      m_polygonOffsetUnits(0.0f), m_depthFunc(GL_LESS), m_lineWidth(1.0f), m_usage(usage), m_primType(primType),
-      m_wireframe(false)
+    : m_primType(primType), m_wireframe(false), m_position(0.0f), m_generateNormals(true), m_enabled(true),
+      m_polygonOffsetFactor(0.0f), m_polygonOffsetUnits(0.0f), m_depthFunc(GL_LESS), m_lineWidth(1.0f), m_usage(usage)
 {
     this->setSize(vsize, isize);
 }
@@ -323,7 +322,6 @@ void Mesh::end()
         }
     }
 
-    GLenum err;
     ivf::clearError(); // flush any accumulated GL errors from before mesh setup
     m_VAO = std::make_unique<VertexArray>();
     m_VAO->bind();
@@ -367,7 +365,7 @@ void Mesh::end()
     }
 
     m_VAO->unbind();
-    err = checkPrintError("Mesh", __FILE__, __LINE__);
+    checkPrintError("Mesh", __FILE__, __LINE__);
 }
 
 void ivf::Mesh::updateVertices()

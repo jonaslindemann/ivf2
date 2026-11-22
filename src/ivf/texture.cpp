@@ -25,8 +25,8 @@ using namespace std;
 
 Texture::Texture()
     : m_id(0), m_wrapT(GL_REPEAT), m_wrapS(GL_REPEAT), m_minFilter(GL_LINEAR_MIPMAP_LINEAR), m_magFilter(GL_LINEAR),
-      m_intFormat(GL_RGBA), m_level(0), m_format(GL_RGBA), m_type(GL_UNSIGNED_BYTE), m_texUnit(0),
-      m_blendMode(TextureBlendMode::Normal), m_blendFactor(1.0), m_useLocalBlendMode(false)
+      m_intFormat(GL_RGBA), m_level(0), m_texUnit(0), m_format(GL_RGBA), m_type(GL_UNSIGNED_BYTE),
+      m_useLocalBlendMode(false), m_blendMode(TextureBlendMode::Normal), m_blendFactor(1.0)
 {
     glGenTextures(1, &m_id);
 }

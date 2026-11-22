@@ -11,7 +11,7 @@
 using namespace ivf;
 
 BufferSelection::BufferSelection(CompositeNodePtr scene)
-    : m_fbo(0), m_colorTexture(0), m_scene(scene), m_depthRenderBuffer(0), m_width(0), m_height(0)
+    : m_fbo(0), m_colorTexture(0), m_depthRenderBuffer(0), m_width(0), m_height(0), m_scene(scene)
 {}
 
 BufferSelection::~BufferSelection()

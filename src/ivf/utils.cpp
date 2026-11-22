@@ -106,7 +106,7 @@ glm::vec3 LinearInterpolFunc::operator()(float t)
     else if (t > float(m_points.size() - 1))
         tt = float(m_points.size() - 1);
 
-    for (int i = 0; i < m_points.size(); i++)
+    for (size_t i = 0; i < m_points.size(); i++)
         pos += m_points[i] * tri(tt - float(i));
 
     return pos;

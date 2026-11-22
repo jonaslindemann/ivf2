@@ -13,8 +13,8 @@
 namespace ivf {
 
 PostProcessor::PostProcessor(int width, int height)
-    : m_width(width), m_height(height), m_fboA(0), m_fboB(0), m_textureA(0), m_textureB(0), m_historyFBO(0),
-      m_historyTex{0, 0}, m_historyIndex(0), m_quadVAO(0), m_quadVBO(0), m_time(0.0f)
+    : m_width(width), m_height(height), m_time(0.0f), m_fboA(0), m_fboB(0), m_textureA(0), m_textureB(0),
+      m_historyFBO(0), m_historyTex{0, 0}, m_historyIndex(0), m_quadVAO(0), m_quadVBO(0)
 {}
 
 PostProcessor::~PostProcessor()

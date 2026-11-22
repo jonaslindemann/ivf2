@@ -22,10 +22,9 @@ void TextureManager::drop()
     // Managers are released together with their RenderContext.
 }
 
-
 TextureManager::TextureManager()
-    : m_textureBlendMode(TextureBlendMode::Normal), m_blendFactor(1.0), m_useTexture(true), m_textureBlendModeId(-1),
-      m_blendFactorId(-1), m_useTextureId(-1), m_globalMultitexturingEnabled(true)
+    : m_textureBlendMode(TextureBlendMode::Normal), m_textureBlendModeId(-1), m_blendFactor(1.0), m_blendFactorId(-1),
+      m_useTexture(true), m_useTextureId(-1), m_globalMultitexturingEnabled(true)
 {
     m_textureBlendModeId = ShaderManager::instance()->currentProgram()->uniformLoc("blendMode");
     m_blendFactorId = ShaderManager::instance()->currentProgram()->uniformLoc("blendFactor");

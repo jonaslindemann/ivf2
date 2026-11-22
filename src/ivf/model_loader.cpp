@@ -24,7 +24,6 @@ void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNo
                  aiMatrix4x4 parentTransform);
 void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode);
 void processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node);
-void processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh);
 
 void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNode> compNode,
                               aiMatrix4x4 parentTransform)
@@ -258,7 +257,7 @@ void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNod
     }
 
     // Process materials (simplified to avoid potential issues)
-    if (aiMesh->mMaterialIndex >= 0)
+    if (aiMesh->mMaterialIndex < scene->mNumMaterials)
     {
         try
         {
@@ -331,59 +330,6 @@ void processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node)
 
             logInfofc("ModelLoader", "  Set diffuse: ({:.6f}, {:.6f}, {:.6f}, {:.6f})", diffuseColor.r, diffuseColor.g,
                       diffuseColor.b, diffuseColor.a);
-        }
-    } catch (const std::exception &e)
-    {
-        logWarningfc("ModelLoader", "Material creation failed: {}", e.what());
-    }
-}
-
-void processMaterial(aiMaterial *aiMat, std::shared_ptr<Mesh> mesh)
-{
-    aiColor3D diffuse(1.0f, 1.0f, 1.0f);
-    aiColor3D ambient(0.2f, 0.2f, 0.2f);
-    aiColor3D specular(1.0f, 1.0f, 1.0f);
-    float shininess = 32.0f;
-    float opacity = 1.0f;
-
-    aiMat->Get(AI_MATKEY_COLOR_DIFFUSE, diffuse);
-    aiMat->Get(AI_MATKEY_COLOR_AMBIENT, ambient);
-    aiMat->Get(AI_MATKEY_COLOR_SPECULAR, specular);
-    aiMat->Get(AI_MATKEY_SHININESS, shininess);
-    aiMat->Get(AI_MATKEY_OPACITY, opacity);
-
-    // Debug output with higher precision
-
-    logInfofc("ModelLoader",
-               "Material - Diffuse: ({:.6f}, {:.6f}, {:.6f}), Opacity: {:.6f}", diffuse.r, diffuse.g,
-              diffuse.b, opacity);
-
-    try
-    {
-        auto material = mesh->material();
-        if (!material)
-        {
-            material = Material::create();
-            mesh->setMaterial(material);
-        }
-
-        if (material)
-        {
-            // Ensure full precision colors
-            glm::vec4 diffuseColor(diffuse.r, diffuse.g, diffuse.b, opacity);
-            glm::vec4 ambientColor(ambient.r, ambient.g, ambient.b, opacity);
-            glm::vec4 specularColor(specular.r, specular.g, specular.b, opacity);
-
-            material->setDiffuseColor(diffuseColor);
-            material->setAmbientColor(ambientColor);
-            material->setSpecularColor(specularColor);
-            material->setShininess(shininess);
-
-            // Ensure material is properly enabled
-            // Debug: Check if colors are being clamped or quantized
-
-            logInfofc("ModelLoader", "  Set ambient: ({:.6f}, {:.6f}, {:.6f}, {:.6f})", ambientColor.r, ambientColor.g,
-                      ambientColor.b, ambientColor.a);
         }
     } catch (const std::exception &e)
     {

@@ -7,3 +7,8 @@ ivf2_add_library(glad FOLDER "depends" SOURCES
 
 set_target_properties(glad PROPERTIES LINKER_LANGUAGE C)
 target_link_libraries(glad PUBLIC OpenGL::GL PRIVATE ${CMAKE_DL_LIBS})
+
+# Generated code: ISO C forbids the object-to-function pointer casts a GL loader needs
+if(NOT MSVC)
+    target_compile_options(glad PRIVATE -Wno-pedantic)
+endif()

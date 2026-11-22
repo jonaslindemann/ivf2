@@ -13,10 +13,7 @@ double constrain(double value, double minValue, double maxValue)
     return value;
 }
 
-Sun::Sun(double m, double x, double y, double z)
-    : m_loc(x, y, z)
-	, m_mass(m)
-	, m_G(10.0)
+Sun::Sun(double m, double x, double y, double z) : m_mass(m), m_loc(x, y, z), m_G(10.0)
 {}
 
 solar::Sun::Sun(const Sun &sunCopy)

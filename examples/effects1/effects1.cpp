@@ -148,7 +148,7 @@ public:
 
         // Populate the grid with transform nodes, each with a random colored material
 
-        for (auto i = 0; i < layout.size(); i++)
+        for (size_t i = 0; i < layout.size(); i++)
         {
             // Create a new material with random diffuse color
 

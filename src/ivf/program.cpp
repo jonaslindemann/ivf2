@@ -11,12 +11,12 @@ using namespace ivf;
 
 using namespace std;
 
-Program::Program() : m_id(static_cast<GLuint>(-1)), m_name("generic"), m_enabled(true)
+Program::Program() : m_name("generic"), m_id(static_cast<GLuint>(-1)), m_enabled(true)
 {}
 
 Program::~Program()
 {
-    if (m_id != -1)
+    if (m_id != static_cast<GLuint>(-1))
         glDeleteProgram(m_id);
 }
 
@@ -42,7 +42,7 @@ size_t Program::shaderCount()
 
 bool Program::link()
 {
-    if (m_id != -1)
+    if (m_id != static_cast<GLuint>(-1))
         glDeleteProgram(m_id);
 
     // Link the program
@@ -84,7 +84,7 @@ const std::string &Program::infoLog() const
 
 void Program::use()
 {
-    if (m_id == -1)
+    if (m_id == static_cast<GLuint>(-1))
     {
         logError("Program not linked yet, cannot use it.", "Program");
         return;

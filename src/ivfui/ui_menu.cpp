@@ -6,8 +6,8 @@ using namespace ivfui;
 
 UiMenuItem::UiMenuItem(const std::string &name, const std::string &shortcut, const std::function<void()> action,
                        const std::function<bool()> selected, const bool isSeparator)
-    : m_name(name), m_selected(false), m_enabled(true), m_shortcut(shortcut), m_actionCallback(action),
-      m_selectedCallback(selected), m_isSeparator(isSeparator)
+    : m_name(name), m_shortcut(shortcut), m_enabled(true), m_selected(false), m_isSeparator(isSeparator),
+      m_actionCallback(action), m_selectedCallback(selected)
 {}
 
 std::shared_ptr<UiMenuItem> ivfui::UiMenuItem::create(const std::string &name, const std::string &shortcut,

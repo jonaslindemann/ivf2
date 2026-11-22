@@ -39,7 +39,6 @@ private:
 
     FpsWindowPtr m_fpsWindow;
 
-    bool m_showDemoWindow = false;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)

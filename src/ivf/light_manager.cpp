@@ -24,11 +24,10 @@ void LightManager::drop()
     // Managers are released together with their RenderContext.
 }
 
-
 LightManager::LightManager()
-    : m_useLighting(true), m_useVertexColors(false), m_useLightingId(-1), m_useVertexColorsId(-1), m_useTextureId(-1),
-      m_pointLightCountId(-1), m_directionalLightCountId(-1), m_spotLightCountId(-1), m_diffuseColorId(-1),
-      m_specularColorId(-1), m_ambientColorId(-1), m_shininessId(-1), m_alphaId(-1), m_savedState(false)
+    : m_useLighting(true), m_useVertexColors(false), m_savedState(false), m_useLightingId(-1), m_useVertexColorsId(-1),
+      m_useTextureId(-1), m_pointLightCountId(-1), m_directionalLightCountId(-1), m_spotLightCountId(-1),
+      m_diffuseColorId(-1), m_specularColorId(-1), m_ambientColorId(-1), m_shininessId(-1), m_alphaId(-1)
 {
     m_useLightingId = ShaderManager::instance()->currentProgram()->uniformLoc("useLighting");
     m_useVertexColorsId = ShaderManager::instance()->currentProgram()->uniformLoc("useVertexColors");
@@ -71,7 +70,7 @@ SpotLightPtr ivf::LightManager::addSpotLight()
 
 PointLightPtr ivf::LightManager::getPointLight(int idx)
 {
-    if ((idx >= 0) && (idx < m_pointLights.size()))
+    if ((idx >= 0) && (static_cast<size_t>(idx) < m_pointLights.size()))
         return m_pointLights[idx];
     else
         return nullptr;
@@ -79,7 +78,7 @@ PointLightPtr ivf::LightManager::getPointLight(int idx)
 
 DirectionalLightPtr ivf::LightManager::getDirectionalLight(int idx)
 {
-    if ((idx >= 0) && (idx < m_dirLights.size()))
+    if ((idx >= 0) && (static_cast<size_t>(idx) < m_dirLights.size()))
         return m_dirLights[idx];
     else
         return nullptr;
@@ -87,7 +86,7 @@ DirectionalLightPtr ivf::LightManager::getDirectionalLight(int idx)
 
 SpotLightPtr ivf::LightManager::getSpotLight(int idx)
 {
-    if ((idx >= 0) && (idx < m_spotLights.size()))
+    if ((idx >= 0) && (static_cast<size_t>(idx) < m_spotLights.size()))
         return m_spotLights[idx];
     else
         return nullptr;
@@ -110,7 +109,7 @@ size_t ivf::LightManager::spotLightCount()
 
 void ivf::LightManager::clearPointLights()
 {
-    for (auto i = 0; i < m_pointLights.size(); i++)
+    for (size_t i = 0; i < m_pointLights.size(); i++)
     {
         m_pointLights[i]->setEnabled(false);
         m_pointLights[i]->apply();
@@ -120,7 +119,7 @@ void ivf::LightManager::clearPointLights()
 
 void ivf::LightManager::clearDirectionalLights()
 {
-    for (auto i = 0; i < m_dirLights.size(); i++)
+    for (size_t i = 0; i < m_dirLights.size(); i++)
     {
         m_dirLights[i]->setEnabled(false);
         m_dirLights[i]->apply();
@@ -130,7 +129,7 @@ void ivf::LightManager::clearDirectionalLights()
 
 void ivf::LightManager::clearSpotLights()
 {
-    for (auto i = 0; i < m_spotLights.size(); i++)
+    for (size_t i = 0; i < m_spotLights.size(); i++)
     {
         m_spotLights[i]->setEnabled(false);
         m_spotLights[i]->apply();
@@ -192,21 +191,21 @@ void ivf::LightManager::apply()
     ShaderManager::instance()->currentProgram()->uniformInt(m_directionalLightCountId, static_cast<int>(m_dirLights.size()));
     ShaderManager::instance()->currentProgram()->uniformInt(m_spotLightCountId, static_cast<int>(m_spotLights.size()));
 
-    for (auto i = 0; i < m_pointLights.size(); i++)
+    for (size_t i = 0; i < m_pointLights.size(); i++)
     {
-        m_pointLights[i]->setIndex(i);
+        m_pointLights[i]->setIndex(static_cast<int>(i));
         m_pointLights[i]->apply();
     }
 
-    for (auto i = 0; i < m_dirLights.size(); i++)
+    for (size_t i = 0; i < m_dirLights.size(); i++)
     {
-        m_dirLights[i]->setIndex(i);
+        m_dirLights[i]->setIndex(static_cast<int>(i));
         m_dirLights[i]->apply();
     }
 
-    for (auto i = 0; i < m_spotLights.size(); i++)
+    for (size_t i = 0; i < m_spotLights.size(); i++)
     {
-        m_spotLights[i]->setIndex(i);
+        m_spotLights[i]->setIndex(static_cast<int>(i));
         m_spotLights[i]->apply();
     }
 
@@ -217,7 +216,7 @@ void ivf::LightManager::apply()
     std::vector<int> shadowMapTextureUnits;
     std::vector<glm::mat4> lightSpaceMatrices;
 
-    for (auto i = 0; i < m_dirLights.size(); i++)
+    for (size_t i = 0; i < m_dirLights.size(); i++)
     {
         if (!m_dirLights[i]->enabled() || !m_dirLights[i]->castsShadows() || !m_dirLights[i]->shadowMap())
             continue;

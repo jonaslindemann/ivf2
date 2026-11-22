@@ -2,7 +2,7 @@
 
 using namespace ivf;
 
-KeyframeAnimation::KeyframeAnimation(TransformNodePtr node) : m_node(node), m_currentTime(0.0f), m_playing(false)
+KeyframeAnimation::KeyframeAnimation(TransformNodePtr node) : m_playing(false), m_node(node), m_currentTime(0.0f)
 {}
 
 std::shared_ptr<KeyframeAnimation> ivf::KeyframeAnimation::create(TransformNodePtr node)

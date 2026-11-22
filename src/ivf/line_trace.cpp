@@ -6,7 +6,7 @@
 using namespace ivf;
 
 LineTrace::LineTrace(int numVertices, bool useColor)
-    : MeshNode(), m_useColor(useColor), m_color{1.0, 1.0, 1.0, 1.0}, m_numVertices(numVertices), m_firstAdd(true)
+    : MeshNode(), m_numVertices(numVertices), m_useColor(useColor), m_color{1.0, 1.0, 1.0, 1.0}, m_firstAdd(true)
 {
     this->doSetup();
 }

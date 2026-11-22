@@ -33,8 +33,6 @@ private:
     bool m_rightMouseButton;              ///< Right mouse button state.
     bool m_anyMouseButton;                ///< Any mouse button state.
     bool m_shiftKey;                      ///< Shift key state.
-    bool m_ctrlKey;                       ///< Control key state.
-    bool m_altKey;                        ///< Alt key state.
     double m_mouseStartX;                 ///< Mouse X position at drag start.
     double m_mouseStartY;                 ///< Mouse Y position at drag start.
     double m_mouseX;                      ///< Current mouse X position.

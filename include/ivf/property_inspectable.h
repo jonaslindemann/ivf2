@@ -53,6 +53,28 @@ private:
     std::vector<Property> m_properties; ///< List of registered properties.
 
 public:
+    PropertyInspectable() = default;
+    virtual ~PropertyInspectable() = default;
+
+    // Properties hold pointers into this object, so a copy (or a moved-to object, e.g. in a
+    // std::vector that reallocates) starts without them and registers its own on first use.
+    PropertyInspectable(const PropertyInspectable &)
+    {
+    }
+    PropertyInspectable(PropertyInspectable &&) noexcept
+    {
+    }
+    PropertyInspectable &operator=(const PropertyInspectable &)
+    {
+        m_properties.clear();
+        return *this;
+    }
+    PropertyInspectable &operator=(PropertyInspectable &&) noexcept
+    {
+        m_properties.clear();
+        return *this;
+    }
+
     /**
      * @brief Get all properties for this object (const).
      * @return const std::vector<Property>& List of properties.

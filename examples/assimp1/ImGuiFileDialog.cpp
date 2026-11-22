@@ -1229,8 +1229,8 @@ bool IGFD::Utils::NaturalCompare(const std::string &vA, const std::string &vB, b
     const auto &bs = vB.size();
     while (ia < as && ib < bs)
     {
-        const char &ca = vInsensitiveCase ? std::tolower(vA[ia]) : vA[ia];
-        const char &cb = vInsensitiveCase ? std::tolower(vB[ib]) : vB[ib];
+        const char ca = vInsensitiveCase ? static_cast<char>(std::tolower(vA[ia])) : vA[ia];
+        const char cb = vInsensitiveCase ? static_cast<char>(std::tolower(vB[ib])) : vB[ib];
         // we cannot start a number extraction from suffixs
         const auto rA = M_ExtractNumFromStringAtPos(vA, ia, nA);
         const auto rB = M_ExtractNumFromStringAtPos(vB, ib, nB);
@@ -5028,8 +5028,8 @@ void IGFD::FileDialog::m_DisplayPathPopup(ImVec2 vSize)
                         if (ImGui::TableNextColumn()) // file name
                         {
                             if (ImGui::Selectable(infos_ptr->fileNameExt.c_str(), &selected,
-                                                  ImGuiSelectableFlags_SpanAllColumns |
-                                                      ImGuiSelectableFlags_SpanAvailWidth))
+                                                  static_cast<ImGuiSelectableFlags>(ImGuiSelectableFlags_SpanAllColumns) |
+                                                      static_cast<ImGuiSelectableFlags>(ImGuiSelectableFlags_SpanAvailWidth)))
                             {
                                 fdi.SetCurrentPath(fdi.ComposeNewPath(fdi.GetCurrentPopupComposedPath()));
                                 fdi.pathClicked = fdi.SelectDirectory(infos_ptr);

@@ -160,7 +160,7 @@ void EnhancedSceneWindow::doPreSetup()
     m_placementMixin->initialize();
 
     // Set up default node creation callback (creates spheres)
-    m_placementMixin->setNodeCreationCallback([this](float x, float y, float z) -> ivf::NodePtr {
+    m_placementMixin->setNodeCreationCallback([](float x, float y, float z) -> ivf::NodePtr {
         auto sphere = Sphere::create();
         sphere->setRadius(0.2f);
         sphere->setPos(glm::vec3(x, y, z));
@@ -178,7 +178,7 @@ void EnhancedSceneWindow::doPreSetup()
     });
 
     // Set up selection callback
-    m_placementMixin->setNodeSelectionCallback([this](ivf::NodePtr node) {
+    m_placementMixin->setNodeSelectionCallback([](ivf::NodePtr node) {
         if (auto transformNode = std::dynamic_pointer_cast<TransformNode>(node))
         {
             ivf::logDebug(ivf::logStr("Selected node at (", transformNode->pos().x, ", ", transformNode->pos().y, ", ", transformNode->pos().z, ")"), "EnhancedSceneWindow");
@@ -186,7 +186,7 @@ void EnhancedSceneWindow::doPreSetup()
     });
 
     // Set up moved callback
-    m_placementMixin->setNodeMovedCallback([this](ivf::NodePtr /*node*/, float x, float y, float z) {
+    m_placementMixin->setNodeMovedCallback([](ivf::NodePtr /*node*/, float x, float y, float z) {
         ivf::logDebug(ivf::logStr("Moved node to (", x, ", ", y, ", ", z, ")"), "EnhancedSceneWindow");
     });
 }

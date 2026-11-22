@@ -7,9 +7,8 @@ using namespace generator;
 using namespace std;
 
 PointPath::PointPath(int segments, std::vector<glm::vec3> points) 
-	:m_segments(segments),
-	 parametricPath_{
-		[segments, this, points](double t) {
+	: parametricPath_{
+		[points](double t) {
 			PathVertex vertex;
 
 			LinearInterpolFunc interpFunc;

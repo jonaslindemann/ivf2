@@ -78,7 +78,7 @@ DodecahedronMesh::Triangles::Triangles(const DodecahedronMesh& mesh) noexcept :
 
 
 bool DodecahedronMesh::Triangles::done() const noexcept {
-	return mFaceIndex == ::polygons.size();
+	return mFaceIndex == static_cast<int>(::polygons.size());
 }
 
 
@@ -133,7 +133,7 @@ DodecahedronMesh::Vertices::Vertices(const DodecahedronMesh& mesh) noexcept :
 
 
 bool DodecahedronMesh::Vertices::done() const noexcept {
-	return mFaceIndex == ::polygons.size();
+	return mFaceIndex == static_cast<int>(::polygons.size());
 }
 
 

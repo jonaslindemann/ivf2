@@ -44,7 +44,6 @@ private:
     TexturePtr m_lightmapTexture;
     
     // UI state
-    bool m_showDemoWindow{false};
     bool m_showControlPanel{true};
     
     // Texture layer controls
@@ -69,8 +68,8 @@ private:
 
 public:
     ExampleWindow(int width, int height, std::string title)
-        : GLFWWindow(width, height, title), m_showDemoWindow(false), m_scene(nullptr), m_camManip(nullptr),
-          m_texMgr(nullptr), m_lightMgr(nullptr)
+        : GLFWWindow(width, height, title), m_scene(nullptr), m_camManip(nullptr), m_texMgr(nullptr),
+          m_lightMgr(nullptr)
     {}
 
     static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)

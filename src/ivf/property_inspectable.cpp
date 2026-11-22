@@ -5,11 +5,11 @@
 namespace ivf {
 
 // Property struct implementations
-Property::Property(const std::string &n, PropertyValue v, const std::string &cat) : name(n), value(v), category(cat)
+Property::Property(const std::string &n, PropertyValue v, const std::string &cat) : name(n), category(cat), value(v)
 {}
 
 Property::Property(const std::string &n, PropertyValue v, double min, double max, const std::string &cat)
-    : name(n), value(v), minValue(min), maxValue(max), hasRange(true), category(cat)
+    : name(n), category(cat), value(v), minValue(min), maxValue(max), hasRange(true)
 {}
 
 // PropertyInspectable implementations

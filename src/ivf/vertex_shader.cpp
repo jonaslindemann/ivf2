@@ -14,7 +14,7 @@ VertexShader::VertexShader(const std::string filename) : Shader(filename)
 
 VertexShader::~VertexShader()
 {
-    if (m_id != -1)
+    if (m_id != static_cast<GLuint>(-1))
         glDeleteShader(m_id);
 }
 
@@ -27,7 +27,7 @@ bool VertexShader::compile()
 {
     // Delete existing shader if any
 
-    if (m_id != -1)
+    if (m_id != static_cast<GLuint>(-1))
         glDeleteShader(m_id);
 
     // Create new shader from source

@@ -41,8 +41,6 @@ namespace ivfui {
 class GLFWWindow {
 private:
     GLFWwindow *m_window;       ///< Native GLFW window handle.
-    GLFWwindow *m_sharedWindow; ///< Shared OpenGL context window.
-    GLFWmonitor *m_monitor;     ///< Monitor for fullscreen mode.
     int m_width, m_height;      ///< Window dimensions.
     std::string m_title;        ///< Window title.
     int m_mouseButton;          ///< Last mouse button event.
@@ -63,7 +61,6 @@ private:
     int m_autoExitFrames{0};       ///< IVF2_EXIT_AFTER_FRAMES: close after this many frames (0 = never).
     std::string m_autoScreenshot;  ///< IVF2_SCREENSHOT: PNG written from the last frame before closing.
     int m_drawnFrames{0};          ///< Frames completed by draw().
-    int m_currentKey;           ///< Last key event.
     std::mutex m_mutex;         ///< Mutex for thread safety.
     double m_t0;                ///< Start time for frame timing.
     double m_t1;                ///< End time for frame timing.

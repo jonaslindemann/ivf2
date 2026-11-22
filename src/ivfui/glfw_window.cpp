@@ -61,13 +61,12 @@ std::shared_ptr<GLFWWindow> GLFWWindow::create(int width, int height, const std:
 }
 
 GLFWWindow::GLFWWindow(int width, int height, const std::string title, GLFWmonitor *monitor, GLFWwindow *shared)
-    : m_width(width), m_height(height), m_title(title), m_mouseButton(-1), m_mouseAction(-1), m_mouseMods(-1),
-      m_mouseX(-1), m_mouseY(-1), m_currentKey(-1), m_altDown(false), m_ctrlDown(false), m_shiftDown(false),
-      m_escQuit(true), m_enabled(true), m_runSetup(true), m_closeNotified(false), m_lastError(0), m_frameCount(0), m_frameTime(0.0), m_t0(0.0),
-      m_t1(0.0), m_lastFrameTime(0.0), m_monitor(monitor), m_sharedWindow(shared),
-      m_scrollX(0.0), m_scrollY(0.0),
-      m_prevMouseX(-1.0), m_prevMouseY(-1.0), m_isDragging(false),
-      m_lastClickTime(-1.0), m_lastClickButton(-1)
+    : m_width(width), m_height(height), m_title(title), m_mouseButton(-1),
+      m_mouseAction(-1), m_mouseMods(-1), m_mouseX(-1), m_mouseY(-1), m_shiftDown(false), m_ctrlDown(false),
+      m_altDown(false), m_escQuit(true), m_enabled(true), m_runSetup(true), m_closeNotified(false),
+      m_t0(0.0), m_t1(0.0), m_frameTime(0.0), m_lastFrameTime(0.0), m_frameCount(0), m_lastError(0), m_scrollX(0.0),
+      m_scrollY(0.0), m_prevMouseX(-1.0), m_prevMouseY(-1.0), m_isDragging(false), m_lastClickTime(-1.0),
+      m_lastClickButton(-1)
 {
     // Core profile; the version is chosen below (stock shaders need GLSL 4.00).
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);

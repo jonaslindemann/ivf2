@@ -6,15 +6,9 @@
 
 #include "physics_box.h"
 
-PhysicsBox::PhysicsBox(rp3d::PhysicsWorld* world,
-                       rp3d::PhysicsCommon& physicsCommon,
-                       const glm::vec3& size,
-                       const glm::vec3& position,
-                       const glm::quat& rotation,
-                       float mass)
-    : PhysicsObject(world, position, rotation, mass)
-    , m_physicsCommon(physicsCommon)
-    , m_boxShape(nullptr)
+PhysicsBox::PhysicsBox(rp3d::PhysicsWorld *world, rp3d::PhysicsCommon &physicsCommon, const glm::vec3 &size,
+                       const glm::vec3 &position, const glm::quat &rotation, float mass)
+    : PhysicsObject(world, position, rotation, mass), m_boxShape(nullptr), m_physicsCommon(physicsCommon)
 {
     m_size = size;
 }

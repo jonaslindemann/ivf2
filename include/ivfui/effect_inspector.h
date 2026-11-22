@@ -103,7 +103,6 @@ private:
     bool m_showOptions{false};            ///< Whether to show inspector options.
     float m_dragSpeed{0.1f};              ///< Drag speed for numeric controls.
     float m_splitterPosition{0.5f};       ///< Position of the splitter between list and properties.
-    int m_draggedEffectIndex{-1};         ///< Index of effect being dragged for reordering.
 
 public:
     /**

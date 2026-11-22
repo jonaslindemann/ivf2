@@ -80,16 +80,19 @@ public:
         if (ImGui::SliderFloat("Gravity", &m_gravity, -20, 5)) {
             m_ps->setGravity({0, m_gravity, 0});
         }
-        if (ImGui::SliderFloat("Min life", &m_minLife, 0.1f, 5.0f) |
-            ImGui::SliderFloat("Max life", &m_maxLife, 0.1f, 5.0f)) {
+        // Both sliders must be drawn every frame, so no short-circuit '||'
+        bool lifeChanged = ImGui::SliderFloat("Min life", &m_minLife, 0.1f, 5.0f);
+        lifeChanged |= ImGui::SliderFloat("Max life", &m_maxLife, 0.1f, 5.0f);
+        if (lifeChanged) {
             m_ps->setLifetime(m_minLife, m_maxLife);
         }
         ImGui::Separator();
         if (ImGui::Checkbox("Depth fog", &m_fog)) {
             m_ps->setDepthFog(m_fog);
         }
-        if (ImGui::SliderFloat("Fog near", &m_fogNear, 0.5f, 50.0f) |
-            ImGui::SliderFloat("Fog far", &m_fogFar, 1.0f, 80.0f)) {
+        bool fogChanged = ImGui::SliderFloat("Fog near", &m_fogNear, 0.5f, 50.0f);
+        fogChanged |= ImGui::SliderFloat("Fog far", &m_fogFar, 1.0f, 80.0f);
+        if (fogChanged) {
             m_ps->setFogRange(m_fogNear, m_fogFar);
         }
         ImGui::Separator();

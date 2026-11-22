@@ -28,7 +28,6 @@ private:
     double m_size;        ///< Height or length of the tube.
     int m_slices;         ///< Number of slices (angular subdivisions).
     int m_segments;       ///< Number of segments along the tube.
-    int m_rings;          ///< Number of rings (not exposed in constructor).
     double m_start;       ///< Start angle (in radians).
     double m_sweep;       ///< Sweep angle (in radians).
 

@@ -5,7 +5,8 @@
 using namespace ivf;
 
 LineGrid::LineGrid(GLfloat width, GLfloat height, GLint xDiv, GLint yDiv)
-    : MeshNode(), m_height(height), m_width(width), m_xDivisions(xDiv), m_yDivisions(yDiv), m_align(GridAlign::XZ), m_useColor(true), m_color{ 1.0, 1.0, 1.0, 1.0 }
+    : MeshNode(), m_width(width), m_height(height), m_xDivisions(xDiv), m_yDivisions(yDiv), m_align(GridAlign::XZ),
+      m_useColor(true), m_color{1.0, 1.0, 1.0, 1.0}
 {
     this->newMesh((m_xDivisions + 1) * 2 + (m_yDivisions + 1) * 2);
     this->doSetup();

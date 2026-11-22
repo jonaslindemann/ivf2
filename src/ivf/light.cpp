@@ -5,7 +5,7 @@ using namespace ivf;
 
 ivf::Light::Light()
     : m_position(glm::vec3(0.0, 0.0, 0.0)), m_diffuseColor(glm::vec3(1.0, 1.0, 1.0)),
-      m_ambientColor(glm::vec3(0.2, 0.2, 0.2)), m_specularColor(glm::vec3(1.0, 1.0, 1.0)), m_enabled(true), m_index(-1),
+      m_specularColor(glm::vec3(1.0, 1.0, 1.0)), m_ambientColor(glm::vec3(0.2, 0.2, 0.2)), m_enabled(true), m_index(-1),
       m_lightArrayName("Lights")
 {}
 

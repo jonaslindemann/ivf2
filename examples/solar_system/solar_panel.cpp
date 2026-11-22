@@ -5,9 +5,9 @@
 using namespace solar_ui;
 
 solar_ui::SolarPanel::SolarPanel(std::string caption)
-    : ivfui::UiWindow(caption), m_solarSystem(nullptr), m_nPlanets(0), m_nSuns(0), m_planetMassMin(0.0),
-      m_planetMassMax(0.0), m_planetRadiusMin(0.0), m_planetRadiusMax(0.0), m_planetSpeedMin(0.0),
-      m_planetSpeedMax(0.0), m_planetMaterial(nullptr), m_sunMaterial(nullptr), m_tracerMaterial(nullptr),
+    : ivfui::UiWindow(caption), m_solarSystem(nullptr), m_planetMaterial(nullptr), m_sunMaterial(nullptr),
+      m_tracerMaterial(nullptr), m_nPlanets(0), m_nSuns(0), m_planetRadiusMin(0.0), m_planetRadiusMax(0.0),
+      m_planetSpeedMin(0.0), m_planetSpeedMax(0.0), m_planetMassMin(0.0), m_planetMassMax(0.0),
       m_planetColor{1.0f, 1.0f, 1.0f}, m_sunColor{1.0f, 1.0f, 1.0f}, m_tracerColor{0.0f, 1.0f, 1.0f},
       m_showTracers(true), m_nTracersPerPlanet(100)
 {

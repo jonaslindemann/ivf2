@@ -3,8 +3,8 @@
 using namespace ivf;
 
 Arrow::Arrow()
-    : CompositeNode(), m_arrowType(ArrowType::DoubleSided), m_length(1.0f), m_bodyRadius(0.1f), m_coneRadius(0.2f),
-      m_arrowBody(nullptr), m_leftArrowCone(nullptr), m_rightArrowCone(nullptr), m_coneLength(0.4f)
+    : CompositeNode(), m_arrowType(ArrowType::DoubleSided), m_arrowBody(nullptr), m_leftArrowCone(nullptr),
+      m_rightArrowCone(nullptr), m_length(1.0f), m_bodyRadius(0.1f), m_coneRadius(0.2f), m_coneLength(0.4f)
 {
     this->setUseMaterial(true);
     this->setName("Arrow");

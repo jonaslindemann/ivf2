@@ -24,16 +24,11 @@ private:
     ivf::CompositeNodePtr m_scene;             ///< Scene reference for extent calculation.
 
     float m_cameraTarget[3];      ///< Current camera target (look-at point).
-    float m_newCameraTarget[3];   ///< Pending camera target (for UI changes).
     float m_cameraPosition[3];    ///< Current camera position.
-    float m_newCameraPosition[3]; ///< Pending camera position (for UI changes).
 
     float m_fov;      ///< Current field of view.
-    float m_newFov;   ///< Pending field of view (for UI changes).
     float m_nearZ;    ///< Current near clipping plane.
-    float m_newNearZ; ///< Pending near clipping plane (for UI changes).
     float m_farZ;     ///< Current far clipping plane.
-    float m_newFarZ;  ///< Pending far clipping plane (for UI changes).
 
     bool m_isDirty; ///< True if camera parameters have been modified via the UI.
     bool m_includeInvisible; ///< Include invisible nodes in extent calculation.

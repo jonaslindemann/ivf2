@@ -27,10 +27,9 @@ void TransformManager::drop()
     // Managers are released together with their RenderContext.
 }
 
-
 TransformManager::TransformManager()
-    : m_modelMatrix(1.0), m_projectionMatrix(1.0), m_viewMatrix(1.0), m_modelId(-1), m_viewId(-1), m_viewPosId(-1),
-      m_projectionId(-1)
+    : m_modelMatrix(1.0), m_viewMatrix(1.0), m_projectionMatrix(1.0), m_modelId(-1), m_viewId(-1), m_projectionId(-1),
+      m_viewPosId(-1)
 {
     m_modelId = ShaderManager::instance()->currentProgram()->uniformLoc("model");
     m_viewId = ShaderManager::instance()->currentProgram()->uniformLoc("view");

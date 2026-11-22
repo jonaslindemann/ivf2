@@ -39,7 +39,7 @@ void MeshNode::newMesh(int vsize, int isize, GLuint primType, GLenum usage)
 
 std::shared_ptr<Mesh> ivf::MeshNode::mesh(int idx)
 {
-    if ((idx >= 0) && (idx < m_meshes.size()))
+    if ((idx >= 0) && (static_cast<size_t>(idx) < m_meshes.size()))
         return m_meshes[idx];
     else
         return nullptr;
@@ -274,7 +274,6 @@ void ivf::MeshNode::updateBoundingBox()
         return;
 
     BoundingBox combinedBbox;
-    int totalVertices = 0;
 
     for (const auto &mesh : m_meshes)
     {
@@ -285,7 +284,6 @@ void ivf::MeshNode::updateBoundingBox()
             {
                 glm::vec3 vertex = vertices->vertex(i);
                 combinedBbox.add(vertex);
-                totalVertices++;
             }
         }
     }
@@ -294,7 +292,6 @@ void ivf::MeshNode::updateBoundingBox()
     setLocalBoundingBox(combinedBbox);
 
     // Debug output
-    // std::cout << "    updateBoundingBox: Processed " << totalVertices << " vertices" << std::endl;
     if (combinedBbox.isValid())
     {
         //    std::cout << "    Computed bbox: Min(" << combinedBbox.min().x << ", " << combinedBbox.min().y << ", " <<

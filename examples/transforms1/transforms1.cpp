@@ -29,7 +29,6 @@ class ExampleWindow : public GLFWSceneWindow {
 private:
     ArrowPtr m_arrow;
 
-    double m_t = 0.0;
 
 public:
     ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)

@@ -38,7 +38,6 @@ using namespace std;
 
 class EditorWindow : public GLFWSceneWindow {
 private:
-    bool m_openFileDialog{false};
 
     SceneInspectorPtr m_sceneInspector{nullptr};
 

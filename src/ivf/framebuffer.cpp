@@ -9,9 +9,9 @@
 using namespace ivf;
 
 FrameBuffer::FrameBuffer(int width, int height)
-    : m_width(width), m_height(height), m_multisample(false), m_samples(4), m_quadVAO(0), m_quadVBO(0),
-      m_multisampledFrameBuffer(0), m_multisampledDepthBuffer(0), m_multisampledColorTexture(0), m_frameBuffer(0),
-      m_depthBuffer(0), m_colorTexture(0)
+    : m_frameBuffer(0), m_multisampledFrameBuffer(0), m_depthBuffer(0), m_multisampledDepthBuffer(0), m_colorTexture(0),
+      m_multisampledColorTexture(0), m_quadVAO(0), m_quadVBO(0), m_multisample(false), m_samples(4), m_width(width),
+      m_height(height)
 {}
 
 FrameBuffer::~FrameBuffer()

@@ -10,9 +10,8 @@ using namespace solar;
 
 SolarSystem::SolarSystem(int n, int m)
     : Base(), m_nPlanets(n), m_nSuns(m), m_planetRadiusMin(30.0), m_planetRadiusMax(100.0), m_planetSpeedMin(10.0),
-      m_planetSpeedMax(20.0), m_planetMassMin(0.1), m_planetMassMax(2.0), m_createPlanetFunc(nullptr),
-      m_createSunFunc(nullptr), m_updatePlanetPosFunc(nullptr), m_clearPlanetsFunc(nullptr), m_clearSunsFunc(nullptr),
-      m_running(true)
+      m_planetSpeedMax(20.0), m_planetMassMin(0.1), m_planetMassMax(2.0), m_running(true), m_createPlanetFunc(nullptr),
+      m_createSunFunc(nullptr), m_updatePlanetPosFunc(nullptr), m_clearPlanetsFunc(nullptr), m_clearSunsFunc(nullptr)
 {}
 
 SolarSystem::~SolarSystem()
@@ -121,7 +120,7 @@ void SolarSystem::setSize(int planets, int suns)
 
 Planet *SolarSystem::planetAt(int idx)
 {
-    if ((idx >= 0) && (idx < m_planets.size()))
+    if ((idx >= 0) && (static_cast<size_t>(idx) < m_planets.size()))
         return m_planets[idx].get();
     else
         return nullptr;
@@ -129,7 +128,7 @@ Planet *SolarSystem::planetAt(int idx)
 
 Sun *SolarSystem::sunAt(int idx)
 {
-    if ((idx >= 0) && (idx < m_suns.size()))
+    if ((idx >= 0) && (static_cast<size_t>(idx) < m_suns.size()))
         return m_suns[idx].get();
     else
         return nullptr;

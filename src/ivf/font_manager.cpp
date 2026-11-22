@@ -91,7 +91,7 @@ FontManager::FontManager()
 
 FontManager::~FontManager() = default;
 
-Result<void> FontManager::loadFace(const std::string filename, const std::string name)
+Result<void> FontManager::loadFace(const std::string filename, const std::string /*name*/)
 {
     return makeError(ErrorCode::NotSupported,
                      "Could not load font '" + filename + "': ivf2 was built without FreeType (IVF2_WITH_FREETYPE=OFF)",

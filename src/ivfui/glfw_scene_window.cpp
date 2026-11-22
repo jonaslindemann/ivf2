@@ -38,14 +38,13 @@ static void updateSceneBehaviors(ivf::CompositeNode* composite, float dt)
 
 GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string title, GLFWmonitor *monitor,
                                  GLFWwindow *shared)
-    : GLFWWindow(width, height, title, monitor, shared), m_selectionEnabled(false), m_lastNode(nullptr),
-      m_currentNode(nullptr), m_renderToTexture(false), m_selectionRendering(false), m_showAxis(false),
-      m_showGrid(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f), m_snapToGrid(false), m_lockPosXZ(false),
-      m_gridSnapValue(0.1f), m_cursor(nullptr), m_axis(nullptr), m_grid(nullptr), m_sceneControlPanel(nullptr),
-      m_cameraWindow(nullptr), m_effectInspector(nullptr), m_sceneInspector(nullptr), m_showMainMenu(true),
-      m_mainMenu(nullptr), m_inputDialog(nullptr), m_frameBuffer(nullptr), m_postProcessor(nullptr),
-      m_bufferSelection(nullptr), m_camManip(nullptr), m_scene(nullptr), m_effects(), m_uiWindows(),
-      m_clearColor(0.07f, 0.13f, 0.17f, 1.0f)
+    : GLFWWindow(width, height, title, monitor, shared), m_scene(nullptr), m_camManip(nullptr), m_uiWindows(),
+      m_bufferSelection(nullptr), m_frameBuffer(nullptr), m_postProcessor(nullptr), m_mainMenu(nullptr),
+      m_sceneControlPanel(nullptr), m_cameraWindow(nullptr), m_effectInspector(nullptr), m_sceneInspector(nullptr),
+      m_clearColor(0.07f, 0.13f, 0.17f, 1.0f), m_selectionEnabled(false), m_lastNode(nullptr), m_currentNode(nullptr),
+      m_renderToTexture(false), m_selectionRendering(false), m_showAxis(false), m_showGrid(false), m_showMainMenu(true),
+      m_axis(nullptr), m_grid(nullptr), m_cursor(nullptr), m_gridSnapValue(0.1f), m_snapToGrid(false),
+      m_lockPosXZ(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f), m_inputDialog(nullptr), m_effects()
 {
     m_scene = ivf::CompositeNode::create();
     m_camManip = ivfui::CameraManipulator::create(this->ref());

@@ -39,6 +39,12 @@ public:
     UiMenuItem(const std::string &name, const std::string &shortcut = "", const std::function<void()> action = nullptr,
                const std::function<bool()> selected = nullptr, const bool isSeparator = false);
 
+    virtual ~UiMenuItem() = default; ///< Virtual: doDraw() is overridable.
+    UiMenuItem(const UiMenuItem &) = default;
+    UiMenuItem &operator=(const UiMenuItem &) = default;
+    UiMenuItem(UiMenuItem &&) = default;
+    UiMenuItem &operator=(UiMenuItem &&) = default;
+
     /**
      * @brief Factory method to create a shared pointer to a UiMenuItem instance.
      * @param name Menu item name.

@@ -108,7 +108,7 @@ RenderContext *RenderContext::currentOrFallback()
     return g_fallback;
 }
 
-bool RenderContext::setupDefaults(const std::string &fontFile)
+bool RenderContext::setupDefaults([[maybe_unused]] const std::string &fontFile)
 {
 #if IVF2_HAS_FREETYPE
     // A missing default font only disables text rendering; the reason is logged.

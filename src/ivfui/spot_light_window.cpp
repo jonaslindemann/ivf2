@@ -6,33 +6,19 @@ using namespace ivfui;
 using namespace ivf;
 
 SpotLightWindow::SpotLightWindow(ivf::SpotLightPtr spotLight, std::string caption)
-	:UiWindow(caption),
-	 m_spotLight(spotLight),
-	 m_constAttenuation(spotLight->constAttenuation()),
-	 m_linearAttenuation(spotLight->linearAttenutation()),
-	 m_quadraticAttenuation(spotLight->quadraticAttenuation()),
-	 m_cutoff(spotLight->innerCutoff()),
-	 m_outerCutoff(spotLight->outerCutoff()),
-	 m_diffuseColor(spotLight->diffuseColor()),
-	 m_specularColor(spotLight->specularColor()),
-	 m_ambientColor(spotLight->ambientColor()),
-	 m_position(spotLight->position()),
-	 m_direction(spotLight->direction()),
-	 m_enabled(spotLight->enabled()),
-	 m_constAttenuationPrev(spotLight->constAttenuation()),
-	 m_linearAttenuationPrev(spotLight->linearAttenutation()),
-	 m_quadraticAttenuationPrev(spotLight->quadraticAttenuation()),
-	 m_cutoffPrev(spotLight->innerCutoff()),
-	 m_outerCutoffPrev(spotLight->outerCutoff()),
-	 m_diffuseColorPrev(spotLight->diffuseColor()),
-	 m_specularColorPrev(spotLight->specularColor()),
-	 m_ambientColorPrev(spotLight->ambientColor()),
-	 m_positionPrev(spotLight->position()),
-	 m_directionPrev(spotLight->direction()),
-	 m_enabledPrev(spotLight->enabled()),
-	 m_isDirty(false)
-{
-}
+    : UiWindow(caption), m_spotLight(spotLight), m_constAttenuation(spotLight->constAttenuation()),
+      m_linearAttenuation(spotLight->linearAttenutation()), m_quadraticAttenuation(spotLight->quadraticAttenuation()),
+      m_cutoff(spotLight->innerCutoff()), m_outerCutoff(spotLight->outerCutoff()), m_direction(spotLight->direction()),
+      m_position(spotLight->position()), m_diffuseColor(spotLight->diffuseColor()),
+      m_specularColor(spotLight->specularColor()), m_ambientColor(spotLight->ambientColor()),
+      m_enabled(spotLight->enabled()), m_constAttenuationPrev(spotLight->constAttenuation()),
+      m_linearAttenuationPrev(spotLight->linearAttenutation()),
+      m_quadraticAttenuationPrev(spotLight->quadraticAttenuation()), m_cutoffPrev(spotLight->innerCutoff()),
+      m_outerCutoffPrev(spotLight->outerCutoff()), m_directionPrev(spotLight->direction()),
+      m_positionPrev(spotLight->position()), m_diffuseColorPrev(spotLight->diffuseColor()),
+      m_specularColorPrev(spotLight->specularColor()), m_ambientColorPrev(spotLight->ambientColor()),
+      m_enabledPrev(spotLight->enabled()), m_isDirty(false)
+{}
 
 std::shared_ptr<SpotLightWindow> SpotLightWindow::create(ivf::SpotLightPtr spotLight, std::string caption)
 {

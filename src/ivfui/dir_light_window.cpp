@@ -6,21 +6,12 @@ using namespace ivfui;
 using namespace ivf;
 
 DirectionalLightWindow::DirectionalLightWindow(ivf::DirectionalLightPtr dirLight, std::string caption)
-	:UiWindow(caption),
-	 m_dirLight(dirLight),
-	 m_direction(dirLight->direction()),
-	 m_diffuseColor(dirLight->diffuseColor()),
-	 m_specularColor(dirLight->specularColor()),
-	 m_ambientColor(dirLight->ambientColor()),
-	 m_enabled(dirLight->enabled()),
-	 m_diffuseColorPrev(dirLight->diffuseColor()),
-	 m_specularColorPrev(dirLight->specularColor()),
-	 m_ambientColorPrev(dirLight->ambientColor()),
-	 m_directionPrev(dirLight->direction()),
-	 m_enabledPrev(dirLight->enabled()),
-	 m_isDirty(false)
-{
-}
+    : UiWindow(caption), m_dirLight(dirLight), m_direction(dirLight->direction()),
+      m_diffuseColor(dirLight->diffuseColor()), m_specularColor(dirLight->specularColor()),
+      m_ambientColor(dirLight->ambientColor()), m_enabled(dirLight->enabled()), m_directionPrev(dirLight->direction()),
+      m_diffuseColorPrev(dirLight->diffuseColor()), m_specularColorPrev(dirLight->specularColor()),
+      m_ambientColorPrev(dirLight->ambientColor()), m_enabledPrev(dirLight->enabled()), m_isDirty(false)
+{}
 
 std::shared_ptr<DirectionalLightWindow> DirectionalLightWindow::create(ivf::DirectionalLightPtr dirLight, std::string caption)
 {

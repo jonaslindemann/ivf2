@@ -6,27 +6,16 @@ using namespace ivfui;
 using namespace ivf;
 
 PointLightWindow::PointLightWindow(ivf::PointLightPtr pointLight, std::string caption)
-	:UiWindow(caption),
-	 m_pointLight(pointLight),
-	 m_constAttenuation(pointLight->constAttenuation()),
-	 m_linearAttenuation(pointLight->linearAttenutation()),
-	 m_quadraticAttenuation(pointLight->quadraticAttenuation()),
-	 m_diffuseColor(pointLight->diffuseColor()),
-	 m_specularColor(pointLight->specularColor()),
-	 m_ambientColor(pointLight->ambientColor()),
-	 m_position(pointLight->position()),
-	 m_enabled(pointLight->enabled()),
-	 m_constAttenuationPrev(pointLight->constAttenuation()),
-	 m_linearAttenuationPrev(pointLight->linearAttenutation()),
-	 m_quadraticAttenuationPrev(pointLight->quadraticAttenuation()),
-	 m_diffuseColorPrev(pointLight->diffuseColor()),
-	 m_specularColorPrev(pointLight->specularColor()),
-	 m_ambientColorPrev(pointLight->ambientColor()),
-	 m_positionPrev(pointLight->position()),
-	 m_enabledPrev(pointLight->enabled()),
-	 m_isDirty(false)
-{
-}
+    : UiWindow(caption), m_pointLight(pointLight), m_constAttenuation(pointLight->constAttenuation()),
+      m_linearAttenuation(pointLight->linearAttenutation()), m_quadraticAttenuation(pointLight->quadraticAttenuation()),
+      m_position(pointLight->position()), m_diffuseColor(pointLight->diffuseColor()),
+      m_specularColor(pointLight->specularColor()), m_ambientColor(pointLight->ambientColor()),
+      m_enabled(pointLight->enabled()), m_constAttenuationPrev(pointLight->constAttenuation()),
+      m_linearAttenuationPrev(pointLight->linearAttenutation()),
+      m_quadraticAttenuationPrev(pointLight->quadraticAttenuation()), m_positionPrev(pointLight->position()),
+      m_diffuseColorPrev(pointLight->diffuseColor()), m_specularColorPrev(pointLight->specularColor()),
+      m_ambientColorPrev(pointLight->ambientColor()), m_enabledPrev(pointLight->enabled()), m_isDirty(false)
+{}
 
 std::shared_ptr<PointLightWindow> PointLightWindow::create(ivf::PointLightPtr pointLight, std::string caption)
 {

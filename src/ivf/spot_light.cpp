@@ -10,8 +10,8 @@
 using namespace ivf;
 
 SpotLight::SpotLight()
-    : m_direction(glm::vec3(0.0, 0.0, 1.0)), m_constAttenuation(1.0), m_linearAttenuation(0.0),
-      m_quadraticAttenuation(0.0), m_cutoff(25.5f), m_outerCutoff(30.0f)
+    : m_direction(glm::vec3(0.0, 0.0, 1.0)), m_cutoff(25.5f), m_outerCutoff(30.0f), m_constAttenuation(1.0),
+      m_linearAttenuation(0.0), m_quadraticAttenuation(0.0)
 {
     setLightArrayName("spotLights");
 }

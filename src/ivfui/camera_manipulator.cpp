@@ -174,9 +174,6 @@ void CameraManipulator::update()
         double movY = m_mouseScaleY * (m_mouseY - m_mouseStartY);
 
         glm::vec3 forward = glm::normalize(m_cameraPosition - m_cameraTarget);
-        glm::vec3 up = glm::vec3(0.0, 1.0, 0.0);
-        glm::vec3 right = glm::normalize(glm::cross(up, forward));
-
         m_cameraNewPos = m_cameraPosition + float(movY) * forward;
 
         glm::vec3 posTargetDist = m_cameraNewPos - m_cameraNewTarget;

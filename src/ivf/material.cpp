@@ -5,10 +5,9 @@
 using namespace ivf;
 
 Material::Material(MaterialProps props)
-    : m_diffuseColor(props.diffuseColor), m_ambientColor(props.ambientColor),
-      m_specularColor(props.specularColor), m_useLighting(props.useLighting),
-      m_useVertexColor(props.useVertexColor), m_useTexture(props.useTexture),
-      m_shininess(props.shininess), m_alpha(props.alpha)
+    : m_useVertexColor(props.useVertexColor), m_useLighting(props.useLighting), m_useTexture(props.useTexture),
+      m_diffuseColor(props.diffuseColor), m_specularColor(props.specularColor), m_ambientColor(props.ambientColor),
+      m_alpha(props.alpha), m_shininess(props.shininess)
 {}
 
 std::shared_ptr<Material> ivf::Material::create(MaterialProps props)

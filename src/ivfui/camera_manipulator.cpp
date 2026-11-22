@@ -2,12 +2,15 @@
 
 #include <ivf/transform_manager.h>
 #include <ivf/extent_visitor.h>
+#include <ivf/logger.h>
 
 #include <glm/gtx/rotate_vector.hpp>
 
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <cstdlib>
+#include <string_view>
 
 using namespace ivfui;
 using namespace ivf;
@@ -208,6 +211,21 @@ void CameraManipulator::update()
             m_cameraTarget = m_cameraNewTarget;
             m_firstClick = true;
         }
+    }
+
+    // IVF2_TRACE_INPUT: what the camera computed from the cursor this frame
+    static const bool trace = [] {
+        const char *value = std::getenv("IVF2_TRACE_INPUT");
+        return value != nullptr && *value != '\0' && std::string_view(value) != "0";
+    }();
+    if (trace && m_anyMouseButton)
+    {
+        const glm::vec3 view = glm::normalize(m_cameraNewTarget - m_cameraNewPos);
+        ivf::logInfo(ivf::logStr("camera ", m_leftMouseButton ? "rotate" : "pan/zoom", " | cursor delta ",
+                                 m_mouseX - m_mouseStartX, ",", m_mouseY - m_mouseStartY, " | pos ",
+                                 m_cameraNewPos.x, ",", m_cameraNewPos.y, ",", m_cameraNewPos.z, " | view dir ",
+                                 view.x, ",", view.y, ",", view.z),
+                     "InputTrace");
     }
 }
 

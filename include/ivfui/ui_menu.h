@@ -139,6 +139,12 @@ public:
      */
     UiMenu(const std::string &name);
 
+    virtual ~UiMenu() = default; ///< Virtual: doDraw() is overridable.
+    UiMenu(const UiMenu &) = default;
+    UiMenu &operator=(const UiMenu &) = default;
+    UiMenu(UiMenu &&) = default;
+    UiMenu &operator=(UiMenu &&) = default;
+
     /**
      * @brief Factory method to create a shared pointer to a UiMenu instance.
      * @param name Menu name.

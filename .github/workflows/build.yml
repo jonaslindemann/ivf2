@@ -122,8 +122,9 @@ jobs:
           restore-keys: vcpkg-${{ matrix.cache-id }}-
 
       # 5. Configure. vcpkg installs the dependencies during this step.
+      #    Warnings in ivf2's own code fail the build, so they get fixed when they appear.
       - name: Configure
-        run: cmake --preset ${{ matrix.configure-preset }}
+        run: cmake --preset ${{ matrix.configure-preset }} -DIVF2_WARNINGS_AS_ERRORS=ON
 
       # 6. Save the dependency cache right away, so it survives even if the
       #    build or tests below fail.

@@ -23,6 +23,13 @@ class CompositeNode;
  */
 class NodeVisitor {
 public:
+    virtual ~NodeVisitor() = default;
+    NodeVisitor() = default;
+    NodeVisitor(const NodeVisitor &) = default;
+    NodeVisitor &operator=(const NodeVisitor &) = default;
+    NodeVisitor(NodeVisitor &&) = default;
+    NodeVisitor &operator=(NodeVisitor &&) = default;
+
     /**
      * @brief Visit a node.
      * @param node Pointer to the node being visited.

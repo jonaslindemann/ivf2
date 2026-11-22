@@ -8,6 +8,8 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ## [Unreleased]
 
+## [2.0.0-alpha.2] - 2026-11-22
+
 ### Changed (may require changes in your code)
 
 - C++23 is required (MSVC 2022, GCC 13, Clang 17, Xcode 16 or newer).
@@ -76,5 +78,6 @@ First public pre-release of ivf2: scene graph, primitives, materials and lightin
 text rendering, model loading with assimp, keyframe animation, procedural geometry (generator),
 ImGui-based user interface and around 20 examples.
 
-[Unreleased]: https://github.com/jonaslindemann/ivf2/compare/2.0.0-alpha...HEAD
+[Unreleased]: https://github.com/jonaslindemann/ivf2/compare/v2.0.0-alpha.2...HEAD
+[2.0.0-alpha.2]: https://github.com/jonaslindemann/ivf2/compare/2.0.0-alpha...v2.0.0-alpha.2
 [2.0.0-alpha]: https://github.com/jonaslindemann/ivf2/releases/tag/2.0.0-alpha

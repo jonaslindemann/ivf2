@@ -85,7 +85,7 @@ and `IVF2_VERSION_PRERELEASE`); `<ivf/config.h>` and `<ivf/version.h>` are gener
 
 To make a release:
 
-1. Update the version in `CMakeLists.txt` and `vcpkg.json`.
+1. Update the version in `CMakeLists.txt` and `vcpkg.json` (`version-semver`).
 2. In `CHANGELOG.md`, rename `[Unreleased]` to the new version with today's date, add an empty
    `[Unreleased]` section and update the comparison links at the bottom.
 3. Commit, wait for CI to pass, then tag the commit `v<version>` (for example

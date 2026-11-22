@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "ivf2",
-  "version": "2.0.0",
-  "description": "Interactive Visualisation Framework 2 - a C++20 scene graph library for OpenGL",
+  "version-semver": "2.0.0-alpha.2",
+  "description": "Interactive Visualisation Framework 2 - a C++23 scene graph library for OpenGL",
   "homepage": "https://github.com/jonaslindemann/ivf2",
   "license": "MIT",
   "$comment-baseline": "Must be a commit that exists in github.com/microsoft/vcpkg (CI clones upstream). Pick it with: git -C <vcpkg> rev-parse origin/master",

@@ -187,7 +187,7 @@ add_ivf2_example(my_example SOURCES main.cpp utils.cpp)
 add_ivf2_example(physics_demo SOURCES demo.cpp EXTRA_LIBS ReactPhysics3D::ReactPhysics3D)
 ```
 
-Examples share one output directory; shaders, fonts and `bin/assets/` are copied there once
+Examples share one output directory; shaders and fonts from `data/` and the assets from `examples/assets/` are copied there once
 per build.
 
 # Troubleshooting

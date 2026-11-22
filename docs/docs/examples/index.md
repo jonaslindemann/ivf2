@@ -4,10 +4,10 @@ ivf2 comes with around 50 small example programs. Each is a standalone executabl
 
 ## Running the examples
 
-The examples are built together with the library. Executables end up in `bin/Release/` or `bin/Debug/`; Debug builds have a `d` suffix, for example `hello_ivfd`.
+The examples are built together with the library. Executables end up in `build/<preset>/bin/<Config>/`; Debug builds have a `d` suffix, for example `hello_ivfd`.
 
 ```
-bin/Release/hello_ivf
+build/release/bin/Release/hello_ivf
 ```
 
 Run them from that folder, or anywhere else as long as the `shaders/`, `fonts/` and `assets/` folders next to the executable are present. CMake copies them there during the build.

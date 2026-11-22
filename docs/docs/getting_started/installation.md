@@ -125,7 +125,7 @@ For single-config generators `<Config>` is the `CMAKE_BUILD_TYPE` (e.g. `build/r
 
 Debug library names carry a `d` suffix (e.g. `ivfd.lib` vs `ivf.lib`).
 
-Shaders, fonts, and asset files from `bin/shaders/`, `bin/fonts/`, and `bin/assets/` are copied next to the examples by CMake so they work out of the box.
+Shaders and fonts from `data/shaders/` and `data/fonts/`, and the example assets from `examples/assets/`, are copied next to the examples by CMake so they work out of the box.
 
 ## Integrating with Your Project
 

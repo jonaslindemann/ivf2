@@ -12,7 +12,7 @@ Text needs a font, loaded once through the window's `FontManager` before any tex
 renderContext()->fonts()->loadFace("fonts/Gidole-Regular.ttf", "gidole");
 ```
 
-Any TrueType (`.ttf`) or OpenType (`.otf`) font works. The most recently loaded font is used for new text. ivf2 ships with Gidole, Gidolinya and Roboto in `bin/fonts/`, which are copied next to the executables at build time.
+Any TrueType (`.ttf`) or OpenType (`.otf`) font works. The most recently loaded font is used for new text. ivf2 ships with Gidole, Gidolinya and Roboto in `data/fonts/`, which are copied next to the executables at build time.
 
 ## Creating text
 

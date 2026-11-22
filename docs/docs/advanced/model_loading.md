@@ -24,7 +24,7 @@ catch (const std::runtime_error &e)
 
 While loading, faces are converted to triangles and smooth normals are generated for meshes that have none.
 
-Paths are relative to the working directory, which for the examples is the executable's folder. Files placed in `bin/assets/` are copied next to the executables at build time.
+Paths are relative to the working directory, which for the examples is the executable's folder. Files placed in `examples/assets/` are copied next to the executables at build time.
 
 ## Materials
 

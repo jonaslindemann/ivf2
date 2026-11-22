@@ -12,7 +12,7 @@ endif()
 add_custom_target(copy_example_assets ALL
     COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/shaders" "${IVF2_RUNTIME_OUTPUT_DIR}/shaders"
     COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/fonts"   "${IVF2_RUNTIME_OUTPUT_DIR}/fonts"
-    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/assets"  "${IVF2_RUNTIME_OUTPUT_DIR}/assets"
+    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${IVF2_RUNTIME_OUTPUT_DIR}/assets"
     COMMENT "Copying shared runtime data and example assets to ${IVF2_RUNTIME_OUTPUT_DIR}"
     VERBATIM)
 set_target_properties(copy_example_assets PROPERTIES FOLDER "examples")

@@ -106,8 +106,8 @@ if(_ivf2_top_level)
     set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${IVF2_OUTPUT_ROOT}/lib/$<CONFIG>")
 endif()
 
-# Runtime data (shaders, fonts) shipped with the library, and example assets.
-set(IVF2_RUNTIME_DATA_DIR "${PROJECT_SOURCE_DIR}/bin" CACHE INTERNAL "ivf2 runtime data (shaders/, fonts/)")
+# Runtime data (shaders, fonts) shipped with the library; example assets are in examples/assets.
+set(IVF2_RUNTIME_DATA_DIR "${PROJECT_SOURCE_DIR}/data" CACHE INTERNAL "ivf2 runtime data (shaders/, fonts/)")
 
 include(IvfTargets)
 include(ivf2Helpers)

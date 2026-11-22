@@ -25,7 +25,7 @@ cmake --build --preset debug
 ctest --preset debug
 ```
 
-Everything is built under `build/<preset>/`: libraries in `lib/<Config>/`, executables plus copied runtime data (`shaders/`, `fonts/`, `assets/` from `bin/`) in `bin/<Config>/`. `-DIVF2_OUTPUT_IN_SOURCE_TREE=ON` restores the old `<source>/bin/<Config>` layout.
+Everything is built under `build/<preset>/`: libraries in `lib/<Config>/`, executables plus copied runtime data (`shaders/`, `fonts/` from `data/`, `assets/` from `examples/assets/`) in `bin/<Config>/`. `-DIVF2_OUTPUT_IN_SOURCE_TREE=ON` restores the old `<source>/bin/<Config>` layout.
 
 Library targets are static, created with `ivf2_add_library()` and exported as `ivf2::<name>`; dependencies are linked per target (no global include dirs). New `.cpp`/`.h` files in `src/<lib>/` and `include/<lib>/` are picked up automatically (`CONFIGURE_DEPENDS` globs), except `src/generator`, which lists its files explicitly. Unit tests (GL-free) live in `tests/`. Builds use `/W4` (MSVC) or `-Wall -Wextra -Wpedantic` (`IVF2_WARNINGS`, on for top-level builds); keep new code warning-free (unused parameters: comment out the name; narrowing: `static_cast`). Optional dependencies (`IVF2_WITH_ASSIMP`, `IVF2_WITH_FREETYPE`, `IVF2_WITH_AUDIO`, `IVF2_WITH_MIDI`, all default ON) are private to `ivf`: public headers must not include assimp/FreeType/miniaudio/RtMidi/stb/nlohmann-json/ImGui (ivf core) — the `header_check_<lib>` targets built with the tests enforce this and header self-containment; guard implementations with the `IVF2_HAS_*` macros from the generated `<ivf/config.h>` and keep a no-op fallback. The `minimal` preset (all off) runs in CI.
 
@@ -53,7 +53,7 @@ build/vs/bin/Debug/lighting1d       # Lighting configuration
 build/vs/bin/Debug/textures1d       # Texture mapping
 build/vs/bin/Debug/animation1d      # Keyframe animation
 build/vs/bin/Debug/procedural1d     # Geometry generation
-bin/Debug/music_scene1    # ivfmusic: song-driven scene (--help for options)
+build/vs/bin/Debug/music_scene1d  # ivfmusic: song-driven scene (--help for options)
 ```
 
 Music scenes can be smoke-tested with a short frame export, which renders a few PNGs and exits by itself: `music_scene1 --export <dir> --start 10 --end 11 --fps 5`.
@@ -154,7 +154,7 @@ GLFW3, GLM (`glm::glm`, the only math library — also used by the generator), O
 
 ## Shaders
 
-The library's built-in shaders are embedded as C++ string constants (`stock_shaders.h`, `pbr_shaders.h`, `post_shaders.h`, ...). File-based shaders used by examples live in `bin/shaders/` and are copied next to the executables at build time (`copy_example_assets` / `ivf2_copy_runtime_files`); `ShaderManager::compileProgramFromFiles` (returns `Result<ProgramPtr>`) resolves them relative to the working directory. The root `shaders/` directory is an older, diverged copy and is not used by the build.
+The library's built-in shaders are embedded as C++ string constants (`stock_shaders.h`, `pbr_shaders.h`, `post_shaders.h`, ...). File-based shaders used by examples live in `data/shaders/` and are copied next to the executables at build time (`copy_example_assets` / `ivf2_copy_runtime_files`) and installed with the library; `ShaderManager::compileProgramFromFiles` (returns `Result<ProgramPtr>`) resolves them relative to the working directory. Example models, textures and sounds are in `examples/assets/`.
 
 ## Documentation
 

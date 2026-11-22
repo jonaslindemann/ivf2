@@ -36,7 +36,6 @@
 
 # Directories
 
-bin/example_*
 build-debug/
 build-release/
 build/
@@ -49,10 +48,8 @@ docs/doxygen/latex/
 _CMakePresets.json
 /docs/site
 /docs/docs/doxygen/html/
-/bin/Release
-/bin/Debug
-/bin/Debug
-/bin/Debug
+# Build output of the legacy in-source layout (IVF2_OUTPUT_IN_SOURCE_TREE)
+/bin/
 /_vcpkg_installed
 
 # CMake presets output / local overrides

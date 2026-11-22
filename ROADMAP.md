@@ -178,8 +178,11 @@ Goal: make the library trustworthy to depend on.
    negative component, node click callbacks never fired (a local shadowed
    `GLFWSceneWindow::m_currentNode`), `clearError()` cleared only one error flag.
    Version macros are generated in `ivf/config.h` (`IVF2_VERSION_*`).
-   *Remaining:* GCC/Clang warnings (measure in CI, then turn on warnings-as-errors per
-   platform); const-correct getters (`material() const`); `const std::string&` instead of
+   GCC and Clang are warning-free too (initializer order, signed/unsigned, unused fields; missing
+   virtual destructors in `PropertyInspectable`, `UiMenuItem`, `UiMenu`, `NodeVisitor`, and
+   property pointers that dangled after copying/moving a `PropertyInspectable`), and CI builds
+   with `IVF2_WARNINGS_AS_ERRORS=ON` on all platforms.
+   *Remaining:* const-correct getters (`material() const`); `const std::string&` instead of
    `const std::string` by value (~98 parameters, none virtual); consistent naming (~40 `get*`
    methods -> `x()`, deprecated aliases); `[[nodiscard]]` on the 159 `create()` factories.
 8. **Visual regression tests.** Headless rendering (hidden GLFW window, or EGL on CI)

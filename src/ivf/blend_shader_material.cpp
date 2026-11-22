@@ -10,14 +10,11 @@ using namespace ivf;
 
 namespace {
 
-std::shared_ptr<BlendShaderMaterial> checkedMaterial(ProgramPtr program, const std::string &name, BlendMode mode)
+std::shared_ptr<BlendShaderMaterial> checkedMaterial(const Result<ProgramPtr> &program, BlendMode mode)
 {
-    if (ShaderManager::instance()->compileLinkErrors())
-    {
-        logError("Shader program '" + name + "' failed to compile or link.", "BlendShaderMaterial");
-        return nullptr;
-    }
-    return BlendShaderMaterial::create(program, mode);
+    if (!program)
+        return nullptr; // the reason is already logged by the ShaderManager
+    return BlendShaderMaterial::create(*program, mode);
 }
 
 } // namespace
@@ -36,10 +33,10 @@ std::shared_ptr<BlendShaderMaterial> BlendShaderMaterial::createFromFiles(const 
                                                                           const std::string &name, BlendMode mode,
                                                                           bool watch)
 {
-    auto program = ShaderManager::instance()->loadProgramFromFiles(vertPath, fragPath, name, false);
-    auto material = checkedMaterial(program, name, mode);
+    auto program = ShaderManager::instance()->compileProgramFromFiles(vertPath, fragPath, name, false);
+    auto material = checkedMaterial(program, mode);
     if (material && watch)
-        ShaderWatcher::instance()->watch(program, vertPath, fragPath);
+        ShaderWatcher::instance()->watch(*program, vertPath, fragPath);
     return material;
 }
 
@@ -47,8 +44,8 @@ std::shared_ptr<BlendShaderMaterial> BlendShaderMaterial::createFromStrings(cons
                                                                             const std::string &fragSource,
                                                                             const std::string &name, BlendMode mode)
 {
-    auto program = ShaderManager::instance()->loadProgramFromStrings(vertSource, fragSource, name, false);
-    return checkedMaterial(program, name, mode);
+    auto program = ShaderManager::instance()->compileProgramFromStrings(vertSource, fragSource, name, false);
+    return checkedMaterial(program, mode);
 }
 
 void BlendShaderMaterial::setBlendMode(BlendMode mode)

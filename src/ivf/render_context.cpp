@@ -116,16 +116,13 @@ bool RenderContext::setupDefaults(const std::string &fontFile)
 #endif
 
     auto shaderMgr = shaders();
-    shaderMgr->loadRenderToTextureShader();
-    shaderMgr->loadBasicShader();
-    shaderMgr->loadPBRShader();
-    shaderMgr->apply();
-
-    if (shaderMgr->compileLinkErrors())
+    // A failure is logged with the driver output by the ShaderManager.
+    if (!shaderMgr->loadRenderToTextureShader() || !shaderMgr->loadBasicShader() || !shaderMgr->loadPBRShader())
     {
         logError("Couldn't compile the default shaders", "RenderContext");
         return false;
     }
+    shaderMgr->apply();
 
     auto lightMgr = lights();
     lightMgr->enableLighting();

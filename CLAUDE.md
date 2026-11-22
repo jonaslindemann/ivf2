@@ -152,7 +152,7 @@ GLFW3, GLM (`glm::glm`, the only math library — also used by the generator), O
 
 ## Shaders
 
-The library's built-in shaders are embedded as C++ string constants (`stock_shaders.h`, `pbr_shaders.h`, `post_shaders.h`, ...). File-based shaders used by examples live in `bin/shaders/` and are copied next to the executables at build time (`copy_example_assets` / `ivf2_copy_runtime_files`); `ShaderManager::loadProgramFromFiles` resolves them relative to the working directory. The root `shaders/` directory is an older, diverged copy and is not used by the build.
+The library's built-in shaders are embedded as C++ string constants (`stock_shaders.h`, `pbr_shaders.h`, `post_shaders.h`, ...). File-based shaders used by examples live in `bin/shaders/` and are copied next to the executables at build time (`copy_example_assets` / `ivf2_copy_runtime_files`); `ShaderManager::compileProgramFromFiles` (returns `Result<ProgramPtr>`) resolves them relative to the working directory. The root `shaders/` directory is an older, diverged copy and is not used by the build.
 
 ## Documentation
 

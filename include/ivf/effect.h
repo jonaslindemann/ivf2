@@ -113,6 +113,16 @@ protected:
     ProgramPtr m_prePassProgram; ///< Optional pre-pass program, see prePassProgram().
 
     /**
+     * @brief Compile a program for this effect, for use in doLoad().
+     *
+     * Registered with the ShaderManager under @p name; does not change the current program.
+     * @return The program, or nullptr if it failed to compile or link. The reason is logged,
+     *         and GLFWSceneWindow::addEffect() skips an effect without a program.
+     */
+    ProgramPtr compileProgram(const std::string &vertexSource, const std::string &fragmentSource,
+                              const std::string &name);
+
+    /**
      * @brief Load effect-specific resources (to be overridden by derived classes).
      */
     virtual void doLoad(){};

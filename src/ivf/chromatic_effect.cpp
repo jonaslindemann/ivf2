@@ -29,8 +29,8 @@ float ivf::ChromaticEffect::offset() const
 
 void ivf::ChromaticEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::chromatic_frag_shader_source, "chromatic", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::chromatic_frag_shader_source, "chromatic");
 }
 
 void ivf::ChromaticEffect::doUpdateParams()

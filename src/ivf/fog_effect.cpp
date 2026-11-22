@@ -108,8 +108,7 @@ float FogEffect::horizonBlend() const
 
 void FogEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, ivf::fog_frag_shader_source,
-                                         "fog", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, ivf::fog_frag_shader_source, "fog");
 }
 
 void FogEffect::doUpdateParams()

@@ -79,10 +79,31 @@ ivf::Result<Heightmap> loadHeightmap(const std::string &path)
 | `Cubemap::load(...)`, `Cubemap::loadFromDirectory(dir)` | `Result<void>` |
 | `FontManager::loadFace(file, name)` | `Result<void>` |
 | `ModelLoader::load(path)` | `Result<CompositeNodePtr>` |
+| `ShaderManager::compileProgramFromFiles(vert, frag, name)` | `Result<ProgramPtr>` |
+| `ShaderManager::compileProgramFromStrings(vert, frag, name)` | `Result<ProgramPtr>` |
+| `ShaderManager::loadBasicShader()`, `loadPBRShader()`, `loadBumpShader()`, `loadRenderToTextureShader()` | `Result<ProgramPtr>` |
 | `SceneSerializer::loadFile(path)` | `Result<CompositeNodePtr>` |
 | `SceneSerializer::saveFile(root, path)` | `Result<void>` |
 
 `Texture::load`, `Cubemap::load` and `FontManager::loadFace` used to return `bool` or `void`; code that uses them in a condition, `if (texture->load(...))`, compiles unchanged.
+
+The `load*Shader()` functions used to return the `ProgramPtr` directly. Code that ignores the return value compiles unchanged (with a warning); code that uses it now needs `*`: `(*shaderMgr->loadBumpShader())->use()`.
+
+### Shader programs
+
+For compile and link failures the error message ends with the driver's output, so it can be shown in a UI, for example while editing a shader:
+
+```cpp
+auto program = shaderMgr->compileProgramFromFiles("shaders/wave.vert", "shaders/wave.frag", "wave");
+if (!program)
+{
+    m_status = program.error().message; // "Shader program 'wave': fragment shader failed to compile:\n0(12) : error ..."
+    return;
+}
+material->setProgram(*program);
+```
+
+A failed program is not registered with the shader manager and does not replace an earlier program with the same name. Effects build their programs with `Effect::compileProgram()`, which returns `nullptr` on failure; `GLFWSceneWindow::addEffect()` skips such an effect.
 
 ### Deprecated
 
@@ -93,5 +114,9 @@ These still work but are marked `[[deprecated]]` and will be removed in a later 
 | `ModelLoader::loadModel(path)` - throws on failure | `ModelLoader::load(path)` |
 | `SceneSerializer::load(path)` - `nullptr` on failure | `SceneSerializer::loadFile(path)` |
 | `SceneSerializer::save(root, path)` - `false` on failure | `SceneSerializer::saveFile(root, path)` |
+| `ShaderManager::loadProgramFromFiles(...)` - `nullptr` on failure | `ShaderManager::compileProgramFromFiles(...)` |
+| `ShaderManager::loadProgramFromStrings(...)` - `nullptr` on failure | `ShaderManager::compileProgramFromStrings(...)` |
+| `ShaderManager::compileLinkErrors()` - flag for the last program | the `Result` of the function that built the program |
+| `smLoadProgramFromFiles`, `smLoadProgramFromStrings`, `smCompileLinkErrors` | the `ShaderManager` functions above |
 
-Shader programs (`ShaderManager::loadProgramFromFiles` and `compileLinkErrors()`) will move to `Result` in a later step.
+The deprecated `loadProgramFrom*()` functions used to return an unusable program when compiling failed; they now return `nullptr`.

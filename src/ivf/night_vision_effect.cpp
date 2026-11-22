@@ -23,8 +23,8 @@ glm::vec3 NightVisionEffect::phosphorColor() const { return m_phosphorColor; }
 
 void NightVisionEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::night_vision_frag_shader_source, "night_vision", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::night_vision_frag_shader_source, "night_vision");
 }
 
 void NightVisionEffect::doUpdateParams()

@@ -27,8 +27,8 @@ float ColorGradingEffect::saturation() const { return m_saturation; }
 
 void ColorGradingEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::color_grading_frag_shader_source, "color_grading", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::color_grading_frag_shader_source, "color_grading");
 }
 
 void ColorGradingEffect::doUpdateParams()

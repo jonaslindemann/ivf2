@@ -5,15 +5,16 @@
  * @brief Hot-reload support for file-based GLSL shader programs.
  *
  * @code
- * auto prog = ShaderManager::instance()->loadProgramFromFiles("vs.glsl", "fs.glsl", "myShader");
- * ShaderWatcher::instance()->watch(prog, "vs.glsl", "fs.glsl");
+ * auto prog = ShaderManager::instance()->compileProgramFromFiles("vs.glsl", "fs.glsl", "myShader");
+ * if (prog)
+ *     ShaderWatcher::instance()->watch(*prog, "vs.glsl", "fs.glsl");
  *
  * // In update loop (GLFWSceneWindow calls this automatically):
  * ShaderWatcher::instance()->update(dt);
  * @endcode
  *
  * On a file change, the watcher recompiles both shaders in place. If compilation
- * or linking fails the old program is kept and the error is printed to stderr.
+ * or linking fails the old program is kept and the error is logged.
  * If it succeeds, the existing ProgramPtr's GL program is replaced transparently.
  *
  * GLFWSceneWindow calls ShaderWatcher::instance()->update(dt) in doUpdateOtherUi(),

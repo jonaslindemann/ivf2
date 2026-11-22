@@ -61,10 +61,12 @@ bool Program::link()
     // Check the program
     glGetProgramiv(m_id, GL_LINK_STATUS, &result);
     glGetProgramiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
+    m_infoLog.clear();
     if (infoLogLength > 1)
     {
         std::vector<char> programErrorMessage(std::max(infoLogLength, int(1)));
         glGetProgramInfoLog(m_id, infoLogLength, NULL, &programErrorMessage[0]);
+        m_infoLog = &programErrorMessage[0];
 
         if (result == GL_FALSE)
             logErrorfc("Program", "Program link error in {}: {}", m_name, std::string(&programErrorMessage[0]));
@@ -73,6 +75,11 @@ bool Program::link()
     }
 
     return result == GL_TRUE;
+}
+
+const std::string &Program::infoLog() const
+{
+    return m_infoLog;
 }
 
 void Program::use()

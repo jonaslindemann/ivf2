@@ -69,6 +69,11 @@ bool Shader::compile()
     return false;
 }
 
+const std::string &Shader::infoLog() const
+{
+    return m_infoLog;
+}
+
 GLuint Shader::id()
 {
     return m_id;

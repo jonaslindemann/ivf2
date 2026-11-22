@@ -105,13 +105,11 @@ std::shared_ptr<GradientSkyMaterial> GradientSkyMaterial::create(glm::vec3 zenit
     auto program = shaderMgr->program(kProgramName);
     if (!program)
     {
-        program =
-            shaderMgr->loadProgramFromStrings(sky_vert_shader_source, sky_frag_shader_source, kProgramName, false);
-        if (shaderMgr->compileLinkErrors())
-        {
-            logError("Sky shader failed to compile or link.", "GradientSkyMaterial");
-            return nullptr;
-        }
+        auto result =
+            shaderMgr->compileProgramFromStrings(sky_vert_shader_source, sky_frag_shader_source, kProgramName, false);
+        if (!result)
+            return nullptr; // the reason is already logged
+        program = *result;
     }
 
     auto material = std::make_shared<GradientSkyMaterial>(zenithColor, horizonColor);

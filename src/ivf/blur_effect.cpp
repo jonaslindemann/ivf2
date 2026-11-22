@@ -29,8 +29,7 @@ float ivf::BlurEffect::blurRadius()
 
 void ivf::BlurEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, ivf::blur_frag_shader_source,
-                                         "blur", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, ivf::blur_frag_shader_source, "blur");
 }
 
 void ivf::BlurEffect::doUpdateParams()

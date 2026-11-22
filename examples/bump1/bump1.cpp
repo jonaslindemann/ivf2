@@ -58,7 +58,8 @@ public:
     int onSetup() override
     {
         // Register the bump shader (basic + PBR are already loaded by GLFWSceneWindow).
-        renderContext()->shaders()->loadBumpShader();
+        if (!renderContext()->shaders()->loadBumpShader())
+            return -1; // the reason is already logged
 
         // Enable texture sampling in the basic shader (used by the left sphere).
         // The bump shader gets useTexture forwarded from the material in BumpMaterial::apply().

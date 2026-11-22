@@ -41,22 +41,15 @@ int onSetup()
     // Load basic shaders
 
     auto shaderMgr = renderContext()->shaders();
-    shaderMgr->loadBasicShader();
-
-    // Check for shader compilation errors
-
-    if (shaderMgr->compileLinkErrors())
-    {
-        cout << "Couldn't compile shaders, exiting..." << endl;
-        return -1;
-    }
+    if (!shaderMgr->loadBasicShader())
+        return -1; // the reason is logged, including the compiler output
 ```
 
 !!! note 
 
     In all the examples in this chapter we have omitted the ivf namespace. The Ivf2 library is designed to be used with the `ivf` namespace, so all classes and functions in the library are prefixed with `ivf::`. In the examples we will use the `using namespace ivf;` directive to avoid having to prefix all classes and functions with `ivf::`. This is not recommended in production code, but it makes the examples easier to read.
 
-The `ShaderManager` manages the shaders. It provides methods for loading and compiling shaders, as well as for checking for compilation errors. Every window owns a *render context* (`renderContext()`) holding the managers for its OpenGL context, so `renderContext()->shaders()` returns this window's shader manager. The `loadBasicShader()` method loads the basic shader from the Ivf2 library. The `compileLinkErrors()` method checks for compilation errors in the shaders. If there are any errors, it will print them to the console and return true. If there are no errors, it will return false.
+The `ShaderManager` manages the shaders. It provides methods for loading and compiling shaders, as well as for checking for compilation errors. Every window owns a *render context* (`renderContext()`) holding the managers for its OpenGL context, so `renderContext()->shaders()` returns this window's shader manager. The `loadBasicShader()` method compiles the basic shader from the Ivf2 library. It returns an `ivf::Result` that converts to `false` if the shader failed to compile or link; the reason, including the compiler output, is written to the log and is available as `result.error().message` (see [Error Handling](../advanced/error_handling.md)).
 
 In the next step we initialise scene lighting by using the `LightManager` class. The `LightManager` class is used to manage the lights in the scene. It provides methods for adding and removing lights, as well as for updating the lights in the scene. Like the shader manager, it belongs to the window's render context and is accessed with `renderContext()->lights()`. (The older `LightManager::instance()` still works and returns the same object; see [Render Context](../advanced/render_context.md).) The code below shows how to add a light to the scene.
 
@@ -160,15 +153,8 @@ public:
         // Load basic shaders
 
         auto shaderMgr = renderContext()->shaders();
-        shaderMgr->loadBasicShader();
-
-        // Check for shader compilation errors
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
+        if (!shaderMgr->loadBasicShader())
+            return -1; // the reason is logged, including the compiler output
 
         // Setup lighting
 

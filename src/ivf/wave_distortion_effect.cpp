@@ -23,8 +23,8 @@ float WaveDistortionEffect::speed() const { return m_speed; }
 
 void WaveDistortionEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::wave_distortion_frag_shader_source, "wave_distortion", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::wave_distortion_frag_shader_source, "wave_distortion");
 }
 
 void WaveDistortionEffect::doUpdateParams()

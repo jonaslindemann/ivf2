@@ -46,15 +46,8 @@ public:
 
         // Load the default basic shader program
 
-        shaderMgr->loadBasicShader();
-
-        // Check for shader compilation and linking errors
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
+        if (!shaderMgr->loadBasicShader())
+            return -1; // the reason is logged, including the compiler output
 
         // Setup lighting
 

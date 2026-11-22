@@ -36,8 +36,7 @@ float ivf::BloomEffect::intensity() const
 
 void ivf::BloomEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, ivf::bloom_frag_shader_source,
-                                         "bloom", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, ivf::bloom_frag_shader_source, "bloom");
 }
 
 void ivf::BloomEffect::doUpdateParams()

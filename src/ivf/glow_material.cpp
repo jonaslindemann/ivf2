@@ -73,13 +73,11 @@ std::shared_ptr<GlowMaterial> GlowMaterial::create(glm::vec3 color, float bright
     auto program = shaderMgr->program(kProgramName);
     if (!program)
     {
-        program =
-            shaderMgr->loadProgramFromStrings(glow_vert_shader_source, glow_frag_shader_source, kProgramName, false);
-        if (shaderMgr->compileLinkErrors())
-        {
-            logError("Glow shader failed to compile or link.", "GlowMaterial");
-            return nullptr;
-        }
+        auto result =
+            shaderMgr->compileProgramFromStrings(glow_vert_shader_source, glow_frag_shader_source, kProgramName, false);
+        if (!result)
+            return nullptr; // the reason is already logged
+        program = *result;
     }
 
     auto material = std::make_shared<GlowMaterial>(color, brightness, mode);

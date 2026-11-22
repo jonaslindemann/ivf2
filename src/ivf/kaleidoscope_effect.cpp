@@ -21,8 +21,8 @@ float KaleidoscopeEffect::rotation() const { return m_rotation; }
 
 void KaleidoscopeEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::kaleidoscope_frag_shader_source, "kaleidoscope", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::kaleidoscope_frag_shader_source, "kaleidoscope");
 }
 
 void KaleidoscopeEffect::doUpdateParams()

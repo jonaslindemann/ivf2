@@ -31,6 +31,7 @@ protected:
     std::vector<std::shared_ptr<Shader>> m_shaders; ///< Attached shaders.
     GLuint m_id;                                    ///< OpenGL program object ID.
     bool m_enabled;                                 ///< Whether the program is currently enabled.
+    std::string m_infoLog;                          ///< Linker output of the last link().
 
 public:
     /**
@@ -71,6 +72,11 @@ public:
      * @return bool True if linking succeeded.
      */
     bool link();
+
+    /**
+     * @brief Linker output (errors and warnings) of the last link(); empty if there was none.
+     */
+    const std::string &infoLog() const;
 
     /**
      * @brief Activate the program for use in OpenGL.

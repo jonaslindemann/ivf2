@@ -44,10 +44,12 @@ bool VertexShader::compile()
 
     glGetShaderiv(m_id, GL_COMPILE_STATUS, &result);
     glGetShaderiv(m_id, GL_INFO_LOG_LENGTH, &infoLogLength);
+    m_infoLog.clear();
     if (infoLogLength > 1)
     {
         std::vector<char> vertexShaderErrorMessage(infoLogLength);
         glGetShaderInfoLog(m_id, infoLogLength, NULL, &vertexShaderErrorMessage[0]);
+        m_infoLog = &vertexShaderErrorMessage[0];
 
         if (result == GL_FALSE)
             logErrorfc("VertexShader", "Vertex shader compilation errors:");

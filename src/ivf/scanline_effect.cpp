@@ -23,8 +23,8 @@ float ScanlineEffect::scrollSpeed() const { return m_scrollSpeed; }
 
 void ScanlineEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::scanline_frag_shader_source, "scanline", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::scanline_frag_shader_source, "scanline");
 }
 
 void ScanlineEffect::doUpdateParams()

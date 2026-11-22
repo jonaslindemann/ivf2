@@ -124,6 +124,15 @@ void ivfui::GLFWSceneWindow::addUiWindow(ivfui::UiWindowPtr uiWindow)
 
 void ivfui::GLFWSceneWindow::addEffect(ivf::EffectPtr effect)
 {
+    if (!effect || !effect->program())
+    {
+        // Not loaded, or its shader failed to compile (the reason is logged when it was loaded).
+        ivf::logError("Effect '" + (effect ? effect->name() : std::string("null")) +
+                          "' has no shader program and is not added. Was load() called?",
+                      "GLFWSceneWindow");
+        return;
+    }
+
     m_effects.push_back(effect);
     m_postProcessor->addEffect(effect->program(), effect->prePassProgram());
 }

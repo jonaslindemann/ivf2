@@ -18,8 +18,8 @@ float PosterizeEffect::levels() const { return m_levels; }
 
 void PosterizeEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::posterize_frag_shader_source, "posterize", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::posterize_frag_shader_source, "posterize");
 }
 
 void PosterizeEffect::doUpdateParams()

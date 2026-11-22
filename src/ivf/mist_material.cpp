@@ -68,13 +68,11 @@ std::shared_ptr<MistMaterial> MistMaterial::create(glm::vec3 color, float opacit
     auto program = shaderMgr->program(kProgramName);
     if (!program)
     {
-        program =
-            shaderMgr->loadProgramFromStrings(mist_vert_shader_source, mist_frag_shader_source, kProgramName, false);
-        if (shaderMgr->compileLinkErrors())
-        {
-            logError("Mist shader failed to compile or link.", "MistMaterial");
-            return nullptr;
-        }
+        auto result =
+            shaderMgr->compileProgramFromStrings(mist_vert_shader_source, mist_frag_shader_source, kProgramName, false);
+        if (!result)
+            return nullptr; // the reason is already logged
+        program = *result;
     }
 
     auto material = std::make_shared<MistMaterial>(color, opacity, radius);

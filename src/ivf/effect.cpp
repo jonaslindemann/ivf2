@@ -1,4 +1,5 @@
 #include <ivf/effect.h>
+#include <ivf/shader_manager.h>
 
 using namespace ivf;
 
@@ -67,6 +68,13 @@ void ivf::Effect::use()
         m_program->uniformInt("height", m_height);
         doUpdateParams();
     }
+}
+
+ProgramPtr ivf::Effect::compileProgram(const std::string &vertexSource, const std::string &fragmentSource,
+                                       const std::string &name)
+{
+    auto program = ShaderManager::instance()->compileProgramFromStrings(vertexSource, fragmentSource, name, false);
+    return program.value_or(nullptr);
 }
 
 ProgramPtr ivf::Effect::program()

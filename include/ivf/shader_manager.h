@@ -2,6 +2,7 @@
 
 #include <ivf/fragment_shader.h>
 #include <ivf/program.h>
+#include <ivf/result.h>
 #include <ivf/transform_manager.h>
 #include <ivf/vertex_shader.h>
 
@@ -65,52 +66,80 @@ public:
     static void drop();
 
     /**
-     * @brief Load and link a shader program from vertex and fragment shader files.
-     * @param vertexShader Path to the vertex shader file.
-     * @param fragmentShader Path to the fragment shader file.
+     * @brief Compile and link a shader program from vertex and fragment shader files.
+     *
+     * On success the program is registered under @p name (replacing an earlier one).
+     * On failure nothing is registered and the error says which file or stage failed;
+     * for compile and link errors its message ends with the driver's output.
+     * @code
+     * auto program = shaderMgr->compileProgramFromFiles("shaders/wave.vert", "shaders/wave.frag", "wave");
+     * if (!program)
+     *     return -1; // the reason is already logged; program.error().message has the details
+     * (*program)->uniformFloat("amplitude", 0.5f);
+     * @endcode
+     * @param vertexFile Path to the vertex shader file.
+     * @param fragmentFile Path to the fragment shader file.
      * @param name Name to assign to the program.
      * @param makeCurrent If true, set as the current program.
-     * @return ProgramPtr Shared pointer to the loaded program.
+     * @return The program, or an error (FileNotFound, ReadFailed, CompileFailed, LinkFailed).
      */
-    ProgramPtr loadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
-                                    const std::string name, bool makeCurrent = true);
+    [[nodiscard]] Result<ProgramPtr> compileProgramFromFiles(const std::string &vertexFile,
+                                                             const std::string &fragmentFile,
+                                                             const std::string &name, bool makeCurrent = true);
 
     /**
-     * @brief Load and link a shader program from vertex and fragment shader source strings.
-     * @param vertexShaderSource Vertex shader source code.
-     * @param fragmentShaderSource Fragment shader source code.
+     * @brief Compile and link a shader program from vertex and fragment shader source strings.
+     * @param vertexSource Vertex shader source code.
+     * @param fragmentSource Fragment shader source code.
      * @param name Name to assign to the program.
      * @param makeCurrent If true, set as the current program.
-     * @return ProgramPtr Shared pointer to the loaded program.
+     * @return The program, or an error (CompileFailed, LinkFailed).
      */
-    ProgramPtr loadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
-                                      const std::string name, bool makeCurrent = true);
+    [[nodiscard]] Result<ProgramPtr> compileProgramFromStrings(const std::string &vertexSource,
+                                                               const std::string &fragmentSource,
+                                                               const std::string &name, bool makeCurrent = true);
 
     /**
-     * @brief Load a basic default shader program.
-     * @return ProgramPtr Shared pointer to the basic shader program.
+     * @brief Deprecated: use compileProgramFromFiles(), which reports why it failed.
+     * @return The program, or nullptr if it could not be built (the reason is logged).
      */
-    ProgramPtr loadBasicShader();
+    [[deprecated("Use compileProgramFromFiles(), which returns an ivf::Result")]] ProgramPtr loadProgramFromFiles(
+        const std::string vertexShader, const std::string fragmentShader, const std::string name,
+        bool makeCurrent = true);
+
+    /**
+     * @brief Deprecated: use compileProgramFromStrings(), which reports why it failed.
+     * @return The program, or nullptr if it could not be built (the reason is logged).
+     */
+    [[deprecated("Use compileProgramFromStrings(), which returns an ivf::Result")]] ProgramPtr loadProgramFromStrings(
+        const std::string vertexShaderSource, const std::string fragmentShaderSource, const std::string name,
+        bool makeCurrent = true);
+
+    /**
+     * @brief Load the basic default shader program, registered as "basic", and make it current.
+     * @return The program, or an error if it failed to compile or link.
+     */
+    Result<ProgramPtr> loadBasicShader();
 
     /**
      * @brief Load the PBR (physically-based rendering) shader program.
      * Registered under the name "pbr". Does not change the current program.
-     * @return ProgramPtr Shared pointer to the PBR shader program.
+     * @return The program, or an error if it failed to compile or link.
      */
-    ProgramPtr loadPBRShader();
+    Result<ProgramPtr> loadPBRShader();
 
     /**
      * @brief Load the bump-mapping (normal-map Phong) shader program.
      * Registered under the name "bump". Does not change the current program.
-     * @return ProgramPtr Shared pointer to the bump shader program.
+     * @return The program, or an error if it failed to compile or link.
      */
-    ProgramPtr loadBumpShader();
+    Result<ProgramPtr> loadBumpShader();
 
     /**
-     * @brief Load a shader program for rendering to a texture.
-     * @return ProgramPtr Shared pointer to the render-to-texture shader program.
+     * @brief Load a shader program for rendering to a texture, registered as "render_to_texture".
+     * @return The program, or an error if it failed to compile or link.
      */
-    ProgramPtr loadRenderToTextureShader();
+    Result<ProgramPtr> loadRenderToTextureShader();
 
     /**
      * @brief Get the currently active shader program.
@@ -153,10 +182,16 @@ public:
     void applyProgram(const std::string name);
 
     /**
-     * @brief Check if there were any compile or link errors.
-     * @return bool True if there were errors.
+     * @brief Deprecated: check the Result returned when the program is built instead.
+     * @return bool True if the most recently built program had compile or link errors.
      */
-    bool compileLinkErrors();
+    [[deprecated("Check the ivf::Result returned by compileProgramFrom*() or load*Shader()")]] bool
+    compileLinkErrors();
+
+private:
+    Result<ProgramPtr> buildProgram(std::shared_ptr<VertexShader> vertexShader,
+                                    std::shared_ptr<FragmentShader> fragmentShader, const std::string &name,
+                                    bool makeCurrent);
 };
 
 /**
@@ -166,36 +201,38 @@ public:
 typedef ShaderManager *ShaderManagerPtr;
 
 /**
- * @brief Load and link a shader program from files using the global ShaderManager.
+ * @brief Deprecated: use ShaderManager::compileProgramFromFiles().
  */
-ProgramPtr smLoadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader,
-                                  const std::string name, bool makeCurrent = true);
+[[deprecated("Use ShaderManager::compileProgramFromFiles(), which returns an ivf::Result")]] ProgramPtr
+smLoadProgramFromFiles(const std::string vertexShader, const std::string fragmentShader, const std::string name,
+                       bool makeCurrent = true);
 
 /**
- * @brief Load and link a shader program from source strings using the global ShaderManager.
+ * @brief Deprecated: use ShaderManager::compileProgramFromStrings().
  */
-ProgramPtr smLoadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
-                                    const std::string name, bool makeCurrent = true);
+[[deprecated("Use ShaderManager::compileProgramFromStrings(), which returns an ivf::Result")]] ProgramPtr
+smLoadProgramFromStrings(const std::string vertexShaderSource, const std::string fragmentShaderSource,
+                         const std::string name, bool makeCurrent = true);
 
 /**
  * @brief Load a basic default shader program using the global ShaderManager.
  */
-ProgramPtr smLoadBasicShader();
+Result<ProgramPtr> smLoadBasicShader();
 
 /**
  * @brief Load the PBR shader program using the global ShaderManager.
  */
-ProgramPtr smLoadPBRShader();
+Result<ProgramPtr> smLoadPBRShader();
 
 /**
  * @brief Load the bump-mapping shader program using the global ShaderManager.
  */
-ProgramPtr smLoadBumpShader();
+Result<ProgramPtr> smLoadBumpShader();
 
 /**
  * @brief Load a render-to-texture shader program using the global ShaderManager.
  */
-ProgramPtr smLoadRenderToTextureShader();
+Result<ProgramPtr> smLoadRenderToTextureShader();
 
 /**
  * @brief Get the currently active shader program using the global ShaderManager.
@@ -218,8 +255,8 @@ void smApply();
 void smApplyProgram(const std::string name);
 
 /**
- * @brief Check for compile or link errors using the global ShaderManager.
+ * @brief Deprecated: check the Result returned when the program is built instead.
  */
-bool smCompileLinkErrors();
+[[deprecated("Check the ivf::Result returned by compileProgramFrom*() or load*Shader()")]] bool smCompileLinkErrors();
 
 }; // namespace ivf

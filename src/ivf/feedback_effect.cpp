@@ -72,8 +72,8 @@ glm::vec3 ivf::FeedbackEffect::colorDecay() const
 
 void ivf::FeedbackEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::feedback_frag_shader_source, "feedback", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::feedback_frag_shader_source, "feedback");
 }
 
 void ivf::FeedbackEffect::doUpdateParams()

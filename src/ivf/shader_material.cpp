@@ -47,14 +47,11 @@ void uploadUniform(Program &program, const std::string &name, const ShaderMateri
         value);
 }
 
-std::shared_ptr<ShaderMaterial> checkedMaterial(ProgramPtr program, const std::string &name)
+std::shared_ptr<ShaderMaterial> checkedMaterial(const Result<ProgramPtr> &program)
 {
-    if (ShaderManager::instance()->compileLinkErrors())
-    {
-        logError("Shader program '" + name + "' failed to compile or link.", "ShaderMaterial");
-        return nullptr;
-    }
-    return ShaderMaterial::create(program);
+    if (!program)
+        return nullptr; // the reason is already logged by the ShaderManager
+    return ShaderMaterial::create(*program);
 }
 
 } // namespace
@@ -73,10 +70,10 @@ std::shared_ptr<ShaderMaterial> ShaderMaterial::createFromFiles(const std::strin
                                                                 const std::string &fragPath, const std::string &name,
                                                                 bool watch)
 {
-    auto program = ShaderManager::instance()->loadProgramFromFiles(vertPath, fragPath, name, false);
-    auto material = checkedMaterial(program, name);
+    auto program = ShaderManager::instance()->compileProgramFromFiles(vertPath, fragPath, name, false);
+    auto material = checkedMaterial(program);
     if (material && watch)
-        ShaderWatcher::instance()->watch(program, vertPath, fragPath);
+        ShaderWatcher::instance()->watch(*program, vertPath, fragPath);
     return material;
 }
 
@@ -84,8 +81,7 @@ std::shared_ptr<ShaderMaterial> ShaderMaterial::createFromStrings(const std::str
                                                                   const std::string &fragSource,
                                                                   const std::string &name)
 {
-    auto program = ShaderManager::instance()->loadProgramFromStrings(vertSource, fragSource, name, false);
-    return checkedMaterial(program, name);
+    return checkedMaterial(ShaderManager::instance()->compileProgramFromStrings(vertSource, fragSource, name, false));
 }
 
 void ShaderMaterial::setProgram(ProgramPtr program)

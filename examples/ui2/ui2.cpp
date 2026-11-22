@@ -82,15 +82,8 @@ public:
         // Create and initialize the shader manager, then load the basic shader.
 
         auto shaderMgr = renderContext()->shaders();
-        shaderMgr->loadBasicShader();
-
-        // Check for shader compilation or linking errors.
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
+        if (!shaderMgr->loadBasicShader())
+            return -1; // the reason is logged, including the compiler output
 
         // Create the light manager.
 

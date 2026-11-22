@@ -67,8 +67,7 @@ public:
 protected:
     void doLoad() override
     {
-        m_program = ivf::smLoadProgramFromStrings(
-            ivf::render_to_texture_vert_shader_source_330, two_tone_frag, "two_tone", false);
+        m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, two_tone_frag, "two_tone");
     }
 
     void doUpdateParams() override
@@ -87,7 +86,7 @@ protected:
 };
 ```
 
-Pass `false` as the last argument of `smLoadProgramFromStrings()` so loading the effect does not change the program currently in use.
+`compileProgram()` registers the program with the shader manager without changing the program currently in use. If the shader fails to compile it returns `nullptr` and logs the compiler output; `addEffect()` then skips the effect.
 
 ### Using it
 

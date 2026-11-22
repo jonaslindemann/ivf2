@@ -26,8 +26,8 @@ float ivf::MotionBlurEffect::blendFactor() const
 
 void ivf::MotionBlurEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::motion_blur_frag_shader_source, "motion_blur", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::motion_blur_frag_shader_source, "motion_blur");
 }
 
 void ivf::MotionBlurEffect::doUpdateParams()

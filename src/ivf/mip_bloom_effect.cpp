@@ -94,8 +94,8 @@ std::shared_ptr<MipBloomEffect> MipBloomEffect::create()
 
 void MipBloomEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, mip_bloom_frag_shader_source,
-                                         "mip_bloom", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               mip_bloom_frag_shader_source, "mip_bloom");
 }
 
 void MipBloomEffect::doUpdateParams()

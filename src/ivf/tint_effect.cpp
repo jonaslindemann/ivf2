@@ -47,8 +47,7 @@ glm::vec3 ivf::TintEffect::grayScaleWeights() const
 
 void ivf::TintEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, ivf::tint_frag_shader_source,
-                                         "tint", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, ivf::tint_frag_shader_source, "tint");
 }
 
 void ivf::TintEffect::doUpdateParams()

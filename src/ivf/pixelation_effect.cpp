@@ -29,8 +29,8 @@ float ivf::PixelationEffect::pixelSize()
 
 void ivf::PixelationEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::pixelate_frag_shader_source, "pixelation", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::pixelate_frag_shader_source, "pixelation");
 }
 
 void ivf::PixelationEffect::doUpdateParams()

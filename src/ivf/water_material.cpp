@@ -109,13 +109,11 @@ std::shared_ptr<WaterMaterial> WaterMaterial::create(PlanarReflectionPtr reflect
     auto program = shaderMgr->program(kProgramName);
     if (!program)
     {
-        program = shaderMgr->loadProgramFromStrings(water_vert_shader_source, water_frag_shader_source, kProgramName,
-                                                    false);
-        if (shaderMgr->compileLinkErrors())
-        {
-            logError("Water shader failed to compile or link.", "WaterMaterial");
-            return nullptr;
-        }
+        auto result =
+            shaderMgr->compileProgramFromStrings(water_vert_shader_source, water_frag_shader_source, kProgramName, false);
+        if (!result)
+            return nullptr; // the reason is already logged
+        program = *result;
     }
 
     auto material = std::make_shared<WaterMaterial>(reflection);

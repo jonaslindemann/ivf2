@@ -21,6 +21,7 @@ protected:
     std::string m_filename;   ///< Filename of the shader source (if loaded from file).
     std::string m_shaderCode; ///< Shader source code.
     GLuint m_id;              ///< OpenGL shader object ID.
+    std::string m_infoLog;    ///< Compiler output of the last compile().
 
 public:
     /**
@@ -76,6 +77,11 @@ public:
      * @return bool True if compilation succeeded.
      */
     virtual bool compile();
+
+    /**
+     * @brief Compiler output (errors and warnings) of the last compile(); empty if there was none.
+     */
+    const std::string &infoLog() const;
 
     /**
      * @brief Get the OpenGL shader object ID.

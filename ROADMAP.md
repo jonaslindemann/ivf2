@@ -161,9 +161,14 @@ Goal: make the library trustworthy to depend on.
    `FontManager::loadFace`, `ModelLoader::load` (old throwing `loadModel` deprecated),
    `SceneSerializer::loadFile/saveFile` (old `load/save` deprecated). Exceptions only for
    programming errors. Docs: Advanced > Error Handling; tests: `test_result`.
-   *Remaining:* shader programs (`ShaderManager::loadProgramFrom*` + `compileLinkErrors()`
-   flag -> `Result<ProgramPtr>`), effect/material shader loading; remove deprecated
-   wrappers in the next major release.
+   *Done (shaders):* `ShaderManager::compileProgramFromFiles/FromStrings` and the built-in
+   `load*Shader()` return `Result<ProgramPtr>` with the driver's info log in the message
+   (`Shader::infoLog()`, `Program::infoLog()`); `loadProgramFrom*` and the global
+   `compileLinkErrors()` flag are deprecated. Effects use `Effect::compileProgram()`
+   (nullptr on failure, skipped by `addEffect()`); materials and `setupDefaults()` check results.
+   *Remaining:* `GpuProceduralTexture` and `ShaderWatcher` still use the low-level
+   compile/link calls; `Effect::load()` could return a Result; remove deprecated wrappers
+   in the next major release.
 7. **API polish.** Raise the MSVC warning level: CMake no longer adds `/W3`, so MSVC
    builds run at `/W1` (only `/w14996` for deprecations was added); expect many conversion
    warnings at `/W3`. Const-correct getters (`material() const`), `std::string_view`/`const&`

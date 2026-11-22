@@ -36,8 +36,7 @@ float ivf::FadeEffect::fadeAmount() const
 
 void ivf::FadeEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330, ivf::fade_frag_shader_source,
-                                         "fade", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, ivf::fade_frag_shader_source, "fade");
 }
 
 void ivf::FadeEffect::doUpdateParams()

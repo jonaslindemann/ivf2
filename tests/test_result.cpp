@@ -5,8 +5,10 @@
 #include <ivf/config.h>
 #include <ivf/logger.h>
 #include <ivf/model_loader.h>
+#include <ivf/render_context.h>
 #include <ivf/result.h>
 #include <ivf/scene_serializer.h>
+#include <ivf/shader_manager.h>
 
 #include <string>
 #include <vector>
@@ -80,6 +82,23 @@ IVF_TEST(model_loader_reports_missing_file)
 #endif
     IVF_CHECK(!model && model.error().message.find("does/not/exist.obj") != std::string::npos);
     IVF_CHECK(log.messages.size() == 1);
+}
+
+IVF_TEST(shader_manager_reports_missing_file)
+{
+    // The files are checked before any OpenGL call, so no GL context is needed.
+    auto ctx = RenderContext::create(nullptr);
+    ctx->makeCurrent();
+    {
+        CapturedErrors log;
+        auto program = ctx->shaders()->compileProgramFromFiles("does/not/exist.vert", "does/not/exist.frag", "missing");
+        IVF_CHECK(!program && program.error().code == ErrorCode::FileNotFound);
+        IVF_CHECK(!program && program.error().message.find("does/not/exist.vert") != std::string::npos);
+        IVF_CHECK(!program && program.error().message.find("'missing'") != std::string::npos);
+        IVF_CHECK(log.messages.size() == 1);
+        IVF_CHECK(ctx->shaders()->program("missing") == nullptr); // failed programs are not registered
+    }
+    RenderContext::clearCurrent();
 }
 
 IVF_TEST(scene_serializer_reports_missing_file)

@@ -23,8 +23,7 @@ float GlitchEffect::speed() const { return m_speed; }
 
 void GlitchEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::glitch_frag_shader_source, "glitch", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, ivf::glitch_frag_shader_source, "glitch");
 }
 
 void GlitchEffect::doUpdateParams()

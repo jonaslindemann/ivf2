@@ -21,8 +21,7 @@ float SwirlEffect::angle() const { return m_angle; }
 
 void SwirlEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::swirl_frag_shader_source, "swirl", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330, ivf::swirl_frag_shader_source, "swirl");
 }
 
 void SwirlEffect::doUpdateParams()

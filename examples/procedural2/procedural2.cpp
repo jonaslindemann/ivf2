@@ -93,13 +93,8 @@ public:
     {
         // Create and load the basic shader
         ShaderManagerPtr shaderMgr = renderContext()->shaders();
-        shaderMgr->loadBasicShader();
-
-        if (shaderMgr->compileLinkErrors())
-        {
-            cout << "Couldn't compile shaders, exiting..." << endl;
-            return -1;
-        }
+        if (!shaderMgr->loadBasicShader())
+            return -1; // the reason is logged, including the compiler output
 
         // Create the LightManager and add a point light
         m_lightMgr = renderContext()->lights();

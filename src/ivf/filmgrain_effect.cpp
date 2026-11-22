@@ -36,8 +36,8 @@ float ivf::FilmgrainEffect::grainBlending() const
 
 void ivf::FilmgrainEffect::doLoad()
 {
-    m_program = smLoadProgramFromStrings(ivf::render_to_texture_vert_shader_source_330,
-                                         ivf::filmgrain_frag_shader_source, "filmgrain", false);
+    m_program = compileProgram(ivf::render_to_texture_vert_shader_source_330,
+                               ivf::filmgrain_frag_shader_source, "filmgrain");
 }
 
 void ivf::FilmgrainEffect::doUpdateParams()

@@ -32,6 +32,14 @@ execute_process(COMMAND "${EXE}" WORKING_DIRECTORY "${WORKDIR}" RESULT_VARIABLE 
                 OUTPUT_VARIABLE output ERROR_VARIABLE output TIMEOUT 300)
 if(NOT result EQUAL 0)
     message("${output}")
+    # A crash (result is a signal name, not a number): show where, if gdb is available
+    find_program(GDB_EXECUTABLE gdb)
+    if(GDB_EXECUTABLE AND NOT result MATCHES "^[0-9]+$")
+        execute_process(COMMAND "${GDB_EXECUTABLE}" -batch -ex run -ex "thread apply all bt" "${EXE}"
+                        WORKING_DIRECTORY "${WORKDIR}" OUTPUT_VARIABLE trace ERROR_VARIABLE trace TIMEOUT 300)
+        string(REGEX MATCH "Thread [0-9]+ .*" trace "${trace}")
+        message("Backtrace:\n${trace}")
+    endif()
     message(FATAL_ERROR "${NAME} exited with ${result}")
 endif()
 if(NOT EXISTS "${actual}")

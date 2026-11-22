@@ -86,7 +86,7 @@ jobs:
             libasound2-dev
           # Visual regression tests: virtual X server and Mesa's software OpenGL (llvmpipe)
           if [ "${{ matrix.visual-tests }}" = "true" ]; then
-            sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri mesa-utils
+            sudo apt-get install -y --no-install-recommends xvfb xauth libgl1-mesa-dri mesa-utils gdb
           fi
 
       - name: Install system packages (macOS)

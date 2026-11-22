@@ -118,6 +118,11 @@ public:
      * @return GLFWWindowPtr Shared pointer to the GLFWWindow.
      */
     GLFWWindowPtr get(GLFWwindow *window);
+
+    /**
+     * @brief Forget all windows (called by ~GLFWApplication before glfwTerminate()).
+     */
+    void clear();
 };
 
 }; // namespace ivfui

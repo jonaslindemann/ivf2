@@ -85,8 +85,20 @@ GLFWApplication::~GLFWApplication()
 {
     logInfo("Terminating GLFW", "GLFWApplication");
 
-    for (auto window : m_windows)
-        window->destroy();
+    // Release the windows while GLFW and their GL contexts still exist. A window held only
+    // by the application is destroyed here, together with its scene and the scene's GL
+    // objects; deleting GL objects after glfwTerminate() crashes on Linux, where GLFW
+    // unloads libGL. Windows still referenced elsewhere at least release their context.
+    GLFWWindowTracker::instance()->clear();
+    for (auto &window : m_windows)
+    {
+        window->makeCurrent();
+        if (window.use_count() == 1)
+            window.reset();
+        else
+            window->destroy();
+    }
+    m_windows.clear();
 
     glfwTerminate();
 }
@@ -161,4 +173,9 @@ void GLFWWindowTracker::addWindow(GLFWWindowPtr window)
 GLFWWindowPtr GLFWWindowTracker::get(GLFWwindow *window)
 {
     return m_windowMap[window];
+}
+
+void GLFWWindowTracker::clear()
+{
+    m_windowMap.clear();
 }

@@ -8,6 +8,7 @@
 #include <ivf/composite_node.h>
 #include <ivf/framebuffer.h>
 #include <ivf/node.h>
+#include <ivf/render_queue.h>
 
 #include <glm/glm.hpp>
 
@@ -112,6 +113,14 @@ public:
      * @param scene Scene to render.
      */
     void render(CompositeNodePtr scene);
+
+    /**
+     * @brief Render collected draw items mirrored in the plane, using the current camera.
+     *
+     * Items of the hidden nodes (see addHiddenNode()) and of their descendants are left out.
+     * @param queue Items of the scene (see Node::collect()), shared with the other passes.
+     */
+    void render(const RenderQueue &queue);
 
     /**
      * @brief Reflection color texture, 0 before the first render().

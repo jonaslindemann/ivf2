@@ -6,6 +6,8 @@
 
 #include <ivf/render_queue.h>
 
+#include <functional>
+
 namespace ivf {
 
 /**
@@ -18,12 +20,17 @@ namespace ivf {
  */
 class Renderer {
 public:
+    /// Returns true for items a pass should leave out.
+    using SkipFn = std::function<bool(const DrawItem &)>;
+
     /**
-     * @brief Draw all items of @p queue in order.
+     * @brief Draw the items of @p queue in order.
      *
      * Uses the current RenderContext's managers. The model matrix is restored afterwards.
+     * @param queue Items to draw.
+     * @param skip Optional filter: items for which it returns true are not drawn.
      */
-    void execute(const RenderQueue &queue);
+    void execute(const RenderQueue &queue, const SkipFn &skip = {});
 };
 
 } // namespace ivf

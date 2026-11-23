@@ -7,6 +7,7 @@
 #include <ivf/point_light.h>
 #include <ivf/spot_light.h>
 #include <ivf/composite_node.h>
+#include <ivf/render_queue.h>
 
 #include <string>
 #include <vector>
@@ -199,9 +200,17 @@ public:
 
     /**
      * @brief Render shadow maps for all lights in the scene.
+     *
+     * Collects the scene into a render queue and calls renderShadowMaps(const RenderQueue &).
      * @param scene Shared pointer to the scene's composite node.
      */
     void renderShadowMaps(CompositeNodePtr scene);
+
+    /**
+     * @brief Render shadow maps for all shadow-casting lights from collected draw items.
+     * @param queue Items of the scene (see Node::collect()), shared with the other passes.
+     */
+    void renderShadowMaps(const RenderQueue &queue);
 
     /**
      * @brief Set the diffuse color for materials.

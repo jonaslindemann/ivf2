@@ -3,6 +3,8 @@
 
 #include <ivf/shader_manager.h>
 #include <ivf/extent_visitor.h>
+#include <ivf/renderer.h>
+#include <ivf/transform_manager.h>
 #include <ivf/shadow_shaders.h>
 
 
@@ -261,6 +263,18 @@ void ivf::LightManager::apply()
 
 void LightManager::renderShadowMaps(CompositeNodePtr scene)
 {
+    if (!m_useShadows || !scene)
+        return;
+
+    RenderQueue queue;
+    CollectState state;
+    state.world = TransformManager::instance()->modelMatrix();
+    scene->collect(queue, state);
+    renderShadowMaps(queue);
+}
+
+void LightManager::renderShadowMaps(const RenderQueue &queue)
+{
     if (!m_useShadows)
         return;
 
@@ -285,15 +299,8 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
 
     // Create an extent visitor to calculate scene bounds
 
-    if (m_autoCalcBBox)
-    {
-        ExtentVisitor extentVisitor;
-        scene->accept(&extentVisitor);
-    }
-    else
-    {
+    if (!m_autoCalcBBox)
         sceneBBox = m_sceneBBox;
-    }
 
     // Use the current shader (stock shader)
 
@@ -308,6 +315,8 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     // so restore that binding rather than the default framebuffer afterwards.
     GLint previousFramebuffer = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+
+    Renderer renderer;
 
     // For each shadow-casting light:
 
@@ -337,7 +346,7 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
 
         // Render the scene
 
-        scene->draw();
+        renderer.execute(queue);
 
         // Reset shader mode
 

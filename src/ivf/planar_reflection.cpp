@@ -1,6 +1,9 @@
 #include <ivf/planar_reflection.h>
 
+#include <ivf/renderer.h>
 #include <ivf/transform_manager.h>
+
+#include <unordered_set>
 
 #include <algorithm>
 #include <cmath>
@@ -140,6 +143,18 @@ void PlanarReflection::render(CompositeNodePtr scene)
     if (!m_enabled || !scene)
         return;
 
+    RenderQueue queue;
+    CollectState state;
+    state.world = TransformManager::instance()->modelMatrix();
+    scene->collect(queue, state);
+    render(queue);
+}
+
+void PlanarReflection::render(const RenderQueue &queue)
+{
+    if (!m_enabled)
+        return;
+
     // Save the state this pass changes
     GLint previousViewport[4];
     glGetIntegerv(GL_VIEWPORT, previousViewport);
@@ -182,14 +197,23 @@ void PlanarReflection::render(CompositeNodePtr scene)
     const glm::vec4 worldPlane(m_normal, -glm::dot(m_normal, m_point) + m_clipOffset);
     const glm::vec4 viewPlane = glm::transpose(glm::inverse(reflectedView)) * worldPlane;
 
-    // Hide the reflecting surface itself
-    std::vector<std::pair<std::shared_ptr<Node>, bool>> hidden;
+    // Leave out the reflecting surface itself (and anything below it in the scene graph)
+    std::unordered_set<const Node *> hidden;
     for (const auto &weak : m_hiddenNodes)
         if (auto node = weak.lock())
+            hidden.insert(node.get());
+    auto isHidden = [&hidden](const DrawItem &item) {
+        if (hidden.empty())
+            return false;
+        for (const Node *node = item.node; node != nullptr;)
         {
-            hidden.emplace_back(node, node->visible());
-            node->setVisible(false);
+            if (hidden.contains(node))
+                return true;
+            auto parent = node->parent(); // owned by the scene, so the pointer stays valid
+            node = parent.get();
         }
+        return false;
+    };
 
     m_frameBuffer->begin();
     glViewport(0, 0, width, height);
@@ -200,16 +224,13 @@ void PlanarReflection::render(CompositeNodePtr scene)
     xfm->setViewPos(reflectedViewPos);
     xfm->refreshForProgram();
 
-    scene->draw();
+    Renderer().execute(queue, isHidden);
 
     // Restore
     xfm->viewMatrix() = view;
     xfm->projectionMatrix() = projection;
     xfm->setViewPos(viewPos);
     xfm->refreshForProgram();
-
-    for (auto &[node, wasVisible] : hidden)
-        node->setVisible(wasVisible);
 
     m_frameBuffer->end(); // resolves the multisampled buffer into the texture
     glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));

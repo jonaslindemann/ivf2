@@ -6,7 +6,7 @@
 
 using namespace ivf;
 
-void Renderer::execute(const RenderQueue &queue)
+void Renderer::execute(const RenderQueue &queue, const SkipFn &skip)
 {
     auto *xfm = TransformManager::instance();
     const glm::mat4 start = xfm->modelMatrix();
@@ -14,7 +14,7 @@ void Renderer::execute(const RenderQueue &queue)
     for (const DrawItem &item : queue.items())
     {
         Node *node = item.node;
-        if (node == nullptr)
+        if (node == nullptr || (skip && skip(item)))
             continue;
 
         // The node applies its own transform on top of its parent's (TransformNode::doPreDraw)

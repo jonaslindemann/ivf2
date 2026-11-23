@@ -23,6 +23,7 @@
 #include <ivf/effect.h>
 #include <ivf/cursor.h>
 #include <ivf/planar_reflection.h>
+#include <ivf/renderer.h>
 
 #include <ivfui/scene_control_panel.h>
 #include <ivfui/camera_window.h>
@@ -93,7 +94,13 @@ private:
 
     std::vector<ivf::PlanarReflectionPtr> m_reflections; ///< Reflection passes rendered before the scene.
 
+    ivf::RenderQueue m_queue; ///< Scene items collected once per frame, shared by all passes.
+    ivf::Renderer m_renderer; ///< Draws m_queue.
+
+    void collectScene();
     void renderReflections();
+    void renderScenePasses();
+    void renderSelection(bool collectFresh);
 
 public:
     /**

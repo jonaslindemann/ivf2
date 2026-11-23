@@ -152,10 +152,52 @@ void ivfui::GLFWSceneWindow::clearReflections()
     m_reflections.clear();
 }
 
+void ivfui::GLFWSceneWindow::collectScene()
+{
+    m_queue.clear();
+    ivf::CollectState state;
+    state.world = TransformManager::instance()->modelMatrix();
+    m_scene->collect(m_queue, state);
+}
+
 void ivfui::GLFWSceneWindow::renderReflections()
 {
     for (auto &reflection : m_reflections)
-        reflection->render(m_scene);
+        reflection->render(m_queue);
+}
+
+void ivfui::GLFWSceneWindow::renderScenePasses()
+{
+    // One traversal per frame; the shadow, reflection and main passes draw the same items
+    smApplyProgram("basic");
+    collectScene();
+    LightManager::instance()->renderShadowMaps(m_queue);
+    renderReflections();
+    m_renderer.execute(m_queue);
+
+    auto &xfm = *TransformManager::instance();
+    glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
+    DebugDraw::instance()->flush(vp, {0, 0, float(width()), float(height())}, float(frameTime()));
+}
+
+void ivfui::GLFWSceneWindow::renderSelection(bool collectFresh)
+{
+    // Draws object ids into the selection buffer (bound by BufferSelection::begin()).
+    // Uses the frame's items unless called outside a frame (box selection from input).
+    int w = 0, h = 0;
+    this->getSize(w, h);
+    glViewport(0, 0, w, h);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+
+    // The clear colour encodes an id no node has (id 0 is the scene root)
+    glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    smApplyProgram("basic");
+    if (collectFresh)
+        collectScene();
+    m_renderer.execute(m_queue);
 }
 
 // EffectListProvider interface implementation
@@ -807,18 +849,7 @@ void GLFWSceneWindow::doDraw()
 
         GLFWWindow::doDraw();
 
-        smApplyProgram("basic");
-        LightManager::instance()->renderShadowMaps(m_scene);
-        if (!m_selectionRendering)
-            renderReflections();
-        m_scene->draw();
-
-        {
-            auto& xfm = *TransformManager::instance();
-            glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
-            DebugDraw::instance()->flush(vp, {0,0,float(width()),float(height())},
-                                         float(frameTime()));
-        }
+        renderScenePasses();
 
         m_frameBuffer->end();
 
@@ -854,18 +885,7 @@ void GLFWSceneWindow::doDraw()
         glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        smApplyProgram("basic");
-        LightManager::instance()->renderShadowMaps(m_scene);
-        if (!m_selectionRendering)
-            renderReflections();
-        m_scene->draw();
-
-        {
-            auto& xfm = *TransformManager::instance();
-            glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
-            DebugDraw::instance()->flush(vp, {0,0,float(width()),float(height())},
-                                         float(frameTime()));
-        }
+        renderScenePasses();
     }
 
     for (auto &uiWindow : m_uiWindows)
@@ -909,7 +929,7 @@ void ivfui::GLFWSceneWindow::doDrawComplete()
 
         m_bufferSelection->begin();
 
-        this->drawScene();
+        this->renderSelection(false);
         // Stored in the member: doMouseButton() sends click notifications to it.
         m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
 
@@ -1195,7 +1215,7 @@ void ivfui::GLFWSceneWindow::doMouseButton(int button, int action, int mods)
             if (std::sqrt(dx*dx + dy*dy) >= k_boxSelectMinDrag && m_selectionEnabled) {
                 m_selectionRendering = true;
                 m_bufferSelection->begin();
-                this->drawScene();
+                this->renderSelection(true);
                 auto nodes = m_bufferSelection->nodesInRegion(
                     int(m_boxStartX), int(m_boxStartY),
                     int(m_boxCurrentX), int(m_boxCurrentY));

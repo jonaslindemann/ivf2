@@ -302,9 +302,22 @@ Goal: make the library trustworthy to depend on.
      7. Docs and a stats readout (draw calls, culled items, state changes).
    - **Decided:** callback items for custom `doDraw()` nodes are kept permanently (design
      rule 4).
+   - **Decided - material inheritance** (inheritance follows the scene, not the drawing
+     order). Today stock materials have an empty `unapply()`, so a node without a material
+     gets whatever was applied last - often a previous sibling's, not its parent's.
+     1. *Nearest material wins:* a node's own material, otherwise the closest ancestor's.
+     2. *Default:* a node with no material anywhere in its path gets a neutral default
+        (lit, light grey), never leftovers from another node.
+     3. *Textures* inherit independently by the same rule.
+     4. *Most specific wins:* `Mesh` material > node material > ancestor material.
+     5. `setUseMaterial(false)` means "ignore my own material and inherit".
+     6. *Instances* resolve per path (an `InstanceNode` takes the material of the group it
+        is drawn in).
+
+     Resolved by the collector while walking the tree (no runtime cost); each draw item
+     stores its resolved material. Later, opt-in: `setMaterialOverride()` on a parent that
+     wins over its children (highlighting a selected group, X-ray views).
    - **Open decisions** (recommendation first):
-     - Material inheritance: keep, but explicit | drop (breaks scenes coloured via a
-       parent material).
      - Materials with alpha < 1 become transparent automatically | stay opaque.
      - Meshes used by several windows: one GPU copy per context, created on demand |
        one copy, documented as not shareable.

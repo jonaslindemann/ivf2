@@ -41,6 +41,8 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   `MistMaterial`, ...), particles and billboards are ordered the same way, so blended nodes no
   longer need to be added last. `Node::setRenderLayer()` chooses a layer explicitly
   (`RenderLayer::Background`, `Opaque`, `Transparent`, `Overlay`). New example `transparency1`.
+  Transparent meshes are drawn in two passes (back faces, then front faces), so their own
+  triangles blend in the right order; `Mesh::clockwise()` tells which winding faces outwards.
 - Frustum culling: `GLFWSceneWindow` skips items outside the camera (main and selection passes),
   the light (shadow maps) or the mirrored camera (reflections). `ivf::Frustum`,
   `Renderer::execute(queue, frustum)` and `Renderer::stats()` are public.

@@ -1,6 +1,7 @@
 #include <ivf/renderer.h>
 
 #include <ivf/material.h>
+#include <ivf/mesh_node.h>
 #include <ivf/node.h>
 #include <ivf/transform_manager.h>
 
@@ -95,10 +96,33 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
         if (inheritTextures)
             item.textureSource->bindTextures();
 
-        node->doPreDraw();
-        if (node->m_visible)
-            node->doDraw();
-        node->doPostDraw();
+        auto drawNode = [node] {
+            node->doPreDraw();
+            if (node->m_visible)
+                node->doDraw();
+            node->doPostDraw();
+        };
+
+        if (transparentState && dynamic_cast<MeshNode *>(node) != nullptr)
+        {
+            // Closed transparent geometry: inside (back faces) first, then the outside, so
+            // the triangle order within the mesh cannot put far faces over near ones
+            const GLboolean cullWas = glIsEnabled(GL_CULL_FACE);
+            GLint cullModeWas = GL_BACK;
+            glGetIntegerv(GL_CULL_FACE_MODE, &cullModeWas);
+            glEnable(GL_CULL_FACE);
+            glCullFace(GL_FRONT);
+            drawNode();
+            glCullFace(GL_BACK);
+            drawNode();
+            glCullFace(static_cast<GLenum>(cullModeWas));
+            if (!cullWas)
+                glDisable(GL_CULL_FACE);
+        }
+        else
+        {
+            drawNode();
+        }
 
         if (inheritTextures)
             item.textureSource->unbindTextures();

@@ -88,6 +88,7 @@ private:
     std::uint64_t m_dataVersion{0};   ///< Incremented by end(); 0 = never ended, nothing to draw.
     std::uint64_t m_vertexVersion{0}; ///< Incremented by updateVertices().
     std::uint64_t m_normalVersion{0}; ///< Incremented by updateNormals().
+    bool m_clockwise{false};          ///< Front faces are clockwise (decided in end()).
 
     glm::vec3 m_position; ///< Mesh position in world space.
 
@@ -391,6 +392,15 @@ public:
      * Needs no OpenGL context: the data is uploaded before the mesh is next drawn.
      */
     void end();
+
+    /**
+     * @brief True if the mesh's front faces (those its normals point away from) are wound
+     * clockwise; drawing then sets glFrontFace(GL_CW) so face culling removes the right side.
+     */
+    [[nodiscard]] bool clockwise() const
+    {
+        return m_clockwise;
+    }
 
     /**
      * @brief Mark the vertex positions as changed; they are uploaded before the next draw.

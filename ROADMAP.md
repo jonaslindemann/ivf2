@@ -341,7 +341,9 @@ Goal: make the library trustworthy to depend on.
         stable, opaque by program and material (numbered in scene order, deterministic)
         then front to back, transparent back to front. Colour passes blend the
         Transparent layer without depth writes (`Renderer::setTransparencyBlending()`);
-        the lit stock shader outputs the material alpha. Nodes with no material at all get
+        the lit stock shader outputs the material alpha; transparent mesh nodes are drawn
+        back faces first, then front faces (each `Mesh` detects its winding from its normals:
+        generator meshes are clockwise after the Y/Z swap). Nodes with no material at all get
         a neutral default material; `LineTrace` got its own unlit material (it relied on
         leftover state). New example `transparency1`. Changed images: mip_bloom1 (blend
         order), animation2 (trace colour). Still open: one item per mesh for `MeshNode`

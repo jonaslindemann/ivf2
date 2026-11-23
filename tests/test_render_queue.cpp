@@ -283,4 +283,46 @@ IVF_TEST(sort_groups_layers_and_orders_by_depth)
     IVF_CHECK(queue.items()[4].node == glassNear);
 }
 
+namespace {
+
+// The winding Mesh::clockwise() reports must make the normals point out of the front faces
+bool windingMatchesNormals(MeshNode &node)
+{
+    for (const auto &mesh : node.meshes())
+    {
+        auto verts = mesh->vertices();
+        auto normals = mesh->normals();
+        auto indices = mesh->indices();
+        if (!indices)
+            continue;
+        long agree = 0;
+        for (GLuint i = 0; i < indices->rows(); ++i)
+        {
+            const GLuint i0 = indices->at(i, 0), i1 = indices->at(i, 1), i2 = indices->at(i, 2);
+            glm::vec3 face = glm::cross(verts->vertex(i1) - verts->vertex(i0), verts->vertex(i2) - verts->vertex(i0));
+            if (mesh->clockwise())
+                face = -face;
+            const float d = glm::dot(face, normals->normal(i0) + normals->normal(i1) + normals->normal(i2));
+            agree += d > 0.0f ? 1 : (d < 0.0f ? -1 : 0);
+        }
+        if (agree <= 0)
+            return false;
+    }
+    return true;
+}
+
+} // namespace
+
+IVF_TEST(mesh_winding_matches_normals)
+{
+    Context c;
+    IVF_CHECK(windingMatchesNormals(*Cube::create()));
+    IVF_CHECK(windingMatchesNormals(*Sphere::create(1.0)));
+    IVF_CHECK(windingMatchesNormals(*Box::create()));
+    IVF_CHECK(windingMatchesNormals(*Cone::create(0.5, 2.0)));
+    IVF_CHECK(windingMatchesNormals(*Plane::create(2.0, 2.0)));
+    // Generator meshes are mirrored by the Y/Z swap, so they are clockwise
+    IVF_CHECK(Sphere::create(1.0)->mesh()->clockwise());
+}
+
 IVF_TEST_MAIN()

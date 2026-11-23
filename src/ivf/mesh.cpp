@@ -322,6 +322,31 @@ void Mesh::end()
         }
     }
 
+    // Which triangle winding faces outwards: generator meshes are mirrored (Y/Z swap) and
+    // clockwise, hand-built ones usually counter-clockwise. Decided by the vertex normals.
+    m_clockwise = false;
+    if (m_primType == GL_TRIANGLES && m_verts && m_normals)
+    {
+        long votes = 0; // > 0: counter-clockwise front faces
+        auto vote = [&](GLuint i0, GLuint i1, GLuint i2) {
+            const glm::vec3 a = m_verts->vertex(i0), b = m_verts->vertex(i1), c = m_verts->vertex(i2);
+            const glm::vec3 n = m_normals->normal(i0) + m_normals->normal(i1) + m_normals->normal(i2);
+            const float d = glm::dot(glm::cross(b - a, c - a), n);
+            votes += d > 0.0f ? 1 : (d < 0.0f ? -1 : 0);
+        };
+        if (m_indices != nullptr)
+        {
+            for (GLuint i = 0; i < m_indices->rows(); i++)
+                vote(m_indices->at(i, 0), m_indices->at(i, 1), m_indices->at(i, 2));
+        }
+        else
+        {
+            for (GLuint i = 0; i + 2 < m_verts->rows(); i += 3)
+                vote(i, i + 1, i + 2);
+        }
+        m_clockwise = votes < 0;
+    }
+
     ++m_dataVersion; // uploaded before the next draw (see gpuCopy())
 }
 
@@ -535,6 +560,10 @@ void Mesh::drawImpl(GLsizei instanceCount)
     if (wideLine)
         glLineWidth(m_lineWidth);
 
+    // Front faces follow the mesh's winding (matters when face culling is enabled)
+    if (m_clockwise)
+        glFrontFace(GL_CW);
+
     gpu->vao->bind();
     if (m_indices != nullptr)
     {
@@ -576,6 +605,9 @@ void Mesh::drawImpl(GLsizei instanceCount)
         }
     }
     gpu->vao->unbind();
+
+    if (m_clockwise)
+        glFrontFace(GL_CCW);
 
     if (m_depthFunc != GL_LESS)
         glDepthFunc(GL_LESS);

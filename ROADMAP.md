@@ -317,11 +317,15 @@ Goal: make the library trustworthy to depend on.
      Resolved by the collector while walking the tree (no runtime cost); each draw item
      stores its resolved material. Later, opt-in: `setMaterialOverride()` on a parent that
      wins over its children (highlighting a selected group, X-ray views).
-   - **Open decisions** (recommendation first):
-     - Materials with alpha < 1 become transparent automatically | stay opaque.
-     - Meshes used by several windows: one GPU copy per context, created on demand |
-       one copy, documented as not shareable.
-     - Selection rendered only on mouse movement/clicks | every frame.
+   - **Decided - transparency:** materials with alpha < 1 are transparent automatically
+     (blending on, transparent bucket, drawn back to front). Today `setAlpha()` has no
+     visible effect because stock materials never enable `GL_BLEND`.
+   - **Decided - selection on demand:** the selection buffer is re-rendered only when the
+     mouse moves, a button is pressed/released or the camera changes (one dirty flag),
+     not every frame. Objects animating under a still cursor update their hover state on
+     the next mouse event.
+   - **Open decision:** meshes used by several windows: one GPU copy per context, created
+     on demand | one copy, documented as not shareable.
 2. **Uniform handling.** Cache uniform locations in `Program`; move camera, lights and
    fog into std140 uniform buffers shared by all programs; automatic instancing of
    identical meshes.

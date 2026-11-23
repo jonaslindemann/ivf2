@@ -95,7 +95,8 @@ private:
     std::vector<ivf::PlanarReflectionPtr> m_reflections; ///< Reflection passes rendered before the scene.
 
     ivf::RenderQueue m_queue; ///< Scene items collected once per frame, shared by all passes.
-    ivf::Renderer m_renderer; ///< Draws m_queue.
+    ivf::Renderer m_renderer;          ///< Draws m_queue in the colour passes (blends transparent items).
+    ivf::Renderer m_selectionRenderer; ///< Draws m_queue into the selection buffer (no blending).
 
     // Selection is rendered on demand: after mouse movement, button presses, resizing,
     // or when the camera changed since the last selection render.

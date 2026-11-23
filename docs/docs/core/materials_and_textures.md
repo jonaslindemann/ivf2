@@ -26,6 +26,19 @@ A material can be applied to a node by calling the `setMaterial` method on the n
 node->setMaterial(material);
 ```
 
+### Transparency
+
+A material with an alpha below 1 makes its nodes transparent: they are drawn after all opaque nodes, sorted back to front and blended with what is behind them, so the order nodes are added in does not matter. A material set on a group (`CompositeNode`) is used by every child without a material of its own, so a whole group can be made transparent at once:
+
+```cpp
+auto glass = Material::create();
+glass->setDiffuseColor(glm::vec4(0.7, 0.85, 1.0, 1.0));
+glass->setAlpha(0.3);
+box->setMaterial(glass);
+```
+
+A node can also be put in a draw-order layer explicitly with `setRenderLayer(RenderLayer::Background | Opaque | Transparent | Overlay)`. The `transparency1` example shows transparent spheres, a glass box, a transparent group and a glow orb.
+
 There are some other properties that can be set to get specific behavior. If the node is not using the lighting system, the `setUseLighting` method should be set to false. This will disable the lighting system for the node. The diffuse and alpha properties will be used as the color of the node. In this mode it is also possible to use the colors defined at the vertices, which is controlled using the `setUseVertexColors` method. 
 
 ## Textures

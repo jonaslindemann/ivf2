@@ -4,6 +4,8 @@
 #include <ivf/node.h>
 #include <ivf/transform_manager.h>
 
+#include <glad/glad.h>
+
 using namespace ivf;
 
 void Renderer::execute(const RenderQueue &queue, const SkipFn &skip)
@@ -18,6 +20,46 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
 
     m_stats = Stats{};
     m_stats.items = queue.size();
+
+    if (!m_defaultMaterial)
+    {
+        // Neutral, lit light grey (instead of whatever the previous node left applied)
+        MaterialProps props;
+        props.diffuseColor = glm::vec4(0.8f, 0.8f, 0.8f, 1.0f);
+        m_defaultMaterial = Material::create(props);
+    }
+
+    // Blending state for the Transparent layer, restored at the end
+    bool transparentState = false;
+    GLboolean blendWas = GL_FALSE, depthMaskWas = GL_TRUE;
+    GLint srcRgb = GL_ONE, dstRgb = GL_ZERO, srcAlpha = GL_ONE, dstAlpha = GL_ZERO;
+    auto setTransparentState = [&](bool on) {
+        if (on == transparentState)
+            return;
+        if (on)
+        {
+            blendWas = glIsEnabled(GL_BLEND);
+            glGetBooleanv(GL_DEPTH_WRITEMASK, &depthMaskWas);
+            glGetIntegerv(GL_BLEND_SRC_RGB, &srcRgb);
+            glGetIntegerv(GL_BLEND_DST_RGB, &dstRgb);
+            glGetIntegerv(GL_BLEND_SRC_ALPHA, &srcAlpha);
+            glGetIntegerv(GL_BLEND_DST_ALPHA, &dstAlpha);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+            glDepthMask(GL_FALSE);
+        }
+        else
+        {
+            if (blendWas)
+                glEnable(GL_BLEND);
+            else
+                glDisable(GL_BLEND);
+            glBlendFuncSeparate(static_cast<GLenum>(srcRgb), static_cast<GLenum>(dstRgb),
+                                static_cast<GLenum>(srcAlpha), static_cast<GLenum>(dstAlpha));
+            glDepthMask(depthMaskWas);
+        }
+        transparentState = on;
+    };
 
     for (const DrawItem &item : queue.items())
     {
@@ -39,12 +81,17 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
         // The node applies its own transform on top of its parent's (TransformNode::doPreDraw)
         xfm->setModelMatrix(item.parentWorld);
 
-        // Material and textures of the nearest ancestor, unless the node has its own
-        const bool inheritMaterial = item.material && !(node->m_material && node->m_useMaterial);
+        setTransparentState(m_transparencyBlending && item.layer == RenderLayer::Transparent);
+
+        // Material and textures of the nearest ancestor, unless the node has its own;
+        // the default material if there is none at all
+        const bool ownMaterial = node->m_material && node->m_useMaterial;
+        const std::shared_ptr<Material> &inherited = item.material ? item.material : m_defaultMaterial;
+        const bool inheritMaterial = !ownMaterial;
         const bool inheritTextures = item.textureSource != nullptr && item.textureSource != node &&
                                      !node->m_useTexture;
         if (inheritMaterial)
-            item.material->apply();
+            inherited->apply();
         if (inheritTextures)
             item.textureSource->bindTextures();
 
@@ -56,8 +103,9 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
         if (inheritTextures)
             item.textureSource->unbindTextures();
         if (inheritMaterial)
-            item.material->unapply();
+            inherited->unapply();
     }
 
+    setTransparentState(false);
     xfm->setModelMatrix(start);
 }

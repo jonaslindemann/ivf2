@@ -225,7 +225,9 @@ void PlanarReflection::render(const RenderQueue &queue)
     xfm->refreshForProgram();
 
     // Cull with the mirrored camera (oblique projection: nothing below the plane)
-    Renderer().execute(queue, Frustum(xfm->projectionMatrix() * xfm->viewMatrix()), isHidden);
+    Renderer renderer;
+    renderer.setTransparencyBlending(true);
+    renderer.execute(queue, Frustum(xfm->projectionMatrix() * xfm->viewMatrix()), isHidden);
 
     // Restore
     xfm->viewMatrix() = view;

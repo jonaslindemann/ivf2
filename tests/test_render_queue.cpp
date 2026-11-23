@@ -217,4 +217,70 @@ IVF_TEST(primitive_bounds_enclose_their_vertices)
     IVF_CHECK(boundsMatchVertices(*Dodecahedron::create(1.0)));
 }
 
+IVF_TEST(layers_follow_materials)
+{
+    Context c;
+    auto opaque = Material::create();
+    auto glass = Material::create();
+    glass->setAlpha(0.5f);
+
+    auto scene = CompositeNode::create();
+    auto a = Cube::create();
+    a->setMaterial(opaque);
+    auto b = Cube::create();
+    b->setMaterial(glass);
+    auto group = CompositeNode::create();
+    group->setMaterial(glass);
+    auto inherits = Cube::create(); // inherits the group's transparent material
+    group->add(inherits);
+    auto forced = Cube::create();
+    forced->setMaterial(glass);
+    forced->setRenderLayer(RenderLayer::Overlay); // explicit layer wins
+    scene->add(a);
+    scene->add(b);
+    scene->add(group);
+    scene->add(forced);
+
+    auto queue = collect(scene);
+    IVF_CHECK(queue.size() == 4);
+    IVF_CHECK(queue.items()[0].layer == RenderLayer::Opaque);
+    IVF_CHECK(queue.items()[1].layer == RenderLayer::Transparent);
+    IVF_CHECK(queue.items()[2].layer == RenderLayer::Transparent);
+    IVF_CHECK(queue.items()[3].layer == RenderLayer::Overlay);
+}
+
+IVF_TEST(sort_groups_layers_and_orders_by_depth)
+{
+    Context c;
+    auto opaque = Material::create();
+    auto glass = Material::create();
+    glass->setAlpha(0.5f);
+
+    // Added in a mixed order; the camera looks from +Z
+    auto scene = CompositeNode::create();
+    auto makeCube = [&](float z, const MaterialPtr &material) {
+        auto cube = Cube::create();
+        cube->setPos({0.0f, 0.0f, z});
+        cube->setMaterial(material);
+        scene->add(cube);
+        return cube.get();
+    };
+    Node *glassNear = makeCube(5.0f, glass);
+    Node *opaqueFar = makeCube(-5.0f, opaque);
+    Node *glassFar = makeCube(-5.0f, glass);
+    Node *opaqueNear = makeCube(5.0f, opaque);
+    auto sky = Cube::create();
+    sky->setRenderLayer(RenderLayer::Background);
+    scene->add(sky);
+
+    auto queue = collect(scene);
+    queue.sortForView({0.0f, 0.0f, 20.0f});
+    IVF_CHECK(queue.size() == 5);
+    IVF_CHECK(queue.items()[0].node == sky.get()); // background first
+    IVF_CHECK(queue.items()[1].node == opaqueNear); // opaque front to back
+    IVF_CHECK(queue.items()[2].node == opaqueFar);
+    IVF_CHECK(queue.items()[3].node == glassFar); // transparent back to front
+    IVF_CHECK(queue.items()[4].node == glassNear);
+}
+
 IVF_TEST_MAIN()

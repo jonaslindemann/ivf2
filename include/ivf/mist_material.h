@@ -22,7 +22,7 @@ namespace ivf {
  * node's own coordinates, so the layer can be moved, rotated and scaled freely.
  * Beyond the radius it is fully transparent, so the shape's edges never show.
  *
- * Add mist nodes after the opaque ones.
+ * Mist nodes are drawn after the opaque ones (Transparent render layer).
  *
  * @code
  * auto mist = MistMaterial::create({0.5f, 0.45f, 0.7f}, 0.35f, 12.0f);

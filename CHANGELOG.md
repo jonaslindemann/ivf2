@@ -25,6 +25,10 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - Scenes are drawn through a render queue: `Node::draw()` collects draw items
   (`Node::collect()`, `RenderQueue`) and draws them with a `Renderer`. Nodes keep their
   `doPreDraw()`/`doDraw()`/`doPostDraw()` hooks.
+- Opaque objects are drawn sorted by shader program and material, then front to back (fewer
+  state changes); `RenderQueue::sortForView()`.
+- Nodes without any material (own or inherited) are drawn with a neutral default material instead
+  of the material of the previously drawn node. `LineTrace` has its own unlit material.
 - Material inheritance follows the scene: a node without a material uses its nearest ancestor's.
   Before, it used whatever material was applied last (often a previous sibling's).
 - `CompositeNode` uses a material set on it (`setMaterial()` on a group used to be ignored
@@ -32,6 +36,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Added
 
+- Transparency: materials with alpha < 1 are drawn after all opaque objects, back to front, with
+  alpha blending (`setAlpha()` had no visible effect before). Blended materials (`GlowMaterial`,
+  `MistMaterial`, ...), particles and billboards are ordered the same way, so blended nodes no
+  longer need to be added last. `Node::setRenderLayer()` chooses a layer explicitly
+  (`RenderLayer::Background`, `Opaque`, `Transparent`, `Overlay`). New example `transparency1`.
 - Frustum culling: `GLFWSceneWindow` skips items outside the camera (main and selection passes),
   the light (shadow maps) or the mirrored camera (reflections). `ivf::Frustum`,
   `Renderer::execute(queue, frustum)` and `Renderer::stats()` are public.

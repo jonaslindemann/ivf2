@@ -54,6 +54,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `skybox1` | A cubemap sky behind the scene | |
 | `lighting1` | Point, directional and spot lights with editing windows | [Lighting](../core/lighting.md) |
 | `shadows1` | Shadow mapping from a directional light | [Shadows](../advanced/shadows.md) |
+| `transparency1` | Transparent materials, a transparent group and a glow orb, sorted back to front | [Materials and Textures](../core/materials_and_textures.md#transparency) |
 
 ## Effects
 

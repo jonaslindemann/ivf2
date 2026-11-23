@@ -43,7 +43,9 @@ void main() {
 
 Skybox::Skybox(CubemapPtr cubemap)
     : m_cubemap(std::move(cubemap))
-{}
+{
+    setRenderLayer(RenderLayer::Background);
+}
 
 Skybox::~Skybox()
 {

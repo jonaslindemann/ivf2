@@ -58,6 +58,11 @@ BlendMode BlendShaderMaterial::blendMode() const
     return m_mode;
 }
 
+RenderLayer BlendShaderMaterial::renderLayer() const
+{
+    return m_mode == BlendMode::Background ? RenderLayer::Background : RenderLayer::Transparent;
+}
+
 void BlendShaderMaterial::apply()
 {
     ShaderMaterial::apply();

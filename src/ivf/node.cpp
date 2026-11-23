@@ -23,7 +23,10 @@ void Node::draw()
     CollectState state;
     state.world = TransformManager::instance()->modelMatrix();
     collect(queue, state);
-    Renderer().execute(queue);
+    queue.sortForView(TransformManager::instance()->viewPos());
+    Renderer renderer;
+    renderer.setTransparencyBlending(true);
+    renderer.execute(queue);
 }
 
 void Node::collect(RenderQueue &queue, const CollectState &state)
@@ -41,7 +44,29 @@ DrawItem Node::drawItem(const CollectState &state) const
     item.world = childState(state).world;
     item.material = state.material;
     item.textureSource = state.textureSource;
+
+    // Explicit layer, else the layer of the material actually used
+    const Material *material = (m_material && m_useMaterial) ? m_material.get() : state.material.get();
+    if (m_renderLayer)
+        item.layer = *m_renderLayer;
+    else if (material != nullptr)
+        item.layer = material->renderLayer();
     return item;
+}
+
+void Node::setRenderLayer(RenderLayer layer)
+{
+    m_renderLayer = layer;
+}
+
+void Node::clearRenderLayer()
+{
+    m_renderLayer.reset();
+}
+
+std::optional<RenderLayer> Node::renderLayer() const
+{
+    return m_renderLayer;
 }
 
 CollectState Node::childState(const CollectState &state) const

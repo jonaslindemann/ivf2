@@ -18,6 +18,9 @@ private:
     int m_numVertices;  ///< Number of vertices in the trace.
     bool m_useColor;    ///< Whether to use a custom color.
     GLfloat m_color[4]; ///< RGBA color for the trace.
+    MaterialPtr m_lineMaterial; ///< Unlit material in the trace colour (see updateLineMaterial()).
+
+    void updateLineMaterial();
     bool m_firstAdd;    ///< Internal flag for first vertex addition.
 
 public:

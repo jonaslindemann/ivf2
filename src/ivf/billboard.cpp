@@ -59,7 +59,9 @@ static const BillVertex k_quad[6] = {
 
 Billboard::Billboard(float width, float height)
     : m_width(width), m_height(height)
-{}
+{
+    setRenderLayer(RenderLayer::Transparent); // blended sprite: after opaque objects, back to front
+}
 
 Billboard::~Billboard()
 {

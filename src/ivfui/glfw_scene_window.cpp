@@ -47,6 +47,7 @@ GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string &title
       m_lockPosXZ(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f), m_inputDialog(nullptr), m_effects()
 {
     m_scene = ivf::CompositeNode::create();
+    m_renderer.setTransparencyBlending(true);
     m_camManip = ivfui::CameraManipulator::create(this->ref());
     m_bufferSelection = ivf::BufferSelection::create(m_scene);
     m_frameBuffer = ivf::FrameBuffer::create(width, height);
@@ -159,6 +160,8 @@ void ivfui::GLFWSceneWindow::collectScene()
     ivf::CollectState state;
     state.world = TransformManager::instance()->modelMatrix();
     m_scene->collect(m_queue, state);
+    // Layers, then opaque by program/material front to back, transparent back to front
+    m_queue.sortForView(TransformManager::instance()->viewPos());
 }
 
 void ivfui::GLFWSceneWindow::renderReflections()
@@ -206,7 +209,7 @@ void ivfui::GLFWSceneWindow::renderSelection(bool collectFresh)
     smApplyProgram("basic");
     if (collectFresh)
         collectScene();
-    m_renderer.execute(m_queue, cameraFrustum());
+    m_selectionRenderer.execute(m_queue, cameraFrustum());
 }
 
 // EffectListProvider interface implementation

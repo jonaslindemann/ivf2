@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ivf/glbase.h>
+#include <ivf/render_layer.h>
 
 #include <glm/glm.hpp>
 
@@ -156,6 +157,15 @@ public:
      * need to restore global state after a node has been drawn.
      */
     virtual void unapply() {}
+
+    /**
+     * @brief Draw order group of nodes using this material: Transparent if alpha < 1
+     * (drawn after opaque objects, back to front, with alpha blending), else Opaque.
+     */
+    [[nodiscard]] virtual RenderLayer renderLayer() const
+    {
+        return m_alpha < 1.0f ? RenderLayer::Transparent : RenderLayer::Opaque;
+    }
 };
 
 /**

@@ -315,7 +315,7 @@ void main()
     {
         if (useLighting) 
         {
-            vec4 baseColor = vec4(result, 1.0);
+            vec4 baseColor = vec4(result, material.alpha);
     
             if (useTexture) 
             {

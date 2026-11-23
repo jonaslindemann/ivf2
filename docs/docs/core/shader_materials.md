@@ -241,8 +241,8 @@ particles->setMaterial(motes);
 | `BlendMode::Alpha` | Uses the shader's alpha for transparency | Veils, mist, glass |
 | `BlendMode::Background` | Opaque, but writes no depth | Sky domes drawn first |
 
-!!! warning "Add blended nodes last"
-    Blended nodes are still hidden behind opaque objects, but opaque objects drawn *after* them will cover them completely. Add opaque nodes first, then blended ones. A `Background` sky is the exception: add it first of all.
+!!! note "Draw order is automatic"
+    Blended nodes are in the transparent render layer: the scene window draws them after all opaque nodes, sorted back to front, whatever order they were added in. A `Background` sky is in the background layer and drawn first. A node can be moved to another layer with `setRenderLayer()`.
 
 ## Related
 

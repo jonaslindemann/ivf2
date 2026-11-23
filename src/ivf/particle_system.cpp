@@ -96,6 +96,7 @@ static const float k_quad[] = {
 ParticleSystem::ParticleSystem(int maxParticles)
     : m_maxParticles(maxParticles), m_rng(automaticSeed())
 {
+    setRenderLayer(RenderLayer::Transparent); // blended particles: after opaque objects
     m_pool.resize(maxParticles);
     m_instanceData.resize(maxParticles);
 }

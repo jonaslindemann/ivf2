@@ -27,7 +27,9 @@ enum class BlendMode {
  *
  * Additive blending makes overlapping light add up; alpha blending gives
  * translucent surfaces. Depth testing stays on, so blended geometry is hidden
- * behind opaque geometry: add blended nodes after the opaque ones.
+ * behind opaque geometry. Nodes using it are in the Transparent render layer (Background
+ * for background mode), so the render queue draws them after the opaque nodes, back to
+ * front, whatever order they were added in.
  *
  * Background mode draws opaque without depth writes, for a sky dome added first:
  * everything drawn later covers it, and the depth buffer still reads as empty sky
@@ -91,6 +93,9 @@ public:
 
     void apply() override;
     void unapply() override;
+
+    /// Additive and alpha blending: Transparent; background mode: Background (drawn first).
+    [[nodiscard]] RenderLayer renderLayer() const override;
 
 private:
     BlendMode m_mode;

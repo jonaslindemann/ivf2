@@ -23,7 +23,7 @@ namespace ivf {
  * combine it with MipBloomEffect for a soft halo.
  *
  * All glow materials share one shader program, so a material per color is cheap.
- * Add glowing nodes after the opaque ones.
+ * Glowing nodes are drawn after the opaque ones (Transparent render layer).
  *
  * @code
  * auto glow = GlowMaterial::create({1.0f, 0.6f, 0.2f}, 1.5f);

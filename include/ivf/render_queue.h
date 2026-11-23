@@ -12,6 +12,7 @@
  */
 
 #include <ivf/bounding_box.h>
+#include <ivf/render_layer.h>
 
 #include <glm/glm.hpp>
 
@@ -47,6 +48,7 @@ struct DrawItem {
     std::shared_ptr<Material> material; ///< Inherited material, used if the node has none of its own.
     Node *textureSource{nullptr};       ///< Inherited textures, used if the node has none of its own.
     BoundingBox bounds;                 ///< World-space bounds; invalid if the node has none.
+    RenderLayer layer{RenderLayer::Opaque}; ///< Draw order group (see sortForView()).
 };
 
 /**
@@ -59,6 +61,17 @@ public:
     {
         m_items.push_back(item);
     }
+
+    /**
+     * @brief Sort the items for drawing from @p eye.
+     *
+     * Groups by layer (Background, Opaque, Transparent, Overlay). Opaque items are ordered
+     * by shader program and material (fewer state changes), then front to back;
+     * transparent items back to front so blending composes correctly. The sort is stable:
+     * equal items keep their scene order.
+     * @param eye Camera position in world coordinates.
+     */
+    void sortForView(const glm::vec3 &eye);
 
     /** @brief Remove all items. */
     void clear()

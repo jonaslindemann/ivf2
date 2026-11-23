@@ -9,6 +9,7 @@
 
 #include <cstddef>
 #include <functional>
+#include <memory>
 
 namespace ivf {
 
@@ -18,7 +19,12 @@ namespace ivf {
  * For each item the renderer sets the model matrix of the node's parent, applies the
  * inherited material and textures if the node has none of its own, and calls the
  * node's doPreDraw()/doDraw()/doPostDraw() - the same hooks Node::draw() always used,
- * so nodes with their own drawing code keep working.
+ * so nodes with their own drawing code keep working. Nodes without any material (own or
+ * inherited) are drawn with a neutral default material.
+ *
+ * With transparency blending enabled (colour passes), items of the Transparent layer are
+ * drawn with alpha blending and without depth writes; sort the queue first
+ * (RenderQueue::sortForView()) so they come after the opaque items, back to front.
  */
 class Renderer {
 public:
@@ -52,6 +58,23 @@ public:
      */
     void execute(const RenderQueue &queue, const Frustum &frustum, const SkipFn &skip = {});
 
+    /**
+     * @brief Draw the Transparent layer with alpha blending and without depth writes.
+     *
+     * Enable it for colour passes; leave it off for depth-only (shadow) and id (selection)
+     * passes. Default: off.
+     */
+    void setTransparencyBlending(bool enabled)
+    {
+        m_transparencyBlending = enabled;
+    }
+
+    /** @brief See setTransparencyBlending(). */
+    [[nodiscard]] bool transparencyBlending() const
+    {
+        return m_transparencyBlending;
+    }
+
     /** @brief Counts of the last execute() call. */
     [[nodiscard]] const Stats &stats() const
     {
@@ -60,6 +83,8 @@ public:
 
 private:
     Stats m_stats;
+    bool m_transparencyBlending{false};
+    std::shared_ptr<Material> m_defaultMaterial; ///< For nodes without any material.
 };
 
 } // namespace ivf

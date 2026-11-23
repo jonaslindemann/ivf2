@@ -334,6 +334,18 @@ Goal: make the library trustworthy to depend on.
         vertices; `MeshNode::updateVertices()` also updates the box. scene_ui1 draws
         53 of 501 items, transforms1 213 of 251.
      5. Sorting and transparency buckets (intended image changes: update references).
+        *Done:* `RenderLayer` (`render_layer.h`: Background, Opaque, Transparent, Overlay)
+        from `Node::setRenderLayer()` or the effective material (`Material::renderLayer()`:
+        alpha < 1 -> Transparent; `BlendShaderMaterial` Transparent/Background; particles
+        and billboards Transparent, skybox Background). `RenderQueue::sortForView()`:
+        stable, opaque by program and material (numbered in scene order, deterministic)
+        then front to back, transparent back to front. Colour passes blend the
+        Transparent layer without depth writes (`Renderer::setTransparencyBlending()`);
+        the lit stock shader outputs the material alpha. Nodes with no material at all get
+        a neutral default material; `LineTrace` got its own unlit material (it relied on
+        leftover state). New example `transparency1`. Changed images: mip_bloom1 (blend
+        order), animation2 (trace colour). Still open: one item per mesh for `MeshNode`
+        (per-mesh materials of loaded models are not sorted separately), PBR alpha.
      6. Explicit `RenderContext&` through the new path.
      7. Docs and a stats readout (draw calls, culled items, state changes).
    - **Decided:** callback items for custom `doDraw()` nodes are kept permanently (design

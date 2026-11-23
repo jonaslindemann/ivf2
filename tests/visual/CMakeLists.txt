@@ -61,7 +61,7 @@ set(_ivf2_visual_examples
     instancing1 lighting1 mip_bloom1 multi_window1 particles1 primitives1 procedural1
     procedural2 reflection1 rigid_body1 scene_ui1 selection1 serialization1 shader_material1
     shadows1 skybox1 solar_system text1 textures1 textures2 textures3 textures4 time_control1
-    timeline1 transforms1 tweening1 ui1 ui2
+    timeline1 transforms1 transparency1 tweening1 ui1 ui2
 )
 foreach(example IN LISTS _ivf2_visual_examples)
     ivf2_add_visual_test(${example})

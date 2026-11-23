@@ -8,7 +8,19 @@ using namespace ivf;
 LineTrace::LineTrace(int numVertices, bool useColor)
     : MeshNode(), m_numVertices(numVertices), m_useColor(useColor), m_color{1.0, 1.0, 1.0, 1.0}, m_firstAdd(true)
 {
+    // Unlit line in the trace colour (vertex colours when useColor is set); without it the
+    // trace would use the default lit material, which does not suit lines
+    m_lineMaterial = Material::create();
+    m_lineMaterial->setUseLighting(false);
+    this->setMaterial(m_lineMaterial);
+    updateLineMaterial();
     this->doSetup();
+}
+
+void ivf::LineTrace::updateLineMaterial()
+{
+    m_lineMaterial->setUseVertexColor(m_useColor);
+    m_lineMaterial->setDiffuseColor(glm::vec4(m_color[0], m_color[1], m_color[2], m_color[3]));
 }
 
 LineTrace::~LineTrace()
@@ -25,12 +37,14 @@ void ivf::LineTrace::setColor(GLfloat r, GLfloat g, GLfloat b, GLfloat a)
     m_color[1] = g;
     m_color[2] = b;
     m_color[3] = a;
+    updateLineMaterial();
     this->refresh();
 }
 
 void ivf::LineTrace::setUseColor(bool value)
 {
     m_useColor = value;
+    updateLineMaterial();
     this->refresh();
 }
 

@@ -13,6 +13,7 @@
 #include <ivf/render_queue.h>
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -47,6 +48,7 @@ private:
     uint32_t m_objectId{0};                        ///< Object ID for selection.
     std::weak_ptr<Node> m_parent{};                ///< Parent node (for hierarchy).
     std::string m_name;                            ///< Name of the node (for identification).
+    std::optional<RenderLayer> m_renderLayer;      ///< Explicit draw order group (see setRenderLayer()).
 
     friend class Renderer; // calls the draw hooks of collected items
 
@@ -82,6 +84,21 @@ public:
      * @param state Transform, material and textures inherited from the ancestors.
      */
     virtual void collect(RenderQueue &queue, const CollectState &state);
+
+    /**
+     * @brief Put the node in a draw order group regardless of its material.
+     *
+     * Without it the layer follows the node's (or inherited) material: Transparent for
+     * alpha < 1 and blended materials, Background for background blending, else Opaque.
+     * @param layer Group the node's draw items belong to.
+     */
+    void setRenderLayer(RenderLayer layer);
+
+    /** @brief Let the material decide the layer again (undoes setRenderLayer()). */
+    void clearRenderLayer();
+
+    /** @brief The explicitly set layer, if any. */
+    [[nodiscard]] std::optional<RenderLayer> renderLayer() const;
 
     /**
      * @brief Draw the node in a selected state.

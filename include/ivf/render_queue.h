@@ -11,6 +11,8 @@
  * Node::draw() does both phases, so existing code that calls scene->draw() keeps working.
  */
 
+#include <ivf/bounding_box.h>
+
 #include <glm/glm.hpp>
 
 #include <cstddef>
@@ -44,6 +46,7 @@ struct DrawItem {
     glm::mat4 world{1.0f};              ///< Model matrix including the node's own transform.
     std::shared_ptr<Material> material; ///< Inherited material, used if the node has none of its own.
     Node *textureSource{nullptr};       ///< Inherited textures, used if the node has none of its own.
+    BoundingBox bounds;                 ///< World-space bounds; invalid if the node has none.
 };
 
 /**
@@ -67,6 +70,16 @@ public:
     [[nodiscard]] std::span<const DrawItem> items() const
     {
         return m_items;
+    }
+
+    /** @brief Union of the valid item bounds (invalid if no item has bounds). */
+    [[nodiscard]] BoundingBox bounds() const
+    {
+        BoundingBox box;
+        for (const auto &item : m_items)
+            if (item.bounds.isValid())
+                box.add(item.bounds);
+        return box;
     }
 
     /** @brief Number of items. */

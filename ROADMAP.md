@@ -312,6 +312,16 @@ Goal: make the library trustworthy to depend on.
         visual tests are pixel-identical; `test_render_queue` covers collection.
      3. Shadow, reflection and selection passes from the queue (removes the extra
         traversals; fixes the shadow scene box, whose `ExtentVisitor` result is unused).
+        *Done:* `GLFWSceneWindow` collects once per frame; shadow maps
+        (`LightManager::renderShadowMaps(const RenderQueue &)`), planar reflections
+        (`PlanarReflection::render(const RenderQueue &)`, mirror surfaces left out with a
+        `Renderer` skip filter) and the main pass draw the same items; the selection pass
+        draws them too instead of re-running `doDraw()` (which re-rendered the shadow maps
+        and called `onDraw()` twice). Items carry world-space `bounds`; automatic shadow
+        framing uses their union, computed before `apply()` so the shadow and main passes
+        use the same light matrix (it was an empty, infinite box before). Images and
+        selection buffers pixel-identical. Still open: selection rendered only on mouse
+        movement/clicks (decided above).
      4. Frustum culling.
      5. Sorting and transparency buckets (intended image changes: update references).
      6. Explicit `RenderContext&` through the new path.

@@ -209,6 +209,12 @@ public:
      */
     void applyLocalTransform(glm::mat4 &m) const;
 
+    /**
+     * @brief Add this node's draw item, with its local bounding box transformed to world
+     * space as the item's bounds.
+     */
+    virtual void collect(RenderQueue &queue, const CollectState &state) override;
+
 protected:
     [[nodiscard]] virtual CollectState childState(const CollectState &state) const override;
 

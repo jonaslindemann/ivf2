@@ -278,6 +278,15 @@ void LightManager::renderShadowMaps(const RenderQueue &queue)
     if (!m_useShadows)
         return;
 
+    // Fit the shadow maps to the scene (before apply(), which uploads the same light
+    // matrix for the main pass). Keeps the previous box if no item has bounds.
+    if (m_autoCalcBBox)
+    {
+        const BoundingBox bounds = queue.bounds();
+        if (bounds.isValid())
+            m_sceneBBox = bounds;
+    }
+
     this->apply();
 
     // Save current OpenGL state
@@ -295,12 +304,7 @@ void LightManager::renderShadowMaps(const RenderQueue &queue)
     glDepthFunc(GL_LESS); // Use default depth function
     glCullFace(GL_FRONT); // Can help with shadow acne (or try GL_BACK)
 
-    BoundingBox sceneBBox;
-
-    // Create an extent visitor to calculate scene bounds
-
-    if (!m_autoCalcBBox)
-        sceneBBox = m_sceneBBox;
+    BoundingBox sceneBBox = m_sceneBBox;
 
     // Use the current shader (stock shader)
 

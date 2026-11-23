@@ -137,6 +137,16 @@ void TransformNode::applyLocalTransform(glm::mat4 &m) const
         m = m * TransformManager::scaleMatrix(glm::vec3(m_scale.x, m_scale.y, m_scale.z));
 }
 
+void TransformNode::collect(RenderQueue &queue, const CollectState &state)
+{
+    if (!visible())
+        return;
+    DrawItem item = drawItem(state);
+    if (m_localBbox.isValid())
+        item.bounds = m_localBbox.transform(item.world);
+    queue.add(item);
+}
+
 CollectState TransformNode::childState(const CollectState &state) const
 {
     CollectState child = Node::childState(state);

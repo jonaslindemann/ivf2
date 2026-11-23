@@ -16,6 +16,9 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   demand and returns the vertex array of the current context.
 - Mesh vertex attributes use the fixed locations bound by `ShaderManager` (`aPos` 0, `aColor` 1,
   `aTex` 2, `aNormal` 3) instead of querying the program that was current at creation.
+- `GLFWSceneWindow` traverses the scene once per frame; the shadow, reflection, main and selection
+  passes draw the same items (`LightManager::renderShadowMaps(const RenderQueue &)`,
+  `PlanarReflection::render(const RenderQueue &)`).
 - Scenes are drawn through a render queue: `Node::draw()` collects draw items
   (`Node::collect()`, `RenderQueue`) and draws them with a `Renderer`. Nodes keep their
   `doPreDraw()`/`doDraw()`/`doPostDraw()` hooks.
@@ -33,6 +36,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
+- Automatic shadow framing (`LightManager::setAutoCalcBBox(true)`, the default) used an empty,
+  infinitely large scene box; it now fits the shadow maps to the scene's bounding boxes, and the
+  shadow and main passes use the same light matrix.
+- With selection enabled, every frame rendered the shadow maps twice and called `onDraw()` twice;
+  the selection pass now draws the frame's collected items only.
 - Line widths above 1 (`Mesh::setLineWidth`) now work on Windows and Linux: windows no longer
   request a forward-compatible OpenGL context there (macOS still needs one and keeps
   1-pixel lines). Scenes with wide lines look different from before.

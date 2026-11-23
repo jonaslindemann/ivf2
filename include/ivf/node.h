@@ -275,6 +275,12 @@ protected:
     void unbindTextures();
 
     /**
+     * @brief The draw item for this node with the given inherited state (no bounds;
+     * TransformNode adds them). Used by collect().
+     */
+    [[nodiscard]] DrawItem drawItem(const CollectState &state) const;
+
+    /**
      * @brief State for this node's children: the node's material and textures replace the
      * inherited ones; TransformNode also applies its transform to the world matrix.
      * @param state State inherited by this node.

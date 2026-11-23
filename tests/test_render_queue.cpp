@@ -145,4 +145,33 @@ IVF_TEST(instances_use_their_own_transform)
     }
 }
 
+IVF_TEST(items_have_world_bounds)
+{
+    Context c;
+    auto scene = CompositeNode::create();
+    auto group = CompositeNode::create();
+    group->setPos({10.0f, 0.0f, 0.0f});
+    auto cube = Cube::create(); // unit cube: local bounds -0.5..0.5
+    cube->setPos({0.0f, 2.0f, 0.0f});
+    group->add(cube);
+    scene->add(group);
+    auto other = Cube::create();
+    other->setPos({-3.0f, 0.0f, 0.0f});
+    scene->add(other);
+
+    auto queue = collect(scene);
+    IVF_CHECK(queue.size() == 2);
+    const BoundingBox &b = queue.items()[0].bounds;
+    IVF_CHECK(b.isValid());
+    IVF_CHECK_NEAR(b.min().x, 9.5, 1e-5);
+    IVF_CHECK_NEAR(b.max().x, 10.5, 1e-5);
+    IVF_CHECK_NEAR(b.min().y, 1.5, 1e-5);
+
+    // Scene box used for automatic shadow framing
+    const BoundingBox all = queue.bounds();
+    IVF_CHECK(all.isValid());
+    IVF_CHECK_NEAR(all.min().x, -3.5, 1e-5);
+    IVF_CHECK_NEAR(all.max().x, 10.5, 1e-5);
+}
+
 IVF_TEST_MAIN()

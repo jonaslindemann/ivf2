@@ -30,14 +30,18 @@ void Node::collect(RenderQueue &queue, const CollectState &state)
 {
     if (!m_visible)
         return;
+    queue.add(drawItem(state));
+}
 
+DrawItem Node::drawItem(const CollectState &state) const
+{
     DrawItem item;
-    item.node = this;
+    item.node = const_cast<Node *>(this);
     item.parentWorld = state.world;
     item.world = childState(state).world;
     item.material = state.material;
     item.textureSource = state.textureSource;
-    queue.add(item);
+    return item;
 }
 
 CollectState Node::childState(const CollectState &state) const

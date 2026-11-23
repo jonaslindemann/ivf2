@@ -324,8 +324,14 @@ Goal: make the library trustworthy to depend on.
      mouse moves, a button is pressed/released or the camera changes (one dirty flag),
      not every frame. Objects animating under a still cursor update their hover state on
      the next mouse event.
-   - **Open decision:** meshes used by several windows: one GPU copy per context, created
-     on demand | one copy, documented as not shareable.
+   - **Decided - meshes in several windows:** one GPU copy per `RenderContext`, created on
+     demand. A mesh keeps its CPU data; the first draw in a window creates that window's
+     buffers and VAO, stored in a small per-context table in the mesh and released when
+     the context is destroyed (textures get the same mechanism). Any node can be in any
+     window's scene without setup and with any host; single-window apps keep exactly one
+     copy. Cost: memory and uploads per window that draws the mesh, and dynamic meshes
+     are uploaded once per window per change. GL share groups (buffers and textures once,
+     VAOs per context) may come later as an optimisation without API changes.
 2. **Uniform handling.** Cache uniform locations in `Program`; move camera, lights and
    fog into std140 uniform buffers shared by all programs; automatic instancing of
    identical meshes.

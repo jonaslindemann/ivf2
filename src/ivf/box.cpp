@@ -132,11 +132,7 @@ void Box::doSetup()
     AnyGenerator<MeshVertex> vertices = box.vertices();
     AnyGenerator<Triangle> triangles = box.triangles();
 
-    this->createFromGenerator(vertices, triangles);
-    
-    // Set bounding box for the box
-    glm::vec3 halfSize = m_size * 0.5f;
-    setLocalBoundingBox(BoundingBox(-halfSize, halfSize));
+    this->createFromGenerator(vertices, triangles); // also sets the bounding box from the vertices
 }
 
 void ivf::Box::setupProperties()

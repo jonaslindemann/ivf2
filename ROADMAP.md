@@ -323,7 +323,16 @@ Goal: make the library trustworthy to depend on.
         selection buffers pixel-identical. Selection is rendered on demand (mouse movement,
         buttons, resize, camera change); a button press picks the node under the cursor
         afresh, so clicks never reach a node deleted since the last hover update.
-     4. Frustum culling.
+     4. Frustum culling. *Done:* `Frustum` (`frustum.h`, planes from a view-projection
+        matrix, conservative box test) and `Renderer::execute(queue, frustum)` with
+        `stats()`; main and selection passes cull with the camera, shadow maps with the
+        light matrix, reflections with the mirrored camera; items without bounds are
+        never culled and `Node::draw()` does not cull. Culling exposed wrong bounding
+        boxes: `Box`, `RoundedBox` and `Plane` set half-size boxes by hand after
+        `createFromGenerator()`, which already computes exact ones - the hand-written
+        boxes are gone and `test_render_queue` checks every primitive's box against its
+        vertices; `MeshNode::updateVertices()` also updates the box. scene_ui1 draws
+        53 of 501 items, transforms1 213 of 251.
      5. Sorting and transparency buckets (intended image changes: update references).
      6. Explicit `RenderContext&` through the new path.
      7. Docs and a stats readout (draw calls, culled items, state changes).

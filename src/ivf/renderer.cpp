@@ -8,14 +8,33 @@ using namespace ivf;
 
 void Renderer::execute(const RenderQueue &queue, const SkipFn &skip)
 {
+    execute(queue, Frustum(), skip);
+}
+
+void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const SkipFn &skip)
+{
     auto *xfm = TransformManager::instance();
     const glm::mat4 start = xfm->modelMatrix();
+
+    m_stats = Stats{};
+    m_stats.items = queue.size();
 
     for (const DrawItem &item : queue.items())
     {
         Node *node = item.node;
-        if (node == nullptr || (skip && skip(item)))
+        if (node == nullptr)
             continue;
+        if (skip && skip(item))
+        {
+            ++m_stats.skipped;
+            continue;
+        }
+        if (!frustum.intersects(item.bounds))
+        {
+            ++m_stats.culled;
+            continue;
+        }
+        ++m_stats.drawn;
 
         // The node applies its own transform on top of its parent's (TransformNode::doPreDraw)
         xfm->setModelMatrix(item.parentWorld);

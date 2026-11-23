@@ -125,7 +125,10 @@ public:
     void refresh();
 
     /**
-     * @brief Update vertex data for all meshes.
+     * @brief Mark the vertex data of all meshes as changed and recompute the bounding box.
+     *
+     * Call it after changing vertices; the bounding box is used for culling. If you change
+     * a Mesh's vertices directly (Mesh::updateVertices()), call updateBoundingBox() too.
      */
     void updateVertices();
 

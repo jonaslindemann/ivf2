@@ -180,6 +180,8 @@ void ivf::MeshNode::updateVertices()
     {
         mesh->updateVertices();
     }
+    // Keep the bounds (used for culling) around the changed vertices
+    updateBoundingBox();
 }
 
 void ivf::MeshNode::updateNormals()

@@ -167,6 +167,12 @@ void ivfui::GLFWSceneWindow::renderReflections()
         reflection->render(m_queue);
 }
 
+ivf::Frustum ivfui::GLFWSceneWindow::cameraFrustum() const
+{
+    auto &xfm = *TransformManager::instance();
+    return ivf::Frustum(xfm.projectionMatrix() * xfm.viewMatrix());
+}
+
 void ivfui::GLFWSceneWindow::renderScenePasses()
 {
     // One traversal per frame; the shadow, reflection and main passes draw the same items
@@ -174,7 +180,7 @@ void ivfui::GLFWSceneWindow::renderScenePasses()
     collectScene();
     LightManager::instance()->renderShadowMaps(m_queue);
     renderReflections();
-    m_renderer.execute(m_queue);
+    m_renderer.execute(m_queue, cameraFrustum());
 
     auto &xfm = *TransformManager::instance();
     glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
@@ -198,7 +204,7 @@ void ivfui::GLFWSceneWindow::renderSelection(bool collectFresh)
     smApplyProgram("basic");
     if (collectFresh)
         collectScene();
-    m_renderer.execute(m_queue);
+    m_renderer.execute(m_queue, cameraFrustum());
 }
 
 // EffectListProvider interface implementation

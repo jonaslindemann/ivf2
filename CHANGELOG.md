@@ -32,6 +32,9 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Added
 
+- Frustum culling: `GLFWSceneWindow` skips items outside the camera (main and selection passes),
+  the light (shadow maps) or the mirrored camera (reflections). `ivf::Frustum`,
+  `Renderer::execute(queue, frustum)` and `Renderer::stats()` are public.
 - A node can be shown in several windows: each OpenGL context gets its own GPU copy of a mesh
   (`multi_window1` shares a floor between two windows).
 - `RenderContext::lifetime()` and `RenderContext::deleteLater()` for objects that hold GL
@@ -39,6 +42,10 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
+- Bounding boxes of `Box`, `RoundedBox` and `Plane` were half their real size (and those of the
+  other generator primitives were approximations): primitives now use the box computed from their
+  vertices. Code using scene extents (camera framing, `Extents`) sees the correct size.
+- `MeshNode::updateVertices()` updates the bounding box.
 - Automatic shadow framing (`LightManager::setAutoCalcBBox(true)`, the default) used an empty,
   infinitely large scene box; it now fits the shadow maps to the scene's bounding boxes, and the
   shadow and main passes use the same light matrix.

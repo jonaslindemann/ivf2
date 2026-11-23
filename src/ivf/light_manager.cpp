@@ -350,7 +350,7 @@ void LightManager::renderShadowMaps(const RenderQueue &queue)
 
         // Render the scene
 
-        renderer.execute(queue);
+        renderer.execute(queue, Frustum(lightSpaceMatrix)); // only what the light sees
 
         // Reset shader mode
 

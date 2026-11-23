@@ -40,12 +40,7 @@ void CappedCylinder::doSetup()
     AnyGenerator<MeshVertex> vertices = cappedCylinder.vertices();
     AnyGenerator<Triangle> triangles = cappedCylinder.triangles();
 
-    this->createFromGenerator(vertices, triangles);
-
-    // Set bounding box for the capped cylinder (axis-aligned along Y)
-    double halfHeight = m_size * 0.5;
-    setLocalBoundingBox(BoundingBox(glm::vec3(-m_radius, -halfHeight, -m_radius),
-                                    glm::vec3(m_radius, halfHeight, m_radius)));
+    this->createFromGenerator(vertices, triangles); // also sets the bounding box from the vertices
 }
 
 void ivf::CappedCylinder::setupProperties()

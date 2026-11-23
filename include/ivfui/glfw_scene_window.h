@@ -105,6 +105,7 @@ private:
     void updateSelection();
 
     void collectScene();
+    [[nodiscard]] ivf::Frustum cameraFrustum() const;
     void renderReflections();
     void renderScenePasses();
     void renderSelection(bool collectFresh);

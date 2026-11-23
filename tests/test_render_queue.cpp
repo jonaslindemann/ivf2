@@ -3,7 +3,16 @@
 
 #include "test_main.h"
 
+#include <ivf/box.h>
+#include <ivf/capped_cone.h>
+#include <ivf/capped_cylinder.h>
 #include <ivf/composite_node.h>
+#include <ivf/cone.h>
+#include <ivf/cylinder.h>
+#include <ivf/dodecahedron.h>
+#include <ivf/plane.h>
+#include <ivf/rounded_box.h>
+#include <ivf/sphere.h>
 #include <ivf/cube.h>
 #include <ivf/instance_node.h>
 #include <ivf/material.h>
@@ -172,6 +181,40 @@ IVF_TEST(items_have_world_bounds)
     IVF_CHECK(all.isValid());
     IVF_CHECK_NEAR(all.min().x, -3.5, 1e-5);
     IVF_CHECK_NEAR(all.max().x, 10.5, 1e-5);
+}
+
+namespace {
+
+// The local bounding box must enclose the node's vertices exactly (culling relies on it)
+bool boundsMatchVertices(MeshNode &node)
+{
+    BoundingBox extent;
+    for (const auto &mesh : node.meshes())
+        for (GLuint i = 0; i < mesh->vertices()->rows(); ++i)
+            extent.add(mesh->vertices()->vertex(i));
+    const BoundingBox b = node.localBoundingBox();
+    if (!b.isValid() || !extent.isValid())
+        return false;
+    const glm::vec3 dmin = glm::abs(b.min() - extent.min());
+    const glm::vec3 dmax = glm::abs(b.max() - extent.max());
+    return glm::max(glm::max(dmin.x, dmin.y), glm::max(dmin.z, glm::max(dmax.x, glm::max(dmax.y, dmax.z)))) < 1e-4f;
+}
+
+} // namespace
+
+IVF_TEST(primitive_bounds_enclose_their_vertices)
+{
+    Context c;
+    IVF_CHECK(boundsMatchVertices(*Cube::create()));
+    IVF_CHECK(boundsMatchVertices(*Box::create(glm::vec3(1.0f, 2.0f, 3.0f))));
+    IVF_CHECK(boundsMatchVertices(*RoundedBox::create(glm::vec3(1.0f, 2.0f, 3.0f))));
+    IVF_CHECK(boundsMatchVertices(*Plane::create(4.0, 2.0)));
+    IVF_CHECK(boundsMatchVertices(*Sphere::create(1.5)));
+    IVF_CHECK(boundsMatchVertices(*Cone::create(0.5, 2.0)));
+    IVF_CHECK(boundsMatchVertices(*Cylinder::create(0.5, 2.0)));
+    IVF_CHECK(boundsMatchVertices(*CappedCone::create(0.5, 2.0)));
+    IVF_CHECK(boundsMatchVertices(*CappedCylinder::create(0.5, 2.0)));
+    IVF_CHECK(boundsMatchVertices(*Dodecahedron::create(1.0)));
 }
 
 IVF_TEST_MAIN()

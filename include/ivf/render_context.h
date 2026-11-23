@@ -7,7 +7,9 @@
 #include <glad/glad.h>
 
 #include <memory>
+#include <functional>
 #include <optional>
+#include <vector>
 #include <string>
 
 namespace ivf {
@@ -76,8 +78,31 @@ public:
     RenderContext(const RenderContext &) = delete;
     RenderContext &operator=(const RenderContext &) = delete;
 
-    /** @brief Make this the current render context on the calling thread. */
+    /**
+     * @brief Make this the current render context on the calling thread.
+     *
+     * Call it after the host has made the OpenGL context current: it also runs the
+     * work queued with deleteLater().
+     */
     void makeCurrent();
+
+    /**
+     * @brief Token that expires when this context is destroyed.
+     *
+     * Objects holding GL resources in several contexts (such as Mesh, with one GPU copy
+     * per context) keep it to tell whether a context still exists: GL objects of a
+     * destroyed context were freed with it and must not be deleted again.
+     */
+    [[nodiscard]] std::weak_ptr<const void> lifetime() const;
+
+    /**
+     * @brief Run work that needs this OpenGL context (typically deleting GL objects)
+     * the next time the context is made current, or when it is destroyed.
+     *
+     * Use it for objects of this context that are released while another context is
+     * current. If this context is current, prefer doing the work right away.
+     */
+    void deleteLater(std::function<void()> work);
 
     /** @brief True if this is the current render context on the calling thread. */
     bool isCurrent() const;
@@ -149,6 +174,10 @@ private:
     GLuint m_fallbackTexture2D{0};
     GLuint m_fallbackCubemap{0};
     std::optional<bool> m_wideLines; ///< Queried on first use.
+    std::shared_ptr<const int> m_lifetime{std::make_shared<const int>(0)}; ///< See lifetime().
+    std::vector<std::function<void()>> m_deleteLater;                       ///< See deleteLater().
+
+    void runDeleteLater();
 };
 
 /** @brief Shared pointer to a RenderContext. */

@@ -44,6 +44,15 @@ public:
     void unbind();
 
     /**
+     * @brief Give up ownership of the OpenGL object without deleting it.
+     *
+     * Used when the object has to be deleted later in its own context (see
+     * RenderContext::deleteLater()) or was already freed with its context.
+     * @return The object name; this wrapper no longer refers to it.
+     */
+    [[nodiscard]] GLuint release();
+
+    /**
      * @brief Upload index data from a Field to the buffer.
      * @param field Pointer to the Field containing index data.
      */

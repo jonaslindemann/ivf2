@@ -13,7 +13,15 @@ IndexBuffer::IndexBuffer()
 
 IndexBuffer::~IndexBuffer()
 {
-    glDeleteBuffers(1, &m_id);
+    if (m_id != 0)
+        glDeleteBuffers(1, &m_id);
+}
+
+GLuint IndexBuffer::release()
+{
+    const GLuint id = m_id;
+    m_id = 0;
+    return id;
 }
 
 std::shared_ptr<IndexBuffer> ivf::IndexBuffer::create()

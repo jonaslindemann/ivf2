@@ -13,7 +13,15 @@ VertexBuffer::VertexBuffer(GLenum usage) : m_usage{usage}
 
 VertexBuffer::~VertexBuffer()
 {
-    glDeleteBuffers(1, &m_id);
+    if (m_id != 0)
+        glDeleteBuffers(1, &m_id);
+}
+
+GLuint VertexBuffer::release()
+{
+    const GLuint id = m_id;
+    m_id = 0;
+    return id;
 }
 
 std::shared_ptr<VertexBuffer> ivf::VertexBuffer::create()

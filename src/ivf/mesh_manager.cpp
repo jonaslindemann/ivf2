@@ -60,6 +60,10 @@ void ivf::mmDefaultMeshUsage(GLenum usage)
 
 GLenum ivf::mmDefaultMeshUsage()
 {
+    // Meshes can be built before any context exists (they are uploaded on first draw);
+    // without a current context use the default instead of the fallback context.
+    if (RenderContext::current() == nullptr)
+        return GL_STATIC_DRAW;
     return MeshManager::instance()->defaultMeshUsage();
 }
 

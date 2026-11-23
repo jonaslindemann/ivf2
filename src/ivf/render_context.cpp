@@ -52,6 +52,9 @@ std::shared_ptr<RenderContext> RenderContext::create(GLLoadProc loader)
 
 RenderContext::~RenderContext()
 {
+    // GL objects other contexts handed over for deletion (the context is current here)
+    runDeleteLater();
+
     // Managers that look up uniforms in the shader manager's programs first,
     // the shader manager (owning the programs) last.
     delete m_shaderWatcher;
@@ -76,6 +79,27 @@ RenderContext::~RenderContext()
 void RenderContext::makeCurrent()
 {
     t_current = this;
+    runDeleteLater();
+}
+
+std::weak_ptr<const void> RenderContext::lifetime() const
+{
+    return m_lifetime;
+}
+
+void RenderContext::deleteLater(std::function<void()> work)
+{
+    if (work)
+        m_deleteLater.push_back(std::move(work));
+}
+
+void RenderContext::runDeleteLater()
+{
+    // Swap first: the work may queue more (it runs on the next makeCurrent())
+    std::vector<std::function<void()>> work;
+    work.swap(m_deleteLater);
+    for (auto &fn : work)
+        fn();
 }
 
 bool RenderContext::isCurrent() const

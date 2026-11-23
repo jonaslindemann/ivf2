@@ -292,7 +292,12 @@ Goal: make the library trustworthy to depend on.
      5. The renderer has no hidden global state; everything goes through the
         `RenderContext` it is given.
    - **Steps** (each its own commit, CI and visual tests green):
-     1. Lazy GPU upload in `Mesh`.
+     1. Lazy GPU upload in `Mesh`. *Done:* CPU data until first draw, one GPU copy per
+        `RenderContext` (version counters for full re-upload vs. vertex/normal updates),
+        `RenderContext::lifetime()`/`deleteLater()` for freeing copies of other contexts,
+        fixed attribute locations; `test_scene_without_gl` and `multi_window1` (floor
+        built before any window, shared by both) cover it. Textures, fonts and shader
+        materials still need a context when created.
      2. `DrawItem`, `RenderQueue`, `collect()`, main pass only, no culling or sorting -
         pixel-identical to today.
      3. Shadow, reflection and selection passes from the queue (removes the extra

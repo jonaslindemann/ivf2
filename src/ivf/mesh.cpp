@@ -27,7 +27,10 @@ Mesh::Mesh(GLuint vsize, GLuint isize, GLuint primType, GLenum usage)
 }
 
 Mesh::~Mesh()
-{}
+{
+    for (auto &copy : m_gpu)
+        release(*copy);
+}
 
 std::shared_ptr<Mesh> ivf::Mesh::create(GLuint vsize, GLuint isize)
 {
@@ -82,14 +85,11 @@ void Mesh::setSize(GLuint vsize, GLuint isize)
     m_normalPos = 0;
     m_texCoordPos = 0;
 
-    m_vertexAttrId = -1;
-    m_colorAttrId = -1;
-    m_texCoordAttrId = -1;
-
-    this->setVertexAttrId(ShaderManager::instance()->currentProgram()->attribId("aPos"));
-    this->setColorAttrId(ShaderManager::instance()->currentProgram()->attribId("aColor"));
-    this->setNormalAttrId(ShaderManager::instance()->currentProgram()->attribId("aNormal"));
-    this->setTexCoordAttrId(ShaderManager::instance()->currentProgram()->attribId("aTex"));
+    // Locations every ShaderManager program binds before linking (no GL context needed)
+    m_vertexAttrId = 0;   // aPos
+    m_colorAttrId = 1;    // aColor
+    m_texCoordAttrId = 2; // aTex
+    m_normalAttrId = 3;   // aNormal
 }
 
 void ivf::Mesh::setEnabled(bool flag)
@@ -322,57 +322,12 @@ void Mesh::end()
         }
     }
 
-    ivf::clearError(); // flush any accumulated GL errors from before mesh setup
-    m_VAO = std::make_unique<VertexArray>();
-    m_VAO->bind();
-
-    m_vertexVBO = std::make_unique<VertexBuffer>(m_usage);
-    m_vertexVBO->setArray(m_verts.get());
-
-    glEnableVertexAttribArray(m_vertexAttrId);
-    glVertexAttribPointer(m_vertexAttrId, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-
-    if (m_indices != 0)
-    {
-        m_indexVBO = std::make_unique<IndexBuffer>();
-        m_indexVBO->setArray(m_indices.get());
-    }
-
-    if (m_colorAttrId != -1)
-    {
-        m_colorVBO = std::make_unique<VertexBuffer>(m_usage);
-        // m_colorVBO->setArray(m_glColors.get());
-        m_colorVBO->setArray(m_colors.get());
-        glEnableVertexAttribArray(m_colorAttrId);
-        glVertexAttribPointer(m_colorAttrId, 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
-    }
-
-    if (m_normalAttrId != -1)
-    {
-        m_normalVBO = std::make_unique<VertexBuffer>(m_usage);
-        // m_normalVBO->setArray(m_glNormals.get());
-        m_normalVBO->setArray(m_normals.get());
-        glEnableVertexAttribArray(m_normalAttrId);
-        glVertexAttribPointer(m_normalAttrId, 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
-    }
-
-    if (m_texCoordAttrId != -1)
-    {
-        m_texCoordVBO = std::make_unique<VertexBuffer>(m_usage);
-        m_texCoordVBO->setArray(m_texCoords.get());
-        glEnableVertexAttribArray(m_texCoordAttrId);
-        glVertexAttribPointer(m_texCoordAttrId, 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
-    }
-
-    m_VAO->unbind();
-    checkPrintError("Mesh", __FILE__, __LINE__);
+    ++m_dataVersion; // uploaded before the next draw (see gpuCopy())
 }
 
 void ivf::Mesh::updateVertices()
 {
-    // m_VAO->bind();
-    m_vertexVBO->updateArray(m_verts.get());
-    // m_VAO->unbind();
+    ++m_vertexVersion;
 }
 
 void ivf::Mesh::updateNormals()
@@ -392,10 +347,148 @@ void ivf::Mesh::updateNormals()
             m_normals->setNormal(m_indices->at(i, 1), norm);
             m_normals->setNormal(m_indices->at(i, 2), norm);
         }
-        // m_VAO->bind();
-        m_normalVBO->updateArray(m_normals.get());
-        // m_VAO->unbind();
+        ++m_normalVersion;
     }
+}
+
+Mesh::GpuCopy *Mesh::gpuCopy()
+{
+    if (m_dataVersion == 0)
+        return nullptr; // nothing defined yet
+
+    RenderContext *context = RenderContext::currentOrFallback();
+
+    // Copies of destroyed contexts were freed with them: just forget them
+    std::erase_if(m_gpu, [](const std::unique_ptr<GpuCopy> &copy) {
+        if (!copy->lifetime.expired())
+            return false;
+        release(*copy);
+        return true;
+    });
+
+    GpuCopy *copy = nullptr;
+    for (auto &candidate : m_gpu)
+        if (candidate->context == context)
+            copy = candidate.get();
+
+    if (copy == nullptr)
+    {
+        m_gpu.push_back(std::make_unique<GpuCopy>());
+        copy = m_gpu.back().get();
+        copy->context = context;
+        copy->lifetime = context->lifetime();
+    }
+
+    if (copy->dataVersion != m_dataVersion)
+    {
+        upload(*copy);
+    }
+    else
+    {
+        if (copy->vertexVersion != m_vertexVersion && copy->vertices)
+        {
+            copy->vertices->updateArray(m_verts.get());
+            copy->vertexVersion = m_vertexVersion;
+        }
+        if (copy->normalVersion != m_normalVersion && copy->normals)
+        {
+            copy->normals->updateArray(m_normals.get());
+            copy->normalVersion = m_normalVersion;
+        }
+    }
+    return copy;
+}
+
+void Mesh::upload(GpuCopy &copy)
+{
+    // The previous objects of this context are replaced; the new vertex array is created
+    // before the old one is deleted, so its address changes (InstancedMeshNode relies on it).
+    GpuCopy previous;
+    previous.vao = std::move(copy.vao);
+    previous.vertices = std::move(copy.vertices);
+    previous.colors = std::move(copy.colors);
+    previous.normals = std::move(copy.normals);
+    previous.texCoords = std::move(copy.texCoords);
+    previous.indices = std::move(copy.indices);
+
+    ivf::clearError(); // flush any accumulated GL errors from before the upload
+    copy.vao = std::make_unique<VertexArray>();
+    copy.vao->bind();
+
+    copy.vertices = std::make_unique<VertexBuffer>(m_usage);
+    copy.vertices->setArray(m_verts.get());
+
+    glEnableVertexAttribArray(static_cast<GLuint>(m_vertexAttrId));
+    glVertexAttribPointer(static_cast<GLuint>(m_vertexAttrId), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+
+    if (m_indices != 0)
+    {
+        copy.indices = std::make_unique<IndexBuffer>();
+        copy.indices->setArray(m_indices.get());
+    }
+
+    if (m_colorAttrId != -1)
+    {
+        copy.colors = std::make_unique<VertexBuffer>(m_usage);
+        copy.colors->setArray(m_colors.get());
+        glEnableVertexAttribArray(static_cast<GLuint>(m_colorAttrId));
+        glVertexAttribPointer(static_cast<GLuint>(m_colorAttrId), 4, GL_FLOAT, GL_FALSE, 0, (void *)0);
+    }
+
+    if (m_normalAttrId != -1)
+    {
+        copy.normals = std::make_unique<VertexBuffer>(m_usage);
+        copy.normals->setArray(m_normals.get());
+        glEnableVertexAttribArray(static_cast<GLuint>(m_normalAttrId));
+        glVertexAttribPointer(static_cast<GLuint>(m_normalAttrId), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+    }
+
+    if (m_texCoordAttrId != -1)
+    {
+        copy.texCoords = std::make_unique<VertexBuffer>(m_usage);
+        copy.texCoords->setArray(m_texCoords.get());
+        glEnableVertexAttribArray(static_cast<GLuint>(m_texCoordAttrId));
+        glVertexAttribPointer(static_cast<GLuint>(m_texCoordAttrId), 2, GL_FLOAT, GL_FALSE, 0, (void *)0);
+    }
+
+    copy.vao->unbind();
+    checkPrintError("Mesh", __FILE__, __LINE__);
+
+    copy.dataVersion = m_dataVersion;
+    copy.vertexVersion = m_vertexVersion;
+    copy.normalVersion = m_normalVersion;
+}
+
+void Mesh::release(GpuCopy &copy)
+{
+    std::vector<GLuint> buffers;
+    GLuint vao = copy.vao ? copy.vao->release() : 0;
+    for (auto *buffer : {copy.vertices.get(), copy.colors.get(), copy.normals.get(), copy.texCoords.get()})
+        if (buffer != nullptr)
+            buffers.push_back(buffer->release());
+    if (copy.indices)
+        buffers.push_back(copy.indices->release());
+    copy.vao.reset();
+    copy.vertices.reset();
+    copy.colors.reset();
+    copy.normals.reset();
+    copy.texCoords.reset();
+    copy.indices.reset();
+
+    // A destroyed context took its objects with it
+    if (copy.lifetime.expired() || copy.context == nullptr)
+        return;
+
+    auto destroy = [vao, buffers]() {
+        if (vao != 0)
+            glDeleteVertexArrays(1, &vao);
+        if (!buffers.empty())
+            glDeleteBuffers(static_cast<GLsizei>(buffers.size()), buffers.data());
+    };
+    if (copy.context->isCurrent())
+        destroy();
+    else
+        copy.context->deleteLater(destroy); // runs when that context is current again
 }
 
 void Mesh::draw()
@@ -411,11 +504,16 @@ void Mesh::drawInstanced(GLsizei instanceCount)
 
 VertexArray *Mesh::vertexArray()
 {
-    return m_VAO.get();
+    GpuCopy *copy = gpuCopy();
+    return copy != nullptr ? copy->vao.get() : nullptr;
 }
 
 void Mesh::drawImpl(GLsizei instanceCount)
 {
+    GpuCopy *gpu = gpuCopy();
+    if (gpu == nullptr)
+        return; // never defined with end()
+
     if (m_material != nullptr)
         m_material->apply();
 
@@ -437,7 +535,7 @@ void Mesh::drawImpl(GLsizei instanceCount)
     if (wideLine)
         glLineWidth(m_lineWidth);
 
-    m_VAO->bind();
+    gpu->vao->bind();
     if (m_indices != nullptr)
     {
         if (m_wireframe)
@@ -477,7 +575,7 @@ void Mesh::drawImpl(GLsizei instanceCount)
             GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
         }
     }
-    m_VAO->unbind();
+    gpu->vao->unbind();
 
     if (m_depthFunc != GL_LESS)
         glDepthFunc(GL_LESS);
@@ -488,9 +586,12 @@ void Mesh::drawImpl(GLsizei instanceCount)
 
 void ivf::Mesh::drawAsPrim(GLuint prim)
 {
-    m_VAO->bind();
-    glDrawArrays(prim, 0, m_glVerts->size());
-    m_VAO->unbind();
+    GpuCopy *gpu = gpuCopy();
+    if (gpu == nullptr)
+        return;
+    gpu->vao->bind();
+    glDrawArrays(prim, 0, static_cast<GLsizei>(m_verts->rows()));
+    gpu->vao->unbind();
 }
 
 void ivf::Mesh::setPos(glm::vec3 pos)

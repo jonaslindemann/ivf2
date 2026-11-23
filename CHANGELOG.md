@@ -8,6 +8,22 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ## [Unreleased]
 
+### Changed (may require changes in your code)
+
+- Meshes are uploaded to the GPU when first drawn instead of in `end()`: creating and changing
+  geometry (primitives, `MeshNode`, `Mesh::updateVertices()`/`updateNormals()`) needs no OpenGL
+  context, so scenes can be built before the window exists. `Mesh::vertexArray()` uploads on
+  demand and returns the vertex array of the current context.
+- Mesh vertex attributes use the fixed locations bound by `ShaderManager` (`aPos` 0, `aColor` 1,
+  `aTex` 2, `aNormal` 3) instead of querying the program that was current at creation.
+
+### Added
+
+- A node can be shown in several windows: each OpenGL context gets its own GPU copy of a mesh
+  (`multi_window1` shares a floor between two windows).
+- `RenderContext::lifetime()` and `RenderContext::deleteLater()` for objects that hold GL
+  resources in several contexts.
+
 ### Fixed
 
 - Line widths above 1 (`Mesh::setLineWidth`) now work on Windows and Linux: windows no longer

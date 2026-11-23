@@ -15,6 +15,7 @@ ivf2_add_test(test_ivfmath LIBS ivf2::ivfmath)
 ivf2_add_test(test_render_context LIBS ivf2::ivf)
 ivf2_add_test(test_logger LIBS ivf2::ivf)
 ivf2_add_test(test_result LIBS ivf2::ivf)
+ivf2_add_test(test_scene_without_gl LIBS ivf2::ivf)
 
 # Public headers must compile on their own with only public dependencies.
 include(${CMAKE_CURRENT_SOURCE_DIR}/header_check.cmake)

@@ -17,17 +17,29 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/vec3.hpp>
 
+#include <cstdint>
 #include <memory>
+#include <vector>
 
 namespace ivf {
+
+class RenderContext;
 
 /**
  * @class Mesh
  * @brief Represents a 3D mesh with vertex, color, normal, index, and texture coordinate data.
  *
  * The Mesh class encapsulates the data and operations for a 3D mesh, including vertex positions,
- * colors, normals, indices, and texture coordinates. It manages OpenGL buffers and supports
- * drawing, updating, and configuring mesh attributes for rendering.
+ * colors, normals, indices, and texture coordinates.
+ *
+ * Building a mesh (begin()/vertex3f()/.../end(), updateVertices(), updateNormals()) only
+ * changes CPU-side data and needs no OpenGL context. The data is uploaded when the mesh is
+ * first drawn: each RenderContext (OpenGL context) that draws the mesh gets its own GPU copy,
+ * brought up to date before drawing, so a mesh can be shown in several windows. A copy is
+ * released with the mesh or its context.
+ *
+ * Vertex attributes use the fixed locations every ShaderManager program binds:
+ * aPos = 0, aColor = 1, aTex = 2, aNormal = 3.
  */
 class Mesh : public GLBase {
 private:
@@ -60,12 +72,22 @@ private:
 
     bool m_wireframe{false}; ///< Render mesh as wireframe.
 
-    std::unique_ptr<VertexArray> m_VAO;          ///< Vertex array object.
-    std::unique_ptr<VertexBuffer> m_vertexVBO;   ///< Vertex buffer object for positions.
-    std::unique_ptr<VertexBuffer> m_colorVBO;    ///< Vertex buffer object for colors.
-    std::unique_ptr<VertexBuffer> m_normalVBO;   ///< Vertex buffer object for normals.
-    std::unique_ptr<IndexBuffer> m_indexVBO;     ///< Index buffer object.
-    std::unique_ptr<VertexBuffer> m_texCoordVBO; ///< Vertex buffer object for texture coordinates.
+    /// GPU buffers of the mesh in one OpenGL context.
+    struct GpuCopy {
+        RenderContext *context{nullptr};      ///< Context the objects belong to.
+        std::weak_ptr<const void> lifetime;   ///< Expires with the context (RenderContext::lifetime()).
+        std::unique_ptr<VertexArray> vao;     ///< Vertex array object.
+        std::unique_ptr<VertexBuffer> vertices, colors, normals, texCoords; ///< Attribute buffers.
+        std::unique_ptr<IndexBuffer> indices; ///< Index buffer.
+        std::uint64_t dataVersion{0};         ///< m_dataVersion when uploaded.
+        std::uint64_t vertexVersion{0};       ///< m_vertexVersion when uploaded.
+        std::uint64_t normalVersion{0};       ///< m_normalVersion when uploaded.
+    };
+    std::vector<std::unique_ptr<GpuCopy>> m_gpu; ///< One GPU copy per context that drew the mesh.
+
+    std::uint64_t m_dataVersion{0};   ///< Incremented by end(); 0 = never ended, nothing to draw.
+    std::uint64_t m_vertexVersion{0}; ///< Incremented by updateVertices().
+    std::uint64_t m_normalVersion{0}; ///< Incremented by updateNormals().
 
     glm::vec3 m_position; ///< Mesh position in world space.
 
@@ -87,6 +109,13 @@ private:
      * @brief Draw the mesh, instanced when @p instanceCount is greater than 0.
      */
     void drawImpl(GLsizei instanceCount);
+
+    /// GPU copy for the current context, created or updated as needed (nullptr before end()).
+    GpuCopy *gpuCopy();
+    /// Create the buffers of @p copy from the CPU data (the copy's context is current).
+    void upload(GpuCopy &copy);
+    /// Release the GL objects of @p copy in the right context.
+    static void release(GpuCopy &copy);
 
 public:
     /**
@@ -357,17 +386,19 @@ public:
     void triQuad(GLdouble w, GLdouble h, GLdouble offset, GLdouble vx, GLdouble vy, GLdouble vz);
 
     /**
-     * @brief End mesh definition.
+     * @brief End mesh definition (generates normals if enabled).
+     *
+     * Needs no OpenGL context: the data is uploaded before the mesh is next drawn.
      */
     void end();
 
     /**
-     * @brief Update the vertex buffer with new vertex data.
+     * @brief Mark the vertex positions as changed; they are uploaded before the next draw.
      */
     void updateVertices();
 
     /**
-     * @brief Update the normal buffer with new normal data.
+     * @brief Recompute normals from the vertex positions; uploaded before the next draw.
      */
     void updateNormals();
 
@@ -386,7 +417,10 @@ public:
     void drawInstanced(GLsizei instanceCount);
 
     /**
-     * @brief Get the vertex array object of the mesh.
+     * @brief Get the vertex array object of the mesh in the current context.
+     *
+     * Uploads the mesh to the current context first if needed. Each context has its own
+     * vertex array, and a new one is created when the mesh is redefined with end().
      * @return Pointer to the vertex array, nullptr before the mesh is set up with end().
      */
     VertexArray *vertexArray();

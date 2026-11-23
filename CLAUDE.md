@@ -91,6 +91,7 @@ GL-bound state lives in an `ivf::RenderContext` (`include/ivf/render_context.h`)
 - In window code use `renderContext()->lights()` etc. `XxxManager::instance()`/`create()` still work: they forward to `RenderContext::current()` (thread-local), or to a leaked process-wide fallback with a warning if none is current. `drop()` is a no-op. Library internals still use `instance()` (explicit passing is planned with the phase 2 render queue).
 - Non-GL globals stay singletons: `Logger`, `TimeController`, `TweenManager`, `TimerManager`, `AudioManager`.
 - Don't add function-local `static` GL objects or binding caches — they break with several contexts; put per-context GL state in `RenderContext`.
+- `Mesh` holds CPU data only until drawn: building or changing geometry (`end()`, `updateVertices()`, `updateNormals()`, primitive setters) needs no GL context, and each `RenderContext` that draws a mesh gets its own GPU copy (so nodes can be shared between windows). Attribute locations are fixed (`aPos` 0, `aColor` 1, `aTex` 2, `aNormal` 3, bound by `ShaderManager`). GL objects of a context that is not current are freed with `RenderContext::deleteLater()`; `RenderContext::lifetime()` tells whether a context still exists. `tests/test_scene_without_gl.cpp` builds scenes with no GL functions loaded.
 - Other hosts (Qt, SDL, EGL): see `examples/embedding1`; several windows: `examples/multi_window1`.
 
 ### Key Patterns

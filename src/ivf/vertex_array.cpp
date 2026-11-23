@@ -9,7 +9,15 @@ VertexArray::VertexArray()
 
 VertexArray::~VertexArray()
 {
-    glDeleteVertexArrays(1, &m_id);
+    if (m_id != 0)
+        glDeleteVertexArrays(1, &m_id);
+}
+
+GLuint VertexArray::release()
+{
+    const GLuint id = m_id;
+    m_id = 0;
+    return id;
 }
 
 std::shared_ptr<VertexArray> ivf::VertexArray::create()

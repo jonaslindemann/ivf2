@@ -10,6 +10,10 @@
  * LightManager::instance() - always refer to the window being processed.
  *
  * Changing the light in one window does not affect the other.
+ *
+ * The floor is one node shared by both scenes. It is created in main() before any
+ * window (and OpenGL context) exists: meshes are uploaded when first drawn, and each
+ * window gets its own GPU copy.
  */
 
 #include <imgui.h>
@@ -26,6 +30,7 @@ private:
     glm::vec3 m_lightColor;
     bool m_spheres;
     DirectionalLightPtr m_light;
+    NodePtr m_sharedNode;
 
 public:
     SceneWindow(int w, int h, std::string title, glm::vec3 lightColor, bool spheres)
@@ -35,6 +40,12 @@ public:
     static std::shared_ptr<SceneWindow> create(int w, int h, std::string title, glm::vec3 lightColor, bool spheres)
     {
         return std::make_shared<SceneWindow>(w, h, title, lightColor, spheres);
+    }
+
+    // A node also shown by other windows (added to the scene in onSetup)
+    void setSharedNode(NodePtr node)
+    {
+        m_sharedNode = node;
     }
 
     int onSetup() override
@@ -65,6 +76,9 @@ public:
                 add(node);
             }
 
+        if (m_sharedNode)
+            add(m_sharedNode);
+
         cameraManipulator()->setCameraPosition({0.0f, 8.0f, 12.0f});
         return 0;
     }
@@ -90,8 +104,17 @@ int main()
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
+    // Built before any window exists; both windows draw it
+    auto floorMaterial = Material::create();
+    floorMaterial->setDiffuseColor({0.45f, 0.45f, 0.5f, 1.0f});
+    auto floor = Box::create({11.0f, 0.2f, 11.0f});
+    floor->setPos({0.0f, -0.8f, 0.0f});
+    floor->setMaterial(floorMaterial);
+
     auto warm = SceneWindow::create(800, 600, "Window A (spheres)", {1.0f, 0.75f, 0.5f}, true);
     auto cool = SceneWindow::create(800, 600, "Window B (cubes)", {0.5f, 0.7f, 1.0f}, false);
+    warm->setSharedNode(floor);
+    cool->setSharedNode(floor);
     glfwSetWindowPos(warm->ref(), 80, 120);
     glfwSetWindowPos(cool->ref(), 920, 120);
 

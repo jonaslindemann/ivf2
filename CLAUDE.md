@@ -83,7 +83,7 @@ All drawable entities inherit from `Node`. The hierarchy is:
     - `TextNode` — text rendering
   - `CompositeNode` — groups child nodes (Composite pattern)
 
-Drawing goes through a render queue (`render_queue.h`, `renderer.h`): `Node::draw()` calls `collect()` (one `DrawItem` per drawable node; `CompositeNode`/`InstanceNode` pass transform, material and textures down via `CollectState`) and `Renderer::execute()`, which sets each item's parent matrix, applies the inherited material/textures if the node has none, and calls the node's `doPreDraw()`/`doDraw()`/`doPostDraw()`. `GLFWSceneWindow` collects once per frame and draws that queue in the shadow, reflection, main and selection passes; items carry world-space `bounds`. Materials inherit from the nearest ancestor (a group's material applies to children without their own). See ROADMAP phase 2.1 for the design and next steps.
+Drawing goes through a render queue (`render_queue.h`, `renderer.h`): `Node::draw()` calls `collect()` (one `DrawItem` per drawable node; `CompositeNode`/`InstanceNode` pass transform, material and textures down via `CollectState`) and `Renderer::execute()`, which sets each item's parent matrix, applies the inherited material/textures if the node has none, and calls the node's `doPreDraw()`/`doDraw()`/`doPostDraw()`. `GLFWSceneWindow` collects once per frame and draws that queue in the shadow, reflection, main and selection passes (selection only after mouse input or camera changes); items carry world-space `bounds`. Materials inherit from the nearest ancestor (a group's material applies to children without their own). See ROADMAP phase 2.1 for the design and next steps.
 
 ### Render Context and Managers
 

@@ -16,6 +16,9 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   demand and returns the vertex array of the current context.
 - Mesh vertex attributes use the fixed locations bound by `ShaderManager` (`aPos` 0, `aColor` 1,
   `aTex` 2, `aNormal` 3) instead of querying the program that was current at creation.
+- Selection (`setSelectionEnabled(true)`) is rendered only after mouse movement, button presses,
+  resizing or camera changes instead of every frame, so `onOverNode()` is no longer called every
+  frame while the cursor rests on a node. Clicks pick the node under the cursor afresh.
 - `GLFWSceneWindow` traverses the scene once per frame; the shadow, reflection, main and selection
   passes draw the same items (`LightManager::renderShadowMaps(const RenderQueue &)`,
   `PlanarReflection::render(const RenderQueue &)`).

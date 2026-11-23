@@ -97,6 +97,13 @@ private:
     ivf::RenderQueue m_queue; ///< Scene items collected once per frame, shared by all passes.
     ivf::Renderer m_renderer; ///< Draws m_queue.
 
+    // Selection is rendered on demand: after mouse movement, button presses, resizing,
+    // or when the camera changed since the last selection render.
+    bool m_selectionDirty{true};     ///< Input since the last selection render.
+    glm::mat4 m_selectionView{0.0f}; ///< View matrix of the last selection render.
+    glm::mat4 m_selectionProj{0.0f}; ///< Projection matrix of the last selection render.
+    void updateSelection();
+
     void collectScene();
     void renderReflections();
     void renderScenePasses();
@@ -519,6 +526,10 @@ public:
 
     /**
      * @brief Called when the mouse is over a node (override for custom behavior).
+     *
+     * Selection is updated on demand, so this is called when the mouse moves or a button
+     * is pressed over the node, or when the camera changes while the cursor is over it -
+     * not every frame.
      * @param node Pointer to the node.
      */
     virtual void onOverNode(ivf::Node *node);

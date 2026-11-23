@@ -95,6 +95,7 @@ void ivfui::GLFWSceneWindow::clear()
 void ivfui::GLFWSceneWindow::setSelectionEnabled(bool enabled)
 {
     m_selectionEnabled = enabled;
+    m_selectionDirty = true;
     // If called after doSetup() (e.g. from onSetup()), the FBO hasn't been
     // initialized yet because doSetup() checks the flag before onSetup() runs.
     if (enabled && width() > 0 && height() > 0)
@@ -793,6 +794,7 @@ void ivfui::GLFWSceneWindow::doSetupMainMenu()
 
 void GLFWSceneWindow::doResize(int width, int height)
 {
+    m_selectionDirty = true;
     m_camManip->update();
     m_bufferSelection->resize(width, height);
 
@@ -921,46 +923,61 @@ void ivfui::GLFWSceneWindow::doDrawUi()
     this->doUpdateUi();
 }
 
-void ivfui::GLFWSceneWindow::doDrawComplete()
+void ivfui::GLFWSceneWindow::updateSelection()
 {
-    if (m_selectionEnabled)
+    // Render the selection buffer only when the result can have changed: after input
+    // (mouse movement, buttons, resize) or a camera change. Objects moving under a still
+    // cursor update their hover state on the next mouse event.
+    auto &xfm = *TransformManager::instance();
+    const bool cameraChanged = xfm.viewMatrix() != m_selectionView || xfm.projectionMatrix() != m_selectionProj;
+    if (!m_selectionDirty && !cameraChanged)
+        return;
+
+    m_selectionDirty = false;
+    m_selectionView = xfm.viewMatrix();
+    m_selectionProj = xfm.projectionMatrix();
+
+    m_selectionRendering = true;
+
+    m_bufferSelection->begin();
+
+    this->renderSelection(false);
+    // Stored in the member: doMouseButton() sends click notifications to it.
+    m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
+
+    if (m_currentNode != nullptr)
     {
-        m_selectionRendering = true;
-
-        m_bufferSelection->begin();
-
-        this->renderSelection(false);
-        // Stored in the member: doMouseButton() sends click notifications to it.
-        m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
-
-        if (m_currentNode != nullptr)
+        if (m_currentNode != m_lastNode)
         {
-            if (m_currentNode != m_lastNode)
-            {
-                if (m_lastNode != nullptr)
-                    this->doLeaveNode(m_lastNode);
-                this->doEnterNode(m_currentNode);
-                m_lastNode = m_currentNode;
-            }
-            else
-            {
-                this->doOverNode(m_currentNode);
-            }
+            if (m_lastNode != nullptr)
+                this->doLeaveNode(m_lastNode);
+            this->doEnterNode(m_currentNode);
+            m_lastNode = m_currentNode;
         }
         else
         {
-            if (m_lastNode != nullptr)
-            {
-                this->doLeaveNode(m_lastNode);
-                m_lastNode = nullptr;
-            }
+            this->doOverNode(m_currentNode);
         }
-
-        m_bufferSelection->end();
     }
     else
-        m_currentNode = nullptr;
+    {
+        if (m_lastNode != nullptr)
+        {
+            this->doLeaveNode(m_lastNode);
+            m_lastNode = nullptr;
+        }
+    }
+
+    m_bufferSelection->end();
     m_selectionRendering = false;
+}
+
+void ivfui::GLFWSceneWindow::doDrawComplete()
+{
+    if (m_selectionEnabled)
+        updateSelection();
+    else
+        m_currentNode = nullptr;
 
     GLFWWindow::doDrawComplete();
 }
@@ -1071,6 +1088,7 @@ void ivfui::GLFWSceneWindow::doKey(int key, int scancode, int action, int mods)
 void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
 {
     GLFWWindow::doMousePosition(x, y);
+    m_selectionDirty = true;
 
     if (m_boxSelecting) {
         m_boxCurrentX = x;
@@ -1198,6 +1216,20 @@ void ivfui::GLFWSceneWindow::doMousePosition(double x, double y)
 
 void ivfui::GLFWSceneWindow::doMouseButton(int button, int action, int mods)
 {
+    m_selectionDirty = true;
+
+    // The hover result can be several frames old (selection is rendered on demand) and the
+    // scene may have changed since: pick the node under the cursor again for the click.
+    if (action == GLFW_PRESS && m_selectionEnabled)
+    {
+        m_selectionRendering = true;
+        m_bufferSelection->begin();
+        this->renderSelection(true);
+        m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
+        m_bufferSelection->end();
+        m_selectionRendering = false;
+    }
+
     if (action == GLFW_PRESS && m_currentNode)
         m_currentNode->notifyClick(m_currentNode, button);
 

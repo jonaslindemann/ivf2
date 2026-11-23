@@ -320,8 +320,9 @@ Goal: make the library trustworthy to depend on.
         and called `onDraw()` twice). Items carry world-space `bounds`; automatic shadow
         framing uses their union, computed before `apply()` so the shadow and main passes
         use the same light matrix (it was an empty, infinite box before). Images and
-        selection buffers pixel-identical. Still open: selection rendered only on mouse
-        movement/clicks (decided above).
+        selection buffers pixel-identical. Selection is rendered on demand (mouse movement,
+        buttons, resize, camera change); a button press picks the node under the cursor
+        afresh, so clicks never reach a node deleted since the last hover update.
      4. Frustum culling.
      5. Sorting and transparency buckets (intended image changes: update references).
      6. Explicit `RenderContext&` through the new path.

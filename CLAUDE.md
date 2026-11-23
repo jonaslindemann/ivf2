@@ -83,6 +83,8 @@ All drawable entities inherit from `Node`. The hierarchy is:
     - `TextNode` — text rendering
   - `CompositeNode` — groups child nodes (Composite pattern)
 
+Drawing goes through a render queue (`render_queue.h`, `renderer.h`): `Node::draw()` calls `collect()` (one `DrawItem` per drawable node; `CompositeNode`/`InstanceNode` pass transform, material and textures down via `CollectState`) and `Renderer::execute()`, which sets each item's parent matrix, applies the inherited material/textures if the node has none, and calls the node's `doPreDraw()`/`doDraw()`/`doPostDraw()`. Materials inherit from the nearest ancestor (a group's material applies to children without their own). See ROADMAP phase 2.1 for the design and next steps.
+
 ### Render Context and Managers
 
 GL-bound state lives in an `ivf::RenderContext` (`include/ivf/render_context.h`) — one per OpenGL context, defined in `ivf` with no windowing dependency. It owns, created lazily on first use: `ShaderManager` (`shaders()`), `LightManager` (`lights()`), `TextureManager` (`textures()`), `FontManager` (`fonts()`), `MeshManager` (`meshes()`), `SelectionManager` (`selection()`), `TransformManager` (`transforms()`, caches uniform locations of the context's program), `DebugDraw`, `ShaderWatcher`, and the fallback textures.

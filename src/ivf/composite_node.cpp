@@ -7,7 +7,7 @@ using namespace ivf;
 
 CompositeNode::CompositeNode() : TransformNode(), m_singleObjectId(false)
 {
-    this->setUseMaterial(false);
+    // A material set on a group is inherited by children without their own material
     this->setName("Composite");
 }
 
@@ -89,6 +89,15 @@ void ivf::CompositeNode::accept(NodeVisitor *visitor)
 
     for (auto node : m_nodes)
         node->accept(visitor);
+}
+
+void ivf::CompositeNode::collect(RenderQueue &queue, const CollectState &state)
+{
+    if (!visible())
+        return;
+    const CollectState child = childState(state);
+    for (auto &node : m_nodes)
+        node->collect(queue, child);
 }
 
 void ivf::CompositeNode::doDraw()

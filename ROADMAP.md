@@ -274,7 +274,7 @@ Goal: make the library trustworthy to depend on.
         `setCastsShadows()` choose bucket and passes. Nodes whose drawing depends on the
         pass override `doDraw(DrawContext &)` (pass, `RenderContext`, view/projection);
         its default calls `doDraw()`.
-     3. *Own queue items* - override `collect(RenderCollector &, const CollectState &)` to
+     3. *Own queue items* - override `collect(RenderQueue &, const CollectState &)` to
         emit several items or decide per frame (one item per particle emitter, LOD,
         chunked point clouds). Items carry a mesh or a draw function.
 
@@ -284,7 +284,7 @@ Goal: make the library trustworthy to depend on.
      `scene->draw()` and plain OpenGL in `onDraw()` keep working.
    - **Design rules** (to keep it open):
      1. Nodes are plain subclasses: no registration, no type ids, no `final` classes.
-     2. `DrawItem`, `RenderCollector`, `CollectState`, `DrawContext` and `Renderer` are
+     2. `DrawItem`, `RenderQueue`, `CollectState`, `DrawContext` and `Renderer` are
         public, documented API, not internals.
      3. Built-in nodes use only these public hooks; a library node needing a private
         shortcut means a public hook is missing.
@@ -300,6 +300,16 @@ Goal: make the library trustworthy to depend on.
         materials still need a context when created.
      2. `DrawItem`, `RenderQueue`, `collect()`, main pass only, no culling or sorting -
         pixel-identical to today.
+        *Done:* `Node::collect(RenderQueue &, const CollectState &)` (`render_queue.h`) and
+        `Renderer::execute()` (`renderer.h`); `Node::draw()` collects and executes, so all
+        passes and `scene->draw()` callers use the queue. Containers (`CompositeNode`,
+        `InstanceNode`) add no items and pass transform, material and textures down;
+        world matrices use the same operations as the matrix stack (bit-identical). Items
+        call the nodes' existing `doPreDraw()`/`doDraw()`/`doPostDraw()`, so every node
+        type works unchanged; per-mesh items for `MeshNode` and the default material come
+        with sorting (step 5). Material inheritance is explicit (siblings no longer leak),
+        and `CompositeNode` uses its material by default (it was ignored before). All 51
+        visual tests are pixel-identical; `test_render_queue` covers collection.
      3. Shadow, reflection and selection passes from the queue (removes the extra
         traversals; fixes the shadow scene box, whose `ExtentVisitor` result is unused).
      4. Frustum culling.

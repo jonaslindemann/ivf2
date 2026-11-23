@@ -130,6 +130,12 @@ public:
      */
     virtual void accept(NodeVisitor *visitor) override;
 
+    /**
+     * @brief Collect the visible children with this node's transform, material and
+     * textures (the composite itself adds no draw item).
+     */
+    virtual void collect(RenderQueue &queue, const CollectState &state) override;
+
     // Iterator type aliases
     using iterator = std::vector<NodePtr>::iterator;             ///< Iterator for child nodes.
     using const_iterator = std::vector<NodePtr>::const_iterator; ///< Const iterator for child nodes.

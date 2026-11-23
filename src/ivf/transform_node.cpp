@@ -116,6 +116,34 @@ void TransformNode::doPreDraw()
     }
 }
 
+void TransformNode::applyLocalTransform(glm::mat4 &m) const
+{
+    // Same operations, in the same order, as doPreDraw() (identical floating-point results)
+    if (!m_useTransform)
+        return;
+    m = m * TransformManager::translationMatrix(m_pos);
+    if ((abs(m_eulerAngles.x) > 0.0) || (abs(m_eulerAngles.y) > 0.0) || (abs(m_eulerAngles.z) > 0.0))
+        m = m * TransformManager::eulerRotationMatrixDeg(m_eulerAngles.x, m_eulerAngles.y, m_eulerAngles.z);
+    if (m_vecRot != glm::vec3(0.0f))
+    {
+        glm::mat4 r(1.0f);
+        if (TransformManager::rotationToVectorMatrix(m_vecRot, r))
+            m = m * r;
+    }
+    if (m_rotAngle != 0.0)
+        m = m * TransformManager::axisRotationMatrixDeg(glm::vec3(m_rotAxis.x, m_rotAxis.y, m_rotAxis.z),
+                                                        static_cast<float>(m_rotAngle));
+    if (!(m_scale.x == 1.0f && m_scale.y == 1.0f && m_scale.z == 1.0f))
+        m = m * TransformManager::scaleMatrix(glm::vec3(m_scale.x, m_scale.y, m_scale.z));
+}
+
+CollectState TransformNode::childState(const CollectState &state) const
+{
+    CollectState child = Node::childState(state);
+    applyLocalTransform(child.world);
+    return child;
+}
+
 void TransformNode::doPostDraw()
 {
     if (m_useTransform)

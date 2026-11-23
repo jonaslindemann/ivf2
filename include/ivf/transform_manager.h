@@ -61,6 +61,25 @@ private:
     void updateShaderMvpMatrix();
 
 public:
+    /** @name Matrices of the individual transform operations
+     *  translate3f(), rotateDeg(), rotateToVector() and scale() multiply the model matrix
+     *  by these; the render queue uses them to compute world matrices identically.
+     */
+    ///@{
+    [[nodiscard]] static glm::mat4 translationMatrix(glm::vec3 t);
+    [[nodiscard]] static glm::mat4 eulerRotationMatrixDeg(float ax, float ay, float az);
+    [[nodiscard]] static glm::mat4 axisRotationMatrixDeg(glm::vec3 axis, float angle);
+    /// Rotation of +X onto @p v; false (and @p m unchanged) if @p v is too short.
+    static bool rotationToVectorMatrix(glm::vec3 v, glm::mat4 &m);
+    [[nodiscard]] static glm::mat4 scaleMatrix(glm::vec3 s);
+    ///@}
+
+    /**
+     * @brief Replace the model matrix and upload it to the current program.
+     * @param m New model matrix.
+     */
+    void setModelMatrix(const glm::mat4 &m);
+
     /**
      * @brief The TransformManager of the current RenderContext (RenderContext::current()->transforms()).
      * @return TransformManager* Pointer to the manager.

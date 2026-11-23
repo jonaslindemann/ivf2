@@ -10,6 +10,7 @@
 #include <ivf/node_visitor.h>
 #include <ivf/property_inspectable.h>
 #include <ivf/behavior.h>
+#include <ivf/render_queue.h>
 
 #include <memory>
 #include <string>
@@ -47,6 +48,8 @@ private:
     std::weak_ptr<Node> m_parent{};                ///< Parent node (for hierarchy).
     std::string m_name;                            ///< Name of the node (for identification).
 
+    friend class Renderer; // calls the draw hooks of collected items
+
 public:
     /**
      * @brief Get the parent node.
@@ -61,9 +64,24 @@ public:
     void setParent(std::shared_ptr<Node> parent);
 
     /**
-     * @brief Draw the node to the screen.
+     * @brief Draw the node (and, for containers, its children) to the screen.
+     *
+     * Collects the node into a RenderQueue (see collect()) and draws it with a Renderer,
+     * starting from the current model matrix.
      */
     void draw();
+
+    /**
+     * @brief Add this node's draw items to @p queue.
+     *
+     * The default adds one DrawItem for a visible node; the Renderer then calls its
+     * doPreDraw()/doDraw()/doPostDraw(). Containers (CompositeNode, InstanceNode) override
+     * this to collect their children instead. Override it to add several items or to
+     * decide per frame what to draw.
+     * @param queue Queue receiving the items.
+     * @param state Transform, material and textures inherited from the ancestors.
+     */
+    virtual void collect(RenderQueue &queue, const CollectState &state);
 
     /**
      * @brief Draw the node in a selected state.
@@ -250,6 +268,18 @@ protected:
      * @brief Bind textures to OpenGL (single or multi).
      */
     void bindTextures();
+
+    /**
+     * @brief Unbind the textures bound by bindTextures().
+     */
+    void unbindTextures();
+
+    /**
+     * @brief State for this node's children: the node's material and textures replace the
+     * inherited ones; TransformNode also applies its transform to the world matrix.
+     * @param state State inherited by this node.
+     */
+    [[nodiscard]] virtual CollectState childState(const CollectState &state) const;
 
     /**
      * @brief Called before drawing the node. Override to perform actions before drawing.

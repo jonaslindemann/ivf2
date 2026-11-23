@@ -1,6 +1,8 @@
 #include <ivf/node.h>
 
+#include <ivf/renderer.h>
 #include <ivf/selection_manager.h>
+#include <ivf/transform_manager.h>
 #include <ivf/shader_manager.h>
 
 using namespace ivf;
@@ -17,10 +19,35 @@ void Node::setParent(std::shared_ptr<Node> parent)
 
 void Node::draw()
 {
-    doPreDraw();
-    if (m_visible)
-        doDraw();
-    doPostDraw();
+    RenderQueue queue;
+    CollectState state;
+    state.world = TransformManager::instance()->modelMatrix();
+    collect(queue, state);
+    Renderer().execute(queue);
+}
+
+void Node::collect(RenderQueue &queue, const CollectState &state)
+{
+    if (!m_visible)
+        return;
+
+    DrawItem item;
+    item.node = this;
+    item.parentWorld = state.world;
+    item.world = childState(state).world;
+    item.material = state.material;
+    item.textureSource = state.textureSource;
+    queue.add(item);
+}
+
+CollectState Node::childState(const CollectState &state) const
+{
+    CollectState child = state;
+    if (m_material && m_useMaterial)
+        child.material = m_material;
+    if (m_useTexture)
+        child.textureSource = const_cast<Node *>(this);
+    return child;
 }
 
 void ivf::Node::drawSelection()
@@ -209,21 +236,24 @@ void Node::doPreDraw()
 void ivf::Node::doDraw()
 {}
 
+void ivf::Node::unbindTextures()
+{
+    if (m_useMultiTexturing && m_textures.size() > 1) {
+        // Use span view for safe iteration
+        for (const auto& tex : textures()) {
+            if (tex) {
+                tex->unbind();
+            }
+        }
+    } else if (m_texture) {
+        m_texture->unbind();
+    }
+}
+
 void ivf::Node::doPostDraw()
 {
-    // Unbind textures - using span for safe iteration
-    if (m_useTexture) {
-        if (m_useMultiTexturing && m_textures.size() > 1) {
-            // Use span view for safe iteration
-            for (const auto& tex : textures()) {
-                if (tex) {
-                    tex->unbind();
-                }
-            }
-        } else if (m_texture) {
-            m_texture->unbind();
-        }
-    }
+    if (m_useTexture)
+        unbindTextures();
     if (m_material && m_useMaterial)
         m_material->unapply();
     onPostDraw();

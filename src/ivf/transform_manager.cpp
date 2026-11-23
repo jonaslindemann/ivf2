@@ -134,9 +134,59 @@ void TransformManager::popMatrix()
     }
 }
 
+glm::mat4 TransformManager::translationMatrix(glm::vec3 t)
+{
+    return glm::translate(glm::mat4(1.0), t);
+}
+
+glm::mat4 TransformManager::eulerRotationMatrixDeg(float ax, float ay, float az)
+{
+    glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(ax), glm::vec3(1.0, 0.0, 0.0));
+    m = m * glm::rotate(glm::mat4(1.0), glm::radians(ay), glm::vec3(0.0, 1.0, 0.0));
+    m = m * glm::rotate(glm::mat4(1.0), glm::radians(az), glm::vec3(0.0, 0.0, 1.0));
+    return m;
+}
+
+glm::mat4 TransformManager::axisRotationMatrixDeg(glm::vec3 axis, float angle)
+{
+    return glm::rotate(glm::mat4(1.0), glm::radians(angle), axis);
+}
+
+bool TransformManager::rotationToVectorMatrix(glm::vec3 v, glm::mat4 &result)
+{
+    // Rotate the local +X axis onto v (the shortest rotation).
+    const float len = glm::length(v);
+    if (len < 1e-6f)
+        return false;
+
+    const glm::vec3 xAxis(1.0f, 0.0f, 0.0f);
+    const glm::vec3 dir = v / len;
+    const glm::vec3 axis = glm::cross(xAxis, dir);
+    const float cosAngle = glm::clamp(glm::dot(xAxis, dir), -1.0f, 1.0f);
+
+    glm::mat4 m(1.0f);
+    if (glm::length(axis) > 1e-6f)
+        m = glm::rotate(m, std::acos(cosAngle), glm::normalize(axis));
+    else if (cosAngle < 0.0f)
+        m = glm::rotate(m, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f)); // v points along -X
+    result = m;
+    return true;
+}
+
+glm::mat4 TransformManager::scaleMatrix(glm::vec3 s)
+{
+    return glm::scale(glm::mat4(1.0), s);
+}
+
+void TransformManager::setModelMatrix(const glm::mat4 &m)
+{
+    m_modelMatrix = m;
+    ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
+}
+
 void TransformManager::translate3f(float tx, float ty, float tz)
 {
-    glm::mat4 m = glm::translate(glm::mat4(1.0), glm::vec3(tx, ty, tz));
+    glm::mat4 m = translationMatrix(glm::vec3(tx, ty, tz));
     m_modelMatrix = m_modelMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
@@ -162,7 +212,7 @@ void TransformManager::rotate(float rx, float ry, float rz, float angle)
 
 void ivf::TransformManager::rotateDeg(float rx, float ry, float rz, float angle)
 {
-    glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(angle), glm::vec3(rx, ry, rz));
+    glm::mat4 m = axisRotationMatrixDeg(glm::vec3(rx, ry, rz), angle);
     m_modelMatrix = m_modelMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
@@ -185,30 +235,16 @@ void ivf::TransformManager::rotate(float ax, float ay, float az)
 
 void ivf::TransformManager::rotateDeg(float ax, float ay, float az)
 {
-    glm::mat4 m = glm::rotate(glm::mat4(1.0), glm::radians(ax), glm::vec3(1.0, 0.0, 0.0));
-    m = m * glm::rotate(glm::mat4(1.0), glm::radians(ay), glm::vec3(0.0, 1.0, 0.0));
-    m = m * glm::rotate(glm::mat4(1.0), glm::radians(az), glm::vec3(0.0, 0.0, 1.0));
+    glm::mat4 m = eulerRotationMatrixDeg(ax, ay, az);
     m_modelMatrix = m_modelMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }
 
 void ivf::TransformManager::rotateToVector(glm::vec3 v)
 {
-    // Rotate the local +X axis onto v (the shortest rotation).
-    const float len = glm::length(v);
-    if (len < 1e-6f)
-        return;
-
-    const glm::vec3 xAxis(1.0f, 0.0f, 0.0f);
-    const glm::vec3 dir = v / len;
-    const glm::vec3 axis = glm::cross(xAxis, dir);
-    const float cosAngle = glm::clamp(glm::dot(xAxis, dir), -1.0f, 1.0f);
-
     glm::mat4 m(1.0f);
-    if (glm::length(axis) > 1e-6f)
-        m = glm::rotate(m, std::acos(cosAngle), glm::normalize(axis));
-    else if (cosAngle < 0.0f)
-        m = glm::rotate(m, glm::pi<float>(), glm::vec3(0.0f, 1.0f, 0.0f)); // v points along -X
+    if (!rotationToVectorMatrix(v, m))
+        return;
 
     m_modelMatrix = m_modelMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
@@ -216,7 +252,7 @@ void ivf::TransformManager::rotateToVector(glm::vec3 v)
 
 void ivf::TransformManager::scale(float sx, float sy, float sz)
 {
-    glm::mat4 m = glm::scale(glm::mat4(1.0), glm::vec3(sx, sy, sz));
+    glm::mat4 m = scaleMatrix(glm::vec3(sx, sy, sz));
     m_modelMatrix = m_modelMatrix * m;
     ShaderManager::instance()->currentProgram()->uniformMatrix4(m_modelId, m_modelMatrix);
 }

@@ -40,6 +40,11 @@ public:
      */
     std::shared_ptr<TransformNode> node() const;
 
+    /**
+     * @brief Collect the instanced node with this node's transform, material and textures.
+     */
+    virtual void collect(RenderQueue &queue, const CollectState &state) override;
+
 protected:
     /**
      * @brief Draw the instanced node with this node's transformation.

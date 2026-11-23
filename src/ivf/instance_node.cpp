@@ -25,6 +25,13 @@ std::shared_ptr<TransformNode> ivf::InstanceNode::node() const
 	return m_node;
 }
 
+void ivf::InstanceNode::collect(RenderQueue &queue, const CollectState &state)
+{
+	if (!visible() || !m_node)
+		return;
+	m_node->collect(queue, childState(state));
+}
+
 void ivf::InstanceNode::doDraw()
 {
 	if (m_node!=nullptr)

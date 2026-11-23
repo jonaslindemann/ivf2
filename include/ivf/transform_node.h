@@ -202,7 +202,16 @@ public:
      */
     [[nodiscard]] inline bool autoUpdateBoundingBox() const noexcept { return m_autoUpdateBoundingBox; }
 
+    /**
+     * @brief Multiply @p m by this node's transform (position, rotations, scale) exactly as
+     * doPreDraw() applies it to the model matrix; does nothing if the transform is disabled.
+     * @param m Matrix to transform (typically the parent's world matrix).
+     */
+    void applyLocalTransform(glm::mat4 &m) const;
+
 protected:
+    [[nodiscard]] virtual CollectState childState(const CollectState &state) const override;
+
     /**
      * @brief Called before drawing the node. Override to perform actions before drawing.
      */

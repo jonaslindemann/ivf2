@@ -16,6 +16,13 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   demand and returns the vertex array of the current context.
 - Mesh vertex attributes use the fixed locations bound by `ShaderManager` (`aPos` 0, `aColor` 1,
   `aTex` 2, `aNormal` 3) instead of querying the program that was current at creation.
+- Scenes are drawn through a render queue: `Node::draw()` collects draw items
+  (`Node::collect()`, `RenderQueue`) and draws them with a `Renderer`. Nodes keep their
+  `doPreDraw()`/`doDraw()`/`doPostDraw()` hooks.
+- Material inheritance follows the scene: a node without a material uses its nearest ancestor's.
+  Before, it used whatever material was applied last (often a previous sibling's).
+- `CompositeNode` uses a material set on it (`setMaterial()` on a group used to be ignored
+  because groups had `setUseMaterial(false)` by default).
 
 ### Added
 

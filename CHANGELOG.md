@@ -8,6 +8,12 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ## [Unreleased]
 
+### Fixed
+
+- Line widths above 1 (`Mesh::setLineWidth`) now work on Windows and Linux: windows no longer
+  request a forward-compatible OpenGL context there (macOS still needs one and keeps
+  1-pixel lines). Scenes with wide lines look different from before.
+
 ## [2.0.0-alpha.2] - 2026-11-22
 
 ### Changed (may require changes in your code)

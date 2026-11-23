@@ -153,8 +153,9 @@ Goal: make the library trustworthy to depend on.
    selection buffer resized without being created (`GL_INVALID_OPERATION`, 40 examples),
    `glLineWidth` > 1 in a forward-compatible context (`GL_INVALID_VALUE`, 7 examples -
    wide lines never worked), `glViewport` with the camera's unset -1 size.
-   *Open decision:* drop `GLFW_OPENGL_FORWARD_COMPAT` on Windows/Linux so line widths > 1
-   take effect (changes how those scenes look; macOS stays at 1 pixel).
+   *Decided:* `GLFW_OPENGL_FORWARD_COMPAT` is only requested on macOS (required there for
+   core profiles), so line widths > 1 take effect on Windows and Linux; macOS stays at
+   1 pixel (`RenderContext::wideLinesSupported()`).
 6. **Error-handling policy.** *Done (policy + loaders):* C++23; `ivf::Result<T>` =
    `std::expected<T, ivf::Error>` (code + message) in `ivf/result.h`; `makeError()` logs and
    returns. Converted: `Texture::fromFile/load/loadHDR`, `Cubemap::load/loadFromDirectory`,

@@ -70,7 +70,13 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmoni
 {
     // Core profile; the version is chosen below (stock shaders need GLSL 4.00).
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    // Forward compatibility only where required (macOS core profiles). Elsewhere it would
+    // make glLineWidth() reject widths above 1 (see RenderContext::wideLinesSupported()).
+#ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_TRUE);
+#else
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GLFW_FALSE);
+#endif
     const bool debugContext = debugContextRequested();
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, debugContext ? GLFW_TRUE : GLFW_FALSE);
 

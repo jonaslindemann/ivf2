@@ -259,6 +259,37 @@ Goal: make the library trustworthy to depend on.
      sets matrix and material and calls their `doDraw()`; library nodes get real
      `collect()` implementations over time. Behaviour changes: sorted draw order, no GL
      state carried between nodes, GPU objects not available directly after `create()`.
+   - **Extension model:** ivf2 stays a library, not a closed engine. Nodes remain plain
+     C++ subclasses with virtual hooks; an extension picks the lowest level that fits:
+     1. *Geometry node* - subclass `MeshNode`, fill the mesh in `doSetup()`, set a local
+        bounding box (as `Cube` does today; unchanged). Shadows, culling, selection and
+        sorting come for free; `mesh()->end()` only marks the mesh dirty, so creating the
+        node needs no GL context and calling `refresh()` every frame (animation,
+        deformers) costs one upload before the next draw.
+     2. *Own GL drawing* - subclass `TransformNode` and override `doDraw()` (as `TextNode`,
+        `Skybox`, `ParticleSystem` today; unchanged). The renderer wraps it in a callback
+        item: sets the world matrix, applies material and textures, calls `doDraw()`,
+        restores state. A bounding box enables culling; `setTransparent()` and
+        `setCastsShadows()` choose bucket and passes. Nodes whose drawing depends on the
+        pass override `doDraw(DrawContext &)` (pass, `RenderContext`, view/projection);
+        its default calls `doDraw()`.
+     3. *Own queue items* - override `collect(RenderCollector &, const CollectState &)` to
+        emit several items or decide per frame (one item per particle emitter, LOD,
+        chunked point clouds). Items carry a mesh or a draw function.
+
+     Beyond nodes: appearance through `ShaderMaterial` (no subclass needed; sorting by
+     program makes custom shaders cheap), custom passes and queue inspection through the
+     public `Renderer`, and hosts can call collect/execute directly (`embedding1`).
+     `scene->draw()` and plain OpenGL in `onDraw()` keep working.
+   - **Design rules** (to keep it open):
+     1. Nodes are plain subclasses: no registration, no type ids, no `final` classes.
+     2. `DrawItem`, `RenderCollector`, `CollectState`, `DrawContext` and `Renderer` are
+        public, documented API, not internals.
+     3. Built-in nodes use only these public hooks; a library node needing a private
+        shortcut means a public hook is missing.
+     4. Overriding `doDraw()` is supported permanently (callback items are not deprecated).
+     5. The renderer has no hidden global state; everything goes through the
+        `RenderContext` it is given.
    - **Steps** (each its own commit, CI and visual tests green):
      1. Lazy GPU upload in `Mesh`.
      2. `DrawItem`, `RenderQueue`, `collect()`, main pass only, no culling or sorting -
@@ -269,6 +300,8 @@ Goal: make the library trustworthy to depend on.
      5. Sorting and transparency buckets (intended image changes: update references).
      6. Explicit `RenderContext&` through the new path.
      7. Docs and a stats readout (draw calls, culled items, state changes).
+   - **Decided:** callback items for custom `doDraw()` nodes are kept permanently (design
+     rule 4).
    - **Open decisions** (recommendation first):
      - Material inheritance: keep, but explicit | drop (breaks scenes coloured via a
        parent material).
@@ -276,8 +309,6 @@ Goal: make the library trustworthy to depend on.
      - Meshes used by several windows: one GPU copy per context, created on demand |
        one copy, documented as not shareable.
      - Selection rendered only on mouse movement/clicks | every frame.
-     - Callback items for custom `doDraw()` nodes kept permanently | deprecated once the
-       library nodes have `collect()`.
 2. **Uniform handling.** Cache uniform locations in `Program`; move camera, lights and
    fog into std140 uniform buffers shared by all programs; automatic instancing of
    identical meshes.

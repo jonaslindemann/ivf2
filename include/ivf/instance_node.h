@@ -49,7 +49,7 @@ protected:
     /**
      * @brief Draw the instanced node with this node's transformation.
      */
-    virtual void doDraw();
+    virtual void doDraw() override;
 };
 
 /**

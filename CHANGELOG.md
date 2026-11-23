@@ -46,6 +46,10 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   other generator primitives were approximations): primitives now use the box computed from their
   vertices. Code using scene extents (camera framing, `Extents`) sees the correct size.
 - `MeshNode::updateVertices()` updates the bounding box.
+- Selection on high-DPI displays (macOS Retina): the selection buffer and its viewport now use window
+  coordinates like the mouse position, so hovering and clicking pick the object under the cursor.
+- Hovering only reports a node while the cursor is over the window; outside it (or in hidden
+  windows) the selection buffer was read at undefined pixels.
 - Automatic shadow framing (`LightManager::setAutoCalcBBox(true)`, the default) used an empty,
   infinitely large scene box; it now fits the shadow maps to the scene's bounding boxes, and the
   shadow and main passes use the same light matrix.

@@ -99,7 +99,7 @@ void ivfui::GLFWSceneWindow::setSelectionEnabled(bool enabled)
     // If called after doSetup() (e.g. from onSetup()), the FBO hasn't been
     // initialized yet because doSetup() checks the flag before onSetup() runs.
     if (enabled && width() > 0 && height() > 0)
-        m_bufferSelection->initialize(width(), height());
+        initializeSelectionBuffer();
 }
 
 bool ivfui::GLFWSceneWindow::selectionEnabled() const
@@ -191,8 +191,10 @@ void ivfui::GLFWSceneWindow::renderSelection(bool collectFresh)
 {
     // Draws object ids into the selection buffer (bound by BufferSelection::begin()).
     // Uses the frame's items unless called outside a frame (box selection from input).
+    // The buffer has the window size in screen coordinates, like the mouse position
+    // (on high-DPI displays the framebuffer is larger).
     int w = 0, h = 0;
-    this->getSize(w, h);
+    glfwGetWindowSize(ref(), &w, &h);
     glViewport(0, 0, w, h);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -618,7 +620,7 @@ int ivfui::GLFWSceneWindow::doSetup()
     ivf::logDebug(ivf::logStr("Cursor visible: ", m_cursor->visible()), "GLFWSceneWindow");
 #endif
     if (m_selectionEnabled)
-        m_bufferSelection->initialize(width(), height());
+        initializeSelectionBuffer();
 
     m_frameBuffer->initialize();
     m_frameBuffer->setMultisample(true);
@@ -929,6 +931,26 @@ void ivfui::GLFWSceneWindow::doDrawUi()
     this->doUpdateUi();
 }
 
+void ivfui::GLFWSceneWindow::initializeSelectionBuffer()
+{
+    // Screen coordinates, matching mouse positions and doResize() (not framebuffer pixels)
+    int w = 0, h = 0;
+    glfwGetWindowSize(ref(), &w, &h);
+    if (w > 0 && h > 0)
+        m_bufferSelection->initialize(w, h);
+}
+
+bool ivfui::GLFWSceneWindow::cursorOverWindow()
+{
+    // Outside the content area (or in a hidden window) nothing is under the cursor; reading
+    // the selection buffer there would return undefined pixels.
+    if (glfwGetWindowAttrib(ref(), GLFW_HOVERED) == GLFW_FALSE)
+        return false;
+    int w = 0, h = 0;
+    glfwGetWindowSize(ref(), &w, &h);
+    return mouseX() >= 0 && mouseY() >= 0 && mouseX() < w && mouseY() < h;
+}
+
 void ivfui::GLFWSceneWindow::updateSelection()
 {
     // Render the selection buffer only when the result can have changed: after input
@@ -949,7 +971,7 @@ void ivfui::GLFWSceneWindow::updateSelection()
 
     this->renderSelection(false);
     // Stored in the member: doMouseButton() sends click notifications to it.
-    m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
+    m_currentNode = cursorOverWindow() ? m_bufferSelection->nodeAtPixel(mouseX(), mouseY()) : nullptr;
 
     if (m_currentNode != nullptr)
     {
@@ -1231,7 +1253,7 @@ void ivfui::GLFWSceneWindow::doMouseButton(int button, int action, int mods)
         m_selectionRendering = true;
         m_bufferSelection->begin();
         this->renderSelection(true);
-        m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
+        m_currentNode = cursorOverWindow() ? m_bufferSelection->nodeAtPixel(mouseX(), mouseY()) : nullptr;
         m_bufferSelection->end();
         m_selectionRendering = false;
     }

@@ -103,6 +103,8 @@ private:
     glm::mat4 m_selectionView{0.0f}; ///< View matrix of the last selection render.
     glm::mat4 m_selectionProj{0.0f}; ///< Projection matrix of the last selection render.
     void updateSelection();
+    bool cursorOverWindow();
+    void initializeSelectionBuffer();
 
     void collectScene();
     [[nodiscard]] ivf::Frustum cameraFrustum() const;

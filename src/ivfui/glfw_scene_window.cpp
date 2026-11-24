@@ -218,7 +218,8 @@ void ivfui::GLFWSceneWindow::logRenderStats()
 {
     auto line = [](const char *pass, const ivf::Renderer::Stats &s) {
         return ivf::logStr(pass, " ", s.drawn, "/", s.items, " drawn, ", s.culled, " culled, ", s.drawCalls,
-                           " draw calls, ", s.programChanges, " programs, ", s.materialApplies, " materials");
+                           " draw calls, ", s.programChanges, " programs, ", s.materialApplies, " materials, ",
+                           s.uniformLookups, " uniform lookups");
     };
     ivf::logInfo(ivf::logStr("Frame ", frameCount(), ": ", line("main", m_renderStats.main)), "RenderStats");
     if (m_renderStats.shadow.items > 0)

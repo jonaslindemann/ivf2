@@ -6,6 +6,7 @@
 #include <memory>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 #include <glad/glad.h>
@@ -32,6 +33,17 @@ protected:
     GLuint m_id;                                    ///< OpenGL program object ID.
     bool m_enabled;                                 ///< Whether the program is currently enabled.
     std::string m_infoLog;                          ///< Linker output of the last link().
+
+    /// Hash accepting std::string and std::string_view (lookups without building a string).
+    struct NameHash {
+        using is_transparent = void;
+        std::size_t operator()(std::string_view name) const noexcept
+        {
+            return std::hash<std::string_view>{}(name);
+        }
+    };
+    /// Uniform locations queried so far (including -1 for names the program lacks); cleared by link().
+    std::unordered_map<std::string, GLint, NameHash, std::equal_to<>> m_uniformLocations;
 
 public:
     /**
@@ -111,8 +123,13 @@ public:
 
     /**
      * @brief Get the uniform location for a named variable.
+     *
+     * Locations are cached per program: the driver is asked once per name after each
+     * link(), later calls are a hash lookup. Names the program does not use are cached
+     * too and return -1 (setting a uniform at -1 is a no-op in OpenGL).
+     *
      * @param name Uniform variable name.
-     * @return GLint Uniform location.
+     * @return GLint Uniform location, or -1 if the program has no active uniform of that name.
      */
     GLint uniformLoc(std::string_view name);
 
@@ -275,8 +292,8 @@ public:
     void uniformIntArray(std::string_view name, int count, const int *values);
 
     /**
-     * @brief Set a mat4 array uniform by name.
-     * @param name Uniform variable name.
+     * @brief Set a mat4 array uniform by name (all elements in one call).
+     * @param name Uniform variable name (without index).
      * @param count Number of matrices.
      * @param matrices Pointer to the array of glm::mat4.
      */

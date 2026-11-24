@@ -61,6 +61,7 @@ public:
         std::uint64_t drawCalls{0};       ///< OpenGL draw calls issued (RenderContext::Counters).
         std::uint64_t programChanges{0};  ///< Switches to another shader program.
         std::uint64_t materialApplies{0}; ///< Materials applied (own, inherited or default).
+        std::uint64_t uniformLookups{0};  ///< Uniform locations queried from the driver.
 
         /** @brief Add the counts of another execute() call (e.g. one per shadow light). */
         Stats &operator+=(const Stats &other)
@@ -72,6 +73,7 @@ public:
             drawCalls += other.drawCalls;
             programChanges += other.programChanges;
             materialApplies += other.materialApplies;
+            uniformLookups += other.uniformLookups;
             return *this;
         }
     };

@@ -151,4 +151,5 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
     m_stats.drawCalls = after.drawCalls - before.drawCalls;
     m_stats.programChanges = after.programChanges - before.programChanges;
     m_stats.materialApplies = after.materialApplies - before.materialApplies;
+    m_stats.uniformLookups = after.uniformLookups - before.uniformLookups;
 }

@@ -60,9 +60,14 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   *Windows > Render Statistics* window shows them, and `IVF2_RENDER_STATS=n` logs them every n
   frames. `RenderContext::counters()` gives the running totals. New user guide page
   *Render Queue*.
+- `Program` caches uniform locations: the driver is queried once per name after each `link()`
+  (switching to a `ShaderMaterial` or `BumpMaterial` used to query dozens per draw). Render
+  statistics count the remaining driver queries (`uniformLookups`, *Lookups* column).
 
 ### Fixed
 
+- `Program::uniformLoc()`, `attribId()` and `bindAttribLoc()` passed `std::string_view` data to
+  OpenGL without a terminating null; `uniformMatrix4Array()` sets the whole array in one call.
 - Bounding boxes of `Box`, `RoundedBox` and `Plane` were half their real size (and those of the
   other generator primitives were approximations): primitives now use the box computed from their
   vertices. Code using scene extents (camera framing, `Extents`) sees the correct size.

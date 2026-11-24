@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). 2.2-2.9 not started; **next: 2.2 uniform handling** |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (step 1, location cache, done; next: camera uniform block). 2.3-2.9 not started |
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -439,6 +439,47 @@ Goal: make the library trustworthy to depend on.
 2. **Uniform handling.** Cache uniform locations in `Program`; move camera, lights and
    fog into std140 uniform buffers shared by all programs; automatic instancing of
    identical meshes.
+
+   - **Today:** `Program::uniformLoc()` asked the driver on every call (and logged a debug
+     line). The managers cache the locations of the stock program, but switching programs
+     (`ShaderMaterial::apply()`) re-queries them through `refreshForProgram()` and
+     re-uploads camera and all lights (`LightManager::apply()`: about ten
+     `"dirLights[i].field"` strings built and looked up per light). Fog is not a scene
+     uniform: it exists only as `FogEffect` (post) and in `ParticleSystem`.
+   - **Uniform buffers:** one `std140` block per kind of data, owned by the
+     `RenderContext`, bound to fixed binding points by `Program::link()` when the program
+     declares the block (GLSL 3.30 has no `binding` layout qualifier):
+     `IvfCamera` (0: view, projection, view-projection, view position) and `IvfLights`
+     (1: counts, point/directional/spot arrays, light-space matrices; shadow samplers stay
+     plain uniforms). Unnamed instance blocks keep the member names (`view`,
+     `projection`), so shader code using them is unchanged apart from the declaration.
+     Changing program then needs only the model matrix and material.
+   - **Compatibility:** programs that still declare plain `view`/`projection`/`dirLights[]`
+     uniforms (user shaders in `data/shaders`, examples) keep getting them, through cached
+     locations; `Program` records once after linking which blocks and legacy uniforms it
+     has. `TransformManager::viewMatrix()`/`projectionMatrix()` return mutable references,
+     so the camera block is written when the renderer starts a pass (and when matrices are
+     set through the manager), not only on change notifications.
+   - **Automatic instancing:** opaque mesh items with the same mesh and material and no
+     own drawing are merged into one `drawInstanced()` with per-instance model matrices
+     (the stock and PBR shaders already have `useInstancing` and instance attributes).
+     Needs the renderer to draw mesh items itself (2.1 open item: one item per mesh for
+     `MeshNode`).
+   - **Steps:**
+     1. Uniform location cache. *Done:* `Program` caches locations per name (also misses,
+        as -1) in a map with heterogeneous lookup, cleared by `link()` (shader hot reload);
+        no debug line per lookup; `uniformMatrix4Array()` sets the array in one call;
+        string views are passed to OpenGL null-terminated. `RenderContext::Counters` and
+        `Renderer::Stats` count driver lookups (`uniformLookups`, *Lookups* column):
+        shader_material1 70 -> 0 per frame, bump1 49 -> 0, reflection1 44 -> 0. All
+        examples pixel-identical (transparency1 and mip_bloom1 vary by 1/255 between runs
+        of the same build on this GPU).
+     2. Camera uniform block (`IvfCamera`) in the stock, PBR and bump shaders; the
+        renderer writes it per pass.
+     3. Lights uniform block (`IvfLights`); `LightManager::apply()` writes the buffer once
+        per frame instead of uploading per program; per-program legacy upload only for
+        shaders without the block.
+     4. Automatic instancing (after one item per mesh for `MeshNode`).
 3. **HDR pipeline.** Float render targets, exposure and tone mapping (ACES/AgX) as the
    final post step, MSAA resolve and FXAA/SMAA option.
 4. **Image-based lighting.** Load HDR environment maps (`.hdr`/`.exr`), precompute

@@ -110,6 +110,7 @@ Every `Renderer::execute()` records what it did in `renderer.stats()`:
 | `drawCalls` | OpenGL draw calls (meshes, text, billboards, particles, skybox) |
 | `programChanges` | Switches to another shader program |
 | `materialApplies` | Materials applied (own, inherited or default) |
+| `uniformLookups` | Uniform locations queried from the driver; `Program` caches them, so this is normally 0 after the first frame |
 
 `GLFWSceneWindow` collects them for each frame:
 

@@ -160,6 +160,7 @@ public:
         std::uint64_t drawCalls{0};       ///< glDraw* calls by meshes, text, billboards, particles, skybox.
         std::uint64_t programChanges{0};  ///< Program::use() calls that switched to another program.
         std::uint64_t materialApplies{0}; ///< Materials applied to nodes (own, inherited or default).
+        std::uint64_t uniformLookups{0};  ///< Uniform locations queried from the driver (cache misses).
     };
 
     /** @brief Totals since the context was created. */
@@ -172,6 +173,12 @@ public:
     void countDrawCall()
     {
         ++m_counters.drawCalls;
+    }
+
+    /** @brief Count a uniform location queried from the driver (called by Program::uniformLoc()). */
+    void countUniformLookup()
+    {
+        ++m_counters.uniformLookups;
     }
 
     /** @brief Count a material applied to a node. */

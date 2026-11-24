@@ -16,7 +16,7 @@ void statsRow(const char *pass, const ivf::Renderer::Stats &stats)
     ImGui::TextUnformatted(pass);
     for (const auto value : {std::uint64_t(stats.items), std::uint64_t(stats.drawn), std::uint64_t(stats.culled),
                              std::uint64_t(stats.skipped), stats.drawCalls, stats.programChanges,
-                             stats.materialApplies})
+                             stats.materialApplies, stats.uniformLookups})
     {
         ImGui::TableNextColumn();
         ImGui::Text("%llu", static_cast<unsigned long long>(value));
@@ -40,9 +40,9 @@ void RenderStatsWindow::doDraw()
         return;
 
     constexpr ImGuiTableFlags flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingFixedFit;
-    if (ImGui::BeginTable("render_stats", 8, flags))
+    if (ImGui::BeginTable("render_stats", 9, flags))
     {
-        for (const char *heading : {"Pass", "Items", "Drawn", "Culled", "Skipped", "Draw calls", "Programs", "Materials"})
+        for (const char *heading : {"Pass", "Items", "Drawn", "Culled", "Skipped", "Draw calls", "Programs", "Materials", "Lookups"})
             ImGui::TableSetupColumn(heading);
         ImGui::TableHeadersRow();
 
@@ -56,4 +56,5 @@ void RenderStatsWindow::doDraw()
 
     ImGui::TextDisabled("Frame = shadow + reflection + main. Selection is rendered after input only.");
     ImGui::TextDisabled("Programs: shader program switches. Materials: materials applied.");
+    ImGui::TextDisabled("Lookups: uniform locations queried from the driver (not yet cached).");
 }

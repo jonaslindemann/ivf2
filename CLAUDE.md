@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and **phase 2 item 2 (uniform handling: cached uniform locations, std140 uniform buffers for camera/lights/fog, automatic instancing) is next**. The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
+Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and **phase 2 item 2 (uniform handling) is in progress**: step 1 (cached uniform locations in `Program`) is done, next are std140 uniform blocks for camera and lights, then automatic instancing. The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
 
 ## Build Commands
 

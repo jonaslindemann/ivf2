@@ -54,6 +54,7 @@ bool Program::link()
         glAttachShader(m_id, m_shaders[i]->id());
 
     glLinkProgram(m_id);
+    m_uniformLocations.clear(); // a new program object: locations may differ
     glLabel(GL_PROGRAM, m_id, m_name);
 
     GLint result = GL_FALSE;
@@ -112,20 +113,26 @@ void ivf::Program::setEnabled(bool enabled)
 
 void ivf::Program::bindAttribLoc(GLuint idx, std::string_view name)
 {
-    GL_ERR(glBindAttribLocation(m_id, idx, name.data()));
+    GL_ERR(glBindAttribLocation(m_id, idx, std::string(name).c_str()));
 }
 
 GLint Program::attribId(std::string_view name)
 {
-    GL_ERR(GLint id = glGetAttribLocation(m_id, name.data()));
+    GL_ERR(GLint id = glGetAttribLocation(m_id, std::string(name).c_str()));
     return id;
 }
 
 GLint Program::uniformLoc(std::string_view name)
 {
-    logDebugfc("Program", "Getting uniform location for {} in {}", name, this->name());
+    if (auto it = m_uniformLocations.find(name); it != m_uniformLocations.end())
+        return it->second;
 
-    GL_ERR(GLint id = glGetUniformLocation(m_id, name.data()));
+    // std::string: glGetUniformLocation needs a null-terminated name, a string_view may not be.
+    std::string key(name);
+    GL_ERR(GLint id = glGetUniformLocation(m_id, key.c_str()));
+    if (auto *context = RenderContext::current())
+        context->countUniformLookup();
+    m_uniformLocations.emplace(std::move(key), id);
     return id;
 }
 
@@ -231,7 +238,7 @@ void ivf::Program::uniformMat4(GLint id, const glm::mat4 matrix)
 
 void ivf::Program::uniformIntArray(std::string_view name, int count, const int *values)
 {
-    GLint location = glGetUniformLocation(m_id, name.data());
+    GLint location = uniformLoc(name);
     if (location != -1)
     {
         glUniform1iv(location, count, values);
@@ -240,10 +247,10 @@ void ivf::Program::uniformIntArray(std::string_view name, int count, const int *
 
 void ivf::Program::uniformMatrix4Array(std::string_view name, int count, const glm::mat4 *matrices)
 {
-    for (int i = 0; i < count; i++)
-    {
-        uniformMatrix4(std::string(name) + "[" + std::to_string(i) + "]", matrices[i]);
-    }
+    // Elements of a uniform array of a basic type have consecutive locations; one call sets them all.
+    GLint location = uniformLoc(std::string(name) + "[0]");
+    if (location != -1)
+        glUniformMatrix4fv(location, count, GL_FALSE, glm::value_ptr(matrices[0]));
 }
 
 void ivf::Program::printAttribs()

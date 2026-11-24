@@ -376,12 +376,12 @@ void ivf::Mesh::updateNormals()
     }
 }
 
-Mesh::GpuCopy *Mesh::gpuCopy()
+Mesh::GpuCopy *Mesh::gpuCopy(RenderContext &renderContext)
 {
     if (m_dataVersion == 0)
         return nullptr; // nothing defined yet
 
-    RenderContext *context = RenderContext::currentOrFallback();
+    RenderContext *context = &renderContext;
 
     // Copies of destroyed contexts were freed with them: just forget them
     std::erase_if(m_gpu, [](const std::unique_ptr<GpuCopy> &copy) {
@@ -518,24 +518,35 @@ void Mesh::release(GpuCopy &copy)
 
 void Mesh::draw()
 {
-    drawImpl(0);
+    drawImpl(*RenderContext::currentOrFallback(), 0);
+}
+
+void Mesh::draw(RenderContext &context)
+{
+    drawImpl(context, 0);
 }
 
 void Mesh::drawInstanced(GLsizei instanceCount)
 {
     if (instanceCount > 0)
-        drawImpl(instanceCount);
+        drawImpl(*RenderContext::currentOrFallback(), instanceCount);
+}
+
+void Mesh::drawInstanced(RenderContext &context, GLsizei instanceCount)
+{
+    if (instanceCount > 0)
+        drawImpl(context, instanceCount);
 }
 
 VertexArray *Mesh::vertexArray()
 {
-    GpuCopy *copy = gpuCopy();
+    GpuCopy *copy = gpuCopy(*RenderContext::currentOrFallback());
     return copy != nullptr ? copy->vao.get() : nullptr;
 }
 
-void Mesh::drawImpl(GLsizei instanceCount)
+void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount)
 {
-    GpuCopy *gpu = gpuCopy();
+    GpuCopy *gpu = gpuCopy(context);
     if (gpu == nullptr)
         return; // never defined with end()
 
@@ -556,7 +567,7 @@ void Mesh::drawImpl(GLsizei instanceCount)
         glDepthFunc(m_depthFunc);
 
     // Widths above 1 are an error in forward-compatible contexts (see wideLinesSupported()).
-    const bool wideLine = m_lineWidth != 1.0f && RenderContext::currentOrFallback()->wideLinesSupported();
+    const bool wideLine = m_lineWidth != 1.0f && context.wideLinesSupported();
     if (wideLine)
         glLineWidth(m_lineWidth);
 
@@ -605,6 +616,7 @@ void Mesh::drawImpl(GLsizei instanceCount)
         }
     }
     gpu->vao->unbind();
+    context.countDrawCall();
 
     if (m_clockwise)
         glFrontFace(GL_CCW);
@@ -618,12 +630,14 @@ void Mesh::drawImpl(GLsizei instanceCount)
 
 void ivf::Mesh::drawAsPrim(GLuint prim)
 {
-    GpuCopy *gpu = gpuCopy();
+    RenderContext &context = *RenderContext::currentOrFallback();
+    GpuCopy *gpu = gpuCopy(context);
     if (gpu == nullptr)
         return;
     gpu->vao->bind();
     glDrawArrays(prim, 0, static_cast<GLsizei>(m_verts->rows()));
     gpu->vao->unbind();
+    context.countDrawCall();
 }
 
 void ivf::Mesh::setPos(glm::vec3 pos)

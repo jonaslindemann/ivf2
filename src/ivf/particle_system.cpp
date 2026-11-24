@@ -1,6 +1,7 @@
 #include <ivf/particle_system.h>
 #include <ivf/texture.h>
 #include <ivf/transform_manager.h>
+#include <ivf/render_context.h>
 #include <ivf/shader_manager.h>
 #include <ivf/logger.h>
 #include <ivf/utils.h>
@@ -322,6 +323,8 @@ void ParticleSystem::doDraw()
     glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
 
     glUseProgram(m_program);
+    if (auto *context = RenderContext::current())
+        context->countProgramUse(m_program);
     glUniformMatrix4fv(glGetUniformLocation(m_program, "viewProj"), 1, GL_FALSE, glm::value_ptr(vp));
     glUniformMatrix4fv(glGetUniformLocation(m_program, "view"),     1, GL_FALSE, glm::value_ptr(xfm.viewMatrix()));
     glUniform1i(glGetUniformLocation(m_program, "billboard"), m_billboard ? 1 : 0);
@@ -344,6 +347,8 @@ void ParticleSystem::doDraw()
 
     glBindVertexArray(m_vao);
     glDrawArraysInstanced(GL_TRIANGLES, 0, 6, idx);
+    if (auto *context = RenderContext::current())
+        context->countDrawCall();
     glBindVertexArray(0);
 
     glDepthMask(GL_TRUE);

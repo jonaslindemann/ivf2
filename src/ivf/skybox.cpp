@@ -1,6 +1,7 @@
 #include <ivf/skybox.h>
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
+#include <ivf/render_context.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -104,6 +105,8 @@ void Skybox::doDraw()
     glDepthFunc(GL_LEQUAL);
 
     glUseProgram(m_program);
+    if (auto *context = RenderContext::current())
+        context->countProgramUse(m_program);
     glUniformMatrix4fv(glGetUniformLocation(m_program, "inverseProjection"), 1, GL_FALSE,
                        glm::value_ptr(inverseProjection));
     glUniformMatrix4fv(glGetUniformLocation(m_program, "inverseView"), 1, GL_FALSE,
@@ -115,6 +118,8 @@ void Skybox::doDraw()
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
+    if (auto *context = RenderContext::current())
+        context->countDrawCall();
     glBindVertexArray(0);
 
     m_cubemap->unbind();

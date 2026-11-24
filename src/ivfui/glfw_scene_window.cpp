@@ -18,7 +18,9 @@ using namespace ivfui;
 #include <ivf/transform_manager.h>
 #include <ivf/composite_node.h>
 
+#include <algorithm>
 #include <cmath>
+#include <cstdlib>
 #include <vector>
 #include <glm/gtx/intersect.hpp>
 
@@ -47,7 +49,15 @@ GLFWSceneWindow::GLFWSceneWindow(int width, int height, const std::string &title
       m_lockPosXZ(false), m_currentIntersectionPoint(0.0f, 0.0f, 0.0f), m_inputDialog(nullptr), m_effects()
 {
     m_scene = ivf::CompositeNode::create();
-    m_renderer.setTransparencyBlending(true);
+    if (auto context = renderContext())
+    {
+        // Passes draw into this window's context, never the current one
+        m_renderer.emplace(*context, ivf::RenderPass::Main);
+        m_renderer->setTransparencyBlending(true);
+        m_selectionRenderer.emplace(*context, ivf::RenderPass::Selection);
+    }
+    if (const char *interval = std::getenv("IVF2_RENDER_STATS"))
+        m_renderStatsInterval = std::max(0, std::atoi(interval));
     m_camManip = ivfui::CameraManipulator::create(this->ref());
     m_bufferSelection = ivf::BufferSelection::create(m_scene);
     m_frameBuffer = ivf::FrameBuffer::create(width, height);
@@ -156,38 +166,65 @@ void ivfui::GLFWSceneWindow::clearReflections()
 
 void ivfui::GLFWSceneWindow::collectScene()
 {
+    auto *xfm = renderContext()->transforms();
     m_queue.clear();
     ivf::CollectState state;
-    state.world = TransformManager::instance()->modelMatrix();
+    state.world = xfm->modelMatrix();
     m_scene->collect(m_queue, state);
     // Layers, then opaque by program/material front to back, transparent back to front
-    m_queue.sortForView(TransformManager::instance()->viewPos());
+    m_queue.sortForView(xfm->viewPos());
 }
 
 void ivfui::GLFWSceneWindow::renderReflections()
 {
+    m_renderStats.reflection = {};
     for (auto &reflection : m_reflections)
-        reflection->render(m_queue);
+    {
+        reflection->render(*renderContext(), m_queue);
+        m_renderStats.reflection += reflection->stats();
+    }
 }
 
 ivf::Frustum ivfui::GLFWSceneWindow::cameraFrustum() const
 {
-    auto &xfm = *TransformManager::instance();
-    return ivf::Frustum(xfm.projectionMatrix() * xfm.viewMatrix());
+    auto *xfm = renderContext()->transforms();
+    return ivf::Frustum(xfm->projectionMatrix() * xfm->viewMatrix());
 }
 
 void ivfui::GLFWSceneWindow::renderScenePasses()
 {
-    // One traversal per frame; the shadow, reflection and main passes draw the same items
-    smApplyProgram("basic");
-    collectScene();
-    LightManager::instance()->renderShadowMaps(m_queue);
-    renderReflections();
-    m_renderer.execute(m_queue, cameraFrustum());
+    if (!m_renderer)
+        return; // no render context (OpenGL failed to load)
 
-    auto &xfm = *TransformManager::instance();
-    glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
-    DebugDraw::instance()->flush(vp, {0, 0, float(width()), float(height())}, float(frameTime()));
+    // One traversal per frame; the shadow, reflection and main passes draw the same items
+    auto &context = *renderContext();
+    context.shaders()->applyProgram("basic");
+    collectScene();
+    context.lights()->renderShadowMaps(context, m_queue);
+    m_renderStats.shadow = context.lights()->shadowStats();
+    renderReflections();
+    m_renderer->execute(m_queue, cameraFrustum());
+    m_renderStats.main = m_renderer->stats();
+
+    auto *xfm = context.transforms();
+    glm::mat4 vp = xfm->projectionMatrix() * xfm->viewMatrix();
+    context.debugDraw()->flush(vp, {0, 0, float(width()), float(height())}, float(frameTime()));
+
+    if (m_renderStatsInterval > 0 && frameCount() % m_renderStatsInterval == 0)
+        logRenderStats();
+}
+
+void ivfui::GLFWSceneWindow::logRenderStats()
+{
+    auto line = [](const char *pass, const ivf::Renderer::Stats &s) {
+        return ivf::logStr(pass, " ", s.drawn, "/", s.items, " drawn, ", s.culled, " culled, ", s.drawCalls,
+                           " draw calls, ", s.programChanges, " programs, ", s.materialApplies, " materials");
+    };
+    ivf::logInfo(ivf::logStr("Frame ", frameCount(), ": ", line("main", m_renderStats.main)), "RenderStats");
+    if (m_renderStats.shadow.items > 0)
+        ivf::logInfo(line("  shadow", m_renderStats.shadow), "RenderStats");
+    if (m_renderStats.reflection.items > 0)
+        ivf::logInfo(line("  reflection", m_renderStats.reflection), "RenderStats");
 }
 
 void ivfui::GLFWSceneWindow::renderSelection(bool collectFresh)
@@ -206,10 +243,13 @@ void ivfui::GLFWSceneWindow::renderSelection(bool collectFresh)
     glClearColor(m_clearColor.r, m_clearColor.g, m_clearColor.b, m_clearColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    smApplyProgram("basic");
+    if (!m_selectionRenderer)
+        return;
+    renderContext()->shaders()->applyProgram("basic");
     if (collectFresh)
         collectScene();
-    m_selectionRenderer.execute(m_queue, cameraFrustum());
+    m_selectionRenderer->execute(m_queue, cameraFrustum());
+    m_renderStats.selection = m_selectionRenderer->stats();
 }
 
 // EffectListProvider interface implementation
@@ -557,6 +597,12 @@ void ivfui::GLFWSceneWindow::showSceneInspector()
     m_sceneInspector->show();
 }
 
+void ivfui::GLFWSceneWindow::showRenderStats()
+{
+    if (m_renderStatsWindow)
+        m_renderStatsWindow->show();
+}
+
 void ivfui::GLFWSceneWindow::zoomToExtent(bool includeInvisible)
 {
     m_camManip->zoomToExtent(m_scene, includeInvisible);
@@ -654,6 +700,11 @@ int ivfui::GLFWSceneWindow::doSetup()
     m_sceneInspector->setRootNode(m_scene);
 
     this->addUiWindow(m_sceneInspector);
+
+    m_renderStatsWindow = ivfui::RenderStatsWindow::create(&m_renderStats);
+    m_renderStatsWindow->hide();
+
+    this->addUiWindow(m_renderStatsWindow);
 
     this->doPreSetup();
     auto retVal = onSetup();

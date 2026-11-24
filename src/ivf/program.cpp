@@ -1,5 +1,6 @@
 #include <ivf/program.h>
 #include <ivf/gl_debug.h>
+#include <ivf/render_context.h>
 
 using namespace ivf;
 
@@ -93,6 +94,8 @@ void Program::use()
     if (m_enabled)
     {
         glUseProgram(m_id);
+        if (auto *context = RenderContext::current())
+            context->countProgramUse(m_id);
         this->doParams();
     }
 }

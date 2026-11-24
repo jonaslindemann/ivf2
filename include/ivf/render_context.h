@@ -6,6 +6,7 @@
 
 #include <glad/glad.h>
 
+#include <cstdint>
 #include <memory>
 #include <functional>
 #include <optional>
@@ -150,6 +151,57 @@ public:
     bool wideLinesSupported();
 
     /**
+     * @brief Running totals of drawing work done in this context.
+     *
+     * Renderer::stats() reports the difference over one execute() call. The totals only
+     * grow; compare two snapshots to measure any stretch of code.
+     */
+    struct Counters {
+        std::uint64_t drawCalls{0};       ///< glDraw* calls by meshes, text, billboards, particles, skybox.
+        std::uint64_t programChanges{0};  ///< Program::use() calls that switched to another program.
+        std::uint64_t materialApplies{0}; ///< Materials applied to nodes (own, inherited or default).
+    };
+
+    /** @brief Totals since the context was created. */
+    [[nodiscard]] const Counters &counters() const
+    {
+        return m_counters;
+    }
+
+    /** @brief Count one draw call (called by the code issuing it). */
+    void countDrawCall()
+    {
+        ++m_counters.drawCalls;
+    }
+
+    /** @brief Count a material applied to a node. */
+    void countMaterialApply()
+    {
+        ++m_counters.materialApplies;
+    }
+
+    /**
+     * @brief Count a program change if @p program differs from the last one counted.
+     *
+     * Called by Program::use(). Renderer::execute() calls resetProgramTracking() first, as
+     * code may bind programs directly with glUseProgram().
+     */
+    void countProgramUse(GLuint program)
+    {
+        if (program != m_lastProgram)
+        {
+            ++m_counters.programChanges;
+            m_lastProgram = program;
+        }
+    }
+
+    /** @brief Set the program countProgramUse() compares with (the one bound right now). */
+    void resetProgramTracking(GLuint current)
+    {
+        m_lastProgram = current;
+    }
+
+    /**
      * @brief The current context, or a process-wide fallback context if none is current.
      *
      * Used by the singleton accessors for backwards compatibility. The fallback is
@@ -174,6 +226,8 @@ private:
     GLuint m_fallbackTexture2D{0};
     GLuint m_fallbackCubemap{0};
     std::optional<bool> m_wideLines; ///< Queried on first use.
+    Counters m_counters;             ///< See counters().
+    GLuint m_lastProgram{0};         ///< Last program seen by countProgramUse().
     std::shared_ptr<const int> m_lifetime{std::make_shared<const int>(0)}; ///< See lifetime().
     std::vector<std::function<void()>> m_deleteLater;                       ///< See deleteLater().
 

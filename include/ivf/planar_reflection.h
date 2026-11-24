@@ -9,6 +9,7 @@
 #include <ivf/framebuffer.h>
 #include <ivf/node.h>
 #include <ivf/render_queue.h>
+#include <ivf/renderer.h>
 
 #include <glm/glm.hpp>
 
@@ -52,6 +53,7 @@ private:
     int m_height{0};
 
     std::vector<std::weak_ptr<Node>> m_hiddenNodes;
+    Renderer::Stats m_stats; ///< Counts of the last render().
 
 public:
     /**
@@ -108,19 +110,28 @@ public:
     /**
      * @brief Render the scene mirrored in the plane, using the current camera.
      *
-     * Reads the camera from TransformManager and restores the camera, framebuffer
-     * binding, viewport and node visibility afterwards.
+     * Collects the scene and calls render(RenderContext &, const RenderQueue &) with the
+     * current RenderContext.
      * @param scene Scene to render.
      */
     void render(CompositeNodePtr scene);
 
     /**
-     * @brief Render collected draw items mirrored in the plane, using the current camera.
+     * @brief Render collected draw items mirrored in the plane, using the camera of @p context.
      *
-     * Items of the hidden nodes (see addHiddenNode()) and of their descendants are left out.
+     * Reads the camera from the context's TransformManager and restores the camera,
+     * framebuffer binding and viewport afterwards. Items of the hidden nodes (see
+     * addHiddenNode()) and of their descendants are left out.
+     * @param context Render context to draw into.
      * @param queue Items of the scene (see Node::collect()), shared with the other passes.
      */
-    void render(const RenderQueue &queue);
+    void render(RenderContext &context, const RenderQueue &queue);
+
+    /** @brief Counts of the last render() (zero while disabled). */
+    [[nodiscard]] const Renderer::Stats &stats() const
+    {
+        return m_stats;
+    }
 
     /**
      * @brief Reflection color texture, 0 before the first render().

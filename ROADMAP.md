@@ -272,8 +272,10 @@ Goal: make the library trustworthy to depend on.
         item: sets the world matrix, applies material and textures, calls `doDraw()`,
         restores state. A bounding box enables culling; `setTransparent()` and
         `setCastsShadows()` choose bucket and passes. Nodes whose drawing depends on the
-        pass override `doDraw(DrawContext &)` (pass, `RenderContext`, view/projection);
-        its default calls `doDraw()`.
+        pass override `doDrawPass(const DrawContext &)` (pass, `RenderContext`, item,
+        view/projection); its default calls `doDraw()`. (Named `doDrawPass` rather than a
+        `doDraw` overload: overloading a virtual hides it in every subclass that overrides
+        `doDraw()`, which `-Woverloaded-virtual` reports.)
      3. *Own queue items* - override `collect(RenderQueue &, const CollectState &)` to
         emit several items or decide per frame (one item per particle emitter, LOD,
         chunked point clouds). Items carry a mesh or a draw function.
@@ -348,8 +350,25 @@ Goal: make the library trustworthy to depend on.
         leftover state). New example `transparency1`. Changed images: mip_bloom1 (blend
         order), animation2 (trace colour). Still open: one item per mesh for `MeshNode`
         (per-mesh materials of loaded models are not sorted separately), PBR alpha.
-     6. Explicit `RenderContext&` through the new path.
-     7. Docs and a stats readout (draw calls, culled items, state changes).
+     6. Explicit `RenderContext&` through the new path. *Done (renderer and passes):*
+        `Renderer(RenderContext &, RenderPass)` uses only its context (transforms, default
+        material, statistics); `LightManager::renderShadowMaps(context, queue)`,
+        `PlanarReflection::render(context, queue)`, `Node::draw(context)` and
+        `Mesh::draw(context)`/`drawInstanced(context, n)` take it explicitly;
+        `GLFWSceneWindow` passes its own context. Public `DrawContext` (`draw_context.h`:
+        context, `RenderPass`, item, view, projection) reaches nodes through
+        `Node::doDrawPass()`, whose default calls `doDraw()`. Materials (`Material::apply()`)
+        and the other node hooks keep using the current context: giving them a context
+        parameter would stop user overrides of the argument-less hooks from being called.
+        That moves with real `collect()` implementations (mesh items drawn by the renderer
+        itself) later. All 52 examples pixel-identical.
+     7. Docs and a stats readout (draw calls, culled items, state changes). *Done:*
+        `Renderer::Stats` adds draw calls, program changes and material applications
+        (differences of `RenderContext::counters()`, counted by meshes, text, billboards,
+        particles, skybox and `Program::use()`); `LightManager::shadowStats()`,
+        `PlanarReflection::stats()`, `GLFWSceneWindow::renderStats()` (`RenderStats` per
+        pass), a *Render Statistics* window and `IVF2_RENDER_STATS=n` logging. User guide
+        page *Render Queue* (frame, layers, extension levels, own passes, statistics).
    - **Decided:** callback items for custom `doDraw()` nodes are kept permanently (design
      rule 4).
    - **Decided - material inheritance** (inheritance follows the scene, not the drawing

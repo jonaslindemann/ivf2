@@ -51,6 +51,7 @@ nav = [
     { "Model Loading" = "advanced/model_loading.md" },
     { "Visitors" = "advanced/visitor_pattern.md" },
     { "Render Context" = "advanced/render_context.md" },
+    { "Render Queue" = "advanced/render_queue.md" },
     { "Diagnostics" = "advanced/diagnostics.md" },
     { "Error Handling" = "advanced/error_handling.md" },
   ] },

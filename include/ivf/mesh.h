@@ -109,10 +109,10 @@ private:
     /**
      * @brief Draw the mesh, instanced when @p instanceCount is greater than 0.
      */
-    void drawImpl(GLsizei instanceCount);
+    void drawImpl(RenderContext &context, GLsizei instanceCount);
 
-    /// GPU copy for the current context, created or updated as needed (nullptr before end()).
-    GpuCopy *gpuCopy();
+    /// GPU copy for @p context, created or updated as needed (nullptr before end()).
+    GpuCopy *gpuCopy(RenderContext &context);
     /// Create the buffers of @p copy from the CPU data (the copy's context is current).
     void upload(GpuCopy &copy);
     /// Release the GL objects of @p copy in the right context.
@@ -413,9 +413,17 @@ public:
     void updateNormals();
 
     /**
-     * @brief Draw the mesh using the current OpenGL state.
+     * @brief Draw the mesh using the current OpenGL state, in the current RenderContext.
      */
     void draw();
+
+    /**
+     * @brief Draw the mesh into @p context (its OpenGL context must be current).
+     *
+     * Uses (and if needed creates or updates) the mesh's GPU copy for that context.
+     * @param context Render context to draw into.
+     */
+    void draw(RenderContext &context);
 
     /**
      * @brief Draw @p instanceCount instances of the mesh in one draw call.
@@ -425,6 +433,13 @@ public:
      * @param instanceCount Number of instances to draw.
      */
     void drawInstanced(GLsizei instanceCount);
+
+    /**
+     * @brief Draw @p instanceCount instances of the mesh into @p context.
+     * @param context Render context to draw into (its OpenGL context must be current).
+     * @param instanceCount Number of instances to draw.
+     */
+    void drawInstanced(RenderContext &context, GLsizei instanceCount);
 
     /**
      * @brief Get the vertex array object of the mesh in the current context.

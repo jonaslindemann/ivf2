@@ -3,6 +3,7 @@
 #include <ivf/material.h>
 #include <ivf/mesh_node.h>
 #include <ivf/node.h>
+#include <ivf/render_context.h>
 #include <ivf/transform_manager.h>
 
 #include <glad/glad.h>
@@ -16,8 +17,17 @@ void Renderer::execute(const RenderQueue &queue, const SkipFn &skip)
 
 void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const SkipFn &skip)
 {
-    auto *xfm = TransformManager::instance();
+    RenderContext &ctx = *m_context;
+    auto *xfm = ctx.transforms();
     const glm::mat4 start = xfm->modelMatrix();
+    const glm::mat4 view = xfm->viewMatrix();
+    const glm::mat4 projection = xfm->projectionMatrix();
+
+    // Statistics: differences of the context's running totals over this call
+    GLint boundProgram = 0;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &boundProgram);
+    ctx.resetProgramTracking(static_cast<GLuint>(boundProgram));
+    const RenderContext::Counters before = ctx.counters();
 
     m_stats = Stats{};
     m_stats.items = queue.size();
@@ -92,14 +102,18 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
         const bool inheritTextures = item.textureSource != nullptr && item.textureSource != node &&
                                      !node->m_useTexture;
         if (inheritMaterial)
+        {
             inherited->apply();
+            ctx.countMaterialApply();
+        }
         if (inheritTextures)
             item.textureSource->bindTextures();
 
-        auto drawNode = [node] {
+        const DrawContext drawContext{ctx, m_pass, item, view, projection};
+        auto drawNode = [node, &drawContext] {
             node->doPreDraw();
             if (node->m_visible)
-                node->doDraw();
+                node->doDrawPass(drawContext);
             node->doPostDraw();
         };
 
@@ -132,4 +146,9 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
 
     setTransparentState(false);
     xfm->setModelMatrix(start);
+
+    const RenderContext::Counters &after = ctx.counters();
+    m_stats.drawCalls = after.drawCalls - before.drawCalls;
+    m_stats.programChanges = after.programChanges - before.programChanges;
+    m_stats.materialApplies = after.materialApplies - before.materialApplies;
 }

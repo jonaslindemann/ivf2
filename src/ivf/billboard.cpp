@@ -1,5 +1,6 @@
 #include <ivf/billboard.h>
 #include <ivf/transform_manager.h>
+#include <ivf/render_context.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -132,6 +133,8 @@ void Billboard::doDraw()
     glm::mat4 vp = xfm.projectionMatrix() * xfm.viewMatrix();
 
     glUseProgram(m_program);
+    if (auto *context = RenderContext::current())
+        context->countProgramUse(m_program);
     glUniformMatrix4fv(glGetUniformLocation(m_program, "viewProj"), 1, GL_FALSE, glm::value_ptr(vp));
     glUniformMatrix4fv(glGetUniformLocation(m_program, "view"),     1, GL_FALSE, glm::value_ptr(xfm.viewMatrix()));
     glUniform3fv(glGetUniformLocation(m_program, "worldPos"), 1, glm::value_ptr(m_pos));
@@ -152,6 +155,8 @@ void Billboard::doDraw()
 
     glBindVertexArray(m_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    if (auto *context = RenderContext::current())
+        context->countDrawCall();
     glBindVertexArray(0);
 
     glDepthMask(GL_TRUE);
@@ -159,6 +164,8 @@ void Billboard::doDraw()
 
     if (m_texture) m_texture->unbind();
     glUseProgram(0);
+    if (auto *context = RenderContext::current())
+        context->countProgramUse(0);
 }
 
 } // namespace ivf

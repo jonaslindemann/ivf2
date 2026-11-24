@@ -8,6 +8,7 @@
 #include <ivf/spot_light.h>
 #include <ivf/composite_node.h>
 #include <ivf/render_queue.h>
+#include <ivf/renderer.h>
 
 #include <string>
 #include <vector>
@@ -58,6 +59,7 @@ private:
     GLint m_lightSpaceMatrixId; ///< Shader uniform location for light space matrix.
     bool m_autoCalcBBox{true};  ///< Whether to auto-calculate scene bounding box.
     BoundingBox m_sceneBBox;    ///< Scene bounding box for shadow mapping.
+    Renderer::Stats m_shadowStats; ///< Counts of the last renderShadowMaps(), all lights.
     int m_debugShadow{0};       ///< Debug flag for shadow rendering.
 
     LightManager();                  ///< Private constructor for singleton pattern.
@@ -201,16 +203,28 @@ public:
     /**
      * @brief Render shadow maps for all lights in the scene.
      *
-     * Collects the scene into a render queue and calls renderShadowMaps(const RenderQueue &).
+     * Collects the scene into a render queue and calls
+     * renderShadowMaps(RenderContext &, const RenderQueue &) with the current RenderContext.
      * @param scene Shared pointer to the scene's composite node.
      */
     void renderShadowMaps(CompositeNodePtr scene);
 
     /**
      * @brief Render shadow maps for all shadow-casting lights from collected draw items.
+     * @param context Render context to draw into (the one owning this LightManager).
      * @param queue Items of the scene (see Node::collect()), shared with the other passes.
      */
-    void renderShadowMaps(const RenderQueue &queue);
+    void renderShadowMaps(RenderContext &context, const RenderQueue &queue);
+
+    /**
+     * @brief Counts of the last renderShadowMaps(), added up over all shadow-casting lights.
+     *
+     * Zero when shadows are off.
+     */
+    [[nodiscard]] const Renderer::Stats &shadowStats() const
+    {
+        return m_shadowStats;
+    }
 
     /**
      * @brief Set the diffuse color for materials.

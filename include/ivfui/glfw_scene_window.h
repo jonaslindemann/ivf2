@@ -30,6 +30,9 @@
 #include <ivfui/effect_inspector.h>
 #include <ivfui/ui_menu.h>
 #include <ivfui/ui_input_dialog.h>
+#include <ivfui/render_stats_window.h>
+
+#include <optional>
 
 namespace ivfui {
 
@@ -95,8 +98,12 @@ private:
     std::vector<ivf::PlanarReflectionPtr> m_reflections; ///< Reflection passes rendered before the scene.
 
     ivf::RenderQueue m_queue; ///< Scene items collected once per frame, shared by all passes.
-    ivf::Renderer m_renderer;          ///< Draws m_queue in the colour passes (blends transparent items).
-    ivf::Renderer m_selectionRenderer; ///< Draws m_queue into the selection buffer (no blending).
+    std::optional<ivf::Renderer> m_renderer;          ///< Main pass (blends transparent items); this window's context.
+    std::optional<ivf::Renderer> m_selectionRenderer; ///< Selection pass (no blending); this window's context.
+    ivf::RenderStats m_renderStats;                   ///< Counts of the last frame's passes.
+    RenderStatsWindowPtr m_renderStatsWindow;         ///< Readout of m_renderStats (Windows menu).
+    int m_renderStatsInterval{0};                     ///< IVF2_RENDER_STATS: log every n frames (0: off).
+    void logRenderStats();
 
     // Selection is rendered on demand: after mouse movement, button presses, resizing,
     // or when the camera changed since the last selection render.
@@ -469,6 +476,23 @@ public:
      * @brief Show scene inspector window UI.
      */
     void showSceneInspector();
+
+    /**
+     * @brief Show the render statistics window (also in the Windows menu).
+     */
+    void showRenderStats();
+
+    /**
+     * @brief What the render passes drew in the last frame.
+     *
+     * Items, culled items, draw calls, program changes and material applications of the
+     * shadow, reflection and main passes, plus the last selection render. Setting the
+     * environment variable IVF2_RENDER_STATS=n logs them every n frames.
+     */
+    [[nodiscard]] const ivf::RenderStats &renderStats() const
+    {
+        return m_renderStats;
+    }
 
     /**
      * @brief Show grid snap value dialog.

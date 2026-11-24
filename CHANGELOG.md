@@ -50,6 +50,16 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   (`multi_window1` shares a floor between two windows).
 - `RenderContext::lifetime()` and `RenderContext::deleteLater()` for objects that hold GL
   resources in several contexts.
+- The renderer draws into an explicit render context: `Renderer(RenderContext &, RenderPass)`,
+  `LightManager::renderShadowMaps(context, queue)`, `PlanarReflection::render(context, queue)`,
+  `Node::draw(context)`, `Mesh::draw(context)`. Nodes can override `Node::doDrawPass(const
+  DrawContext &)` to see the pass (`RenderPass::Main`, `Shadow`, `Reflection`, `Selection`),
+  the render context and the camera; its default calls `doDraw()`.
+- Render statistics: `Renderer::stats()` also counts draw calls, shader program changes and
+  material applications; `GLFWSceneWindow::renderStats()` reports them per pass, the
+  *Windows > Render Statistics* window shows them, and `IVF2_RENDER_STATS=n` logs them every n
+  frames. `RenderContext::counters()` gives the running totals. New user guide page
+  *Render Queue*.
 
 ### Fixed
 

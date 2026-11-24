@@ -266,15 +266,17 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     if (!m_useShadows || !scene)
         return;
 
+    RenderContext &context = *RenderContext::currentOrFallback();
     RenderQueue queue;
     CollectState state;
-    state.world = TransformManager::instance()->modelMatrix();
+    state.world = context.transforms()->modelMatrix();
     scene->collect(queue, state);
-    renderShadowMaps(queue);
+    renderShadowMaps(context, queue);
 }
 
-void LightManager::renderShadowMaps(const RenderQueue &queue)
+void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &queue)
 {
+    m_shadowStats = Renderer::Stats{};
     if (!m_useShadows)
         return;
 
@@ -308,7 +310,7 @@ void LightManager::renderShadowMaps(const RenderQueue &queue)
 
     // Use the current shader (stock shader)
 
-    ProgramPtr shader = ShaderManager::instance()->currentProgram();
+    ProgramPtr shader = context.shaders()->currentProgram();
 
     // Save current OpenGL state
 
@@ -320,7 +322,7 @@ void LightManager::renderShadowMaps(const RenderQueue &queue)
     GLint previousFramebuffer = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
 
-    Renderer renderer;
+    Renderer renderer(context, RenderPass::Shadow);
 
     // For each shadow-casting light:
 
@@ -351,6 +353,7 @@ void LightManager::renderShadowMaps(const RenderQueue &queue)
         // Render the scene
 
         renderer.execute(queue, Frustum(lightSpaceMatrix)); // only what the light sees
+        m_shadowStats += renderer.stats();
 
         // Reset shader mode
 

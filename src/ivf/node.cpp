@@ -1,5 +1,6 @@
 #include <ivf/node.h>
 
+#include <ivf/render_context.h>
 #include <ivf/renderer.h>
 #include <ivf/selection_manager.h>
 #include <ivf/transform_manager.h>
@@ -19,12 +20,18 @@ void Node::setParent(std::shared_ptr<Node> parent)
 
 void Node::draw()
 {
+    draw(*RenderContext::currentOrFallback());
+}
+
+void Node::draw(RenderContext &context)
+{
+    auto *xfm = context.transforms();
     RenderQueue queue;
     CollectState state;
-    state.world = TransformManager::instance()->modelMatrix();
+    state.world = xfm->modelMatrix();
     collect(queue, state);
-    queue.sortForView(TransformManager::instance()->viewPos());
-    Renderer renderer;
+    queue.sortForView(xfm->viewPos());
+    Renderer renderer(context);
     renderer.setTransparencyBlending(true);
     renderer.execute(queue);
 }
@@ -255,7 +262,11 @@ void Node::doPreDraw()
     SelectionManager::instance()->setObjectId(m_objectId);
 
     if ((m_material != nullptr) && (m_useMaterial))
+    {
         m_material->apply();
+        if (auto *context = RenderContext::current())
+            context->countMaterialApply();
+    }
     
     // Use bindTextures instead of single texture bind
     if (m_useTexture)
@@ -264,6 +275,11 @@ void Node::doPreDraw()
 
 void ivf::Node::doDraw()
 {}
+
+void ivf::Node::doDrawPass(const DrawContext & /*context*/)
+{
+    doDraw();
+}
 
 void ivf::Node::unbindTextures()
 {

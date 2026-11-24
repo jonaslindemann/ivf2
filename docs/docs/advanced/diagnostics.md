@@ -101,6 +101,7 @@ These environment variables, read when a window is created, let you run any ivf2
 | `IVF2_GL_DEBUG=1` / `0` | Force OpenGL debug output on / off |
 | `IVF2_TRACE_INPUT=1` | Log mouse button events and, while a button is held, per frame whether the UI blocks the camera and how long the UI, drawing, ImGui viewports and buffer swap take |
 | `IVF2_IMGUI_VIEWPORTS=0` | Keep ImGui windows inside the main window (no separate platform windows) |
+| `IVF2_RENDER_STATS=N` | Log every N frames what the render passes drew: items, culled items, draw calls, program changes and materials (see [Render Queue](render_queue.md#statistics)) |
 
 For example, in PowerShell:
 

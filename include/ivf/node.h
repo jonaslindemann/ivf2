@@ -22,6 +22,9 @@
 
 namespace ivf {
 
+class RenderContext;
+struct DrawContext;
+
 template <typename T>
 concept ValidNodeType = std::is_base_of_v<Node, T>;
 
@@ -69,9 +72,19 @@ public:
      * @brief Draw the node (and, for containers, its children) to the screen.
      *
      * Collects the node into a RenderQueue (see collect()) and draws it with a Renderer,
-     * starting from the current model matrix.
+     * starting from the current model matrix. Uses the current RenderContext; see
+     * draw(RenderContext &).
      */
     void draw();
+
+    /**
+     * @brief Draw the node (and, for containers, its children) into @p context.
+     *
+     * Like draw(), with an explicit render context (RenderPass::Main, no culling). The
+     * context's OpenGL context must be current.
+     * @param context Render context to draw into.
+     */
+    void draw(RenderContext &context);
 
     /**
      * @brief Add this node's draw items to @p queue.
@@ -313,6 +326,17 @@ protected:
      * @brief Called to perform the actual drawing of the node. Override to implement custom drawing.
      */
     virtual void doDraw();
+
+    /**
+     * @brief Draw the node for one pass of a Renderer. The default calls doDraw().
+     *
+     * Override it instead of doDraw() when the drawing depends on the pass (for example,
+     * nothing in RenderPass::Shadow) or when the node should use the renderer's
+     * RenderContext (@c context.context) instead of the manager singletons. Called between
+     * doPreDraw() and doPostDraw(), only for visible nodes.
+     * @param context Render context, pass, item and camera of this drawing.
+     */
+    virtual void doDrawPass(const DrawContext &context);
 
     /**
      * @brief Called after drawing the node. Override to perform actions after drawing.

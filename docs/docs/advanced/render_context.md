@@ -74,7 +74,7 @@ auto xfm = ctx->transforms();
 xfm->enableProjectionMatrix(); xfm->identity(); xfm->perspective(45.0f, aspect, 0.1f, 100.0f);
 xfm->enableViewMatrix();       xfm->identity(); xfm->lookAt(eye, target);
 xfm->enableModelMatrix();      xfm->identity();
-scene->draw();
+scene->draw(*ctx);               // or collect and run the passes yourself (Render Queue page)
 
 // 4. On shutdown, release ivf objects while the GL context is still current.
 scene.reset();
@@ -87,5 +87,6 @@ Pass `nullptr` to `create()` if the host has already loaded the OpenGL functions
 
 - **Current context.** `RenderContext::current()` returns the context made current on the calling thread with `makeCurrent()`. It is per thread, like OpenGL's own current context.
 - **No current context.** If a manager is requested while no context is current, a process-wide fallback context is created once and a warning is logged. This keeps old code working but should be avoided.
-- **Creating nodes.** Primitives upload their geometry when they are created, so create nodes while the window's (or host's) context is current - in `onSetup()` or later, not in a window constructor.
+- **Creating nodes.** Meshes are uploaded to the GPU when they are first drawn, once per context that draws them, so geometry nodes can be created before any window exists and shown in several windows. Textures, fonts and shader materials still need a current context when they are created - create them in `onSetup()` or later.
+- **Explicit context.** The drawing code takes the render context as a parameter instead of looking up the current one: `Renderer` (constructed with a context), `LightManager::renderShadowMaps(context, queue)`, `PlanarReflection::render(context, queue)`, `Node::draw(context)` and `Mesh::draw(context)`. Nodes that override `doDrawPass()` get it as `DrawContext::context`. Materials and the other node hooks still use the current context, so make the context current before drawing (see [Render Queue](render_queue.md)).
 - **Fallback textures.** The 1×1 textures bound to unused material slots (`fallbackTexture2D()`, `fallbackCubemap()`) are also per context.

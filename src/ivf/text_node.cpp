@@ -3,6 +3,7 @@
 #include <ivf/config.h>
 #include <ivf/font_manager.h>
 #include <ivf/shader_manager.h>
+#include <ivf/render_context.h>
 
 #if IVF2_HAS_FREETYPE
 #include <ft2build.h>
@@ -315,6 +316,8 @@ void ivf::TextNode::doDraw()
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexVBO);
         GL_ERR(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0));
+        if (auto *context = RenderContext::current())
+            context->countDrawCall();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         x += (ch.glyphAdvance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th

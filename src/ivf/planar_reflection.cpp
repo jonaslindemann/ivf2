@@ -1,5 +1,6 @@
 #include <ivf/planar_reflection.h>
 
+#include <ivf/render_context.h>
 #include <ivf/renderer.h>
 #include <ivf/transform_manager.h>
 
@@ -143,15 +144,17 @@ void PlanarReflection::render(CompositeNodePtr scene)
     if (!m_enabled || !scene)
         return;
 
+    RenderContext &context = *RenderContext::currentOrFallback();
     RenderQueue queue;
     CollectState state;
-    state.world = TransformManager::instance()->modelMatrix();
+    state.world = context.transforms()->modelMatrix();
     scene->collect(queue, state);
-    render(queue);
+    render(context, queue);
 }
 
-void PlanarReflection::render(const RenderQueue &queue)
+void PlanarReflection::render(RenderContext &context, const RenderQueue &queue)
 {
+    m_stats = Renderer::Stats{};
     if (!m_enabled)
         return;
 
@@ -183,7 +186,7 @@ void PlanarReflection::render(const RenderQueue &queue)
     m_width = width;
     m_height = height;
 
-    auto xfm = TransformManager::instance();
+    auto *xfm = context.transforms();
     const glm::mat4 view = xfm->viewMatrix();
     const glm::mat4 projection = xfm->projectionMatrix();
     const glm::vec3 viewPos = xfm->viewPos();
@@ -225,9 +228,10 @@ void PlanarReflection::render(const RenderQueue &queue)
     xfm->refreshForProgram();
 
     // Cull with the mirrored camera (oblique projection: nothing below the plane)
-    Renderer renderer;
+    Renderer renderer(context, RenderPass::Reflection);
     renderer.setTransparencyBlending(true);
     renderer.execute(queue, Frustum(xfm->projectionMatrix() * xfm->viewMatrix()), isHidden);
+    m_stats = renderer.stats();
 
     // Restore
     xfm->viewMatrix() = view;

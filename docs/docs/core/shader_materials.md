@@ -147,7 +147,7 @@ layout(std140) uniform IvfCamera {
 
 The block has no instance name, so the members are used like plain uniforms (`projection * view * p`). In C++ shader strings, `IVF_CAMERA_BLOCK_GLSL` from `<ivf/uniform_blocks.h>` expands to this declaration. Older shaders that declare plain `uniform mat4 view, projection;` and `uniform vec3 viewPos;` instead still get them set (the `ripple` shader does); a program can't have both.
 
-The standard light and material uniforms are only uploaded after `setUseLighting(true)`, so unlit shaders don't need to declare them.
+The standard light and material uniforms are only uploaded after `setUseLighting(true)`, so unlit shaders don't need to declare them. A lit shader gets the lights from the `IvfLights` uniform block: in C++ shader strings, `IVF_LIGHTS_BLOCK_GLSL` declares the `PointLight`, `DirLight` and `SpotLight` structs and the block with the arrays `pointLights`, `dirLights`, `spotLights`, `lightSpaceMatrices` and the counts `pointLightCount`, `dirLightCount`, `spotLightCount` (see `include/ivf/uniform_blocks.h` for the members). Shadow maps stay ordinary samplers: `uniform sampler2D shadowMaps[IVF_MAX_DIR_LIGHTS];`, where `shadowMaps[i]` belongs to `dirLights[i]`. Shaders that declare the light arrays as plain uniforms (the layout before the block) still get every light uploaded.
 
 ### A complete example
 

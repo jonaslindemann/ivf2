@@ -6,6 +6,11 @@
 #include <ivf/renderer.h>
 #include <ivf/transform_manager.h>
 #include <ivf/shadow_shaders.h>
+#include <ivf/gl_debug.h>
+
+#include <algorithm>
+#include <array>
+#include <cstring>
 
 
 using namespace ivf;
@@ -44,6 +49,12 @@ LightManager::LightManager()
     m_alphaId = ShaderManager::instance()->currentProgram()->uniformLoc("material.alpha");
 
     this->setupDefaultColors();
+}
+
+LightManager::~LightManager()
+{
+    if (m_lightsBuffer != 0)
+        glDeleteBuffers(1, &m_lightsBuffer);
 }
 
 PointLightPtr ivf::LightManager::addPointLight()
@@ -117,6 +128,7 @@ void ivf::LightManager::clearPointLights()
         m_pointLights[i]->apply();
     }
     m_pointLights.clear();
+    syncLightsBlock();
 }
 
 void ivf::LightManager::clearDirectionalLights()
@@ -127,6 +139,7 @@ void ivf::LightManager::clearDirectionalLights()
         m_dirLights[i]->apply();
     }
     m_dirLights.clear();
+    syncLightsBlock();
 }
 
 void ivf::LightManager::clearSpotLights()
@@ -137,6 +150,7 @@ void ivf::LightManager::clearSpotLights()
         m_spotLights[i]->apply();
     }
     m_spotLights.clear();
+    syncLightsBlock();
 }
 
 void ivf::LightManager::clearLights()
@@ -187,77 +201,178 @@ void ivf::LightManager::setupDefaultColors()
     this->setAlpha(1.0);
 }
 
+LightsBlock LightManager::buildLightsBlock()
+{
+    LightsBlock block;
+
+    const int points = std::min(static_cast<int>(m_pointLights.size()), MaxPointLights);
+    for (int i = 0; i < points; i++)
+    {
+        auto &light = *m_pointLights[i];
+        auto &data = block.pointLights[i];
+        data.position = light.position();
+        data.enabled = light.enabled() ? 1 : 0;
+        data.ambientColor = light.ambientColor();
+        data.diffuseColor = light.diffuseColor();
+        data.specularColor = light.specularColor();
+        data.constant = light.constAttenuation();
+        data.linear = light.linearAttenutation();
+        data.quadratic = light.quadraticAttenuation();
+    }
+
+    const int dirs = std::min(static_cast<int>(m_dirLights.size()), MaxDirLights);
+    for (int i = 0; i < dirs; i++)
+    {
+        auto &light = *m_dirLights[i];
+        auto &data = block.dirLights[i];
+        data.direction = light.direction();
+        data.enabled = light.enabled() ? 1 : 0;
+        data.ambientColor = light.ambientColor();
+        data.diffuseColor = light.diffuseColor();
+        data.specularColor = light.specularColor();
+        data.castShadows = light.castsShadows() ? 1 : 0;
+        data.shadowStrength = light.shadowStrength();
+        // The matrix the shadow pass renders with (renderShadowMaps() uses the same box).
+        if (light.enabled() && light.castsShadows() && light.shadowMap())
+            block.lightSpaceMatrices[i] = light.calculateLightSpaceMatrix(m_sceneBBox);
+    }
+
+    const int spots = std::min(static_cast<int>(m_spotLights.size()), MaxSpotLights);
+    for (int i = 0; i < spots; i++)
+    {
+        auto &light = *m_spotLights[i];
+        auto &data = block.spotLights[i];
+        data.position = light.position();
+        data.enabled = light.enabled() ? 1 : 0;
+        data.direction = light.direction();
+        data.ambientColor = light.ambientColor();
+        data.diffuseColor = light.diffuseColor();
+        data.specularColor = light.specularColor();
+        data.constant = light.constAttenuation();
+        data.linear = light.linearAttenutation();
+        data.quadratic = light.quadraticAttenuation();
+        data.cutOff = glm::cos(glm::radians(light.innerCutoff()));
+        data.outerCutOff = glm::cos(glm::radians(light.outerCutoff()));
+    }
+
+    block.pointLightCount = points;
+    block.dirLightCount = dirs;
+    block.spotLightCount = spots;
+    return block;
+}
+
+void LightManager::syncLightsBlock()
+{
+    const LightsBlock block = buildLightsBlock();
+
+    if (m_lightsBlockValid && std::memcmp(&block, &m_lightsBlock, sizeof(LightsBlock)) == 0)
+        return; // unchanged: no upload
+
+    if (m_lightsBuffer == 0)
+    {
+        if (glGenBuffers == nullptr)
+            return; // no OpenGL functions loaded (GL-free tests)
+        glGenBuffers(1, &m_lightsBuffer);
+        glBindBuffer(GL_UNIFORM_BUFFER, m_lightsBuffer);
+        glBufferData(GL_UNIFORM_BUFFER, sizeof(LightsBlock), nullptr, GL_DYNAMIC_DRAW);
+        glLabel(GL_BUFFER, m_lightsBuffer, LightsBlockName);
+    }
+    else
+        glBindBuffer(GL_UNIFORM_BUFFER, m_lightsBuffer);
+
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(LightsBlock), &block);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBindBufferBase(GL_UNIFORM_BUFFER, LightsBlockBinding, m_lightsBuffer);
+
+    m_lightsBlock = block;
+    m_lightsBlockValid = true;
+    if (auto *context = RenderContext::current())
+        context->countLightsBlockUpload();
+}
+
+const LightsBlock &LightManager::lightsBlock() const
+{
+    return m_lightsBlock;
+}
+
+void LightManager::applyLegacyUniforms(Program &program)
+{
+    program.uniformInt("pointLightCount", static_cast<int>(m_pointLights.size()));
+    program.uniformInt("dirLightCount", static_cast<int>(m_dirLights.size()));
+    program.uniformInt("spotLightCount", static_cast<int>(m_spotLights.size()));
+
+    for (auto &light : m_pointLights)
+        light->apply();
+    for (auto &light : m_dirLights)
+        light->apply();
+    for (auto &light : m_spotLights)
+        light->apply();
+
+    program.uniformMatrix4Array("lightSpaceMatrices", MaxDirLights, m_lightsBlock.lightSpaceMatrices);
+}
+
+namespace {
+
+/// True if the program declares plain light uniforms (an old shader without the IvfLights block).
+bool hasLegacyLightUniforms(Program &program)
+{
+    // Block members have no location of their own, so these are -1 for block programs.
+    for (const char *name : {"pointLightCount", "dirLightCount", "spotLightCount", "pointLights[0].enabled",
+                             "dirLights[0].enabled", "spotLights[0].enabled"})
+        if (program.uniformLoc(name) != -1)
+            return true;
+    return false;
+}
+
+} // namespace
+
 void ivf::LightManager::apply()
 {
-    ShaderManager::instance()->currentProgram()->uniformInt(m_pointLightCountId, static_cast<int>(m_pointLights.size()));
-    ShaderManager::instance()->currentProgram()->uniformInt(m_directionalLightCountId, static_cast<int>(m_dirLights.size()));
-    ShaderManager::instance()->currentProgram()->uniformInt(m_spotLightCountId, static_cast<int>(m_spotLights.size()));
-
     for (size_t i = 0; i < m_pointLights.size(); i++)
-    {
         m_pointLights[i]->setIndex(static_cast<int>(i));
-        m_pointLights[i]->apply();
-    }
-
     for (size_t i = 0; i < m_dirLights.size(); i++)
-    {
         m_dirLights[i]->setIndex(static_cast<int>(i));
-        m_dirLights[i]->apply();
-    }
-
     for (size_t i = 0; i < m_spotLights.size(); i++)
-    {
         m_spotLights[i]->setIndex(static_cast<int>(i));
-        m_spotLights[i]->apply();
-    }
 
-    // Set shadow map textures
-    GLuint textureUnit = 1; // Assuming 0 is used for regular textures
+    syncLightsBlock();
 
-    // Create arrays to pass to shader
-    std::vector<int> shadowMapTextureUnits;
-    std::vector<glm::mat4> lightSpaceMatrices;
+    auto program = ShaderManager::instance()->currentProgram();
+    if (!program)
+        return;
 
-    for (size_t i = 0; i < m_dirLights.size(); i++)
+    if (hasLegacyLightUniforms(*program))
+        applyLegacyUniforms(*program);
+
+    // Shadow maps: samplers cannot be in a uniform block. dirLights[i] uses shadowMaps[i]
+    // on texture unit 1 + i (unit 0 is used for regular textures).
+    std::array<int, MaxDirLights> shadowMapUnits{};
+    bool anyShadows = false;
+    const int dirs = std::min(static_cast<int>(m_dirLights.size()), MaxDirLights);
+    for (int i = 0; i < dirs; i++)
     {
-        if (!m_dirLights[i]->enabled() || !m_dirLights[i]->castsShadows() || !m_dirLights[i]->shadowMap())
+        auto &light = m_dirLights[i];
+        if (!light->enabled() || !light->castsShadows() || !light->shadowMap())
             continue;
 
-        std::string prefix = "dirLights[" + std::to_string(i) + "].";
+        const int unit = 1 + i;
+        glActiveTexture(GL_TEXTURE0 + unit);
+        glBindTexture(GL_TEXTURE_2D, light->shadowMap()->depthTexture());
+        shadowMapUnits[i] = unit;
 
-        // Activate texture unit and bind shadow map
-
-        glActiveTexture(GL_TEXTURE0 + textureUnit);
-        glBindTexture(GL_TEXTURE_2D, m_dirLights[i]->shadowMap()->depthTexture());
-
-        // Store texture unit and light space matrix
-
-        shadowMapTextureUnits.push_back(textureUnit);
-        lightSpaceMatrices.push_back(m_dirLights[i]->shadowMap()->lightSpaceMatrix());
-
-        ShaderManager::instance()->currentProgram()->uniformBool(prefix + "castsShadows", true);
-        ShaderManager::instance()->currentProgram()->uniformBool("useShadows", true);
-
-        // Pass light space matrix
-
-        ShaderManager::instance()->currentProgram()->uniformMatrix4(
-            "lightSpaceMatrix", m_dirLights[i]->calculateLightSpaceMatrix(m_sceneBBox));
-
-        // Only using one shadow map for now, but you could use multiple
-
-        textureUnit++;
-        // break;
+        if (!anyShadows)
+        {
+            // Single matrix of the first shadow-casting light (used by the debug views).
+            program->uniformMatrix4("lightSpaceMatrix", m_lightsBlock.lightSpaceMatrices[i]);
+            anyShadows = true;
+        }
     }
+    glActiveTexture(GL_TEXTURE0);
 
-    // Set shadow map arrays to shader
-    if (!shadowMapTextureUnits.empty())
+    if (anyShadows)
     {
-        // Set the array of shadow map samplers
-        ShaderManager::instance()->currentProgram()->uniformIntArray("shadowMaps", static_cast<int>(shadowMapTextureUnits.size()),
-                                                                     shadowMapTextureUnits.data());
-
-        ShaderManager::instance()->currentProgram()->uniformMatrix4Array(
-            "lightSpaceMatrices", static_cast<int>(lightSpaceMatrices.size()), lightSpaceMatrices.data());
+        program->uniformBool("useShadows", true);
+        program->uniformIntArray("shadowMaps", MaxDirLights, shadowMapUnits.data());
     }
 }
 

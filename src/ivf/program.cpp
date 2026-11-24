@@ -84,6 +84,9 @@ bool Program::link()
         const GLuint cameraBlock = glGetUniformBlockIndex(m_id, CameraBlockName);
         if (cameraBlock != GL_INVALID_INDEX)
             glUniformBlockBinding(m_id, cameraBlock, CameraBlockBinding);
+        const GLuint lightsBlock = glGetUniformBlockIndex(m_id, LightsBlockName);
+        if (lightsBlock != GL_INVALID_INDEX)
+            glUniformBlockBinding(m_id, lightsBlock, LightsBlockBinding);
     }
 
     return result == GL_TRUE;

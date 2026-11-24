@@ -39,8 +39,10 @@ namespace ivf {
  * - Provided automatically: `uniform mat4 model;` and the camera block `IvfCamera` (`view`,
  *   `projection`, `viewProjection`, `viewPos`; see ivf/uniform_blocks.h). Plain `view`,
  *   `projection` and `viewPos` uniforms are still set for shaders that declare them instead.
- * - The stock lighting uniforms (light arrays, `material.*`) are uploaded only when
- *   setUseLighting(true) is set, so unlit shaders do not need to declare them.
+ * - The stock lighting uniforms (`material.*`, `useLighting`) and the lights are provided
+ *   only when setUseLighting(true) is set, so unlit shaders do not need to declare them.
+ *   Lights come from the `IvfLights` uniform block (IVF_LIGHTS_BLOCK_GLSL); shaders that
+ *   declare plain light arrays instead still get them uploaded.
  *
  * Uniforms a shader does not declare are ignored, so one set of global uniforms
  * (e.g. time or music envelopes, see setGlobalUniform()) can feed every shader.

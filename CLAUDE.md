@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and **phase 2 item 2 (uniform handling) is in progress**: steps 1-2 (cached uniform locations in `Program`, `IvfCamera` uniform block) are done, next is the lights uniform block, then automatic instancing. The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
+Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and **phase 2 item 2 (uniform handling) is in progress**: steps 1-3 (cached uniform locations in `Program`, `IvfCamera` and `IvfLights` uniform blocks) are done; next is automatic instancing, which first needs the 2.1 open item "one item per mesh for `MeshNode`". The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
 
 ## Build Commands
 
@@ -161,7 +161,7 @@ GLFW3, GLM (`glm::glm`, the only math library — also used by the generator), O
 
 ## Shaders
 
-Camera data reaches shaders through the std140 uniform block `IvfCamera` (`view`, `projection`, `viewProjection`, `viewPos`; `include/ivf/uniform_blocks.h`, `IVF_CAMERA_BLOCK_GLSL` for C++ shader strings), bound by `Program::link()` and written by `TransformManager::syncCameraBlock()`. New shaders declare the block instead of plain `view`/`projection`/`viewPos` uniforms (those still work for old shaders, but a program can't mix both); don't set camera uniforms by name on the built-in programs.
+Camera data reaches shaders through the std140 uniform block `IvfCamera` (`view`, `projection`, `viewProjection`, `viewPos`; `include/ivf/uniform_blocks.h`, `IVF_CAMERA_BLOCK_GLSL` for C++ shader strings), bound by `Program::link()` and written by `TransformManager::syncCameraBlock()`. New shaders declare the block instead of plain `view`/`projection`/`viewPos` uniforms (those still work for old shaders, but a program can't mix both); don't set camera uniforms by name on the built-in programs. Lights likewise come from `IvfLights` (`IVF_LIGHTS_BLOCK_GLSL`: light structs, `pointLights`/`dirLights`/`spotLights`, `lightSpaceMatrices`, counts; binding 1), written by `LightManager::apply()`/`syncLightsBlock()` when lights changed; shadow map samplers stay plain uniforms (`shadowMaps[i]` on unit 1 + i for `dirLights[i]`). Programs with plain light uniforms still get the old per-light upload.
 
 The library's built-in shaders are embedded as C++ string constants (`stock_shaders.h`, `pbr_shaders.h`, `post_shaders.h`, ...). File-based shaders used by examples live in `data/shaders/` and are copied next to the executables at build time (`copy_example_assets` / `ivf2_copy_runtime_files`) and installed with the library; `ShaderManager::compileProgramFromFiles` (returns `Result<ProgramPtr>`) resolves them relative to the working directory. Example models, textures and sounds are in `examples/assets/`.
 

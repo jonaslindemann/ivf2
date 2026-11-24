@@ -54,59 +54,8 @@ in vec3 vNormal;
 in vec2 texCoord;
 in vec4 instanceColor;
 
-// ---- Light structs (identical names to basic shader so LightManager works) -
-
-struct DirLight
-{
-    bool  enabled;
-    vec3  direction;
-    vec3  ambientColor;
-    vec3  diffuseColor;
-    vec3  specularColor;
-    bool  castShadows;
-    mat4  lightSpaceMatrix;
-};
-
-struct PointLight
-{
-    bool  enabled;
-    vec3  position;
-    float constant;
-    float linear;
-    float quadratic;
-    vec3  ambientColor;
-    vec3  diffuseColor;
-    vec3  specularColor;
-};
-
-struct SpotLight
-{
-    bool  enabled;
-    vec3  position;
-    vec3  direction;
-    float cutOff;
-    float outerCutOff;
-    float constant;
-    float linear;
-    float quadratic;
-    vec3  ambientColor;
-    vec3  diffuseColor;
-    vec3  specularColor;
-};
-
-// ---- Lighting uniforms (shared with basic shader) --------------------------
-#define NR_POINT_LIGHTS 8
-#define NR_DIR_LIGHTS   8
-#define NR_SPOT_LIGHTS  8
-
-uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform DirLight   dirLights[NR_DIR_LIGHTS];
-uniform SpotLight  spotLights[NR_SPOT_LIGHTS];
-
-uniform int  pointLightCount = 0;
-uniform int  dirLightCount   = 0;
-uniform int  spotLightCount  = 0;
-
+// ---- Lights (IvfLights uniform block, shared with the basic shader) --------
+)" IVF_LIGHTS_BLOCK_GLSL R"(
 uniform bool useLighting     = true;
 uniform bool useVertexColors = false;
 

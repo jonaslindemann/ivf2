@@ -162,6 +162,7 @@ public:
         std::uint64_t materialApplies{0}; ///< Materials applied to nodes (own, inherited or default).
         std::uint64_t uniformLookups{0};  ///< Uniform locations queried from the driver (cache misses).
         std::uint64_t cameraBlockUploads{0}; ///< Uploads of the IvfCamera uniform buffer (camera changes).
+        std::uint64_t lightsBlockUploads{0}; ///< Uploads of the IvfLights uniform buffer (light changes).
     };
 
     /** @brief Totals since the context was created. */
@@ -186,6 +187,12 @@ public:
     void countCameraBlockUpload()
     {
         ++m_counters.cameraBlockUploads;
+    }
+
+    /** @brief Count an upload of the lights uniform block (called by LightManager). */
+    void countLightsBlockUpload()
+    {
+        ++m_counters.lightsBlockUploads;
     }
 
     /** @brief Count a material applied to a node. */

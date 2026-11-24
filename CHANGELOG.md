@@ -36,6 +36,10 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   `view`, `projection` and `viewPos` uniforms. Setting those by name on a built-in program (e.g.
   `program->uniformMatrix4("view", ...)`) no longer has an effect; use `TransformManager`.
   Your own shaders with plain camera uniforms keep working.
+- The built-in stock, PBR and bump shaders read the lights from the `IvfLights` uniform block
+  instead of plain `pointLights[]`/`dirLights[]`/`spotLights[]` uniforms. Call
+  `LightManager::apply()` after changing lights (as before). The PBR shader uses at most 4
+  directional lights (was 8). Your own shaders with plain light uniforms keep working.
 - `CompositeNode` uses a material set on it (`setMaterial()` on a group used to be ignored
   because groups had `setUseMaterial(false)` by default).
 
@@ -73,9 +77,15 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
+- Lights uniform block `IvfLights`: all lights, shadow matrices and counts in one uniform buffer
+  shared by all programs, uploaded by `LightManager::apply()` only when a light changed
+  (`IVF_LIGHTS_BLOCK_GLSL`, `LightsBlock`). Switching to a lit `ShaderMaterial`, `PBRMaterial` or
+  `BumpMaterial` no longer uploads every light to that program.
 
 ### Fixed
 
+- Shadows of a directional light that is not the first shadow caster: shadow maps and their
+  matrices were packed by caster while the shaders read them by light index.
 - `Program::uniformLoc()`, `attribId()` and `bindAttribLoc()` passed `std::string_view` data to
   OpenGL without a terminating null; `uniformMatrix4Array()` sets the whole array in one call.
 - Bounding boxes of `Box`, `RoundedBox` and `Plane` were half their real size (and those of the

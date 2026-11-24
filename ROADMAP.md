@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (steps 1-2, location cache and camera block, done; next: lights block). 2.3-2.9 not started |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (steps 1-3, location cache, camera and lights blocks, done; next: automatic instancing, which needs one item per mesh for `MeshNode`). 2.3-2.9 not started |
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -488,7 +488,22 @@ Goal: make the library trustworthy to depend on.
         `Skybox` and `DebugDraw` (raw programs with their own `viewProj`) are unchanged.
      3. Lights uniform block (`IvfLights`); `LightManager::apply()` writes the buffer once
         per frame instead of uploading per program; per-program legacy upload only for
-        shaders without the block.
+        shaders without the block. *Done:* `LightsBlock` (8 point, 4 directional, 8 spot
+        lights, `lightSpaceMatrices`, counts; binding point 1; `IVF_LIGHTS_BLOCK_GLSL`
+        declares the structs and the block). `LightManager::apply()` builds the block from
+        the lights and uploads it only when it changed (`syncLightsBlock()`, also after
+        `clear*Lights()`); per program it only binds the shadow maps (samplers cannot be
+        in a block) and, for programs that still declare plain light uniforms, uploads
+        every light as before. Stock, PBR and bump shaders use the block; their light
+        structs dropped unused fields (per-light `lightSpaceMatrix`, point/spot
+        `shadowStrength`). Shadow map units and matrices are indexed by light
+        (`shadowMaps[i]`, `lightSpaceMatrices[i]` belong to `dirLights[i]`; before they were
+        packed by shadow caster, which only matched when the casters came first), and the
+        matrices are computed from the same scene box as the shadow pass. PBR now reads at
+        most 4 directional lights (was 8; the stock shader always used 4).
+        `RenderContext::Counters::lightsBlockUploads`. All examples pixel-identical, also
+        with the previous (plain-uniform) stock shader through the legacy path; no GL
+        debug messages.
      4. Automatic instancing (after one item per mesh for `MeshNode`).
 3. **HDR pipeline.** Float render targets, exposure and tone mapping (ACES/AgX) as the
    final post step, MSAA resolve and FXAA/SMAA option.

@@ -8,7 +8,9 @@
 #include <ivf/spot_light.h>
 #include <ivf/composite_node.h>
 #include <ivf/render_queue.h>
+#include <ivf/program.h>
 #include <ivf/renderer.h>
+#include <ivf/uniform_blocks.h>
 
 #include <string>
 #include <vector>
@@ -62,9 +64,34 @@ private:
     Renderer::Stats m_shadowStats; ///< Counts of the last renderShadowMaps(), all lights.
     int m_debugShadow{0};       ///< Debug flag for shadow rendering.
 
+    GLuint m_lightsBuffer{0};       ///< Uniform buffer of the IvfLights block (created on first upload).
+    LightsBlock m_lightsBlock;      ///< Contents last uploaded to m_lightsBuffer.
+    bool m_lightsBlockValid{false}; ///< m_lightsBlock has been uploaded.
+
     LightManager();                  ///< Private constructor for singleton pattern.
 
+    /// Fill a LightsBlock from the current lights.
+    LightsBlock buildLightsBlock();
+
+    /// Upload counts and every light as plain uniforms (programs without the IvfLights block).
+    void applyLegacyUniforms(Program &program);
+
 public:
+    ~LightManager();
+
+    LightManager(const LightManager &) = delete;
+    LightManager &operator=(const LightManager &) = delete;
+
+    /**
+     * @brief Write all lights to the `IvfLights` uniform block (only if they changed).
+     *
+     * Called by apply() and the clear functions. See ivf/uniform_blocks.h.
+     */
+    void syncLightsBlock();
+
+    /** @brief Lights block contents last uploaded by syncLightsBlock(). */
+    [[nodiscard]] const LightsBlock &lightsBlock() const;
+
     /**
      * @brief The LightManager of the current RenderContext (RenderContext::current()->lights()).
      * @return LightManager* Pointer to the manager.
@@ -196,7 +223,13 @@ public:
     void setupDefaultColors();
 
     /**
-     * @brief Apply lighting and material parameters to the current shader.
+     * @brief Make the current lights visible to the shaders.
+     *
+     * Writes the `IvfLights` uniform block (shared by all programs; uploaded only when a
+     * light changed), binds the shadow maps for the current program and, for programs
+     * that declare plain light uniforms (`dirLights[i].diffuseColor`, `pointLightCount`,
+     * ...) instead of the block, uploads every light to that program. Call it after
+     * changing lights.
      */
     void apply();
 

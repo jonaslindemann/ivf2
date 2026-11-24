@@ -48,4 +48,6 @@ spotLight->setEnabled(true);
 
 The `setCutoff` method sets the inner and outer angles of the spotlight. The inner angle is where the light is fully bright, and the outer angle is where the light starts to fade out.
 
-The light manager also provides methods to enable or disable lighting globally. The `setUseLighting` method can be used to enable or disable the lighting system for the entire scene. When lighting is disabled, objects will not be affected by any lights, and their appearance will be based solely on their materials and textures. This is also used internally by the `Material` class to disable lighting for nodes that do not use the lighting system. 
+The light manager also provides methods to enable or disable lighting globally. The `setUseLighting` method can be used to enable or disable the lighting system for the entire scene. When lighting is disabled, objects will not be affected by any lights, and their appearance will be based solely on their materials and textures. This is also used internally by the `Material` class to disable lighting for nodes that do not use the lighting system.
+
+After adding or changing lights, call `lightMgr->apply()`. It writes all lights to the `IvfLights` uniform buffer, which every shader program of the window shares, so switching between materials does not upload the lights again. The shaders read at most 8 point lights, 4 directional lights and 8 spot lights (`ivf::MaxPointLights`, `MaxDirLights`, `MaxSpotLights`); further lights are ignored.

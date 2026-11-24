@@ -68,47 +68,6 @@ struct Material
     float shininess;
 };
 
-struct DirLight
-{
-    bool  enabled;
-    vec3  direction;
-    vec3  ambientColor;
-    vec3  diffuseColor;
-    vec3  specularColor;
-    bool  castShadows;
-    float shadowStrength;
-    mat4  lightSpaceMatrix;
-};
-
-struct PointLight
-{
-    bool  enabled;
-    vec3  position;
-    float constant;
-    float linear;
-    float quadratic;
-    vec3  ambientColor;
-    vec3  diffuseColor;
-    vec3  specularColor;
-    float shadowStrength;
-};
-
-struct SpotLight
-{
-    bool  enabled;
-    vec3  position;
-    vec3  direction;
-    float cutOff;
-    float outerCutOff;
-    float constant;
-    float linear;
-    float quadratic;
-    vec3  ambientColor;
-    vec3  diffuseColor;
-    vec3  specularColor;
-    float shadowStrength;
-};
-
 in vec3 normal;
 in vec3 fragPos;
 in vec4 color;
@@ -129,9 +88,6 @@ uniform bool useFixedTextColor = false;
 uniform float point_falloff_a = 0.0;
 uniform float point_falloff_b = 0.0;
 
-uniform int pointLightCount = 0;
-uniform int dirLightCount   = 0;
-uniform int spotLightCount  = 0;
 
 uniform sampler2D texture0;
 
@@ -146,13 +102,7 @@ uniform sampler2D textures[MAX_TEXTURES];
 uniform int   textureBlendModes[MAX_TEXTURES];
 uniform float textureBlendFactors[MAX_TEXTURES];
 
-#define NR_POINT_LIGHTS 8
-#define NR_DIR_LIGHTS   8
-#define NR_SPOT_LIGHTS  8
-
-uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform DirLight   dirLights[NR_DIR_LIGHTS];
-uniform SpotLight  spotLights[NR_SPOT_LIGHTS];
+)" IVF_LIGHTS_BLOCK_GLSL R"(
 
 uniform Material material;
 
@@ -168,8 +118,7 @@ uniform mat4      lightSpaceMatrix;
 uniform bool      useShadows  = false;
 uniform int       debugShadow = 0;
 
-uniform sampler2D shadowMaps[NR_DIR_LIGHTS];
-uniform mat4      lightSpaceMatrices[NR_DIR_LIGHTS];
+uniform sampler2D shadowMaps[IVF_MAX_DIR_LIGHTS];
 
 uniform samplerCube envMap;
 uniform bool        useEnvMap       = false;

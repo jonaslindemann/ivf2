@@ -1,5 +1,6 @@
 #include <ivf/render_queue.h>
 
+#include <ivf/mesh.h>
 #include <ivf/node.h>
 #include <ivf/shader_material.h>
 
@@ -11,9 +12,11 @@ using namespace ivf;
 
 namespace {
 
-// Material actually used for the item: the node's own, otherwise the inherited one
+// Material actually used for the item: the mesh's own, the node's own, otherwise the inherited one
 const Material *effectiveMaterial(const DrawItem &item)
 {
+    if (item.mesh != nullptr && item.mesh->material())
+        return item.mesh->material().get();
     if (item.node != nullptr && item.node->material() && item.node->useMaterial())
         return item.node->material().get();
     return item.material.get();

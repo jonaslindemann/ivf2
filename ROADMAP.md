@@ -13,15 +13,14 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (steps 1-3, location cache, camera and lights blocks, done; next: automatic instancing, which needs one item per mesh for `MeshNode`). 2.3-2.9 not started |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (steps 1-3, location cache, camera and lights blocks, done; one item per mesh for `MeshNode` done; next: automatic instancing). 2.3-2.9 not started |
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
 
-- Render queue (2.1): one item per mesh for `MeshNode` (per-mesh materials of loaded models
-  sorted separately, materials and meshes drawn with the renderer's explicit context, which
-  completes step B); alpha for the PBR material; `setCastsShadows()` per node;
+- Render queue (2.1): materials applied with the renderer's explicit context (completes
+  step B; meshes already are); alpha for the PBR material; `setCastsShadows()` per node;
   `setMaterialOverride()` (decided, opt-in).
 - Render context (1.2): `ivf::Key`/`ivf::MouseButton`; drop the `instance()` forwarders after
   a deprecation period.
@@ -383,8 +382,18 @@ Goal: make the library trustworthy to depend on.
         generator meshes are clockwise after the Y/Z swap). Nodes with no material at all get
         a neutral default material; `LineTrace` got its own unlit material (it relied on
         leftover state). New example `transparency1`. Changed images: mip_bloom1 (blend
-        order), animation2 (trace colour). Still open: one item per mesh for `MeshNode`
-        (per-mesh materials of loaded models are not sorted separately), PBR alpha.
+        order), animation2 (trace colour). Still open: PBR alpha.
+        *Done later:* one item per mesh for `MeshNode`. `DrawItem::mesh` names the mesh;
+        `MeshNode::collect()` adds an item per enabled mesh (sharing the node's world matrix
+        and box), the mesh's own material decides layer and sort order, and
+        `MeshNode::doDrawPass()` draws only the item's mesh with the renderer's context. The
+        node's hooks still run per item, so subclasses overriding `doPreDraw()`,
+        `doPostDraw()` or `doDraw()` (Axis, Grid, LineTrace, DeformableMeshNode) work
+        unchanged. `Mesh` undoes its material after drawing (a mesh `ShaderMaterial` left
+        its program bound). The model loader gives each further mesh of an Assimp node with
+        a different material its own material (all meshes used to share one node material,
+        overwritten by the last mesh). All examples pixel-identical (their nodes have one
+        mesh each).
      6. Explicit `RenderContext&` through the new path. *Done (renderer and passes):*
         `Renderer(RenderContext &, RenderPass)` uses only its context (transforms, default
         material, statistics); `LightManager::renderShadowMaps(context, queue)`,
@@ -463,8 +472,10 @@ Goal: make the library trustworthy to depend on.
    - **Automatic instancing:** opaque mesh items with the same mesh and material and no
      own drawing are merged into one `drawInstanced()` with per-instance model matrices
      (the stock and PBR shaders already have `useInstancing` and instance attributes).
-     Needs the renderer to draw mesh items itself (2.1 open item: one item per mesh for
-     `MeshNode`).
+     Builds on the per-mesh items (`DrawItem::mesh`, done). Mesh items still run their
+     node's hooks (`doPreDraw()` sets the object id, material, textures and transform), so
+     only items whose node keeps the default hooks can be merged; this needs a way to tell
+     (for example, a `MeshNode` flag that subclasses with own hooks clear).
    - **Steps:**
      1. Uniform location cache. *Done:* `Program` caches locations per name (also misses,
         as -1) in a map with heterogeneous lookup, cleared by `link()` (shader hot reload);
@@ -504,7 +515,7 @@ Goal: make the library trustworthy to depend on.
         `RenderContext::Counters::lightsBlockUploads`. All examples pixel-identical, also
         with the previous (plain-uniform) stock shader through the legacy path; no GL
         debug messages.
-     4. Automatic instancing (after one item per mesh for `MeshNode`).
+     4. Automatic instancing (per-mesh items are in place).
 3. **HDR pipeline.** Float render targets, exposure and tone mapping (ACES/AgX) as the
    final post step, MSAA resolve and FXAA/SMAA option.
 4. **Image-based lighting.** Load HDR environment maps (`.hdr`/`.exr`), precompute

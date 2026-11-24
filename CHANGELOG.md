@@ -40,6 +40,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   instead of plain `pointLights[]`/`dirLights[]`/`spotLights[]` uniforms. Call
   `LightManager::apply()` after changing lights (as before). The PBR shader uses at most 4
   directional lights (was 8). Your own shaders with plain light uniforms keep working.
+- `MeshNode` adds one draw item per mesh: meshes of one node are culled, sorted and blended
+  separately, and a mesh with its own transparent material is drawn with the transparent
+  objects. The node's `doPreDraw()`/`doPostDraw()` run once per mesh, and `MeshNode::doDraw()`
+  draws only the mesh being drawn; subclasses overriding `doDraw()` should call
+  `MeshNode::doDraw()`.
 - `CompositeNode` uses a material set on it (`setMaterial()` on a group used to be ignored
   because groups had `setUseMaterial(false)` by default).
 
@@ -84,6 +89,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
+- Loaded models: a node with several meshes of different materials showed all of them with the
+  last mesh's material; further meshes now get their own material (`Mesh::material()`).
+- A mesh's own `ShaderMaterial` (`Mesh::setMaterial()`) stayed applied after the mesh was
+  drawn.
+- `MeshNode::showNormals()` always returned false.
 - Shadows of a directional light that is not the first shadow caster: shadow maps and their
   matrices were packed by caster while the shaders read them by light index.
 - `Program::uniformLoc()`, `attribId()` and `bindAttribLoc()` passed `std::string_view` data to

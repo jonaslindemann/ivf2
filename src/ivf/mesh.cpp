@@ -626,6 +626,10 @@ void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount)
 
     if (m_lineWidth != 1.0f)
         glLineWidth(1.0f);
+
+    // Undo the mesh's own material (e.g. restore the program a ShaderMaterial replaced)
+    if (m_material != nullptr)
+        m_material->unapply();
 }
 
 void ivf::Mesh::drawAsPrim(GLuint prim)

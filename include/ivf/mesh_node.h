@@ -27,6 +27,9 @@ private:
     bool m_showNormals{false};
     float m_normalLength{1.0f};
 
+    Mesh *m_drawMesh{nullptr};               ///< Mesh of the item being drawn (doDrawPass()); nullptr: all.
+    RenderContext *m_drawContext{nullptr};   ///< Context of the item being drawn (doDrawPass()).
+
 protected:
     std::vector<std::shared_ptr<Mesh>> m_meshes; ///< List of meshes managed by this node.
 
@@ -151,11 +154,30 @@ public:
     void updateNormalVisualization();
     bool showNormals() const;
 
+    /**
+     * @brief Add one draw item per enabled mesh (DrawItem::mesh).
+     *
+     * Each mesh is then culled, sorted and, if its material is transparent, blended on its
+     * own; a mesh's material (Mesh::setMaterial()) decides its layer and sort order. All
+     * items share the node's world matrix and bounding box, and the node's hooks
+     * (doPreDraw(), doDraw(), doPostDraw()) run once per item. A node without meshes adds
+     * a single item like any other node.
+     */
+    void collect(RenderQueue &queue, const CollectState &state) override;
+
 protected:
     /**
-     * @brief Draw the mesh node (called by the scene graph).
+     * @brief Draw the meshes (called by the scene graph).
+     *
+     * Draws the mesh of the item being drawn (see collect()), or all enabled meshes when
+     * called outside the renderer. Subclasses that override it should call it to draw.
      */
     virtual void doDraw();
+
+    /**
+     * @brief Draw the item's mesh with the renderer's context, then call doDraw().
+     */
+    void doDrawPass(const DrawContext &context) override;
 
     /**
      * @brief Internal setup method for initializing the mesh node.

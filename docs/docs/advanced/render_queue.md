@@ -33,7 +33,7 @@ Pick the lowest level that does what you need.
 
 ### 1. Geometry nodes
 
-Subclass `MeshNode` and fill the mesh in `doSetup()`, as the built-in primitives do. Shadows, culling, selection, sorting and transparency work without further code. Creating the node needs no OpenGL context: the mesh is uploaded when it is first drawn.
+Subclass `MeshNode` and fill the mesh in `doSetup()`, as the built-in primitives do. Shadows, culling, selection, sorting and transparency work without further code. A `MeshNode` adds one item per enabled mesh (`DrawItem::mesh`), so meshes with their own material (`Mesh::setMaterial()`) are sorted, and blended if transparent, on their own. The node's hooks run once per mesh item; if you override `doDraw()`, call `MeshNode::doDraw()`, which draws the item's mesh. Creating the node needs no OpenGL context: the mesh is uploaded when it is first drawn.
 
 ### 2. Nodes with their own OpenGL drawing
 

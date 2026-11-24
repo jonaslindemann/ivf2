@@ -25,6 +25,7 @@ namespace ivf {
 
 class Node;
 class Material;
+class Mesh;
 
 /**
  * @brief State passed down the scene graph while collecting.
@@ -49,6 +50,9 @@ struct DrawItem {
     Node *textureSource{nullptr};       ///< Inherited textures, used if the node has none of its own.
     BoundingBox bounds;                 ///< World-space bounds; invalid if the node has none.
     RenderLayer layer{RenderLayer::Opaque}; ///< Draw order group (see sortForView()).
+    /// The one mesh of a MeshNode this item draws (MeshNode emits an item per mesh); nullptr
+    /// for items that draw the whole node. Owned by the node, valid while the node lives.
+    Mesh *mesh{nullptr};
 };
 
 /**

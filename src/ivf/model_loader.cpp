@@ -22,8 +22,9 @@ namespace {
 
 void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNode> compNode,
                  aiMatrix4x4 parentTransform);
-void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode);
-void processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node);
+void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode,
+                   unsigned int nodeMaterialIndex);
+void processMaterial(aiMaterial *aiMat, Material &material);
 
 void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNode> compNode,
                               aiMatrix4x4 parentTransform)
@@ -67,10 +68,12 @@ void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNo
             meshNode->setRotAngle(glm::degrees(angle));
         }
 
+        // The first mesh's material becomes the node's; meshes with another material get their own
+        const unsigned int nodeMaterialIndex = scene->mMeshes[node->mMeshes[0]]->mMaterialIndex;
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-            processAiMesh(scene, mesh, meshNode);
+            processAiMesh(scene, mesh, meshNode, nodeMaterialIndex);
         }
         compNode->add(meshNode);
     }
@@ -107,7 +110,8 @@ void processNode(const aiScene *scene, aiNode *node, std::shared_ptr<CompositeNo
         }
     }
 }
-void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode)
+void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNode> meshNode,
+                   unsigned int nodeMaterialIndex)
 {
     logInfo("Processing aiMesh...", "ModelLoader");
     logInfofc("ModelLoader", "  Mesh name: {}", aiMesh->mName.C_Str());
@@ -262,8 +266,23 @@ void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNod
         try
         {
             aiMaterial *aiMat = scene->mMaterials[aiMesh->mMaterialIndex];
-            processMaterial(aiMat, meshNode);
-            // meshNode->setShowNormals(true, 0.1f); // Enable normal visualization with a length of 0.1
+            if (aiMesh->mMaterialIndex == nodeMaterialIndex)
+            {
+                // Node material (shared by all meshes using it; set once)
+                if (!meshNode->material())
+                {
+                    auto material = Material::create();
+                    processMaterial(aiMat, *material);
+                    meshNode->setMaterial(material);
+                }
+            }
+            else
+            {
+                // Another material in the same node: the mesh's own (drawn and sorted per mesh)
+                auto material = Material::create();
+                processMaterial(aiMat, *material);
+                mesh->setMaterial(material);
+            }
         } catch (const std::exception &e)
         {
             logWarningfc("ModelLoader", "Failed to process material: {}", e.what());
@@ -274,7 +293,7 @@ void processAiMesh(const aiScene *scene, aiMesh *aiMesh, std::shared_ptr<MeshNod
               mesh->indexPos());
 }
 
-void processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node)
+void processMaterial(aiMaterial *aiMat, Material &material)
 {
     aiColor3D diffuse(1.0f, 1.0f, 1.0f);
     aiColor3D ambient(0.2f, 0.2f, 0.2f);
@@ -299,42 +318,14 @@ void processMaterial(aiMaterial *aiMat, std::shared_ptr<MeshNode> node)
     logInfofc("ModelLoader", "  Shininess: {:.6f}", shininess);
     logInfofc("ModelLoader", "  Opacity: {:.6f}", opacity);
 
-    try
-    {
-        auto material = node->material();
-        if (!material)
-        {
-            material = Material::create();
-            /*
-            material->setDiffuseColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
-            material->setSpecularColor(glm::vec4(1.0, 1.0, 1.0, 1.0));
-            material->setAmbientColor(glm::vec4(0.2, 0.2, 0.2, 1.0));
-            */
-            node->setMaterial(material);
-        }
+    glm::vec4 diffuseColor(diffuse.r, diffuse.g, diffuse.b, opacity);
+    glm::vec4 ambientColor(ambient.r, ambient.g, ambient.b, opacity);
+    glm::vec4 specularColor(specular.r, specular.g, specular.b, opacity);
 
-        if (material)
-        {
-            // Ensure full precision colors
-            glm::vec4 diffuseColor(diffuse.r, diffuse.g, diffuse.b, opacity);
-            glm::vec4 ambientColor(ambient.r, ambient.g, ambient.b, opacity);
-            glm::vec4 specularColor(specular.r, specular.g, specular.b, opacity);
-
-            material->setDiffuseColor(diffuseColor);
-            material->setAmbientColor(ambientColor);
-            material->setSpecularColor(specularColor);
-            material->setShininess(shininess);
-
-            // Ensure material is properly enabled
-            // Debug: Check if colors are being clamped or quantized
-
-            logInfofc("ModelLoader", "  Set diffuse: ({:.6f}, {:.6f}, {:.6f}, {:.6f})", diffuseColor.r, diffuseColor.g,
-                      diffuseColor.b, diffuseColor.a);
-        }
-    } catch (const std::exception &e)
-    {
-        logWarningfc("ModelLoader", "Material creation failed: {}", e.what());
-    }
+    material.setDiffuseColor(diffuseColor);
+    material.setAmbientColor(ambientColor);
+    material.setSpecularColor(specularColor);
+    material.setShininess(shininess);
 }
 
 } // namespace

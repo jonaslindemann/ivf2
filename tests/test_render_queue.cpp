@@ -16,6 +16,7 @@
 #include <ivf/cube.h>
 #include <ivf/instance_node.h>
 #include <ivf/material.h>
+#include <ivf/mesh_node.h>
 #include <ivf/render_context.h>
 #include <ivf/render_queue.h>
 
@@ -323,6 +324,89 @@ IVF_TEST(mesh_winding_matches_normals)
     IVF_CHECK(windingMatchesNormals(*Plane::create(2.0, 2.0)));
     // Generator meshes are mirrored by the Y/Z swap, so they are clockwise
     IVF_CHECK(Sphere::create(1.0)->mesh()->clockwise());
+}
+
+namespace {
+
+// A node with two triangle meshes (like a loaded model with two materials)
+MeshNodePtr twoMeshNode()
+{
+    auto node = MeshNode::create();
+    for (int m = 0; m < 2; ++m)
+    {
+        node->newMesh(3, 1);
+        auto mesh = node->mesh(m);
+        mesh->begin(GL_TRIANGLES);
+        mesh->vertex3f(0.0f, 0.0f, 0.0f);
+        mesh->vertex3f(1.0f, 0.0f, 0.0f);
+        mesh->vertex3f(0.0f, 1.0f, float(m));
+        mesh->index3i(0, 1, 2);
+        mesh->end();
+    }
+    node->updateBoundingBox();
+    return node;
+}
+
+} // namespace
+
+IVF_TEST(mesh_nodes_add_one_item_per_mesh)
+{
+    Context c;
+    auto node = twoMeshNode();
+    auto queue = collect(node);
+    IVF_CHECK(queue.size() == 2);
+    IVF_CHECK(queue.items()[0].mesh == node->mesh(0).get());
+    IVF_CHECK(queue.items()[1].mesh == node->mesh(1).get());
+    IVF_CHECK(queue.items()[0].node == node.get());
+    IVF_CHECK(queue.items()[0].bounds.isValid()); // the node's box, shared by its meshes
+
+    // Disabled meshes add no item; a node with no enabled mesh still adds one (for doDraw())
+    node->mesh(0)->setEnabled(false);
+    queue = collect(node);
+    IVF_CHECK(queue.size() == 1);
+    IVF_CHECK(queue.items()[0].mesh == node->mesh(1).get());
+    node->mesh(1)->setEnabled(false);
+    queue = collect(node);
+    IVF_CHECK(queue.size() == 1);
+    IVF_CHECK(queue.items()[0].mesh == nullptr);
+
+    // Primitives are mesh nodes too
+    queue = collect(Cube::create());
+    IVF_CHECK(queue.size() == 1);
+    IVF_CHECK(queue.items()[0].mesh != nullptr);
+}
+
+IVF_TEST(mesh_materials_decide_layer_and_sort_order)
+{
+    Context c;
+    auto glass = Material::create();
+    glass->setAlpha(0.5f);
+    auto red = Material::create();
+
+    auto node = twoMeshNode();
+    node->setMaterial(red);
+    node->mesh(1)->setMaterial(glass); // most specific wins
+
+    auto queue = collect(node);
+    IVF_CHECK(queue.size() == 2);
+    IVF_CHECK(queue.items()[0].layer == RenderLayer::Opaque);
+    IVF_CHECK(queue.items()[1].layer == RenderLayer::Transparent);
+
+    // Sorting puts the transparent mesh after an opaque node added later
+    auto scene = CompositeNode::create();
+    scene->add(node);
+    auto cube = Cube::create();
+    scene->add(cube);
+    queue = collect(scene);
+    queue.sortForView(glm::vec3(0.0f, 0.0f, 10.0f));
+    IVF_CHECK(queue.size() == 3);
+    IVF_CHECK(queue.items()[2].mesh == node->mesh(1).get());
+
+    // An explicit node layer still wins over the mesh's material
+    node->setRenderLayer(RenderLayer::Overlay);
+    queue = collect(node);
+    IVF_CHECK(queue.items()[0].layer == RenderLayer::Overlay);
+    IVF_CHECK(queue.items()[1].layer == RenderLayer::Overlay);
 }
 
 IVF_TEST_MAIN()

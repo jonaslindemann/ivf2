@@ -2,6 +2,9 @@
 
 #include <ivf/mesh_manager.h>
 #include <ivf/light_manager.h>
+#include <ivf/draw_context.h>
+#include <ivf/render_context.h>
+#include <ivf/render_queue.h>
 
 #include <generator/generator.hpp>
 #include <generator/utils.hpp>
@@ -249,19 +252,66 @@ void ivf::MeshNode::updateNormalVisualization()
 
 bool ivf::MeshNode::showNormals() const
 {
-    return false;
+    return m_showNormals;
+}
+
+void MeshNode::collect(RenderQueue &queue, const CollectState &state)
+{
+    if (!visible())
+        return;
+
+    DrawItem item = drawItem(state);
+    if (localBoundingBox().isValid())
+        item.bounds = localBoundingBox().transform(item.world);
+
+    bool added = false;
+    for (const auto &mesh : m_meshes)
+    {
+        if (!mesh || !mesh->enabled())
+            continue;
+        DrawItem meshItem = item;
+        meshItem.mesh = mesh.get();
+        // The mesh's material wins over the node's (most specific), so it decides the layer
+        if (mesh->material() && !renderLayer())
+            meshItem.layer = mesh->material()->renderLayer();
+        queue.add(meshItem);
+        added = true;
+    }
+
+    if (!added)
+        queue.add(item); // nothing to split: one item for the node (it may draw other things)
+}
+
+void MeshNode::doDrawPass(const DrawContext &context)
+{
+    m_drawMesh = context.item.mesh;
+    m_drawContext = &context.context;
+    doDraw();
+    m_drawMesh = nullptr;
+    m_drawContext = nullptr;
 }
 
 void ivf::MeshNode::doDraw()
 {
-    for (auto &mesh : m_meshes)
-        if (mesh->enabled())
-            mesh->draw();
+    RenderContext &context = m_drawContext != nullptr ? *m_drawContext : *RenderContext::currentOrFallback();
 
-    if (m_showNormals && m_normalVisMesh)
+    // One mesh when drawn as a renderer item, otherwise all of them
+    Mesh *lastEnabled = nullptr;
+    for (auto &mesh : m_meshes)
+    {
+        if (!mesh->enabled())
+            continue;
+        lastEnabled = mesh.get();
+        if (m_drawMesh == nullptr || m_drawMesh == mesh.get())
+            mesh->draw(context);
+    }
+
+    // Normals once per node: with the last mesh's item
+    const bool drawNormals = m_drawMesh == nullptr || m_drawMesh == lastEnabled;
+    if (drawNormals && m_showNormals && m_normalVisMesh)
     {
         ivf::LightManager::instance()->setUseLighting(false); // Disable lighting for normal visualization
-        m_normalVisMesh->draw();
+        m_normalVisMesh->draw(context);
         ivf::LightManager::instance()->setUseLighting(true); // Disable lighting for normal visualization
     }
 }

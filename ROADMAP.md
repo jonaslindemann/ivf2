@@ -4,7 +4,37 @@ A plan for making ivf2 a high-quality, widely usable C++ library for interactive
 visualisation and creative coding. Based on a review of the code base in November 2026
 (~33k lines of library code in `ivf`, `ivfui`, `ivfmath`, `ivfmusic`; 54 examples).
 
+## Status (24 November 2026)
+
+Latest release: **2.0.0-alpha.2** (22 November 2026). `main` adds the render queue (unreleased,
+see `CHANGELOG.md`).
+
+| Phase | State |
+|-------|-------|
+| 0 - Build system | Done |
+| 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). 2.2-2.9 not started; **next: 2.2 uniform handling** |
+| 3 - Differentiators | Not started |
+| 4 - Reach | Not started |
+
+**Open items from finished work**
+
+- Render queue (2.1): one item per mesh for `MeshNode` (per-mesh materials of loaded models
+  sorted separately, materials and meshes drawn with the renderer's explicit context, which
+  completes step B); alpha for the PBR material; `setCastsShadows()` per node;
+  `setMaterialOverride()` (decided, opt-in).
+- Render context (1.2): `ivf::Key`/`ivf::MouseButton`; drop the `instance()` forwarders after
+  a deprecation period.
+- Dependencies (1.3): ImGui out of the core (`DebugDraw::drawUi()` labels).
+- Error handling (1.6): `GpuProceduralTexture`, `ShaderWatcher` and `Effect::load()` to
+  `Result`; remove deprecated wrappers in the next major release.
+- API (1.7): rename virtual `get*` functions in the next major release.
+- CI and tests (1.1, 1.8): Ubuntu/Clang, sanitizer, `clang-format` and `clang-tidy` jobs;
+  EGL instead of Xvfb; Windows/macOS visual references; Git LFS for assets (1.9).
+
 ## Where ivf2 stands
+
+*The review this roadmap started from; rows marked fixed have been addressed since.*
 
 **Strengths**
 
@@ -21,13 +51,13 @@ visualisation and creative coding. Based on a review of the code base in Novembe
 | Area | Observation |
 |------|-------------|
 | Build & packaging | Legacy CMake (global include dirs, outputs in the source tree, no install/export) - *fixed in phase 0* |
-| Global state | 9 raw-pointer singletons (`ShaderManager`, `LightManager`, `TextureManager`, ...) - one GL context per process, managers never dropped (GL objects leak or are freed after the context is gone), hard to test |
-| Host coupling | `ivf` makes no GLFW calls, but context bootstrap does: the GL loader runs only in `GLFWWindow`, default shaders/font/light are set up in `GLFWSceneWindow::doSetup`, and `XxxNode::create()` uploads to the GPU immediately, so nodes need a current context. Public input APIs use GLFW key/button codes |
-| Dependency footprint | Public headers include assimp, FreeType, stb, nlohmann/json, GLFW, ImGui. Every consumer compiles against all of them; none can be made optional |
+| Global state | 9 raw-pointer singletons (`ShaderManager`, `LightManager`, `TextureManager`, ...) - one GL context per process, managers never dropped (GL objects leak or are freed after the context is gone), hard to test - *fixed: `RenderContext` (1.2)* |
+| Host coupling | `ivf` makes no GLFW calls, but context bootstrap does: the GL loader runs only in `GLFWWindow`, default shaders/font/light are set up in `GLFWSceneWindow::doSetup`, and `XxxNode::create()` uploads to the GPU immediately, so nodes need a current context. Public input APIs use GLFW key/button codes - *fixed except input codes (1.2, 2.1)* |
+| Dependency footprint | Public headers include assimp, FreeType, stb, nlohmann/json, GLFW, ImGui. Every consumer compiles against all of them; none can be made optional - *fixed (1.3)* |
 | Bundled third-party code | glm 1.0, gml, glad and dirent are vendored in `include/`. Two math libraries (glm in ivf, gml in generator) - *fixed: only glad/KHR remain, glm from vcpkg* |
-| Rendering core | Immediate, recursive draw with a global "current program"; no render queue, sorting, culling or uniform buffers; `glGetUniformLocation` per call with no cache |
-| Diagnostics | No `KHR_debug` callback, 4 `glGetError` calls in total; 50 `std::cout`/`std::cerr` calls bypass the existing `Logger` |
-| Testing / CI | No tests and no build CI (only CodeQL and docs workflows) - *unit test scaffold added in phase 0* |
+| Rendering core | Immediate, recursive draw with a global "current program"; no render queue, sorting, culling or uniform buffers; `glGetUniformLocation` per call with no cache - *render queue, sorting and culling done (2.1); uniforms next (2.2)* |
+| Diagnostics | No `KHR_debug` callback, 4 `glGetError` calls in total; 50 `std::cout`/`std::cerr` calls bypass the existing `Logger` - *fixed (1.5)* |
+| Testing / CI | No tests and no build CI (only CodeQL and docs workflows) - *fixed: CI on three platforms, unit and visual tests (1.1, 1.8)* |
 | Layering | `ivf` depended on `ivfui` for stb symbols - *fixed in phase 0* |
 | Large classes | `glfw_scene_window.cpp` (1.3k lines), `placement_mixin.cpp` (1.1k), `glfw_music_scene_window.cpp` (1k) |
 
@@ -59,6 +89,10 @@ Goal: make the library trustworthy to depend on.
    Windows/MSVC, Ubuntu/GCC and macOS/AppleClang using the presets, caches vcpkg binaries,
    runs `ctest`, installs and builds `tests/package` against the installed package. CodeQL
    updated to v3 (`build-mode: none`); Dependabot keeps actions current.
+   *Cost split:* a push to `main` builds Linux/GCC only; pull requests, manual runs, a nightly
+   run (skipped without new commits) and releases (`release.yml` creates the release only if
+   it passes) get the full matrix with visual tests; ccache on Linux/macOS; CodeQL weekly;
+   docs only when their sources change.
    *Next:* Ubuntu/Clang job, a sanitizer (ASan/UBSan) job, `clang-format` check on changed
    lines, `clang-tidy`.
 2. **Render context, independent of the windowing system.** *Step A done:*
@@ -68,8 +102,9 @@ Goal: make the library trustworthy to depend on.
    `GLFWSceneWindow::doSetup`; examples use `renderContext()->...`; new `multi_window1`,
    `embedding1` and `test_render_context`. Finding during implementation:
    `TransformManager` caches uniform locations of the context's program, so it is
-   context-bound and lives in the context (the original plan kept it out). Still open:
-   `ivf::Key`/`ivf::MouseButton`, step B (with 2.1), and dropping the `instance()`
+   context-bound and lives in the context (the original plan kept it out). *Step B done
+   for the renderer and passes* (2.1 step 6); materials and node hooks still use the current
+   context. Still open: `ivf::Key`/`ivf::MouseButton` and dropping the `instance()`
    forwarders after a deprecation period. Original plan: replace the GL-bound
    singletons with `ivf::RenderContext`, defined in the core `ivf` library with no
    knowledge of windows. It represents *one OpenGL context and the resources that belong
@@ -194,7 +229,7 @@ Goal: make the library trustworthy to depend on.
 8. **Visual regression tests.** Headless rendering (hidden GLFW window, or EGL on CI)
    rendering each example scene to an FBO and comparing with golden images within a
    tolerance.
-   *Done:* `IVF2_VISUAL_TESTS` (`ctest -L visual`, `tests/visual/`) renders 51 examples hidden
+   *Done:* `IVF2_VISUAL_TESTS` (`ctest -L visual`, `tests/visual/`) renders 52 examples hidden
    with `IVF2_FIXED_TIMESTEP` and `IVF2_RANDOM_SEED` and compares the last frame with
    references (`image_compare`: per-pixel threshold, fraction of differing pixels, diff image).
    The Linux CI job runs them with Mesa llvmpipe under Xvfb and uploads the rendered images.
@@ -213,9 +248,9 @@ Goal: make the library trustworthy to depend on.
 
 ## Phase 2 - Rendering quality and performance (3-6 months)
 
-1. **Render queue.** Separate scene traversal from drawing: one traversal per frame collects
-   a flat list of draw items, which every pass (shadows, reflections, main, selection)
-   then culls, sorts and draws. Design (agreed in principle, not yet implemented):
+1. **Render queue.** *Done (steps 1-7 below; open items in Status).* Separate scene
+   traversal from drawing: one traversal per frame collects a flat list of draw items, which
+   every pass (shadows, reflections, main, selection) then culls, sorts and draws. Design:
 
    ```
    frame:  scene --collect()--> RenderQueue [DrawItem, ...]
@@ -462,8 +497,9 @@ clearest way to stand out.
 
 ## Suggested order of work
 
-1. CI (phase 1.1) - everything else becomes safer to change.
-2. Hide third-party headers + optional dependencies (1.3) - largest effect on usability.
-3. Render context (1.2) and diagnostics (1.5).
-4. Render queue + uniform buffers (2.1, 2.2) - the base for HDR, IBL, shadows.
+1. CI (phase 1.1) - everything else becomes safer to change. *Done.*
+2. Hide third-party headers + optional dependencies (1.3) - largest effect on usability. *Done.*
+3. Render context (1.2) and diagnostics (1.5). *Done.*
+4. Render queue + uniform buffers (2.1, 2.2) - the base for HDR, IBL, shadows. *Render queue
+   done; uniform handling is next.*
 5. Scientific visualisation module and Python bindings (3.1, 3.2) - the main differentiators.

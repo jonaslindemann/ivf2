@@ -175,7 +175,7 @@ protected:
      * it draws all copies with Mesh::drawInstances(). Subclasses that override it should
      * call it to draw.
      */
-    virtual void doDraw();
+    void doDraw() override;
 
     /**
      * @brief Draw the item's mesh with the renderer's context, then call doDraw().
@@ -185,7 +185,7 @@ protected:
     /**
      * @brief Internal setup method for initializing the mesh node.
      */
-    virtual void doSetup();
+    void doSetup() override;
 };
 
 /**

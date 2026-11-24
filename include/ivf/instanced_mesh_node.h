@@ -5,6 +5,7 @@
  * @brief Draws many copies of a mesh in a single draw call using GPU instancing.
  */
 
+#include <ivf/instancing.h>
 #include <ivf/mesh_node.h>
 #include <ivf/transform_node.h>
 
@@ -46,11 +47,7 @@ namespace ivf {
  */
 class InstancedMeshNode : public TransformNode {
 private:
-    struct InstanceAttributes {
-        glm::mat4 transform{1.0f};
-        glm::vec4 color{1.0f};
-        glm::vec4 data{0.0f};
-    };
+    using InstanceAttributes = ivf::InstanceAttributes;
 
     MeshNodePtr m_source;
     std::vector<InstanceAttributes> m_instances;
@@ -58,9 +55,6 @@ private:
     GLuint m_instanceBuffer{0};
     size_t m_bufferCapacity{0}; ///< Allocated size of the instance buffer, in instances.
     bool m_dirty{true};
-
-    /// Meshes whose vertex array has the instance attributes attached.
-    std::vector<std::pair<std::weak_ptr<Mesh>, VertexArray *>> m_attachedMeshes;
 
     void uploadInstances();
     void attachInstanceAttributes(const std::shared_ptr<Mesh> &mesh);

@@ -10,6 +10,13 @@
 
 using namespace ivf;
 
+bool Renderer::instanceable(const DrawItem &first, const DrawItem &other)
+{
+    return first.mesh != nullptr && first.node != nullptr && first.layer == RenderLayer::Opaque &&
+           other.layer == RenderLayer::Opaque && other.node == first.node && other.mesh == first.mesh &&
+           other.material == first.material && other.textureSource == first.textureSource;
+}
+
 void Renderer::execute(const RenderQueue &queue, const SkipFn &skip)
 {
     execute(queue, Frustum(), skip);
@@ -73,22 +80,27 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
         transparentState = on;
     };
 
-    for (const DrawItem &item : queue.items())
-    {
-        Node *node = item.node;
-        if (node == nullptr)
-            continue;
+    // Culling, skipping and statistics for one item
+    auto visible = [&](const DrawItem &item) {
+        if (item.node == nullptr)
+            return false;
         if (skip && skip(item))
         {
             ++m_stats.skipped;
-            continue;
+            return false;
         }
         if (!frustum.intersects(item.bounds))
         {
             ++m_stats.culled;
-            continue;
+            return false;
         }
         ++m_stats.drawn;
+        return true;
+    };
+
+    // Draw one item, or a batch of copies (instances: world matrices, item is the first)
+    auto drawItem = [&](const DrawItem &item, std::span<const glm::mat4> instances) {
+        Node *node = item.node;
 
         // The node applies its own transform on top of its parent's (TransformNode::doPreDraw)
         xfm->setModelMatrix(item.parentWorld);
@@ -110,7 +122,7 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
         if (inheritTextures)
             item.textureSource->bindTextures();
 
-        const DrawContext drawContext{ctx, m_pass, item, view, projection};
+        const DrawContext drawContext{ctx, m_pass, item, view, projection, instances};
         auto drawNode = [node, &drawContext] {
             node->doPreDraw();
             if (node->m_visible)
@@ -143,6 +155,43 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
             item.textureSource->unbindTextures();
         if (inheritMaterial)
             inherited->unapply();
+    };
+
+    const auto items = queue.items();
+    for (std::size_t i = 0; i < items.size();)
+    {
+        const DrawItem &item = items[i];
+
+        // Following copies of the same mesh (adjacent after sortForView())
+        std::size_t end = i + 1;
+        if (ctx.autoInstancing())
+            while (end < items.size() && instanceable(item, items[end]))
+                ++end;
+
+        if (end - i == 1)
+        {
+            if (visible(item))
+                drawItem(item, {});
+            ++i;
+            continue;
+        }
+
+        // A batch: draw the visible copies with one call
+        m_batch.clear();
+        const DrawItem *first = nullptr;
+        for (std::size_t k = i; k < end; ++k)
+        {
+            if (!visible(items[k]))
+                continue;
+            if (first == nullptr)
+                first = &items[k];
+            m_batch.push_back(items[k].world);
+        }
+        if (m_batch.size() > 1)
+            drawItem(*first, m_batch);
+        else if (first != nullptr)
+            drawItem(*first, {});
+        i = end;
     }
 
     setTransparentState(false);
@@ -153,4 +202,5 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
     m_stats.programChanges = after.programChanges - before.programChanges;
     m_stats.materialApplies = after.materialApplies - before.materialApplies;
     m_stats.uniformLookups = after.uniformLookups - before.uniformLookups;
+    m_stats.instances = after.instances - before.instances;
 }

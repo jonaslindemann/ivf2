@@ -5,6 +5,7 @@
 #include <ivf/draw_context.h>
 #include <ivf/render_context.h>
 #include <ivf/render_queue.h>
+#include <ivf/transform_manager.h>
 
 #include <generator/generator.hpp>
 #include <generator/utils.hpp>
@@ -286,9 +287,11 @@ void MeshNode::doDrawPass(const DrawContext &context)
 {
     m_drawMesh = context.item.mesh;
     m_drawContext = &context.context;
+    m_drawInstances = context.item.mesh != nullptr ? context.instances : std::span<const glm::mat4>{};
     doDraw();
     m_drawMesh = nullptr;
     m_drawContext = nullptr;
+    m_drawInstances = {};
 }
 
 void ivf::MeshNode::doDraw()
@@ -303,7 +306,12 @@ void ivf::MeshNode::doDraw()
             continue;
         lastEnabled = mesh.get();
         if (m_drawMesh == nullptr || m_drawMesh == mesh.get())
-            mesh->draw(context);
+        {
+            if (m_drawMesh != nullptr && !m_drawInstances.empty())
+                mesh->drawInstances(context, m_drawInstances);
+            else
+                mesh->draw(context);
+        }
     }
 
     // Normals once per node: with the last mesh's item
@@ -311,7 +319,18 @@ void ivf::MeshNode::doDraw()
     if (drawNormals && m_showNormals && m_normalVisMesh)
     {
         ivf::LightManager::instance()->setUseLighting(false); // Disable lighting for normal visualization
-        m_normalVisMesh->draw(context);
+        if (m_drawInstances.empty())
+            m_normalVisMesh->draw(context);
+        else
+        {
+            const glm::mat4 model = context.transforms()->modelMatrix();
+            for (const glm::mat4 &world : m_drawInstances)
+            {
+                context.transforms()->setModelMatrix(world);
+                m_normalVisMesh->draw(context);
+            }
+            context.transforms()->setModelMatrix(model);
+        }
         ivf::LightManager::instance()->setUseLighting(true); // Disable lighting for normal visualization
     }
 }

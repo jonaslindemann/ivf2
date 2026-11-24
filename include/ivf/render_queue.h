@@ -70,7 +70,9 @@ public:
      * @brief Sort the items for drawing from @p eye.
      *
      * Groups by layer (Background, Opaque, Transparent, Overlay). Opaque items are ordered
-     * by shader program and material (fewer state changes), then front to back;
+     * by shader program and material (fewer state changes), then front to back; copies of
+     * a mesh drawn several times by one node (InstanceNode) are kept next to each other so
+     * the Renderer can draw them instanced;
      * transparent items back to front so blending composes correctly. The sort is stable:
      * equal items keep their scene order.
      * @param eye Camera position in world coordinates.

@@ -6,10 +6,15 @@
 
 #include <glad/glad.h>
 
+#include <glm/glm.hpp>
+
+#include <ivf/instancing.h>
+
 #include <cstdint>
 #include <memory>
 #include <functional>
 #include <optional>
+#include <span>
 #include <vector>
 #include <string>
 
@@ -151,6 +156,32 @@ public:
     bool wideLinesSupported();
 
     /**
+     * @brief Draw repeated meshes with one instanced draw call (default on).
+     *
+     * The Renderer merges opaque items of the same node, mesh, material and textures (for
+     * example the copies an InstanceNode makes) into one batch. Off draws every item on
+     * its own. The environment variable `IVF2_AUTO_INSTANCING=0` turns it off by default.
+     */
+    void setAutoInstancing(bool enabled)
+    {
+        m_autoInstancing = enabled;
+    }
+
+    /** @brief See setAutoInstancing(). */
+    [[nodiscard]] bool autoInstancing() const
+    {
+        return m_autoInstancing;
+    }
+
+    /**
+     * @brief Upload model matrices as InstanceAttributes (white colour, zero data) to the
+     *        context's instance buffer and return the buffer.
+     *
+     * Used by Mesh::drawInstances(); the buffer is reused (and grown) for every batch.
+     */
+    GLuint uploadInstanceTransforms(std::span<const glm::mat4> transforms);
+
+    /**
      * @brief Running totals of drawing work done in this context.
      *
      * Renderer::stats() reports the difference over one execute() call. The totals only
@@ -163,6 +194,7 @@ public:
         std::uint64_t uniformLookups{0};  ///< Uniform locations queried from the driver (cache misses).
         std::uint64_t cameraBlockUploads{0}; ///< Uploads of the IvfCamera uniform buffer (camera changes).
         std::uint64_t lightsBlockUploads{0}; ///< Uploads of the IvfLights uniform buffer (light changes).
+        std::uint64_t instances{0};          ///< Instances drawn by instanced draw calls of batches.
     };
 
     /** @brief Totals since the context was created. */
@@ -193,6 +225,12 @@ public:
     void countLightsBlockUpload()
     {
         ++m_counters.lightsBlockUploads;
+    }
+
+    /** @brief Count @p count instances drawn with one instanced draw call (Mesh::drawInstances()). */
+    void countInstances(std::uint64_t count)
+    {
+        m_counters.instances += count;
     }
 
     /** @brief Count a material applied to a node. */
@@ -248,6 +286,10 @@ private:
     GLuint m_fallbackCubemap{0};
     std::optional<bool> m_wideLines; ///< Queried on first use.
     Counters m_counters;             ///< See counters().
+    bool m_autoInstancing{true};     ///< See setAutoInstancing().
+    GLuint m_instanceBuffer{0};      ///< See uploadInstanceTransforms().
+    std::size_t m_instanceCapacity{0};             ///< Allocated size of m_instanceBuffer, in instances.
+    std::vector<InstanceAttributes> m_instanceScratch; ///< Records being uploaded.
     GLuint m_lastProgram{0};         ///< Last program seen by countProgramUse().
     std::shared_ptr<const int> m_lifetime{std::make_shared<const int>(0)}; ///< See lifetime().
     std::vector<std::function<void()>> m_deleteLater;                       ///< See deleteLater().

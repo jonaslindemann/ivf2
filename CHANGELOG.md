@@ -82,6 +82,13 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
+- Automatic instancing: copies of a mesh that an `InstanceNode` draws with the same material and
+  textures are drawn with one instanced draw call (opaque objects, all passes). Custom shaders
+  without the instance attributes get one draw per copy, so images do not change.
+  `RenderContext::setAutoInstancing()` and `IVF2_AUTO_INSTANCING=0` turn it off; render
+  statistics count `instances`. `Mesh::drawInstances()` and `DrawContext::instances` are public;
+  `ivf/instancing.h` (`InstanceAttributes`, `bindInstanceAttributes()`) is shared with
+  `InstancedMeshNode`. New example `auto_instancing1`.
 - Lights uniform block `IvfLights`: all lights, shadow matrices and counts in one uniform buffer
   shared by all programs, uploaded by `LightManager::apply()` only when a light changed
   (`IVF_LIGHTS_BLOCK_GLSL`, `LightsBlock`). Switching to a lit `ShaderMaterial`, `PBRMaterial` or

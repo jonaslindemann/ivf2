@@ -9,15 +9,6 @@
 
 using namespace ivf;
 
-namespace {
-
-// Attribute locations shared with the stock, PBR and custom shaders
-constexpr GLuint kInstanceTransformLoc = 4; // mat4 occupies 4..7
-constexpr GLuint kInstanceColorLoc = 8;
-constexpr GLuint kInstanceDataLoc = 9;
-
-} // namespace
-
 InstancedMeshNode::InstancedMeshNode(MeshNodePtr source) : m_source(source)
 {
     setName("InstancedMeshNode");
@@ -46,7 +37,6 @@ glm::mat4 InstancedMeshNode::makeTransform(glm::vec3 position, glm::vec3 rotatio
 void InstancedMeshNode::setSource(MeshNodePtr source)
 {
     m_source = source;
-    m_attachedMeshes.clear();
 }
 
 MeshNodePtr InstancedMeshNode::source() const
@@ -140,44 +130,10 @@ void InstancedMeshNode::uploadInstances()
 
 void InstancedMeshNode::attachInstanceAttributes(const std::shared_ptr<Mesh> &mesh)
 {
-    VertexArray *vao = mesh->vertexArray();
-    if (vao == nullptr)
-        return;
-
-    for (const auto &[attachedMesh, attachedVao] : m_attachedMeshes)
-        if (attachedMesh.lock() == mesh && attachedVao == vao)
-            return;
-
-    // Forget meshes that no longer exist (e.g. after the source was refreshed)
-    std::erase_if(m_attachedMeshes, [](const auto &entry) { return entry.first.expired(); });
-
-    vao->bind();
-    glBindBuffer(GL_ARRAY_BUFFER, m_instanceBuffer);
-
-    const GLsizei stride = sizeof(InstanceAttributes);
-    for (GLuint col = 0; col < 4; ++col)
-    {
-        glEnableVertexAttribArray(kInstanceTransformLoc + col);
-        glVertexAttribPointer(kInstanceTransformLoc + col, 4, GL_FLOAT, GL_FALSE, stride,
-                              reinterpret_cast<void *>(offsetof(InstanceAttributes, transform) +
-                                                       col * sizeof(glm::vec4)));
-        glVertexAttribDivisor(kInstanceTransformLoc + col, 1);
-    }
-
-    glEnableVertexAttribArray(kInstanceColorLoc);
-    glVertexAttribPointer(kInstanceColorLoc, 4, GL_FLOAT, GL_FALSE, stride,
-                          reinterpret_cast<void *>(offsetof(InstanceAttributes, color)));
-    glVertexAttribDivisor(kInstanceColorLoc, 1);
-
-    glEnableVertexAttribArray(kInstanceDataLoc);
-    glVertexAttribPointer(kInstanceDataLoc, 4, GL_FLOAT, GL_FALSE, stride,
-                          reinterpret_cast<void *>(offsetof(InstanceAttributes, data)));
-    glVertexAttribDivisor(kInstanceDataLoc, 1);
-
-    vao->unbind();
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    m_attachedMeshes.emplace_back(mesh, vao);
+    // Every draw: the vertex array may also be used by automatic instancing, which points
+    // the same attributes at the render context's instance buffer.
+    if (VertexArray *vao = mesh->vertexArray())
+        bindInstanceAttributes(*vao, m_instanceBuffer);
 }
 
 void InstancedMeshNode::doDraw()

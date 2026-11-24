@@ -277,4 +277,21 @@ for (auto i = 0; i < 11; i++)
         }
 ```
 
-You can see in the above example that the `instSphere` node can be used just like any other node except that it reuses the same mesh data as the `sphere` node. This allows you to create multiple instances of a mesh with different transformations and properties without having to create a new mesh for each instance. 
+You can see in the above example that the `instSphere` node can be used just like any other node except that it reuses the same mesh data as the `sphere` node. This allows you to create multiple instances of a mesh with different transformations and properties without having to create a new mesh for each instance.
+
+Copies that share their material are drawn together: the renderer merges them into one instanced draw call (automatic instancing). Give the copies a common material, for example by putting them in a group with a material, instead of one material each as above:
+
+```cpp
+auto red = CompositeNode::create();
+red->setMaterial(redMaterial); // inherited by every copy in the group
+for (auto i = 0; i < 100; i++)
+{
+    auto copy = InstanceNode::create();
+    copy->setNode(sphere);
+    copy->setPos(glm::vec3(i * 0.5, 0.0, 0.0));
+    red->add(copy);
+}
+this->add(red); // 100 spheres, one draw call
+```
+
+Opaque copies with the same node, material and textures are merged; transparent ones are drawn one by one (back to front). Shaders without the instance attributes (see `ivf/instancing.h`) still work: their copies are drawn one by one. `renderContext()->setAutoInstancing(false)` (or `IVF2_AUTO_INSTANCING=0`) turns it off. For thousands of copies with their own colours, use `InstancedMeshNode`. See the `auto_instancing1` example. 

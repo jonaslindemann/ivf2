@@ -33,6 +33,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `text1` | 3D text with live editing | [Text](../primitives/text.md) |
 | `custom_mesh1` | `DynamicMesh` for generated geometry: a Lissajous curve and a Lorenz attractor | |
 | `instancing1` | Thousands of copies of a mesh with `InstancedMeshNode` | |
+| `auto_instancing1` | `InstanceNode` copies merged into instanced draw calls automatically; on/off switch and statistics | [Nodes](../core/nodes.md#instancenode-class) |
 | `bbox1` | Bounding boxes of nested nodes | [Nodes](../core/nodes.md) |
 | `deformer1` | Twist and bend deformers with inspectors | [Deformers](../core/deformers.md) |
 | `deformer2` | Layered wave deformers for a water surface | [Deformers](../core/deformers.md) |

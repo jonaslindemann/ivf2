@@ -14,6 +14,10 @@
 
 #include <glm/glm.hpp>
 
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+
 using namespace ivf;
 
 namespace {
@@ -47,7 +51,29 @@ std::shared_ptr<RenderContext> RenderContext::create(GLLoadProc loader)
                 "RenderContext");
     }
 
-    return std::shared_ptr<RenderContext>(new RenderContext());
+    auto context = std::shared_ptr<RenderContext>(new RenderContext());
+    if (const char *value = std::getenv("IVF2_AUTO_INSTANCING"); value != nullptr && std::strcmp(value, "0") == 0)
+        context->m_autoInstancing = false;
+    return context;
+}
+
+GLuint RenderContext::uploadInstanceTransforms(std::span<const glm::mat4> transforms)
+{
+    m_instanceScratch.resize(transforms.size());
+    for (std::size_t i = 0; i < transforms.size(); ++i)
+        m_instanceScratch[i] = InstanceAttributes{transforms[i], glm::vec4(1.0f), glm::vec4(0.0f)};
+
+    if (m_instanceBuffer == 0)
+        glGenBuffers(1, &m_instanceBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_instanceBuffer);
+    // New storage for every batch (orphaning): earlier draws keep theirs, no waiting on the GPU
+    m_instanceCapacity = std::max<std::size_t>(transforms.size(), m_instanceCapacity);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(m_instanceCapacity * sizeof(InstanceAttributes)), nullptr,
+                 GL_STREAM_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(transforms.size() * sizeof(InstanceAttributes)),
+                    m_instanceScratch.data());
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return m_instanceBuffer;
 }
 
 RenderContext::~RenderContext()
@@ -66,6 +92,9 @@ RenderContext::~RenderContext()
     delete m_meshes;
     delete m_fonts;
     delete m_shaders;
+
+    if (m_instanceBuffer != 0)
+        glDeleteBuffers(1, &m_instanceBuffer);
 
     if (m_fallbackTexture2D != 0)
         glDeleteTextures(1, &m_fallbackTexture2D);

@@ -29,6 +29,7 @@ private:
 
     Mesh *m_drawMesh{nullptr};               ///< Mesh of the item being drawn (doDrawPass()); nullptr: all.
     RenderContext *m_drawContext{nullptr};   ///< Context of the item being drawn (doDrawPass()).
+    std::span<const glm::mat4> m_drawInstances; ///< World matrices of a batch (doDrawPass()); empty: one.
 
 protected:
     std::vector<std::shared_ptr<Mesh>> m_meshes; ///< List of meshes managed by this node.
@@ -170,7 +171,9 @@ protected:
      * @brief Draw the meshes (called by the scene graph).
      *
      * Draws the mesh of the item being drawn (see collect()), or all enabled meshes when
-     * called outside the renderer. Subclasses that override it should call it to draw.
+     * called outside the renderer. For a batch of identical items (DrawContext::instances)
+     * it draws all copies with Mesh::drawInstances(). Subclasses that override it should
+     * call it to draw.
      */
     virtual void doDraw();
 

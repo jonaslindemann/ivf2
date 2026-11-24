@@ -19,6 +19,7 @@
 #include <ivf/mesh_node.h>
 #include <ivf/render_context.h>
 #include <ivf/render_queue.h>
+#include <ivf/renderer.h>
 
 using namespace ivf;
 
@@ -407,6 +408,58 @@ IVF_TEST(mesh_materials_decide_layer_and_sort_order)
     queue = collect(node);
     IVF_CHECK(queue.items()[0].layer == RenderLayer::Overlay);
     IVF_CHECK(queue.items()[1].layer == RenderLayer::Overlay);
+}
+
+IVF_TEST(instance_copies_are_adjacent_and_instanceable)
+{
+    Context c;
+    auto red = Material::create();
+    auto blue = Material::create();
+
+    // Two groups of InstanceNode copies of one sphere, mixed with other cubes in depth
+    auto sphere = Sphere::create(0.5);
+    auto scene = CompositeNode::create();
+    auto redGroup = CompositeNode::create();
+    redGroup->setMaterial(red);
+    auto blueGroup = CompositeNode::create();
+    blueGroup->setMaterial(blue);
+    scene->add(redGroup);
+    scene->add(blueGroup);
+    for (int i = 0; i < 4; ++i)
+    {
+        auto copy = InstanceNode::create();
+        copy->setNode(sphere);
+        copy->setPos({0.0f, 0.0f, -2.0f * float(i)});
+        (i % 2 == 0 ? redGroup : blueGroup)->add(copy);
+
+        auto cube = Cube::create(); // its own mesh: never instanced
+        cube->setPos({3.0f, 0.0f, -2.0f * float(i) - 1.0f});
+        redGroup->add(cube);
+    }
+
+    auto queue = collect(scene);
+    queue.sortForView({0.0f, 0.0f, 10.0f});
+    IVF_CHECK(queue.size() == 8);
+
+    // Red: the four cubes front to back (each a single), then the two red sphere copies together
+    auto items = queue.items();
+    for (int i = 0; i < 4; ++i)
+        IVF_CHECK(items[i].mesh != sphere->mesh().get());
+    IVF_CHECK(items[0].world[3].z > items[1].world[3].z); // nearer first
+    IVF_CHECK(items[4].mesh == sphere->mesh().get() && items[5].mesh == sphere->mesh().get());
+    IVF_CHECK(items[4].material == red && items[5].material == red);
+    IVF_CHECK(Renderer::instanceable(items[4], items[5]));
+
+    // Blue copies form the next batch; red and blue copies don't mix (different material)
+    IVF_CHECK(items[6].material == blue && items[7].material == blue);
+    IVF_CHECK(Renderer::instanceable(items[6], items[7]));
+    IVF_CHECK(!Renderer::instanceable(items[5], items[6]));
+    IVF_CHECK(!Renderer::instanceable(items[0], items[1])); // different meshes
+
+    // Transparent copies are never merged (they are sorted back to front one by one)
+    DrawItem glassCopy = items[5];
+    glassCopy.layer = RenderLayer::Transparent;
+    IVF_CHECK(!Renderer::instanceable(items[4], glassCopy));
 }
 
 IVF_TEST_MAIN()

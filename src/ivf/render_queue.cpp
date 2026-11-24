@@ -6,7 +6,9 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <map>
 #include <unordered_map>
+#include <utility>
 
 using namespace ivf;
 
@@ -42,6 +44,8 @@ struct SortKey {
     RenderLayer layer;
     std::size_t program;  // order of first appearance in the scene (deterministic, unlike addresses)
     std::size_t material; // same for materials
+    std::size_t copies;   // 0, or 1 + first-seen number of a mesh drawn several times by one node
+                          // (InstanceNode copies): keeps them adjacent for instancing
     float depth;          // squared distance; negated for back-to-front
 };
 
@@ -64,6 +68,15 @@ void RenderQueue::sortForView(const glm::vec3 &eye)
     // Precompute keys, then sort indices (stable: ties keep the scene order)
     std::vector<SortKey> keys(m_items.size());
     FirstSeen programIds, materialIds;
+
+    // Meshes drawn more than once by the same node (copies made by InstanceNode)
+    auto copyKey = [](const DrawItem &item) { return std::pair<const void *, const void *>(item.mesh, item.node); };
+    std::map<std::pair<const void *, const void *>, std::size_t> copyCount;
+    for (const DrawItem &item : m_items)
+        if (item.layer == RenderLayer::Opaque && item.mesh != nullptr)
+            ++copyCount[copyKey(item)];
+    std::map<std::pair<const void *, const void *>, std::size_t> copyIds;
+
     for (std::size_t i = 0; i < m_items.size(); ++i)
     {
         const DrawItem &item = m_items[i];
@@ -71,12 +84,15 @@ void RenderQueue::sortForView(const glm::vec3 &eye)
         key.layer = item.layer;
         key.program = 0;
         key.material = 0;
+        key.copies = 0;
         key.depth = 0.0f;
         if (item.layer == RenderLayer::Opaque)
         {
             const Material *material = effectiveMaterial(item);
             key.program = programIds(programOf(material));
             key.material = materialIds(material);
+            if (item.mesh != nullptr && copyCount[copyKey(item)] > 1)
+                key.copies = 1 + copyIds.try_emplace(copyKey(item), copyIds.size()).first->second;
             key.depth = distance2(item, eye); // front to back
         }
         else if (item.layer == RenderLayer::Transparent)
@@ -98,6 +114,8 @@ void RenderQueue::sortForView(const glm::vec3 &eye)
             return ka.program < kb.program;
         if (ka.material != kb.material)
             return ka.material < kb.material;
+        if (ka.copies != kb.copies)
+            return ka.copies < kb.copies;
         return ka.depth < kb.depth;
     });
 

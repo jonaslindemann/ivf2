@@ -1,0 +1,1 @@
+add_ivf2_example(auto_instancing1 SOURCES auto_instancing1.cpp)

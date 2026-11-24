@@ -12,6 +12,9 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
+#include <vector>
+
+#include <glm/glm.hpp>
 
 namespace ivf {
 
@@ -31,6 +34,11 @@ class RenderContext;
  * same hooks Node::draw() always used, so nodes with their own drawing code keep
  * working. Nodes without any material (own or inherited) are drawn with a neutral
  * default material.
+ *
+ * Consecutive opaque items of the same node, mesh, material and textures (copies made by
+ * InstanceNode, sorted next to each other by RenderQueue::sortForView()) are drawn as one
+ * batch: the node's hooks run once and MeshNode draws all copies with one instanced draw
+ * call (DrawContext::instances). RenderContext::setAutoInstancing(false) turns this off.
  *
  * With transparency blending enabled (colour passes), items of the Transparent layer are
  * drawn with alpha blending and without depth writes; sort the queue first
@@ -62,6 +70,7 @@ public:
         std::uint64_t programChanges{0};  ///< Switches to another shader program.
         std::uint64_t materialApplies{0}; ///< Materials applied (own, inherited or default).
         std::uint64_t uniformLookups{0};  ///< Uniform locations queried from the driver.
+        std::uint64_t instances{0};       ///< Items drawn as instances of a batch (one draw call each batch).
 
         /** @brief Add the counts of another execute() call (e.g. one per shadow light). */
         Stats &operator+=(const Stats &other)
@@ -74,6 +83,7 @@ public:
             programChanges += other.programChanges;
             materialApplies += other.materialApplies;
             uniformLookups += other.uniformLookups;
+            instances += other.instances;
             return *this;
         }
     };
@@ -141,6 +151,14 @@ public:
         return m_transparencyBlending;
     }
 
+    /**
+     * @brief True if @p other can be drawn in one instanced batch with @p first.
+     *
+     * Both are opaque items of the same node and mesh with the same inherited material and
+     * textures (so the node's hooks and the effective material are the same).
+     */
+    [[nodiscard]] static bool instanceable(const DrawItem &first, const DrawItem &other);
+
     /** @brief Counts of the last execute() call. */
     [[nodiscard]] const Stats &stats() const
     {
@@ -153,6 +171,7 @@ private:
     Stats m_stats;
     bool m_transparencyBlending{false};
     std::shared_ptr<Material> m_defaultMaterial; ///< For nodes without any material.
+    std::vector<glm::mat4> m_batch;              ///< World matrices of the batch being drawn.
 };
 
 /**

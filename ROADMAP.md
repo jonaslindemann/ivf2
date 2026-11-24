@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (steps 1-3, location cache, camera and lights blocks, done; one item per mesh for `MeshNode` done; next: automatic instancing). 2.3-2.9 not started |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **Next: 2.3 HDR pipeline**. 2.3-2.9 not started |
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -445,9 +445,9 @@ Goal: make the library trustworthy to depend on.
      copy. Cost: memory and uploads per window that draws the mesh, and dynamic meshes
      are uploaded once per window per change. GL share groups (buffers and textures once,
      VAOs per context) may come later as an optimisation without API changes.
-2. **Uniform handling.** Cache uniform locations in `Program`; move camera, lights and
-   fog into std140 uniform buffers shared by all programs; automatic instancing of
-   identical meshes.
+2. **Uniform handling.** *Done (steps 1-4 below).* Cache uniform locations in `Program`;
+   move camera, lights and fog into std140 uniform buffers shared by all programs;
+   automatic instancing of identical meshes.
 
    - **Today:** `Program::uniformLoc()` asked the driver on every call (and logged a debug
      line). The managers cache the locations of the stock program, but switching programs
@@ -515,7 +515,24 @@ Goal: make the library trustworthy to depend on.
         `RenderContext::Counters::lightsBlockUploads`. All examples pixel-identical, also
         with the previous (plain-uniform) stock shader through the legacy path; no GL
         debug messages.
-     4. Automatic instancing (per-mesh items are in place).
+     4. Automatic instancing (per-mesh items are in place). *Done:* the Renderer merges
+        consecutive opaque items of the same node, mesh, material and textures
+        (`Renderer::instanceable()`; the copies an `InstanceNode` makes) into a batch: the
+        node's hooks run once and `MeshNode::doDraw()` passes the world matrices
+        (`DrawContext::instances`) to `Mesh::drawInstances()`. That applies the mesh's
+        material, then draws one `glDraw*Instanced` call if the current program has
+        `useInstancing` (stock, PBR), else one draw per copy (custom shaders), so images
+        never change. Requiring the same node answers the hooks question: a node's own
+        hooks are the same for all its copies, so no opt-out flag is needed.
+        `sortForView()` keeps copies of a (mesh, node) pair that occurs more than once next
+        to each other; all other items keep front-to-back order. Per-instance data is shared
+        with `InstancedMeshNode` (`instancing.h`: `InstanceAttributes`,
+        `bindInstanceAttributes()`); the render context owns one orphaned instance buffer.
+        `RenderContext::setAutoInstancing()` / `IVF2_AUTO_INSTANCING=0`, statistics
+        `instances`. New example `auto_instancing1` (main pass 359 -> 75 draw calls, 140 ->
+        2 program changes, identical image with instancing off; its visual reference comes
+        from the CI artifact). Not merged: copies with different materials (lighting1 gives
+        every copy its own material), different nodes sharing a mesh, transparent items.
 3. **HDR pipeline.** Float render targets, exposure and tone mapping (ACES/AgX) as the
    final post step, MSAA resolve and FXAA/SMAA option.
 4. **Image-based lighting.** Load HDR environment maps (`.hdr`/`.exr`), precompute

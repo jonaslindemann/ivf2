@@ -10,6 +10,8 @@
 #include <ivf/transform_manager.h>
 #include <ivf/utils.h>
 #include <ivf/material.h>
+#include <ivf/instancing.h>
+#include <ivf/program.h>
 
 using namespace ivf;
 using namespace std;
@@ -544,7 +546,13 @@ VertexArray *Mesh::vertexArray()
     return copy != nullptr ? copy->vao.get() : nullptr;
 }
 
-void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount)
+void Mesh::drawInstances(RenderContext &context, std::span<const glm::mat4> transforms)
+{
+    if (!transforms.empty())
+        drawImpl(context, 0, transforms);
+}
+
+void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount, std::span<const glm::mat4> transforms)
 {
     GpuCopy *gpu = gpuCopy(context);
     if (gpu == nullptr)
@@ -575,48 +583,68 @@ void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount)
     if (m_clockwise)
         glFrontFace(GL_CW);
 
-    gpu->vao->bind();
-    if (m_indices != nullptr)
-    {
-        if (m_wireframe)
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        }
-        else
-        {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        }
+    glPolygonMode(GL_FRONT_AND_BACK, m_wireframe ? GL_LINE : GL_FILL);
+
+    auto drawCall = [&](GLsizei instances) {
+        gpu->vao->bind();
         // GL_ERR expands to several statements, so keep the braces
-        if (instanceCount > 0)
+        if (m_indices != nullptr)
         {
-            GL_ERR(glDrawElementsInstanced(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0, instanceCount));
+            if (instances > 0)
+            {
+                GL_ERR(glDrawElementsInstanced(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0, instances));
+            }
+            else
+            {
+                GL_ERR(glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0));
+            }
         }
         else
         {
-            GL_ERR(glDrawElements(m_primType, m_indices->size(), GL_UNSIGNED_INT, 0));
+            if (instances > 0)
+            {
+                GL_ERR(glDrawArraysInstanced(m_primType, 0, m_verts->rows(), instances));
+            }
+            else
+            {
+                GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
+            }
         }
+        gpu->vao->unbind();
+        context.countDrawCall();
+    };
+
+    if (transforms.empty())
+    {
+        drawCall(instanceCount);
     }
     else
     {
-        if (m_wireframe)
+        // Copies of the mesh at several places: one instanced draw if the program (after the
+        // mesh's own material) reads the instance attributes, else one draw per copy
+        auto *xfm = context.transforms();
+        const glm::mat4 model = xfm->modelMatrix();
+        ProgramPtr program = context.shaders()->currentProgram();
+        const GLint useInstancing = program ? program->uniformLoc("useInstancing") : -1;
+        if (useInstancing != -1)
         {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            bindInstanceAttributes(*gpu->vao, context.uploadInstanceTransforms(transforms));
+            xfm->setModelMatrix(glm::mat4(1.0f)); // the shader computes model * aInstanceModel
+            program->uniformBool(useInstancing, true);
+            drawCall(static_cast<GLsizei>(transforms.size()));
+            program->uniformBool(useInstancing, false);
+            context.countInstances(transforms.size());
         }
         else
         {
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            for (const glm::mat4 &transform : transforms)
+            {
+                xfm->setModelMatrix(transform);
+                drawCall(0);
+            }
         }
-        if (instanceCount > 0)
-        {
-            GL_ERR(glDrawArraysInstanced(m_primType, 0, m_verts->rows(), instanceCount));
-        }
-        else
-        {
-            GL_ERR(glDrawArrays(m_primType, 0, m_verts->rows()));
-        }
+        xfm->setModelMatrix(model);
     }
-    gpu->vao->unbind();
-    context.countDrawCall();
 
     if (m_clockwise)
         glFrontFace(GL_CCW);

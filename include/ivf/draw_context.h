@@ -6,6 +6,8 @@
 
 #include <glm/glm.hpp>
 
+#include <span>
+
 namespace ivf {
 
 class RenderContext;
@@ -56,6 +58,9 @@ struct DrawContext {
     glm::mat4 projection;   ///< Projection matrix of the pass. In the Shadow pass, view and
                             ///< projection are the camera's; geometry is transformed by the
                             ///< light's `lightSpaceMatrix`.
+    /// World matrices of all copies when the renderer draws a batch of identical items with
+    /// one call (automatic instancing; `item` is the first of them). Empty for a single item.
+    std::span<const glm::mat4> instances{};
 };
 
 } // namespace ivf

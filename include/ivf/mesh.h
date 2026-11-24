@@ -19,6 +19,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <vector>
 
 namespace ivf {
@@ -109,7 +110,7 @@ private:
     /**
      * @brief Draw the mesh, instanced when @p instanceCount is greater than 0.
      */
-    void drawImpl(RenderContext &context, GLsizei instanceCount);
+    void drawImpl(RenderContext &context, GLsizei instanceCount, std::span<const glm::mat4> transforms = {});
 
     /// GPU copy for @p context, created or updated as needed (nullptr before end()).
     GpuCopy *gpuCopy(RenderContext &context);
@@ -440,6 +441,18 @@ public:
      * @param instanceCount Number of instances to draw.
      */
     void drawInstanced(RenderContext &context, GLsizei instanceCount);
+
+    /**
+     * @brief Draw the mesh once per model matrix in @p transforms (automatic instancing).
+     *
+     * Applies the mesh's material, then draws all copies with one instanced draw call if
+     * the current program has the `useInstancing` uniform (stock and PBR shaders; see
+     * ivf/instancing.h), or one draw per copy otherwise. The model matrix of the
+     * TransformManager is restored afterwards.
+     * @param context Render context to draw into (its OpenGL context must be current).
+     * @param transforms World (model) matrix of each copy.
+     */
+    void drawInstances(RenderContext &context, std::span<const glm::mat4> transforms);
 
     /**
      * @brief Get the vertex array object of the mesh in the current context.

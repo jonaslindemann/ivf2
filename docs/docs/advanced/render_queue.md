@@ -26,6 +26,8 @@ Each pass is a `Renderer` that filters, culls and draws the items:
 - **Inheritance.** A node without a material uses the material of its nearest ancestor that has one; with none at all it gets a neutral light grey material. Textures are inherited the same way.
 - **Transparency.** A material with alpha < 1 puts the node in the `Transparent` layer: it is drawn after all opaque objects, back to front, with alpha blending and without depth writes. Blended shader materials (`GlowMaterial`, `MistMaterial`, ...), particles and billboards are transparent too, so they no longer have to be added to the scene last.
 - **Explicit layer.** `node->setRenderLayer(ivf::RenderLayer::Overlay)` overrides the layer chosen from the material; `clearRenderLayer()` undoes it.
+- **Meshes.** A `MeshNode` adds one item per mesh (`DrawItem::mesh`); a mesh with its own material (`Mesh::setMaterial()`) is sorted, and blended if transparent, on its own.
+- **Automatic instancing.** Opaque items of the same node, mesh, material and textures - the copies an `InstanceNode` makes - are sorted next to each other and drawn as one batch: the node's hooks run once and `Mesh::drawInstances()` draws all copies with one instanced draw call (`DrawContext::instances` holds their world matrices). Shaders without the `useInstancing` uniform get one draw per copy. Off with `renderContext()->setAutoInstancing(false)` or `IVF2_AUTO_INSTANCING=0`.
 
 ## Extending
 
@@ -111,6 +113,7 @@ Every `Renderer::execute()` records what it did in `renderer.stats()`:
 | `programChanges` | Switches to another shader program |
 | `materialApplies` | Materials applied (own, inherited or default) |
 | `uniformLookups` | Uniform locations queried from the driver; `Program` caches them, so this is normally 0 after the first frame |
+| `instances` | Items drawn as copies in instanced draw calls (automatic instancing) |
 
 `GLFWSceneWindow` collects them for each frame:
 

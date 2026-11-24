@@ -1,9 +1,12 @@
 # Release: runs when a version tag (v2.0.0, v2.0.0-alpha.2, ...) is pushed.
 #
-# Checks that the tag matches the version in CMakeLists.txt and creates a GitHub
-# release whose notes are the tag's section of CHANGELOG.md. Releases are published
-# as normal releases (also alpha/beta versions) and become the latest release.
-# See CONTRIBUTING.md.
+# 1. check:   the tag must match the version in CMakeLists.txt and CHANGELOG.md must have a
+#             section for it (fails fast, before the expensive build).
+# 2. build:   the full Build workflow (all platforms, visual tests, package test).
+# 3. release: creates a GitHub release whose notes are the tag's section of CHANGELOG.md.
+#
+# Releases are published as normal releases (also alpha/beta versions) and become the latest
+# release. See CONTRIBUTING.md.
 
 name: Release
 
@@ -12,11 +15,14 @@ on:
     tags: ['v*']
 
 permissions:
-  contents: write   # create the release
+  contents: read
 
 jobs:
-  release:
+  check:
+    name: Check version
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -48,9 +54,29 @@ jobs:
           fi
           cat notes.md
 
+  build:
+    name: Build
+    needs: check
+    uses: ./.github/workflows/build.yml
+
+  release:
+    name: Create release
+    needs: [check, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write   # create the release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          version="${{ steps.version.outputs.version }}"
+          version="${{ needs.check.outputs.version }}"
+          # Same extraction as in the check job, which verified that the section exists.
+          awk -v v="$version" '
+            index($0, "## [" v "]") == 1 { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }' CHANGELOG.md > notes.md
           gh release create "$GITHUB_REF_NAME" --title "ivf2 $version" --notes-file notes.md --verify-tag --latest

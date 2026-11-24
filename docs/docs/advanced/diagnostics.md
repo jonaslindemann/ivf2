@@ -121,7 +121,7 @@ ctest --preset release -L visual
 
 Each run sets `IVF2_FIXED_TIMESTEP` and `IVF2_RANDOM_SEED`, so it renders the same image every time; it fails if the example exits with an error, logs an `ERROR` line, or if more than 1% of the pixels differ from the reference by more than 24 (of 255) in a colour channel (`IVF2_VISUAL_MAX_FRACTION`, `IVF2_VISUAL_THRESHOLD`). Rendered images and diff images (differing pixels in red) are written to `<build>/visual/`.
 
-The references are rendered by CI on Linux with Mesa's software renderer (llvmpipe under Xvfb); the CI job uploads its rendered images as the `visual-tests` artifact. When a change alters the look on purpose, copy the new images from that artifact into `tests/visual/reference/` and commit them.
+The references are rendered by CI on Linux with Mesa's software renderer (llvmpipe under Xvfb); the CI job uploads its rendered images as the `visual-tests` artifact. Visual tests run in the full CI build (pull requests, the nightly build, manual runs from the Actions tab and releases), not in the quick build after each push to `main`. When a change alters the look on purpose, copy the new images from that artifact into `tests/visual/reference/` and commit them.
 
 Other GPUs render slightly differently. To check your own changes locally, keep references of your own:
 

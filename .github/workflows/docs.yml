@@ -1,8 +1,21 @@
 name: Deploy Docs to GitHub Pages
 
+# Rebuilds the site only when something it is generated from changes
+# (the user guide, or the sources Doxygen reads: see INPUT in Doxyfile).
 on:
   push:
     branches: [main]
+    paths:
+      - 'docs/**'
+      - 'include/ivf/**'
+      - 'include/ivfui/**'
+      - 'include/ivfmusic/**'
+      - 'src/ivf/**'
+      - 'src/ivfui/**'
+      - 'src/ivfmusic/**'
+      - 'examples/**'
+      - 'Doxyfile'
+      - '.github/workflows/docs.yml'
   workflow_dispatch:
 
 permissions:

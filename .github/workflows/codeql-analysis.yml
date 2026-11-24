@@ -2,15 +2,12 @@
 # Results appear under the repository's "Security" -> "Code scanning" tab.
 #
 # build-mode: none analyses the C++ sources without compiling them, so this
-# workflow needs no compiler, vcpkg or dependencies.
+# workflow needs no compiler, vcpkg or dependencies. It runs weekly and on demand
+# (not on every push) to keep CI cheap.
 
 name: CodeQL
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   schedule:
     - cron: '29 23 * * 5'   # weekly, Friday 23:29 UTC
   workflow_dispatch:

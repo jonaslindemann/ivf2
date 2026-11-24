@@ -1,7 +1,14 @@
 # Continuous integration: build and test ivf2 on Windows, Linux and macOS.
 #
-# Runs on every push to main, on every pull request, and on demand from the
-# "Actions" tab (workflow_dispatch). Each platform runs as its own job in parallel.
+# To keep CI cheap, not every event builds every platform (the "plan" job decides):
+#
+#   push to main ............ quick: Linux (GCC) only, unit tests, no visual tests
+#   pull request ............ full matrix
+#   nightly (schedule) ...... full matrix, only if main got new commits in the last 24 hours
+#   "Run workflow" button ... full matrix
+#   release.yml (version tag) full matrix; the release is created only if it passes
+#
+# A commit message containing [skip ci] skips the build altogether.
 
 name: Build
 
@@ -11,11 +18,14 @@ on:
     paths-ignore: ['docs/**', '**.md']   # documentation-only changes don't need a rebuild
   pull_request:
     paths-ignore: ['docs/**', '**.md']
+  schedule:
+    - cron: '17 2 * * *'   # nightly, 02:17 UTC
   workflow_dispatch:
+  workflow_call:           # used by release.yml
 
 # A newer push to the same branch cancels a still-running older build.
 concurrency:
-  group: build-${{ github.ref }}
+  group: build-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 # The workflow only needs to read the repository.
@@ -27,45 +37,72 @@ defaults:
     shell: bash   # use bash on all three OSes (Git Bash on Windows) so steps are identical
 
 jobs:
+  # Decides which platforms to build for this event (see the table at the top).
+  plan:
+    name: Plan
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Select platforms
+        id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref }}
+        run: |
+          # All platforms. Fields are used as matrix.<name> by the build job.
+          cat > matrix.json <<'JSON'
+          [
+            { "name": "Windows (MSVC)", "os": "windows-2025", "cache-id": "windows-2025",
+              "vcpkg-installed": "vcpkg_installed", "configure-preset": "vs",
+              "build-preset": "vs-release", "build-dir": "build/vs" },
+            { "name": "Linux (GCC)", "os": "ubuntu-24.04", "cache-id": "ubuntu-24.04",
+              "vcpkg-installed": "vcpkg_installed", "configure-preset": "release",
+              "build-preset": "release", "build-dir": "build/release",
+              "ccache": true, "visual-tests": true },
+            { "name": "macOS (AppleClang)", "os": "macos-15", "cache-id": "macos-15",
+              "vcpkg-installed": "vcpkg_installed", "configure-preset": "release",
+              "build-preset": "release", "build-dir": "build/release",
+              "ccache": true },
+            { "name": "Linux (minimal)", "os": "ubuntu-24.04", "cache-id": "ubuntu-24.04-minimal",
+              "vcpkg-installed": "build/minimal/vcpkg_installed", "configure-preset": "minimal",
+              "build-preset": "minimal", "build-dir": "build/minimal",
+              "ccache": true }
+          ]
+          JSON
+          # "Linux (minimal)" keeps the fallback code paths (all optional dependencies off) compiling.
+          # Visual tests render the examples with Mesa llvmpipe under Xvfb.
+
+          if [ "$EVENT" = "push" ] && [ "$REF" = "refs/heads/main" ]; then
+            echo "Push to main: quick build (Linux GCC only, no visual tests)"
+            matrix=$(jq -c '[.[] | select(.name == "Linux (GCC)") | .["visual-tests"] = false]' matrix.json)
+          elif [ "$EVENT" = "schedule" ] && \
+               [ "$(git log -1 --format=%ct)" -lt "$(( $(date +%s) - 86400 ))" ]; then
+            echo "Nightly: no new commits in the last 24 hours, nothing to build"
+            matrix='[]'
+          else
+            echo "$EVENT ($REF): full matrix"
+            matrix=$(jq -c '.' matrix.json)
+          fi
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
   build:
     name: ${{ matrix.name }}
+    needs: plan
+    if: needs.plan.outputs.matrix != '[]'
     runs-on: ${{ matrix.os }}
     timeout-minutes: 150
+    env:
+      # The library and examples use precompiled headers; this lets ccache cache their users.
+      CCACHE_SLOPPINESS: pch_defines,time_macros,include_file_mtime,include_file_ctime
 
     strategy:
       fail-fast: false   # let the other platforms finish even if one fails
       matrix:
-        include:
-          - name: Windows (MSVC)
-            os: windows-2025
-            cache-id: windows-2025
-            vcpkg-installed: vcpkg_installed
-            configure-preset: vs           # names from CMakePresets.json
-            build-preset: vs-release
-            build-dir: build/vs
-          - name: Linux (GCC)
-            os: ubuntu-24.04
-            cache-id: ubuntu-24.04
-            vcpkg-installed: vcpkg_installed
-            configure-preset: release
-            build-preset: release
-            build-dir: build/release
-            visual-tests: true             # rendered with Mesa llvmpipe under Xvfb
-          - name: macOS (AppleClang)
-            os: macos-15
-            cache-id: macos-15
-            vcpkg-installed: vcpkg_installed
-            configure-preset: release
-            build-preset: release
-            build-dir: build/release
-          # All optional dependencies off: keeps the fallback code paths compiling.
-          - name: Linux (minimal)
-            os: ubuntu-24.04
-            cache-id: ubuntu-24.04-minimal
-            vcpkg-installed: build/minimal/vcpkg_installed
-            configure-preset: minimal
-            build-preset: minimal
-            build-dir: build/minimal
+        include: ${{ fromJSON(needs.plan.outputs.matrix) }}
 
     steps:
       # 1. Get the ivf2 source code onto the runner.
@@ -126,11 +163,28 @@ jobs:
           key: vcpkg-${{ matrix.cache-id }}-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'overlay-ports/**') }}
           restore-keys: vcpkg-${{ matrix.cache-id }}-
 
+      # 4b. Compiler cache (Linux/macOS): only sources that changed since the cached
+      #     build are recompiled. Pull requests read the cache but don't save their own,
+      #     to stay within the repository's cache storage. Not used with MSVC (the Visual
+      #     Studio generator doesn't support compiler launchers).
+      - name: Set up ccache
+        if: matrix.ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-${{ matrix.cache-id }}
+          max-size: 500M
+          save: ${{ github.event_name != 'pull_request' }}
+
       # 5. Configure. vcpkg installs the dependencies during this step.
       #    Warnings in ivf2's own code fail the build, so they get fixed when they appear.
       - name: Configure
         run: |
-          cmake --preset ${{ matrix.configure-preset }} -DIVF2_WARNINGS_AS_ERRORS=ON             -DIVF2_VISUAL_TESTS=${{ matrix.visual-tests && 'ON' || 'OFF' }}
+          launcher=""
+          if [ "${{ matrix.ccache }}" = "true" ]; then
+            launcher="-DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          fi
+          cmake --preset ${{ matrix.configure-preset }} -DIVF2_WARNINGS_AS_ERRORS=ON \
+            -DIVF2_VISUAL_TESTS=${{ matrix.visual-tests && 'ON' || 'OFF' }} $launcher
 
       # 6. Save the dependency cache right away, so it survives even if the
       #    build or tests below fail.

@@ -40,7 +40,10 @@ options.
 1. Fork the repository and create a branch for your change.
 2. Keep the change focused: one feature or fix per pull request.
 3. Build with warnings on (the default) and keep your code warning-free; CI builds with
-   warnings as errors on MSVC, GCC and AppleClang.
+   warnings as errors on MSVC, GCC and AppleClang. Pull requests get the full build on all
+   platforms; a push to `main` only builds on Linux, and the other platforms are checked by
+   the nightly build (or start the Build workflow from the Actions tab). Add `[skip ci]` to a
+   commit message to skip CI for it.
 4. Run the unit tests (`ctest`) and the examples your change affects. Examples can run
    without showing windows: `IVF2_HIDE_WINDOWS=1 IVF2_EXIT_AFTER_FRAMES=90`.
 5. If the change alters what examples look like, the visual tests in CI will fail; download the
@@ -88,10 +91,12 @@ To make a release:
 1. Update the version in `CMakeLists.txt` and `vcpkg.json` (`version-semver`).
 2. In `CHANGELOG.md`, rename `[Unreleased]` to the new version with today's date, add an empty
    `[Unreleased]` section and update the comparison links at the bottom.
-3. Commit, wait for CI to pass, then tag the commit `v<version>` (for example
+3. Commit, then tag the commit `v<version>` (for example
    `git tag -a v2.0.0-alpha.2 -m "ivf2 2.0.0-alpha.2"`) and push the tag. The release workflow
-   checks that the tag matches the version in `CMakeLists.txt` and creates the GitHub release
-   from the changelog section.
+   checks that the tag matches the version in `CMakeLists.txt`, runs the full build on all
+   platforms and, if it passes, creates the GitHub release from the changelog section. If it
+   fails, fix the problem, delete the tag (`git push --delete origin v<version>`,
+   `git tag -d v<version>`) and tag again.
 
 ## License
 

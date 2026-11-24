@@ -32,16 +32,117 @@ void main()
 }
 )";
 
+/// Output step: draws the (HDR) scene image to the screen with exposure, tone mapping
+/// (ivf::ToneMapping), gamma and optional FXAA. The defaults copy the image unchanged.
 inline const std::string render_to_texture_frag_shader_source_330 = R"(
 #version 330 core
 out vec4 FragColor;
 in vec2 TexCoords;
 
 uniform sampler2D screenTexture;
+uniform int toneMapping = 0;    // ivf::ToneMapping: 0 none, 1 Reinhard, 2 ACES, 3 AgX
+uniform float exposure = 1.0;   // scale before tone mapping
+uniform float gamma = 1.0;      // 1: none; 2.2 for linear lighting
+uniform bool fxaa = false;      // fast approximate anti-aliasing on the mapped image
+
+// ACES filmic fit (Stephen Hill, BakingLab): sRGB -> ACES, RRT + ODT fit, back to sRGB
+const mat3 acesInput = mat3(0.59719, 0.07600, 0.02840,
+                            0.35458, 0.90834, 0.13383,
+                            0.04823, 0.01566, 0.83777);
+const mat3 acesOutput = mat3( 1.60475, -0.10208, -0.00327,
+                             -0.53108,  1.10813, -0.07276,
+                             -0.07367, -0.00605,  1.07602);
+
+vec3 aces(vec3 color)
+{
+    color = acesInput * color;
+    vec3 a = color * (color + 0.0245786) - 0.000090537;
+    vec3 b = color * (0.983729 * color + 0.4329510) + 0.238081;
+    return clamp(acesOutput * (a / b), 0.0, 1.0);
+}
+
+// AgX (Troy Sobotka), minimal version by Benjamin Wrensch: log encoding, sigmoid fit,
+// then the reference display EOTF (power 2.2), so the result is in the same space as the
+// other operators' (the gamma uniform encodes all of them alike)
+vec3 agx(vec3 color)
+{
+    const mat3 agxIn = mat3(0.842479062253094, 0.0423282422610123, 0.0423756549057051,
+                            0.0784335999999992, 0.878468636469772, 0.0784336,
+                            0.0792237451477643, 0.0791661274605434, 0.879142973793104);
+    const mat3 agxOut = mat3(1.19687900512017, -0.0528968517574562, -0.0529716355144438,
+                             -0.0980208811401368, 1.15190312990417, -0.0980434501171241,
+                             -0.0990297440797205, -0.0989611768448433, 1.15107367264116);
+    const float minEv = -12.47393;
+    const float maxEv = 4.026069;
+    color = agxIn * max(color, vec3(1e-10));
+    color = clamp(log2(color), minEv, maxEv);
+    color = (color - minEv) / (maxEv - minEv);
+    vec3 x2 = color * color;
+    vec3 x4 = x2 * x2;
+    color = 15.5 * x4 * x2 - 40.14 * x4 * color + 31.96 * x4 - 6.868 * x2 * color
+          + 0.4298 * x2 + 0.1191 * color - 0.00232;
+    return pow(clamp(agxOut * color, 0.0, 1.0), vec3(2.2));
+}
+
+// HDR scene colour -> display colour
+vec3 display(vec3 color)
+{
+    if (any(isnan(color)) || any(isinf(color)))
+        color = vec3(0.0);
+    color *= exposure;
+    if (toneMapping == 1)
+        color = color / (1.0 + max(color, vec3(0.0)));
+    else if (toneMapping == 2)
+        color = aces(color);
+    else if (toneMapping == 3)
+        color = agx(color);
+    if (gamma != 1.0)
+        color = pow(max(color, vec3(0.0)), vec3(1.0 / gamma));
+    return color;
+}
+
+vec3 displayAt(vec2 uv)
+{
+    return display(texture(screenTexture, uv).rgb);
+}
+
+float luma(vec3 color)
+{
+    return dot(color, vec3(0.299, 0.587, 0.114));
+}
+
+// FXAA (after Timothy Lottes' FXAA 3.11, compact form): blur along the edge direction
+// where the luminance of the mapped image changes sharply
+vec3 fxaaAt(vec2 uv)
+{
+    const float reduceMin = 1.0 / 128.0;
+    const float reduceMul = 1.0 / 8.0;
+    const float spanMax = 8.0;
+    vec2 texel = 1.0 / vec2(textureSize(screenTexture, 0));
+
+    vec3 rgbM = displayAt(uv);
+    float lumaNW = luma(displayAt(uv + vec2(-1.0, -1.0) * texel));
+    float lumaNE = luma(displayAt(uv + vec2(1.0, -1.0) * texel));
+    float lumaSW = luma(displayAt(uv + vec2(-1.0, 1.0) * texel));
+    float lumaSE = luma(displayAt(uv + vec2(1.0, 1.0) * texel));
+    float lumaM = luma(rgbM);
+    float lumaMin = min(lumaM, min(min(lumaNW, lumaNE), min(lumaSW, lumaSE)));
+    float lumaMax = max(lumaM, max(max(lumaNW, lumaNE), max(lumaSW, lumaSE)));
+
+    vec2 dir = vec2(-((lumaNW + lumaNE) - (lumaSW + lumaSE)), (lumaNW + lumaSW) - (lumaNE + lumaSE));
+    float dirReduce = max((lumaNW + lumaNE + lumaSW + lumaSE) * (0.25 * reduceMul), reduceMin);
+    float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+    dir = clamp(dir * rcpDirMin, vec2(-spanMax), vec2(spanMax)) * texel;
+
+    vec3 rgbA = 0.5 * (displayAt(uv + dir * (1.0 / 3.0 - 0.5)) + displayAt(uv + dir * (2.0 / 3.0 - 0.5)));
+    vec3 rgbB = rgbA * 0.5 + 0.25 * (displayAt(uv - dir * 0.5) + displayAt(uv + dir * 0.5));
+    float lumaB = luma(rgbB);
+    return (lumaB < lumaMin || lumaB > lumaMax) ? rgbA : rgbB;
+}
+
 void main()
 {
-    vec3 col = texture(screenTexture, TexCoords).rgb;
-    FragColor = vec4(col, 1.0);
+    FragColor = vec4(fxaa ? fxaaAt(TexCoords) : displayAt(TexCoords), 1.0);
 })";
 
 inline const std::string vignette_frag_shader_source = R"(

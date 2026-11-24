@@ -144,19 +144,20 @@ void ivf::FrameBuffer::resize(int width, int height)
 
 void ivf::FrameBuffer::drop()
 {
+    // Everything that exists (deleting 0 is a no-op): the multisampled objects too when
+    // multisampling has just been turned off
     glDeleteBuffers(1, &m_quadVBO);
     glDeleteVertexArrays(1, &m_quadVAO);
-
-    if (m_multisample)
-    {
-        glDeleteTextures(1, &m_multisampledColorTexture);
-        glDeleteRenderbuffers(1, &m_multisampledDepthBuffer);
-        glDeleteFramebuffers(1, &m_multisampledFrameBuffer);
-    }
-
+    glDeleteTextures(1, &m_multisampledColorTexture);
+    glDeleteRenderbuffers(1, &m_multisampledDepthBuffer);
+    glDeleteFramebuffers(1, &m_multisampledFrameBuffer);
     glDeleteTextures(1, &m_colorTexture);
     glDeleteTextures(1, &m_depthBuffer);
     glDeleteFramebuffers(1, &m_frameBuffer);
+
+    m_quadVBO = m_quadVAO = 0;
+    m_multisampledColorTexture = m_multisampledDepthBuffer = m_multisampledFrameBuffer = 0;
+    m_colorTexture = m_depthBuffer = m_frameBuffer = 0;
 }
 
 void FrameBuffer::bind()

@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and phase 2 item 2 (uniform handling: uniform location cache, `IvfCamera`/`IvfLights` uniform blocks, one draw item per mesh, automatic instancing) is done, and **phase 2 item 3 (HDR pipeline) is next**. The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
+Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and phase 2 item 2 (uniform handling: uniform location cache, `IvfCamera`/`IvfLights` uniform blocks, one draw item per mesh, automatic instancing) is done, phase 2 item 3 (HDR pipeline: output step with exposure, tone mapping, gamma, FXAA; MSAA samples) is done, and **phase 2 item 4 (image-based lighting) is next**. The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
 
 ## Build Commands
 
@@ -133,7 +133,7 @@ int main() {
 
 ### Effects / Post-Processing
 
-Effects belong to the `GLFWSceneWindow`: call `setRenderToTexture(true)`, create the effect, call `load()`, then `addEffect()`; they run in the order added. Available effects include: `BlurEffect`, `BloomEffect`, `MipBloomEffect` (wide bloom from the mip chain with tone mapping; place last), `ChromaticEffect`, `DitheringEffect`, `FilmGrainEffect`, `FogEffect`, `PixelationEffect`, `TintEffect`, `VignetteEffect`, `EdgeDetectionEffect`.
+Effects belong to the `GLFWSceneWindow`: call `setRenderToTexture(true)`, create the effect, call `load()`, then `addEffect()`; they run in the order added. The scene image and effect chain are RGBA16F (HDR); the final output step (the `render_to_texture` program, `post_shaders.h`) applies `setExposure()`, `setToneMapping()` (`ivf::ToneMapping`, `tone_mapping.h`), `setGamma()` and `setFxaa()` after all effects (defaults copy unchanged; tone mapping or FXAA turn render to texture on); `setMsaaSamples()` sets the offscreen multisampling (default 4). With window tone mapping use `MipBloomEffect::setToneMapping(false)`. Available effects include: `BlurEffect`, `BloomEffect`, `MipBloomEffect` (wide bloom from the mip chain with tone mapping; place last), `ChromaticEffect`, `DitheringEffect`, `FilmGrainEffect`, `FogEffect`, `PixelationEffect`, `TintEffect`, `VignetteEffect`, `EdgeDetectionEffect`.
 
 Custom shaders on nodes use `ShaderMaterial`; `BlendShaderMaterial` adds additive, alpha or background blending without depth writes (the render queue draws blended and alpha < 1 nodes after opaque ones, back to front; no need to order them by hand); `GlowMaterial`, `MistMaterial` and `GradientSkyMaterial` are ready-made subclasses with built-in shaders and typed setters (same pattern as `WaterMaterial`). `ivfui::PathCameraManipulator` lets the viewer look around an authored camera path (`ivf::TimelineCamera`) and returns to it.
 

@@ -48,6 +48,7 @@ addEffect(m_bloom);   // add last
 | `setThreshold(t)` | 0.6 | Brightness where the glow starts, with a soft knee |
 | `setIntensity(i)` | 0.8 | Strength of the glow |
 | `setSpread(s)` | 0.75 | How far the halo reaches; higher uses the larger, blurrier levels more |
+| `setToneMapping(on)` | on | The effect's own soft shoulder; turn it off when the window tone maps ([HDR and Tone Mapping](hdr.md)) |
 | `setExposure(e)` | 1.0 | Exposure applied before tone mapping |
 
 !!! tip

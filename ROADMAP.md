@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **Next: 2.3 HDR pipeline**. 2.3-2.9 not started |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **Next: 2.4 image-based lighting**. 2.4-2.9 not started |
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -535,6 +535,21 @@ Goal: make the library trustworthy to depend on.
         every copy its own material), different nodes sharing a mesh, transparent items.
 3. **HDR pipeline.** Float render targets, exposure and tone mapping (ACES/AgX) as the
    final post step, MSAA resolve and FXAA/SMAA option.
+   *Done (except SMAA):* float targets and the MSAA resolve already existed (RGBA16F scene
+   image with a 4x multisampled copy, RGBA16F effect chain); the final copy to the screen
+   clamped. The copy shader is now the output step: exposure, tone mapping
+   (`ivf::ToneMapping`: None, Reinhard, ACES fit after Stephen Hill, AgX after Troy
+   Sobotka/Benjamin Wrensch with its 2.2 display EOTF so all operators output the same
+   space), gamma and FXAA (compact FXAA 3.11 on the mapped image), used after the effect
+   chain and without effects alike. `GLFWSceneWindow::setToneMapping()`, `setExposure()`,
+   `setGamma()`, `setFxaa()` (tone mapping or FXAA turn render to texture on) and
+   `setMsaaSamples()` (0 = off, clamped to `GL_MAX_SAMPLES`; was fixed at 4).
+   `MipBloomEffect::setToneMapping(false)` leaves the mapping to the window.
+   `FrameBuffer::drop()` also frees the multisampled objects when MSAA is turned off. Gamma
+   defaults to 1 because materials and lights are authored in display space; a linear
+   workflow (sRGB textures, linear lighting) is a separate step. Defaults copy the image
+   unchanged: all existing examples pixel-identical. New example `hdr1` and user guide
+   page *HDR and Tone Mapping*. Open: SMAA, automatic exposure (eye adaptation).
 4. **Image-based lighting.** Load HDR environment maps (`.hdr`/`.exr`), precompute
    irradiance and prefiltered specular maps for the existing PBR material; skybox from
    the same map.

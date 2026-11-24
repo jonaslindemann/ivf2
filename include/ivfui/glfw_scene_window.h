@@ -24,6 +24,7 @@
 #include <ivf/cursor.h>
 #include <ivf/planar_reflection.h>
 #include <ivf/renderer.h>
+#include <ivf/tone_mapping.h>
 
 #include <ivfui/scene_control_panel.h>
 #include <ivfui/camera_window.h>
@@ -75,6 +76,14 @@ private:
     static constexpr double k_boxSelectMinDrag = 5.0; ///< Min pixels to initiate box select.
 
     bool m_renderToTexture{false};    ///< Render to texture enabled.
+
+    // HDR output step (see setToneMapping())
+    ivf::ToneMapping m_toneMapping{ivf::ToneMapping::None};
+    float m_exposure{1.0f};
+    float m_gamma{1.0f};
+    bool m_fxaa{false};
+    int m_msaaSamples{4};       ///< Samples of the offscreen scene image (0 or 1: no MSAA).
+    bool m_msaaDirty{false};    ///< m_msaaSamples changed after setup.
     bool m_selectionRendering{false}; ///< Selection rendering in progress.
     bool m_showAxis{false};           ///< Show axis overlay.
     bool m_showGrid{false};           ///< Show grid overlay.
@@ -104,6 +113,8 @@ private:
     RenderStatsWindowPtr m_renderStatsWindow;         ///< Readout of m_renderStats (Windows menu).
     int m_renderStatsInterval{0};                     ///< IVF2_RENDER_STATS: log every n frames (0: off).
     void logRenderStats();
+    void applyMsaaSamples();    ///< Set up the offscreen image's multisampling from m_msaaSamples.
+    void applyOutputSettings(); ///< Upload the HDR output uniforms to the output program.
 
     // Selection is rendered on demand: after mouse movement, button presses, resizing,
     // or when the camera changed since the last selection render.
@@ -189,6 +200,46 @@ public:
      * @return bool True if enabled.
      */
     bool renderToTexture() const;
+
+    /** @name HDR output
+     *  With render to texture the scene is drawn into a floating-point (RGBA16F) image,
+     *  so colours can exceed 1 (bright lights, additive glows); effects work on these
+     *  values. The output step then scales the image by the exposure, applies the tone
+     *  mapping curve and the gamma, and optionally FXAA, as the very last step. A tone
+     *  mapping other than None or FXAA turns render to texture on by itself. Defaults
+     *  (None, exposure 1, gamma 1, no FXAA) copy the image unchanged.
+     */
+    ///@{
+    /** @brief Curve mapping HDR colours to the display (ivf::ToneMapping). */
+    void setToneMapping(ivf::ToneMapping toneMapping);
+    [[nodiscard]] ivf::ToneMapping toneMapping() const;
+
+    /** @brief Brightness scale applied before tone mapping (1 = unchanged). */
+    void setExposure(float exposure);
+    [[nodiscard]] float exposure() const;
+
+    /**
+     * @brief Gamma applied after tone mapping (1 = none).
+     *
+     * ivf2's materials and lights are authored in display space, so 1 is right for most
+     * scenes; use 2.2 for shaders that light in linear space.
+     */
+    void setGamma(float gamma);
+    [[nodiscard]] float gamma() const;
+
+    /** @brief Fast approximate anti-aliasing of the final image (cheap, softens edges). */
+    void setFxaa(bool enabled);
+    [[nodiscard]] bool fxaa() const;
+
+    /**
+     * @brief Multisampling of the offscreen scene image (default 4; 0 or 1 turns it off).
+     *
+     * Clamped to what the driver supports. Only affects render to texture; the window's
+     * own framebuffer is multisampled through the GLFW_SAMPLES hint.
+     */
+    void setMsaaSamples(int samples);
+    [[nodiscard]] int msaaSamples() const;
+    ///@}
 
     /**
      * @brief Add a custom UI window to the scene window.

@@ -18,6 +18,7 @@ uniform float glowThreshold;
 uniform float glowIntensity;
 uniform float glowSpread;
 uniform float glowExposure;
+uniform bool glowToneMap = true; // off: leave HDR values for the window's tone mapping
 
 // A NaN or infinite pixel spreads through the whole mip chain; drop it instead
 vec3 sanitize(vec3 color)
@@ -73,9 +74,11 @@ void main()
 
     // Soft shoulder: unchanged below 0.8, rolls off smoothly towards 1 above it
     // (same slope at the joint, so there is no visible kink)
-    const float shoulder = 0.8;
-    vec3 over = max(color - shoulder, 0.0);
-    color = min(color, vec3(shoulder)) + (1.0 - shoulder) * (1.0 - exp(-over / (1.0 - shoulder)));
+    if (glowToneMap) {
+        const float shoulder = 0.8;
+        vec3 over = max(color - shoulder, 0.0);
+        color = min(color, vec3(shoulder)) + (1.0 - shoulder) * (1.0 - exp(-over / (1.0 - shoulder)));
+    }
 
     FragColor = vec4(color, base.a);
 })";
@@ -104,6 +107,7 @@ void MipBloomEffect::doUpdateParams()
     m_program->uniformFloat("glowIntensity", m_intensity);
     m_program->uniformFloat("glowSpread", m_spread);
     m_program->uniformFloat("glowExposure", m_exposure);
+    m_program->uniformBool("glowToneMap", m_toneMapping);
 }
 
 void MipBloomEffect::setupProperties()
@@ -152,4 +156,14 @@ float MipBloomEffect::spread() const
 float MipBloomEffect::exposure() const
 {
     return m_exposure;
+}
+
+void MipBloomEffect::setToneMapping(bool enabled)
+{
+    m_toneMapping = enabled;
+}
+
+bool MipBloomEffect::toneMapping() const
+{
+    return m_toneMapping;
 }

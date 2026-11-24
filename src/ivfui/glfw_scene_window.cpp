@@ -128,6 +128,90 @@ bool ivfui::GLFWSceneWindow::renderToTexture() const
     return m_renderToTexture;
 }
 
+void ivfui::GLFWSceneWindow::setToneMapping(ivf::ToneMapping toneMapping)
+{
+    m_toneMapping = toneMapping;
+}
+
+ivf::ToneMapping ivfui::GLFWSceneWindow::toneMapping() const
+{
+    return m_toneMapping;
+}
+
+void ivfui::GLFWSceneWindow::setExposure(float exposure)
+{
+    m_exposure = std::max(exposure, 0.0f);
+}
+
+float ivfui::GLFWSceneWindow::exposure() const
+{
+    return m_exposure;
+}
+
+void ivfui::GLFWSceneWindow::setGamma(float gamma)
+{
+    m_gamma = std::max(gamma, 0.01f);
+}
+
+float ivfui::GLFWSceneWindow::gamma() const
+{
+    return m_gamma;
+}
+
+void ivfui::GLFWSceneWindow::setFxaa(bool enabled)
+{
+    m_fxaa = enabled;
+}
+
+bool ivfui::GLFWSceneWindow::fxaa() const
+{
+    return m_fxaa;
+}
+
+void ivfui::GLFWSceneWindow::setMsaaSamples(int samples)
+{
+    samples = std::max(samples, 0);
+    if (samples == m_msaaSamples)
+        return;
+    m_msaaSamples = samples;
+    m_msaaDirty = true; // applied to the offscreen image before the next frame
+}
+
+int ivfui::GLFWSceneWindow::msaaSamples() const
+{
+    return m_msaaSamples;
+}
+
+void ivfui::GLFWSceneWindow::applyMsaaSamples()
+{
+    GLint maxSamples = 1;
+    glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
+    const int samples = std::min(m_msaaSamples, int(maxSamples));
+    if (samples > 1)
+    {
+        m_frameBuffer->setSamples(samples);
+        m_frameBuffer->setMultisample(true);
+    }
+    else
+    {
+        m_frameBuffer->setMultisample(false);
+    }
+    m_msaaDirty = false;
+}
+
+void ivfui::GLFWSceneWindow::applyOutputSettings()
+{
+    // Uniforms of the output program, used by FrameBuffer::draw() and the post processor
+    auto program = renderContext()->shaders()->program("render_to_texture");
+    if (!program)
+        return;
+    program->use();
+    program->uniformInt("toneMapping", static_cast<int>(m_toneMapping));
+    program->uniformFloat("exposure", m_exposure);
+    program->uniformFloat("gamma", m_gamma);
+    program->uniformBool("fxaa", m_fxaa);
+}
+
 void ivfui::GLFWSceneWindow::addUiWindow(ivfui::UiWindowPtr uiWindow)
 {
     m_uiWindows.push_back(uiWindow);
@@ -673,7 +757,7 @@ int ivfui::GLFWSceneWindow::doSetup()
         initializeSelectionBuffer();
 
     m_frameBuffer->initialize();
-    m_frameBuffer->setMultisample(true);
+    applyMsaaSamples();
 
     m_postProcessor->initialize();
 
@@ -897,8 +981,12 @@ void GLFWSceneWindow::doUpdateOtherUi()
 
 void GLFWSceneWindow::doDraw()
 {
-    if ((m_renderToTexture) && (!m_selectionRendering))
+    // Tone mapping and FXAA work on the offscreen image
+    const bool offscreen = m_renderToTexture || m_toneMapping != ivf::ToneMapping::None || m_fxaa;
+    if (offscreen && (!m_selectionRendering))
     {
+        if (m_msaaDirty)
+            applyMsaaSamples();
         m_frameBuffer->resize(width(), height());
         m_postProcessor->resize(width(), height());
 
@@ -918,8 +1006,9 @@ void GLFWSceneWindow::doDraw()
 
         m_frameBuffer->end();
 
-        // Draw texture to screen
+        // Draw texture to screen (exposure, tone mapping, gamma, FXAA)
 
+        applyOutputSettings();
         smApplyProgram("render_to_texture");
         smCurrentProgram()->uniformInt("screenTexture", 0);
 

@@ -58,7 +58,7 @@ set(_ivf2_visual_examples
     animation1 animation2 animation3 assimp1 audio_reactive1 auto_instancing1 bbox1 behaviors1
     bump1 camera_anim1 cursor1 cursor_optimization custom_mesh1 debug_draw1 deformer1 deformer2
     deformer3 dof1
-    editor1 effects1 extrusions1 flow_field1 fog1 frame_export1 hello_ivf hello_pipeline
+    editor1 effects1 extrusions1 flow_field1 fog1 frame_export1 hdr1 hello_ivf hello_pipeline
     instancing1 lighting1 mip_bloom1 multi_window1 particles1 primitives1 procedural1
     procedural2 reflection1 rigid_body1 scene_ui1 selection1 serialization1 shader_material1
     shadows1 skybox1 solar_system text1 textures1 textures2 textures3 textures4 time_control1

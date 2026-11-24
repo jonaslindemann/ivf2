@@ -40,6 +40,7 @@ nav = [
   ] },
   { "Effects" = [
     { "Overview" = "effects/index.md" },
+    { "HDR and Tone Mapping" = "effects/hdr.md" },
     { "Blur, Bloom and Depth" = "effects/blur.md" },
     { "Colour Effects" = "effects/color_effects.md" },
     { "Film and Distortion" = "effects/film_effects.md" },

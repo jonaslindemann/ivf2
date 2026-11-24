@@ -82,6 +82,12 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
+- HDR output: `GLFWSceneWindow::setToneMapping()` (`ivf::ToneMapping`: None, Reinhard, ACES, AgX),
+  `setExposure()`, `setGamma()` and `setFxaa()` map the floating-point scene image to the display
+  as the last step after all effects; `setMsaaSamples()` sets the multisampling of the offscreen
+  image (was fixed at 4). Tone mapping or FXAA turn render to texture on. The defaults leave
+  images unchanged. `MipBloomEffect::setToneMapping(false)` leaves tone mapping to the window. New
+  example `hdr1` and user guide page *HDR and Tone Mapping*.
 - Automatic instancing: copies of a mesh that an `InstanceNode` draws with the same material and
   textures are drawn with one instanced draw call (opaque objects, all passes). Custom shaders
   without the instance attributes get one draw per copy, so images do not change.
@@ -96,6 +102,7 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
+- `FrameBuffer` leaked its multisampled objects when multisampling was turned off.
 - Loaded models: a node with several meshes of different materials showed all of them with the
   last mesh's material; further meshes now get their own material (`Mesh::material()`).
 - A mesh's own `ShaderMaterial` (`Mesh::setMaterial()`) stayed applied after the mesh was

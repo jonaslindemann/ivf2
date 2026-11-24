@@ -37,6 +37,8 @@ Effects run in the order you add them. Order matters, because each effect sees t
 3. **Lens and film**: chromatic aberration, vignette, film grain, scanlines.
 4. **Wide bloom last**: [`MipBloomEffect`](blur.md#mipbloomeffect) includes tone mapping, so it should see the final colours.
 
+The scene image and the effects use floating-point colours, so values above 1 survive the whole chain. Tone mapping, exposure, gamma and FXAA run after all effects, as the window's output step: see [HDR and Tone Mapping](hdr.md).
+
 ## Controlling effects at runtime
 
 Every added effect gets an index, starting at 0 in the order of `addEffect()` calls. Effects are enabled when added.
@@ -99,3 +101,4 @@ To write your own, see [Custom Effects](custom_effects.md).
 
 - `effects1` adds all of the stylisation effects with a panel to switch between them. See [Effects Examples](../examples/effects_examples.md).
 - `fog1`, `dof1` and `mip_bloom1` each focus on one depth or bloom effect.
+- `hdr1` shows bright lights with tone mapping, exposure, bloom in HDR, FXAA and MSAA (see [HDR and Tone Mapping](hdr.md)).

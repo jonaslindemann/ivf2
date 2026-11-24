@@ -30,6 +30,7 @@ private:
     float m_intensity{0.8f}; ///< Amount of bloom added.
     float m_spread{0.75f};   ///< Weight falloff per blur level; higher gives wider halos [0, 1].
     float m_exposure{1.0f};  ///< Scale before tone mapping.
+    bool m_toneMapping{true}; ///< Apply the soft shoulder (off: the window tone maps).
 
 public:
     MipBloomEffect();
@@ -45,6 +46,15 @@ public:
     [[nodiscard]] float intensity() const;
     [[nodiscard]] float spread() const;
     [[nodiscard]] float exposure() const;
+
+    /**
+     * @brief Roll off bright values with the effect's own soft shoulder (default on).
+     *
+     * Turn it off when the window tone maps the image (GLFWSceneWindow::setToneMapping()),
+     * so the bloom stays in HDR and is mapped only once, at the end.
+     */
+    void setToneMapping(bool enabled);
+    [[nodiscard]] bool toneMapping() const;
 
 protected:
     void doLoad() override;

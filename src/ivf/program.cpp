@@ -1,6 +1,7 @@
 #include <ivf/program.h>
 #include <ivf/gl_debug.h>
 #include <ivf/render_context.h>
+#include <ivf/uniform_blocks.h>
 
 using namespace ivf;
 
@@ -74,6 +75,15 @@ bool Program::link()
             logErrorfc("Program", "Program link error in {}: {}", m_name, std::string(&programErrorMessage[0]));
         else if (programErrorMessage[0] != '\0')
             logWarningfc("Program", "Program link warning in {}: {}", m_name, std::string(&programErrorMessage[0]));
+    }
+
+    // Connect the shared uniform blocks the program declares to their binding points
+    // (GLSL 3.30 has no layout(binding = n)).
+    if (result == GL_TRUE)
+    {
+        const GLuint cameraBlock = glGetUniformBlockIndex(m_id, CameraBlockName);
+        if (cameraBlock != GL_INVALID_INDEX)
+            glUniformBlockBinding(m_id, cameraBlock, CameraBlockBinding);
     }
 
     return result == GL_TRUE;

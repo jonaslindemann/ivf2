@@ -19,6 +19,7 @@ void Renderer::execute(const RenderQueue &queue, const Frustum &frustum, const S
 {
     RenderContext &ctx = *m_context;
     auto *xfm = ctx.transforms();
+    xfm->syncCameraBlock(); // view/projection may have been changed through their references
     const glm::mat4 start = xfm->modelMatrix();
     const glm::mat4 view = xfm->viewMatrix();
     const glm::mat4 projection = xfm->projectionMatrix();

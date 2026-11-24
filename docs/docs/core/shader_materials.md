@@ -134,12 +134,18 @@ layout (location = 2) in vec2 aTex;
 layout (location = 3) in vec3 aNormal;
 ```
 
-These uniforms are set automatically:
+`uniform mat4 model` (object to world) is set automatically. The camera comes from the `IvfCamera` uniform block, which the render context keeps up to date for all programs; declare it in every stage that uses one of its members:
 
-| Uniform | Contents |
-|---------|----------|
-| `mat4 model`, `view`, `projection` | Transform matrices |
-| `vec3 viewPos` | Camera position in world space |
+```glsl
+layout(std140) uniform IvfCamera {
+    mat4 view;           // world to view space
+    mat4 projection;     // view to clip space
+    mat4 viewProjection; // projection * view
+    vec3 viewPos;        // camera position in world space
+};
+```
+
+The block has no instance name, so the members are used like plain uniforms (`projection * view * p`). In C++ shader strings, `IVF_CAMERA_BLOCK_GLSL` from `<ivf/uniform_blocks.h>` expands to this declaration. Older shaders that declare plain `uniform mat4 view, projection;` and `uniform vec3 viewPos;` instead still get them set (the `ripple` shader does); a program can't have both.
 
 The standard light and material uniforms are only uploaded after `setUseLighting(true)`, so unlit shaders don't need to declare them.
 
@@ -153,7 +159,13 @@ The `glow` shader from the `shader_material1` example: the sphere breathes along
 layout (location = 0) in vec3 aPos;
 layout (location = 3) in vec3 aNormal;
 
-uniform mat4 model, view, projection;
+uniform mat4 model;
+layout(std140) uniform IvfCamera {
+    mat4 view;
+    mat4 projection;
+    mat4 viewProjection;
+    vec3 viewPos;
+};
 uniform float time;
 uniform float pulse;
 
@@ -176,7 +188,12 @@ void main()
 in vec3 worldPos;
 in vec3 worldNormal;
 
-uniform vec3 viewPos;
+layout(std140) uniform IvfCamera {
+    mat4 view;
+    mat4 projection;
+    mat4 viewProjection;
+    vec3 viewPos;
+};
 uniform vec3 glowColor;
 uniform float time;
 uniform float pulse;

@@ -36,7 +36,9 @@ namespace ivf {
  *   layout (location = 2) in vec2 aTex;
  *   layout (location = 3) in vec3 aNormal;
  *   @endcode
- * - Provided automatically: `uniform mat4 model, view, projection;` and `uniform vec3 viewPos;`
+ * - Provided automatically: `uniform mat4 model;` and the camera block `IvfCamera` (`view`,
+ *   `projection`, `viewProjection`, `viewPos`; see ivf/uniform_blocks.h). Plain `view`,
+ *   `projection` and `viewPos` uniforms are still set for shaders that declare them instead.
  * - The stock lighting uniforms (light arrays, `material.*`) are uploaded only when
  *   setUseLighting(true) is set, so unlit shaders do not need to declare them.
  *

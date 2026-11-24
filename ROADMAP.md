@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (step 1, location cache, done; next: camera uniform block). 2.3-2.9 not started |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling in progress** (steps 1-2, location cache and camera block, done; next: lights block). 2.3-2.9 not started |
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -475,7 +475,17 @@ Goal: make the library trustworthy to depend on.
         examples pixel-identical (transparency1 and mip_bloom1 vary by 1/255 between runs
         of the same build on this GPU).
      2. Camera uniform block (`IvfCamera`) in the stock, PBR and bump shaders; the
-        renderer writes it per pass.
+        renderer writes it per pass. *Done:* `uniform_blocks.h` (`CameraBlock`: view,
+        projection, viewProjection, viewPos; binding point 0; `IVF_CAMERA_BLOCK_GLSL`);
+        `Program::link()` binds the block when declared; `TransformManager` owns the
+        buffer and writes it in `syncCameraBlock()` only when the contents changed
+        (every view/projection setter, `setViewPos()`, `refreshForProgram()`, and
+        `Renderer::execute()` for matrices changed through the references). Stock, PBR,
+        bump, glow, mist, water and gradient-sky shaders and the `glow`/`instanced_glow`
+        example shaders use the block; `ripple` keeps plain uniforms, which are still set
+        through cached locations. `RenderContext::Counters::cameraBlockUploads`. All
+        examples pixel-identical, no GL debug messages. `Billboard`, `ParticleSystem`,
+        `Skybox` and `DebugDraw` (raw programs with their own `viewProj`) are unchanged.
      3. Lights uniform block (`IvfLights`); `LightManager::apply()` writes the buffer once
         per frame instead of uploading per program; per-program legacy upload only for
         shaders without the block.

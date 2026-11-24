@@ -31,6 +31,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   of the material of the previously drawn node. `LineTrace` has its own unlit material.
 - Material inheritance follows the scene: a node without a material uses its nearest ancestor's.
   Before, it used whatever material was applied last (often a previous sibling's).
+- The built-in shaders (stock, PBR, bump, `GlowMaterial`, `MistMaterial`, `WaterMaterial`,
+  `GradientSkyMaterial`) read the camera from the `IvfCamera` uniform block instead of plain
+  `view`, `projection` and `viewPos` uniforms. Setting those by name on a built-in program (e.g.
+  `program->uniformMatrix4("view", ...)`) no longer has an effect; use `TransformManager`.
+  Your own shaders with plain camera uniforms keep working.
 - `CompositeNode` uses a material set on it (`setMaterial()` on a group used to be ignored
   because groups had `setUseMaterial(false)` by default).
 
@@ -63,6 +68,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - `Program` caches uniform locations: the driver is queried once per name after each `link()`
   (switching to a `ShaderMaterial` or `BumpMaterial` used to query dozens per draw). Render
   statistics count the remaining driver queries (`uniformLookups`, *Lookups* column).
+- Camera uniform block `IvfCamera` (`ivf/uniform_blocks.h`): view, projection, view-projection
+  and camera position in a std140 uniform buffer shared by all programs of a render context.
+  Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
+  upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
+  camera changes.
 
 ### Fixed
 

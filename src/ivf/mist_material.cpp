@@ -1,4 +1,5 @@
 #include <ivf/mist_material.h>
+#include <ivf/uniform_blocks.h>
 
 #include <ivf/logger.h>
 #include <ivf/shader_manager.h>
@@ -17,9 +18,7 @@ const std::string mist_vert_shader_source = R"(
 layout (location = 0) in vec3 aPos;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
+)" IVF_CAMERA_BLOCK_GLSL R"(
 out vec3 localPos;
 
 void main()

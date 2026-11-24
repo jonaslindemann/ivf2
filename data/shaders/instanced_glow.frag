@@ -4,7 +4,13 @@ in vec3 worldNormal;
 in vec4 instColor;
 in float pulse;
 
-uniform vec3 viewPos;
+// Camera data shared by all programs (see ivf/uniform_blocks.h)
+layout(std140) uniform IvfCamera {
+    mat4 view;
+    mat4 projection;
+    mat4 viewProjection;
+    vec3 viewPos;
+};
 
 out vec4 fragColor;
 

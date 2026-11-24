@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ivf/uniform_blocks.h>
 #include <string>
 
 namespace ivf {
@@ -23,8 +24,7 @@ out vec2 texCoord;
 out vec4 instanceColor;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+)" IVF_CAMERA_BLOCK_GLSL R"(
 uniform bool useInstancing = false;
 
 void main()
@@ -110,8 +110,7 @@ uniform int  spotLightCount  = 0;
 uniform bool useLighting     = true;
 uniform bool useVertexColors = false;
 
-uniform vec3 viewPos;
-
+)" IVF_CAMERA_BLOCK_GLSL R"(
 // ---- Selection (identical to basic shader) ---------------------------------
 uniform bool selectionRendering = false;
 uniform uint objectId;

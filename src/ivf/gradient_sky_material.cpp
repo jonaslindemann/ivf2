@@ -1,4 +1,5 @@
 #include <ivf/gradient_sky_material.h>
+#include <ivf/uniform_blocks.h>
 
 #include <ivf/logger.h>
 #include <ivf/shader_manager.h>
@@ -16,10 +17,7 @@ const std::string sky_vert_shader_source = R"(
 #version 330 core
 layout (location = 0) in vec3 aPos;
 
-uniform mat4 view;
-uniform mat4 projection;
-uniform vec3 viewPos;
-
+)" IVF_CAMERA_BLOCK_GLSL R"(
 out vec3 direction;
 
 void main()

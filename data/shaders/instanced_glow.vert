@@ -8,8 +8,13 @@ layout (location = 8) in vec4 aInstanceColor;
 layout (location = 9) in vec4 aInstanceData;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+// Camera data shared by all programs (see ivf/uniform_blocks.h)
+layout(std140) uniform IvfCamera {
+    mat4 view;
+    mat4 projection;
+    mat4 viewProjection;
+    vec3 viewPos;
+};
 uniform float time;
 
 out vec3 worldPos;

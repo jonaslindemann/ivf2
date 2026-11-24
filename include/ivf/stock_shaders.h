@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ivf/uniform_blocks.h>
 #include <string>
 
 namespace ivf {
@@ -33,9 +34,7 @@ out vec2 texCoord;
 out vec4 instanceColor;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
+)" IVF_CAMERA_BLOCK_GLSL R"(
 uniform bool shadowPass = false;
 uniform mat4 lightSpaceMatrix;
 uniform bool useInstancing = false;
@@ -154,7 +153,7 @@ in vec2 texCoord;
 in vec4 instanceColor;
 
 uniform vec3 lightPos;
-uniform vec3 viewPos; 
+)" IVF_CAMERA_BLOCK_GLSL R"(
 uniform vec4 lightColor;
 uniform vec3 textColor;
 

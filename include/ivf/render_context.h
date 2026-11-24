@@ -161,6 +161,7 @@ public:
         std::uint64_t programChanges{0};  ///< Program::use() calls that switched to another program.
         std::uint64_t materialApplies{0}; ///< Materials applied to nodes (own, inherited or default).
         std::uint64_t uniformLookups{0};  ///< Uniform locations queried from the driver (cache misses).
+        std::uint64_t cameraBlockUploads{0}; ///< Uploads of the IvfCamera uniform buffer (camera changes).
     };
 
     /** @brief Totals since the context was created. */
@@ -179,6 +180,12 @@ public:
     void countUniformLookup()
     {
         ++m_counters.uniformLookups;
+    }
+
+    /** @brief Count an upload of the camera uniform block (called by TransformManager). */
+    void countCameraBlockUpload()
+    {
+        ++m_counters.cameraBlockUploads;
     }
 
     /** @brief Count a material applied to a node. */

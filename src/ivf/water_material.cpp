@@ -1,4 +1,5 @@
 #include <ivf/water_material.h>
+#include <ivf/uniform_blocks.h>
 
 #include <ivf/logger.h>
 #include <ivf/shader_manager.h>
@@ -19,9 +20,7 @@ layout (location = 2) in vec2 aTex;
 layout (location = 3) in vec3 aNormal;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
+)" IVF_CAMERA_BLOCK_GLSL R"(
 out vec3 worldPos;
 
 void main()
@@ -39,7 +38,7 @@ in vec3 worldPos;
 uniform sampler2D reflectionTexture;
 uniform bool hasReflection;
 uniform vec2 viewportSize;
-uniform vec3 viewPos;
+)" IVF_CAMERA_BLOCK_GLSL R"(
 uniform float time;
 
 uniform vec3 waterColor;

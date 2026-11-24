@@ -5,8 +5,13 @@ layout (location = 2) in vec2 aTex;
 layout (location = 3) in vec3 aNormal;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+// Camera data shared by all programs (see ivf/uniform_blocks.h)
+layout(std140) uniform IvfCamera {
+    mat4 view;
+    mat4 projection;
+    mat4 viewProjection;
+    vec3 viewPos;
+};
 
 uniform float time;
 uniform float pulse;

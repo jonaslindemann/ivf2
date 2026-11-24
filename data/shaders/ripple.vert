@@ -5,6 +5,7 @@ layout (location = 2) in vec2 aTex;
 layout (location = 3) in vec3 aNormal;
 
 uniform mat4 model;
+// Plain camera uniforms still work; the IvfCamera block (see glow.vert) is preferred.
 uniform mat4 view;
 uniform mat4 projection;
 

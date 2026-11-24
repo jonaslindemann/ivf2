@@ -1,4 +1,5 @@
 #include <ivf/glow_material.h>
+#include <ivf/uniform_blocks.h>
 
 #include <ivf/logger.h>
 #include <ivf/shader_manager.h>
@@ -17,9 +18,7 @@ layout (location = 0) in vec3 aPos;
 layout (location = 3) in vec3 aNormal;
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
-
+)" IVF_CAMERA_BLOCK_GLSL R"(
 out vec3 worldPos;
 out vec3 worldNormal;
 
@@ -38,7 +37,7 @@ const std::string glow_frag_shader_source = R"(
 in vec3 worldPos;
 in vec3 worldNormal;
 
-uniform vec3 viewPos;
+)" IVF_CAMERA_BLOCK_GLSL R"(
 uniform vec3 glowColor;
 uniform float glowBrightness;
 uniform float glowFalloff;

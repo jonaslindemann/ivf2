@@ -2,6 +2,7 @@
 
 #include <ivf/glbase.h>
 #include <ivf/shader.h>
+#include <ivf/uniform_blocks.h>
 
 #include <string>
 #include <vector>
@@ -53,6 +54,10 @@ private:
     GLint m_projectionId; ///< Shader uniform location for projection matrix.
     GLint m_viewPosId;    ///< Shader uniform location for view position.
 
+    GLuint m_cameraBuffer{0};       ///< Uniform buffer of the IvfCamera block (created on first upload).
+    CameraBlock m_cameraBlock;      ///< Contents last uploaded to m_cameraBuffer.
+    bool m_cameraBlockValid{false}; ///< m_cameraBlock has been uploaded.
+
     TransformManager();                  ///< Private constructor for singleton pattern.
 
     /**
@@ -60,7 +65,31 @@ private:
      */
     void updateShaderMvpMatrix();
 
+    /// Upload the view matrix and view position (plain uniforms and camera block).
+    void uploadView();
+
+    /// Upload the projection matrix (plain uniform and camera block).
+    void uploadProjection();
+
 public:
+    ~TransformManager();
+
+    TransformManager(const TransformManager &) = delete;
+    TransformManager &operator=(const TransformManager &) = delete;
+
+    /**
+     * @brief Write view, projection and view position to the `IvfCamera` uniform block.
+     *
+     * Uploads only if they differ from the last upload. Called by every function that
+     * changes these matrices and by the Renderer at the start of each pass; call it
+     * yourself after changing viewMatrix() or projectionMatrix() through their references
+     * if you draw without the Renderer. See ivf/uniform_blocks.h.
+     */
+    void syncCameraBlock();
+
+    /** @brief Camera block contents last uploaded by syncCameraBlock(). */
+    [[nodiscard]] const CameraBlock &cameraBlock() const;
+
     /** @name Matrices of the individual transform operations
      *  translate3f(), rotateDeg(), rotateToVector() and scale() multiply the model matrix
      *  by these; the render queue uses them to compute world matrices identically.
@@ -332,7 +361,8 @@ public:
      * @brief Set the view (camera) position used for lighting, without changing the view matrix.
      *
      * Used by render passes that replace the view matrix directly, such as
-     * PlanarReflection. The value is uploaded on the next refreshForProgram().
+     * PlanarReflection. Updates the camera block; plain `viewPos` uniforms are uploaded on
+     * the next refreshForProgram().
      * @param pos Camera position in world space.
      */
     void setViewPos(glm::vec3 pos);

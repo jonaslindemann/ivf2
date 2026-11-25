@@ -28,6 +28,7 @@
 #include <ivf/light_manager.h>
 #include <ivf/normal_factory.h>
 #include <ivf/texture.h>
+#include <ivf/texture3d.h>
 #include <ivf/material.h>
 #include <ivf/font_manager.h>
 #include <ivf/selection_manager.h>

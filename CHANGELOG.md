@@ -80,6 +80,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   `ivfvis::Streamlines` (RK4 tracing forward, backward or both, as lines or tubes coloured by
   field strength); `traceStreamline()`/`traceStreamlines()` without OpenGL and seed helpers
   (`seedLine`, `seedPlane`, `seedCircle`, `seedRandom`). New example `vis_vectors1`.
+- `ivfvis::Volume`: volume rendering of a grid's scalar array by ray marching, with a transfer
+  function (colormap colours, opacity curve; `opacityAt()`, `transferTable()`), density, sample
+  count and gradient shading; rays stop at opaque geometry. New example `vis_volume1`.
+- `Texture3D`: single-channel 3D textures (R8, R16F, R32F) kept on the CPU and uploaded per render
+  context when bound.
 - `OverlayNode`: children drawn in window pixel coordinates over the scene (HUDs, legends).
 - `TextNode::setResolution()` (glyph pixel size, for sharp text at a known size),
   `TextNode::setColor()`/`setUseColor()` (fixed colour independent of lighting).

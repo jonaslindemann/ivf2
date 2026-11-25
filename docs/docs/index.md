@@ -84,6 +84,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 - [Point clouds](visualisation/point_clouds.md) of millions of points, coloured and sized by their values and picked point by point
 - [Isosurfaces and slice planes](visualisation/scalar_fields.md) through 3D fields, with contour lines
 - [Glyphs and streamlines](visualisation/vector_fields.md) for vector fields: arrows, field lines and stream tubes
+- [Volume rendering](visualisation/volumes.md) with colour and opacity transfer functions, embedded among opaque objects
 
 ### User interface
 

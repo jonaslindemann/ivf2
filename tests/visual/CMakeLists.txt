@@ -67,3 +67,5 @@ set(_ivf2_visual_examples
 foreach(example IN LISTS _ivf2_visual_examples)
     ivf2_add_visual_test(${example})
 endforeach()
+# Ray marching is slow on the software renderer: the picture is static, a few frames suffice
+ivf2_add_visual_test(vis_volume1 FRAMES 3)

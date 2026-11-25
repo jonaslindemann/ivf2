@@ -22,3 +22,4 @@
 #include <ivfvis/uniform_grid.h>
 #include <ivfvis/value_range.h>
 #include <ivfvis/vector_field.h>
+#include <ivfvis/volume.h>

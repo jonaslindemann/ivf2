@@ -65,6 +65,7 @@ nav = [
     { "Point Clouds" = "visualisation/point_clouds.md" },
     { "Isosurfaces and Slices" = "visualisation/scalar_fields.md" },
     { "Glyphs and Streamlines" = "visualisation/vector_fields.md" },
+    { "Volume Rendering" = "visualisation/volumes.md" },
 ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },

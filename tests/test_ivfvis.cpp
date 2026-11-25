@@ -558,4 +558,54 @@ IVF_TEST(glyph_and_streamline_nodes)
     ivf::RenderContext::clearCurrent();
 }
 
+IVF_TEST(volume_transfer_function)
+{
+    const std::vector<glm::vec2> ramp{{0.2f, 0.0f}, {0.6f, 0.8f}, {1.0f, 0.4f}};
+    IVF_CHECK_NEAR(opacityAt(ramp, 0.0f), 0.0, 1e-6);  // constant before the first point
+    IVF_CHECK_NEAR(opacityAt(ramp, 0.4f), 0.4, 1e-6);
+    IVF_CHECK_NEAR(opacityAt(ramp, 0.8f), 0.6, 1e-6);
+    IVF_CHECK_NEAR(opacityAt(ramp, 2.0f), 0.4, 1e-6);  // and after the last
+    IVF_CHECK_NEAR(opacityAt({}, 0.3f), 0.3, 1e-6);    // no points: linear ramp
+
+    auto gray = Colormap::create(BuiltinColormap::Gray);
+    const auto table = transferTable(*gray, ramp, 11);
+    IVF_CHECK(table.size() == 11);
+    IVF_CHECK(near(table[5], {0.5f, 0.5f, 0.5f, 0.6f}));
+    gray->setReversed(true);
+    IVF_CHECK_NEAR(transferTable(*gray, ramp, 11)[0].r, 1.0, 1e-6);
+}
+
+IVF_TEST(volume_node_without_gl)
+{
+    auto ctx = ivf::RenderContext::create(nullptr);
+    ctx->makeCurrent();
+
+    auto grid = UniformGrid::create({4, 3, 2}, ivf::BoundingBox({0, 0, 0}, {3, 2, 1}));
+    grid->fillScalars("f", [](const glm::vec3 &p) { return p.x + 10.0f * p.y; });
+    auto volume = Volume::create(grid, "f", Colormap::create());
+    IVF_CHECK(near(volume->localBoundingBox().max(), {3, 2, 1}));
+    IVF_CHECK(volume->renderLayer() == ivf::RenderLayer::Transparent && !volume->castsShadows());
+
+    auto tex = volume->texture();
+    IVF_CHECK(tex->dimensions() == glm::ivec3(4, 3, 2) && tex->data().size() == 24);
+    IVF_CHECK_NEAR(tex->data()[grid->index(2, 1, 0)], 12.0, 1e-6);
+
+    grid->scalars("f")[0] = 99.0f;
+    volume->update();
+    IVF_CHECK_NEAR(tex->data()[0], 99.0, 1e-6);
+
+    volume->setOpacity({{1.0f, 1.0f}, {0.0f, 0.0f}}); // sorted
+    IVF_CHECK(volume->opacity().front().x == 0.0f);
+
+    // Texture3D on its own
+    auto t3 = ivf::Texture3D::create();
+    const std::vector<float> values(8, 0.5f);
+    t3->setData({2, 2, 2}, values, ivf::Texture3D::Format::R8);
+    IVF_CHECK(t3->format() == ivf::Texture3D::Format::R8 && t3->data().size() == 8);
+    t3->setData({3, 3, 3}, values); // too few values: unchanged
+    IVF_CHECK(t3->dimensions() == glm::ivec3(2, 2, 2));
+
+    ivf::RenderContext::clearCurrent();
+}
+
 IVF_TEST_MAIN()

@@ -14,7 +14,7 @@ see `CHANGELOG.md`).
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-4 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines); **next: step 5** (volume rendering) |
+| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-5 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering); **next: step 6** (axes and annotation) |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -766,7 +766,18 @@ clearest way to stand out.
 5. *Volume rendering.* `Texture3D` in core; `VolumeNode` (box proxy, ray marching in the
       transparent layer, transfer function = colormap + opacity curve, jittered start,
       early termination, stops at opaque scene depth). Example `vis_volume1`.
-   6. *Axes and annotation.* `Axes3D` (bounding box with nice-number ticks, camera-facing
+      *Done:* `ivf::Texture3D` (CPU data, per-context upload like `Mesh`, R8/R16F/R32F).
+      `Volume` draws the back faces of the grid's box (works with the camera inside) with
+      its own program per context; the fragment shader intersects the ray with the box,
+      marches front to back (opacity `1 - exp(-a * extinction * step)`, extinction scaled by
+      the box diagonal, per-pixel jitter, stop at 99 %), optional gradient shading. Opaque
+      occlusion: in the main pass the current depth buffer is blitted into a depth texture of
+      the same format (queried from the framebuffer: 24-bit, 24+8 stencil, 32F; falls back
+      to no occlusion with a warning) and the ray ends at that depth. Transfer function as a
+      256-entry RGBA texture. Visual test with 3 frames (llvmpipe is slow at ray marching).
+      Open: transparent objects inside volumes, empty-space skipping, a transfer function
+      editor widget.
+6. *Axes and annotation.* `Axes3D` (bounding box with nice-number ticks, camera-facing
       labels, titles, back-face grid planes; sized from a node's bounds).
    7. *Readers.* CSV, `.npy`, VTK legacy (structured points, polydata, unstructured grid),
       VTU (ASCII/base64/zlib; optional). All return `ivf::Result<T>`; unit tests.

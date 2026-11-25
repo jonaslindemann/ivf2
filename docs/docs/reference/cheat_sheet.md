@@ -25,6 +25,8 @@ All classes are created with `ClassName::create(...)` and returned as `std::shar
 | `InstancedMeshNode` | Draws many copies of a mesh in one call | `instancing1` example |
 | `NodeVisitor` | Walks the scene graph | [Visitors](../advanced/visitor_pattern.md) |
 | `SceneSerializer` | Saves and loads scenes as JSON | `serialization1` example |
+| `GltfModel` | glTF 2.0 model: hierarchy, PBR materials, skinning, morph targets, animations | [Model Loading](../advanced/model_loading.md#gltf-models) |
+| `ModelLoader` | Loads glTF and, through Assimp, OBJ, FBX, 3DS, ... | [Model Loading](../advanced/model_loading.md) |
 
 ## Primitives
 

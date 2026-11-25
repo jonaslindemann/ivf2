@@ -13,15 +13,14 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **Next: 2.7 glTF 2.0**. 2.7-2.9 not started|
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **Next: 2.8 resource hot reload**. 2.8-2.9 not started|
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
 
 - Render queue (2.1): materials applied with the renderer's explicit context (completes
-  step B; meshes already are); alpha for the PBR material; `setMaterialOverride()`
-  (decided, opt-in).
+  step B; meshes already are); `setMaterialOverride()` (decided, opt-in).
 - Render context (1.2): `ivf::Key`/`ivf::MouseButton`; drop the `instance()` forwarders after
   a deprecation period.
 - Dependencies (1.3): ImGui out of the core (`DebugDraw::drawUi()` labels).
@@ -619,6 +618,30 @@ Goal: make the library trustworthy to depend on.
    material pass), temporal accumulation against noise.
 7. **glTF 2.0** as the primary model format: PBR materials, node hierarchy, skinning and
    morph-target animation (fastgltf or cgltf; keep assimp for legacy formats).
+   *Done:* cgltf (header-only, MIT, a regular private dependency, so glTF also loads
+   without assimp). `GltfModel` (`gltf_model.h`) is a `CompositeNode`: glTF nodes become
+   `CompositeNode`s with TRS (new `TransformNode::setRotation(glm::quat)`, applied after
+   the other rotations and before the scale, also in `doPreDraw()`), meshes a `MeshNode`
+   child with one `Mesh` per primitive (triangles, strips, fans; smooth normals if
+   missing), materials `PBRMaterial`s (factors, base colour, packed metallic-roughness,
+   normal, occlusion and emissive textures from files, data URIs or the .glb buffer with
+   their samplers; alpha modes; vertex colours; KHR_materials_emissive_strength). New PBR
+   features: `setMetallicRoughnessMap()`, `setEmissiveMap()`, albedo factor times map,
+   `setAlphaMode()` (Opaque/Mask/Blend; Blend sorts as transparent, which closes the PBR
+   alpha open item), `setAlphaCutoff()`, `setUseVertexColors()`. Animations: translation,
+   rotation (slerp), scale and morph-weight channels with step, linear and cubic spline
+   sampling, `setAnimation()`, `setTime()`, looping; skinning (joint matrices relative to
+   the mesh node) and morph targets are applied on the CPU into dynamic meshes, so they
+   work with every shader, shadows and selection. `ModelLoader::load()` hands .gltf/.glb
+   to `GltfModel`. `Texture::loadFromMemory()`, `Texture::setImage()`,
+   `loadImageFromMemory()`. Files with required extensions other than
+   KHR_materials_emissive_strength and KHR_lights_punctual are refused. Unit test
+   `test_gltf` (writes its own glTF files: hierarchy, materials, animation sampling,
+   skinning, morphing, errors). New example `gltf1` with a generated showcase model
+   (`examples/gltf1/make_showcase.py`, no third-party asset); checked locally with the
+   Khronos Fox (skinned) and DamagedHelmet (all texture types) samples. Existing images
+   unchanged. Open: GPU skinning for large meshes, glTF lights and cameras, texture
+   transforms, Draco/meshopt, alpha-mask shadows.
 8. **Resource hot reload** generalized from `ShaderWatcher` to textures and models.
 9. **CPU picking** via ray casting against a per-mesh BVH, complementing the existing
    color-buffer selection.

@@ -1,7 +1,10 @@
 #include <ivf/model_loader.h>
 #include <ivf/composite_node.h>
+#include <ivf/gltf_model.h>
 #include <ivf/config.h>
 #include <ivf/logger.h>
+#include <algorithm>
+#include <cctype>
 #include <filesystem>
 
 #include <stdexcept>
@@ -330,7 +333,7 @@ void processMaterial(aiMaterial *aiMat, Material &material)
 
 } // namespace
 
-Result<std::shared_ptr<CompositeNode>> ModelLoader::load(const std::string &path)
+static Result<std::shared_ptr<CompositeNode>> loadWithAssimp(const std::string &path)
 {
     if (!std::filesystem::exists(std::filesystem::path(path)))
         return makeError(ErrorCode::FileNotFound, "Could not load model '" + path + "': file not found", "ModelLoader");
@@ -376,7 +379,7 @@ Result<std::shared_ptr<CompositeNode>> ModelLoader::load(const std::string &path
 
 #else // !IVF2_HAS_ASSIMP
 
-Result<std::shared_ptr<CompositeNode>> ModelLoader::load(const std::string &path)
+static Result<std::shared_ptr<CompositeNode>> loadWithAssimp(const std::string &path)
 {
     return makeError(ErrorCode::NotSupported,
                      "Could not load model '" + path + "': ivf2 was built without assimp (IVF2_WITH_ASSIMP=OFF)",
@@ -391,4 +394,20 @@ std::shared_ptr<CompositeNode> ModelLoader::loadModel(const std::string &path)
     if (!model)
         throw std::runtime_error(model.error().message);
     return *model;
+}
+
+Result<std::shared_ptr<CompositeNode>> ModelLoader::load(const std::string &path)
+{
+    // glTF has its own loader (materials, skins and animations); assimp reads the rest
+    std::string extension = std::filesystem::path(path).extension().string();
+    std::transform(extension.begin(), extension.end(), extension.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+    if (extension == ".gltf" || extension == ".glb")
+    {
+        auto model = GltfModel::load(path);
+        if (!model)
+            return std::unexpected(model.error());
+        return std::static_pointer_cast<CompositeNode>(*model);
+    }
+    return loadWithAssimp(path);
 }

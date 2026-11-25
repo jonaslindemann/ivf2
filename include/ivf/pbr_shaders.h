@@ -23,6 +23,7 @@ out vec3 fragPos;
 out vec3 vNormal;
 out vec2 texCoord;
 out vec4 instanceColor;
+out vec4 vColor;
 
 uniform mat4 model;
 )" IVF_CAMERA_BLOCK_GLSL R"(
@@ -36,6 +37,7 @@ void main()
     fragPos  = vec3(modelMatrix * vec4(aPos, 1.0));
     vNormal  = mat3(modelMatrix) * aNormal;
     texCoord = aTex;
+    vColor   = aColor;
     gl_Position = projection * view * vec4(fragPos, 1.0);
 }
 )";
@@ -54,8 +56,9 @@ in vec3 fragPos;
 in vec3 vNormal;
 in vec2 texCoord;
 in vec4 instanceColor;
+in vec4 vColor;
 
-// ---- Lights (IvfLights uniform block, shared with the basic shader) --------
+// ---- Lights(IvfLights uniform block, shared with the basic shader) --------
 )" IVF_LIGHTS_BLOCK_GLSL R"(
 uniform bool useLighting     = true;
 uniform bool useVertexColors = false;
@@ -85,6 +88,13 @@ uniform bool      useRoughnessMap = false;
 uniform bool      useMetallicMap  = false;
 uniform bool      useAOMap        = false;
 uniform bool      useEnvCubemap   = false;
+uniform bool      useMetallicRoughnessMap = false; // glTF: roughness in G, metallic in B
+uniform bool      useEmissiveMap  = false;
+uniform sampler2D metallicRoughnessMap;
+uniform sampler2D emissiveMap;
+uniform bool      pbrVertexColors = false;
+uniform int       pbrAlphaMode    = 0;   // 0 opaque, 1 mask, 2 blend
+uniform float     pbrAlphaCutoff  = 0.5;
 
 uniform sampler2D albedoMap;
 uniform sampler2D normalMap;
@@ -197,11 +207,28 @@ void main()
     }
 
     // --- Resolve material values from maps or scalars ---
-    vec4  albedo4   = (useAlbedoMap   ? texture(albedoMap, texCoord)    : pbr.albedo) * instanceColor;
+    vec4  albedo4   = pbr.albedo * instanceColor;
+    if (useAlbedoMap)
+        albedo4 *= texture(albedoMap, texCoord);
+    if (pbrVertexColors)
+        albedo4 *= vColor;
+    if (pbrAlphaMode == 1 && albedo4.a < pbrAlphaCutoff)
+        discard;
     vec3  albedo    = pow(albedo4.rgb, vec3(2.2)); // gamma to linear
     float roughness = useRoughnessMap ? texture(roughnessMap, texCoord).r : pbr.roughness;
     float metallic  = useMetallicMap  ? texture(metallicMap, texCoord).r  : pbr.metallic;
+    if (useMetallicRoughnessMap)
+    {
+        vec4 mr = texture(metallicRoughnessMap, texCoord);
+        if (!useRoughnessMap)
+            roughness *= mr.g;
+        if (!useMetallicMap)
+            metallic *= mr.b;
+    }
     float ao        = useAOMap        ? texture(aoMap, texCoord).r         : pbr.ao;
+    vec3  emissive  = pbr.emissive;
+    if (useEmissiveMap)
+        emissive *= pow(texture(emissiveMap, texCoord).rgb, vec3(2.2));
 
     roughness = clamp(roughness, 0.04, 1.0);
     metallic  = clamp(metallic,  0.0,  1.0);
@@ -297,7 +324,7 @@ void main()
         ambient = vec3(0.03) * albedo * ao;
     }
 
-    vec3 outColor = ambient + Lo + pbr.emissive;
+    vec3 outColor = ambient + Lo + emissive;
 
     // Tone mapping (Reinhard) + gamma correction, unless the window maps the HDR image
     if (pbrToneMap)
@@ -306,7 +333,7 @@ void main()
         outColor = pow(outColor, vec3(1.0 / 2.2));
     }
 
-    fragColor = vec4(outColor, albedo4.a);
+    fragColor = vec4(outColor, pbrAlphaMode == 2 ? albedo4.a : 1.0);
 }
 )";
 

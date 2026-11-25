@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and phase 2 item 2 (uniform handling: uniform location cache, `IvfCamera`/`IvfLights` uniform blocks, one draw item per mesh, automatic instancing) is done, phase 2 item 3 (HDR pipeline: output step with exposure, tone mapping, gamma, FXAA; MSAA samples) is done, phase 2 item 4 (image-based lighting: `EnvironmentMap`, `PBRMaterial::setEnvironment()`) is done, phase 2 item 5 (better shadows: cascades, PCF/PCSS, point and spot light shadows) is done, phase 2 item 6 (`SsaoEffect`, `ScreenSpaceReflectionEffect`) is done, and **phase 2 item 7 (glTF 2.0) is next**. The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
+Latest release 2.0.0-alpha.2; `main` adds the render queue (see `CHANGELOG.md` `[Unreleased]`). `ROADMAP.md` tracks the plan: phases 0 (build) and 1 (foundations) are done apart from listed open items, phase 2 item 1 (render queue, steps 1-7) is done, and phase 2 item 2 (uniform handling: uniform location cache, `IvfCamera`/`IvfLights` uniform blocks, one draw item per mesh, automatic instancing) is done, phase 2 item 3 (HDR pipeline: output step with exposure, tone mapping, gamma, FXAA; MSAA samples) is done, phase 2 item 4 (image-based lighting: `EnvironmentMap`, `PBRMaterial::setEnvironment()`) is done, phase 2 item 5 (better shadows: cascades, PCF/PCSS, point and spot light shadows) is done, phase 2 item 6 (`SsaoEffect`, `ScreenSpaceReflectionEffect`) is done, phase 2 item 7 (`GltfModel`: glTF 2.0 with PBR materials, skinning, morph targets, animations) is done, and **phase 2 item 8 (resource hot reload) is next**. The "Status" section at the top of `ROADMAP.md` lists what is open; when finishing roadmap work, update that section and add a *Done:* note to the item.
 
 ## Build Commands
 
@@ -157,7 +157,7 @@ ReactPhysics3D integration is in `examples/rigid_body1/`. The framework does not
 
 ## Dependencies (vcpkg.json)
 
-GLFW3, GLM (`glm::glm`, the only math library — also used by the generator), OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options. Only glad/KHR are still vendored in `include/`.
+GLFW3, GLM (`glm::glm`, the only math library — also used by the generator), OpenGL, ImGui (docking), cgltf (glTF, header-only, private to `gltf_model.cpp`), Assimp,FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options. Only glad/KHR are still vendored in `include/`.
 
 ## Shaders
 

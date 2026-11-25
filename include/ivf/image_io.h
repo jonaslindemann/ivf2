@@ -25,7 +25,14 @@ namespace ivf {
                                        int desiredChannels = 0);
 
 /**
- * @brief Load an image as 32-bit floats (HDR files keep their range).
+ * @brief Decode an image file held in memory (PNG, JPEG, ...), e.g. embedded in a .glb file.
+ * @return Pixel data to be released with freeImage(), or nullptr on failure.
+ */
+[[nodiscard]] unsigned char *loadImageFromMemory(const unsigned char *bytes, int size, int *width, int *height,
+                                                 int *channels, int desiredChannels = 0);
+
+/**
+ * @brief Load an image as 32-bit floats(HDR files keep their range).
  * @return Pixel data to be released with freeImage(), or nullptr on failure.
  */
 [[nodiscard]] float *loadImageF(const char *filename, int *width, int *height, int *channels,

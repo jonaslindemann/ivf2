@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <cstddef>
 #include <string_view>
 
 #include <ivf/glbase.h>
@@ -74,6 +75,18 @@ public:
      *         Usable as a condition: `if (texture->load("brick.png")) ...`
      */
     Result<void> load(std::string_view filename);
+
+    /**
+     * @brief Load the texture from an image file held in memory (PNG, JPEG, ...).
+     * @param name Used in messages and as the OpenGL debug label.
+     */
+    Result<void> loadFromMemory(const unsigned char *bytes, std::size_t size, std::string_view name);
+
+    /**
+     * @brief Upload 8-bit pixels (1-4 channels, rows from the first image row) with mipmaps.
+     * @param name Used as the OpenGL debug label.
+     */
+    void setImage(int width, int height, int channels, const unsigned char *pixels, std::string_view name = {});
 
     /**
      * @brief Unbind the texture from the current OpenGL context.

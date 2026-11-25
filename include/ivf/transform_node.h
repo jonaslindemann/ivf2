@@ -3,6 +3,7 @@
 #include <ivf/node.h>
 #include <ivf/bounding_box.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 namespace ivf {
 
@@ -20,6 +21,7 @@ private:
     glm::vec3 m_rotAxis;     ///< Axis of rotation
     float m_rotAngle;        ///< Angle of rotation (in radians or degrees, depending on implementation)
     glm::vec3 m_scale;       ///< Scale factors along each axis
+    glm::quat m_rotation{1.0f, 0.0f, 0.0f, 0.0f}; ///< Rotation as a quaternion (identity: none)
     bool m_useTransform;     ///< Flag to enable/disable transformation
     glm::vec3 m_vecRot;      ///< Vector rotation (for advanced rotation control)
     glm::vec3 m_eulerAngles; ///< Euler angles for rotation
@@ -147,6 +149,18 @@ public:
      * @return The scale factors as a glm::vec3.
      */
     [[nodiscard]] inline glm::vec3 scale() const noexcept { return m_scale; }
+
+    /**
+     * @brief Set a rotation as a quaternion (default identity, no rotation).
+     *
+     * Applied after the Euler, rotate-to-vector and axis rotations and before the scale,
+     * so a node with only position, quaternion and scale has the transform T * R * S
+     * (as in glTF).
+     */
+    inline void setRotation(const glm::quat &rotation) noexcept { m_rotation = rotation; }
+
+    /** @brief Rotation quaternion (identity if none was set). */
+    [[nodiscard]] inline glm::quat rotation() const noexcept { return m_rotation; }
 
     /**
      * @brief Get the local transformation matrix.

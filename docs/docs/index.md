@@ -54,7 +54,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 - A [scene graph](core/nodes.md) of nodes, transforms and groups, with `create()` factories and `shared_ptr` throughout
 - [Basic primitives](primitives/basic_primitives.md) such as cubes, spheres, cylinders and cones, and [complex ones](primitives/complex_primitives.md) such as extrusions, rounded boxes, capsules and polyhedra
 - [Procedural geometry](core/procedural_geometry.md) from the bundled `generator` library, with around 80 composable shapes, paths and meshes
-- [3D text](primitives/text.md), and [model loading](advanced/model_loading.md) through Assimp
+- [3D text](primitives/text.md), and [model loading](advanced/model_loading.md): glTF 2.0 with PBR materials, skinning, morph targets and animations, and other formats through Assimp
 - [Lighting](core/lighting.md) with point, directional and spot lights
 
 ### Materials and effects

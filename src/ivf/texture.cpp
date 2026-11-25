@@ -90,23 +90,7 @@ Result<void> Texture::load(const std::string_view filename)
     if (data)
     {
         logInfofc("Texture", "Loaded texture: {} ({}x{}, {} channels)", filename, width, height, nrChannels);
-
-        GLenum fmt;
-        GLint  ifmt;
-        switch (nrChannels) {
-            case 1:  fmt = GL_RED;  ifmt = GL_RED;   break;
-            case 2:  fmt = GL_RG;   ifmt = GL_RG;    break;
-            case 3:  fmt = GL_RGB;  ifmt = GL_RGB;   break;
-            default: fmt = GL_RGBA; ifmt = GL_RGBA;  break;
-        }
-
-        this->bind();
-        GL_ERR_BEGIN;
-        glTexImage2D(GL_TEXTURE_2D, m_level, ifmt, width, height, 0, fmt, m_type, data);
-        glLabel(GL_TEXTURE, m_id, std::filesystem::path(filename).filename().string());
-        glGenerateMipmap(GL_TEXTURE_2D);
-        GL_ERR_END("Texture::load()");
-        this->unbind();
+        setImage(width, height, nrChannels, data, std::filesystem::path(filename).filename().string());
     }
     else
     {
@@ -115,6 +99,60 @@ Result<void> Texture::load(const std::string_view filename)
     ivf::freeImage(data);
 
     return {};
+}
+
+Result<void> Texture::loadFromMemory(const unsigned char *bytes, std::size_t size, std::string_view name)
+{
+    int width = 0, height = 0, nrChannels = 0;
+    unsigned char *data =
+        ivf::loadImageFromMemory(bytes, static_cast<int>(size), &width, &height, &nrChannels, 0);
+    if (!data)
+        return makeError(ErrorCode::UnsupportedFormat, std::string("Could not decode image: ") + std::string(name),
+                         "Texture");
+    setImage(width, height, nrChannels, data, name);
+    ivf::freeImage(data);
+    return {};
+}
+
+void Texture::setImage(int width, int height, int channels, const unsigned char *pixels, std::string_view name)
+{
+    GLenum fmt;
+    GLint ifmt;
+    switch (channels)
+    {
+    case 1:
+        fmt = GL_RED;
+        ifmt = GL_RED;
+        break;
+    case 2:
+        fmt = GL_RG;
+        ifmt = GL_RG;
+        break;
+    case 3:
+        fmt = GL_RGB;
+        ifmt = GL_RGB;
+        break;
+    default:
+        fmt = GL_RGBA;
+        ifmt = GL_RGBA;
+        break;
+    }
+
+    // Rows of 1-3 channel images are not always 4-byte aligned
+    GLint alignment = 4;
+    glGetIntegerv(GL_UNPACK_ALIGNMENT, &alignment);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+    this->bind();
+    GL_ERR_BEGIN;
+    glTexImage2D(GL_TEXTURE_2D, m_level, ifmt, width, height, 0, fmt, m_type, pixels);
+    if (!name.empty())
+        glLabel(GL_TEXTURE, m_id, std::string(name));
+    glGenerateMipmap(GL_TEXTURE_2D);
+    GL_ERR_END("Texture::setImage()");
+    this->unbind();
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
 }
 
 void Texture::unbind()

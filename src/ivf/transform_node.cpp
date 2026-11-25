@@ -57,6 +57,9 @@ glm::mat4 ivf::TransformNode::localTransform() const
     if (m_rotAngle != 0.0)
         localTransform = glm::rotate(localTransform, glm::radians(m_rotAngle), m_rotAxis);
 
+    if (m_rotation != glm::quat(1.0f, 0.0f, 0.0f, 0.0f))
+        localTransform = localTransform * glm::mat4_cast(m_rotation);
+
     localTransform = glm::scale(localTransform, m_scale);
 
     return localTransform;
@@ -111,7 +114,9 @@ void TransformNode::doPreDraw()
             xfmMgr()->rotateToVector(m_vecRot);
         if (m_rotAngle != 0.0)
             xfmMgr()->rotateDeg(m_rotAxis.x, m_rotAxis.y, m_rotAxis.z, m_rotAngle);
-        if (!(m_scale.x == 1.0f && m_scale.y == 1.0f && m_scale.z == 1.0f))
+        if (m_rotation != glm::quat(1.0f, 0.0f, 0.0f, 0.0f))
+            xfmMgr()->multMatrix(glm::mat4_cast(m_rotation));
+        if (!(m_scale.x== 1.0f && m_scale.y == 1.0f && m_scale.z == 1.0f))
             xfmMgr()->scale(m_scale.x, m_scale.y, m_scale.z);
     }
 }
@@ -133,7 +138,9 @@ void TransformNode::applyLocalTransform(glm::mat4 &m) const
     if (m_rotAngle != 0.0)
         m = m * TransformManager::axisRotationMatrixDeg(glm::vec3(m_rotAxis.x, m_rotAxis.y, m_rotAxis.z),
                                                         static_cast<float>(m_rotAngle));
-    if (!(m_scale.x == 1.0f && m_scale.y == 1.0f && m_scale.z == 1.0f))
+    if (m_rotation != glm::quat(1.0f, 0.0f, 0.0f, 0.0f))
+        m = m * glm::mat4_cast(m_rotation);
+    if (!(m_scale.x == 1.0f&& m_scale.y == 1.0f && m_scale.z == 1.0f))
         m = m * TransformManager::scaleMatrix(glm::vec3(m_scale.x, m_scale.y, m_scale.z));
 }
 

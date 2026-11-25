@@ -141,6 +141,9 @@ find_package(imgui CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
 # Header-only single-file libraries without CMake targets.
+# cgltf: header-only glTF 2.0 parser, private to gltf_model.cpp
+find_path(CGLTF_INCLUDE_DIR cgltf.h REQUIRED)
+
 find_package(Stb QUIET)
 if(NOT Stb_INCLUDE_DIR)
     find_path(Stb_INCLUDE_DIR stb_image.h PATH_SUFFIXES stb REQUIRED)

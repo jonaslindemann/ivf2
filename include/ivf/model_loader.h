@@ -3,8 +3,9 @@
  * @file model_loader.h
  * @brief Loading 3D model files into the scene graph.
  *
- * Model loading uses assimp, which is a private dependency of ivf. Check
- * IVF2_HAS_ASSIMP (ivf/config.h) to see whether this build supports it.
+ * glTF files (.gltf, .glb) are read by GltfModel; everything else uses assimp, which is a
+ * private dependency of ivf. Check IVF2_HAS_ASSIMP (ivf/config.h) to see whether this
+ * build supports the other formats.
  */
 
 #include <ivf/composite_node.h>
@@ -18,7 +19,8 @@ namespace ivf {
 
 /**
  * @class ModelLoader
- * @brief Loads model files (OBJ, FBX, glTF, 3DS, ... - everything assimp reads).
+ * @brief Loads model files: glTF through GltfModel (also without assimp), and OBJ, FBX,
+ *        3DS, ... (everything assimp reads).
  */
 class ModelLoader {
 public:
@@ -28,8 +30,9 @@ public:
     /**
      * @brief Load a model file as a node hierarchy.
      * @param path Path to the model file.
-     * @return The root of the loaded hierarchy, or an Error (FileNotFound, UnsupportedFormat,
-     *         NotSupported when built without assimp). Errors are also logged.
+     * @return The root of the loaded hierarchy (a GltfModel for .gltf/.glb files), or an
+     *         Error (FileNotFound, UnsupportedFormat, NotSupported for other formats when
+     *         built without assimp). Errors are also logged.
      */
     [[nodiscard]] static Result<std::shared_ptr<CompositeNode>> load(const std::string &path);
 

@@ -36,6 +36,13 @@ unsigned char *loadImage(const char *filename, int *width, int *height, int *cha
     return stbi_load(filename, width, height, channels ? channels : &dummy, desiredChannels);
 }
 
+unsigned char *loadImageFromMemory(const unsigned char *bytes, int size, int *width, int *height, int *channels,
+                                   int desiredChannels)
+{
+    int dummy = 0;
+    return stbi_load_from_memory(bytes, size, width, height, channels ? channels : &dummy, desiredChannels);
+}
+
 float *loadImageF(const char *filename, int *width, int *height, int *channels, int desiredChannels)
 {
     int dummy = 0;

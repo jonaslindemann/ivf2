@@ -35,6 +35,10 @@ endif()
 # stb is a private implementation detail of image_io.cpp (see ivf/image_io.h).
 target_include_directories(ivf PRIVATE ${Stb_INCLUDE_DIR})
 
+# cgltf is a private implementation detail of gltf_model.cpp (see ivf/gltf_model.h).
+target_include_directories(ivf PRIVATE ${CGLTF_INCLUDE_DIR})
+set_source_files_properties(gltf_model.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
 # image_io.cpp must not see the PCH: an earlier stb include would bypass its
 # STB_*_STATIC / *_IMPLEMENTATION defines.
 set_source_files_properties(image_io.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)

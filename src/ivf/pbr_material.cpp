@@ -87,6 +87,11 @@ void PBRMaterial::refreshManagers()
     SelectionManager::instance()->refreshForProgram();
 }
 
+RenderLayer PBRMaterial::renderLayer() const
+{
+    return m_alphaMode == AlphaMode::Blend ? RenderLayer::Transparent : RenderLayer::Opaque;
+}
+
 void PBRMaterial::bindMaps()
 {
     auto prog = ShaderManager::instance()->currentProgram();
@@ -141,6 +146,30 @@ void PBRMaterial::bindMaps()
     }
     prog->uniformInt("aoMap", 4);
 
+    if (m_metallicRoughnessMap) {
+        m_metallicRoughnessMap->setTexUnit(5);
+        m_metallicRoughnessMap->bind();
+        prog->uniformBool("useMetallicRoughnessMap", true);
+    } else {
+        bindFallbackTexture2D(5);
+        prog->uniformBool("useMetallicRoughnessMap", false);
+    }
+    prog->uniformInt("metallicRoughnessMap", 5);
+
+    if (m_emissiveMap) {
+        m_emissiveMap->setTexUnit(6);
+        m_emissiveMap->bind();
+        prog->uniformBool("useEmissiveMap", true);
+    } else {
+        bindFallbackTexture2D(6);
+        prog->uniformBool("useEmissiveMap", false);
+    }
+    prog->uniformInt("emissiveMap", 6);
+
+    prog->uniformInt("pbrAlphaMode", static_cast<int>(m_alphaMode));
+    prog->uniformFloat("pbrAlphaCutoff", m_alphaCutoff);
+    prog->uniformBool("pbrVertexColors", m_useVertexColors);
+
     if (m_envCubemap) {
         m_envCubemap->bind(kEnvCubemapUnit);
         prog->uniformBool("useEnvCubemap", true);
@@ -178,5 +207,7 @@ void PBRMaterial::unbindMaps()
     if (m_roughnessMap) m_roughnessMap->unbind();
     if (m_metallicMap)  m_metallicMap->unbind();
     if (m_aoMap)        m_aoMap->unbind();
+    if (m_metallicRoughnessMap) m_metallicRoughnessMap->unbind();
+    if (m_emissiveMap)  m_emissiveMap->unbind();
     if (m_envCubemap)   m_envCubemap->unbind();
 }

@@ -106,6 +106,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `ui1`, `ui2`, `scene_ui1` | ImGui windows combined with a scene | [UI Windows](../ui/ui_windows.md) |
 | `multi_window1` | Two windows, each with its own scene, lights and user interface | [Render Context](../advanced/render_context.md) |
 | `embedding1` | ivf inside an application that owns its OpenGL context (plain GLFW, as Qt or SDL would) | [Render Context](../advanced/render_context.md) |
+| `gltf1` | A glTF 2.0 model with PBR textures, alpha, a skinned tentacle, morph targets and animations (or any `.glb` given on the command line) | [Model Loading](../advanced/model_loading.md#gltf-models) |
 | `assimp1` | Opening any model file through a file dialog | [Model Loading](../advanced/model_loading.md) |
 | `serialization1` | Saving, loading and clearing a scene as JSON | |
 | `debug_draw1` | Immediate-mode debug lines and shapes | |

@@ -10,7 +10,10 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Changed (may require changes in your code)
 
-- Shadows: the `IvfLights` block has `ShadowData shadows[4]` and a `shadowIndex` per directional
+- `PBRMaterial`: an albedo map is now multiplied by `setAlbedo()` (it replaced it before; the
+  default albedo is white, so materials that set only the map look the same). The shader writes
+  alpha 1 unless `setAlphaMode(AlphaMode::Blend)`.
+- Shadows: the `IvfLights` blockhas `ShadowData shadows[4]` and a `shadowIndex` per directional
   and point light instead of `lightSpaceMatrices`; shadow maps are sampled as `shadowMaps[i]`
   on texture units 8-11 (`ivf::ShadowMapUnit`) instead of 1-4. Shaders that sampled
   `shadowMaps[i]` with `lightSpaceMatrices[i]` use `ivf::shadow_glsl` and `ivfShadowFactor()`.
@@ -88,7 +91,15 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
-- Screen-space effects: `SsaoEffect` (ambient occlusion from the depth buffer: darker creases,
+- glTF 2.0 models: `GltfModel::load()` reads `.gltf`/`.glb` files (also without assimp) into
+  the scene graph with their node hierarchy, PBR materials (base colour, metallic-roughness,
+  normal, occlusion and emissive textures, alpha modes, vertex colours), skinned meshes, morph
+  targets and animations (`setAnimation()`, `setTime()`, `setLooping()`, `setMorphWeights()`).
+  `ModelLoader::load()` uses it for glTF files. `TransformNode::setRotation()` takes a quaternion.
+  `PBRMaterial` gains `setMetallicRoughnessMap()`, `setEmissiveMap()`, `setAlphaMode()` with
+  `setAlphaCutoff()`, and `setUseVertexColors()`; `Texture::loadFromMemory()` and `setImage()`.
+  New example `gltf1`.
+- Screen-space effects:`SsaoEffect` (ambient occlusion from the depth buffer: darker creases,
   corners and contacts) and `ScreenSpaceReflectionEffect` (reflections of the visible scene in
   floors and other surfaces facing one direction, with roughness and Fresnel). Effects also get
   the `projection` and `view` matrices. New examples `ssao1` and `ssr1`, guide page

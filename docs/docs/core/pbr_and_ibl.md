@@ -21,9 +21,13 @@ sphere->setMaterial(gold);
 | `setRoughness(r)` | 0.5 | Microsurface roughness, clamped to 0.04-1 |
 | `setEmissive(c)` | black | Light the surface emits itself |
 | `setAO(a)` | 1 | Ambient occlusion: how much ambient light reaches the surface |
-| `setAlbedoMap()`, `setNormalMap()`, `setRoughnessMap()`, `setMetallicMap()`, `setAOMap()` | - | Textures for the values above |
+| `setAlbedoMap()`, `setNormalMap()`, `setRoughnessMap()`, `setMetallicMap()`, `setAOMap()` | - | Textures for the values above (the albedo map is multiplied by `setAlbedo()`) |
+| `setMetallicRoughnessMap()` | - | Packed texture as in glTF: roughness in green, metallic in blue, multiplied by the factors |
+| `setEmissiveMap()` | - | Emissive colour texture, multiplied by `setEmissive()` |
+| `setAlphaMode(m)`, `setAlphaCutoff(c)` | Opaque, 0.5 | `PBRMaterial::AlphaMode`: `Opaque` ignores alpha, `Mask` discards pixels below the cutoff, `Blend` blends (drawn after opaque objects) |
+| `setUseVertexColors(b)` | false | Multiply the albedo by the mesh's vertex colours |
 
-The scene's point, directional and spot lights light PBR materials like the stock ones. The `textures4` example shows a grid of spheres from rough to smooth and dielectric to metal.
+The scene's point, directional and spot lights light PBR materials like the stock ones, including their shadows. [glTF models](../advanced/model_loading.md#gltf-models) load their materials as `PBRMaterial`s.The `textures4` example shows a grid of spheres from rough to smooth and dielectric to metal.
 
 ## Image-based lighting
 

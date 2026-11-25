@@ -2,3 +2,10 @@
 # (no CRLF conversion on Windows checkouts), or they may fail to apply.
 overlay-ports/**/*.patch -text
 overlay-ports/**/*.diff  -text
+
+# Data files read by ivfvis: never convert line endings (binary sections, exact test data)
+*.npy binary
+*.vtk -text
+*.vtu -text
+*.vtp -text
+*.vti -text

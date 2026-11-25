@@ -10,7 +10,13 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Changed (may require changes in your code)
 
-- Meshes are uploaded to the GPU when first drawn instead of in `end()`: creating and changing
+- Shadows: the `IvfLights` block has `ShadowData shadows[4]` and a `shadowIndex` per directional
+  and point light instead of `lightSpaceMatrices`; shadow maps are sampled as `shadowMaps[i]`
+  on texture units 8-11 (`ivf::ShadowMapUnit`) instead of 1-4. Shaders that sampled
+  `shadowMaps[i]` with `lightSpaceMatrices[i]` use `ivf::shadow_glsl` and `ivfShadowFactor()`.
+  Only opaque nodes cast shadows (transparent ones did before). A light's `ShadowMap` is created
+  by the first shadow pass instead of `setCastShadows(true)`.
+- Meshes are uploadedto the GPU when first drawn instead of in `end()`: creating and changing
   geometry (primitives, `MeshNode`, `Mesh::updateVertices()`/`updateNormals()`) needs no OpenGL
   context, so scenes can be built before the window exists. `Mesh::vertexArray()` uploads on
   demand and returns the vertex array of the current context.
@@ -82,7 +88,16 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
-- Image-based lighting: `EnvironmentMap` loads an equirectangular `.hdr` environment (or
+- Better shadows: cascaded shadow maps for directional lights
+  (`DirectionalLight::setShadowCascades()`, `setShadowDistance()`, `setCascadeSplitLambda()`),
+  shadows from point lights in all directions (`setCastShadows(true)` on a `PointLight`,
+  `setShadowRange()`), and soft shadows (`Light::setShadowFilter()` with `ShadowFilter::Hard`,
+  `Pcf` or `Pcss`, `setShadowFilterRadius()`, `setShadowSoftness()`), with `setShadowBias()`
+  and `setShadowNormalBias()` against acne. PBR materials receive shadows. `Node::setCastShadows()`
+  leaves a node out of the shadow maps; `setDebugShadow(5)` shows the cascades. Custom shaders
+  can sample shadows with `ivf::shadow_glsl` and `ivfShadowFactor()`. New examples
+  `cascaded_shadows1` and `point_shadows1`.
+- Image-based lighting: `EnvironmentMap` loadsan equirectangular `.hdr` environment (or
   generates an HDR sky with `loadSky()`) and precomputes irradiance, prefiltered reflections and a
   BRDF table on the GPU; `PBRMaterial::setEnvironment()` lights materials with it (diffuse light
   and reflections that blur with roughness), `Skybox::create(env->cubemap())` shows it and
@@ -109,7 +124,12 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
-- `FrameBuffer` leaked its multisampled objects when multisampling was turned off.
+- Nodes with a `PBRMaterial`, `BumpMaterial` or `ShaderMaterial` were drawn into shadow maps
+  with their own program (the camera's projection) instead of the light's: their shadows were
+  wrong or missing. The shadow pass now keeps the depth program (`ShaderManager::lockProgram()`).
+- Shadow maps were bound to texture units 1-4, shared with multitexturing and the PBR maps.
+- The shadow pass left the cull face mode at `GL_FRONT`.
+- `FrameBuffer` leaked its multisampled objectswhen multisampling was turned off.
 - Loaded models: a node with several meshes of different materials showed all of them with the
   last mesh's material; further meshes now get their own material (`Mesh::material()`).
 - A mesh's own `ShaderMaterial` (`Mesh::setMaterial()`) stayed applied after the mesh was

@@ -147,7 +147,7 @@ layout(std140) uniform IvfCamera {
 
 The block has no instance name, so the members are used like plain uniforms (`projection * view * p`). In C++ shader strings, `IVF_CAMERA_BLOCK_GLSL` from `<ivf/uniform_blocks.h>` expands to this declaration. Older shaders that declare plain `uniform mat4 view, projection;` and `uniform vec3 viewPos;` instead still get them set (the `ripple` shader does); a program can't have both.
 
-The standard light and material uniforms are only uploaded after `setUseLighting(true)`, so unlit shaders don't need to declare them. A lit shader gets the lights from the `IvfLights` uniform block: in C++ shader strings, `IVF_LIGHTS_BLOCK_GLSL` declares the `PointLight`, `DirLight` and `SpotLight` structs and the block with the arrays `pointLights`, `dirLights`, `spotLights`, `lightSpaceMatrices` and the counts `pointLightCount`, `dirLightCount`, `spotLightCount` (see `include/ivf/uniform_blocks.h` for the members). Shadow maps stay ordinary samplers: `uniform sampler2D shadowMaps[IVF_MAX_DIR_LIGHTS];`, where `shadowMaps[i]` belongs to `dirLights[i]`. Shaders that declare the light arrays as plain uniforms (the layout before the block) still get every light uploaded.
+The standard light and material uniforms are only uploaded after `setUseLighting(true)`, so unlit shaders don't need to declare them. A lit shader gets the lights from the `IvfLights` uniform block: in C++ shader strings, `IVF_LIGHTS_BLOCK_GLSL` declares the `PointLight`, `DirLight`, `SpotLight` and `ShadowData` structs and the block with the arrays `pointLights`, `dirLights`, `spotLights`, `shadows` and the counts `pointLightCount`, `dirLightCount`, `spotLightCount` (see `include/ivf/uniform_blocks.h` for the members). For shadows, append `ivf::shadow_glsl` (`ivf/shadow_shaders.h`) and call `ivfShadowFactor(light.shadowIndex, fragPos, normal, toLight)`; see [Shadows](../advanced/shadows.md#in-custom-shaders).Shaders that declare the light arrays as plain uniforms (the layout before the block) still get every light uploaded.
 
 ### A complete example
 
@@ -240,7 +240,7 @@ A shader that doesn't declare a uniform simply ignores it, so global uniforms ar
 
 ### Children and shadows
 
-Child nodes of a node with a shader material are drawn with the same program, unless they have a shader material of their own. The program is also used when the node is drawn into a shadow map.
+Child nodes of a node with a shader material are drawn with the same program, unless they have a shader material of their own. Shadow maps are drawn with the stock depth program for every node, so a vertex shader that moves vertices does not move the node's shadow; `setCastShadows(false)` leaves a node out of the shadow maps.
 
 ## Blending: BlendShaderMaterial
 

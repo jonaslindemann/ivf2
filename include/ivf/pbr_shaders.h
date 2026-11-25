@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ivf/shadow_shaders.h>
 #include <ivf/uniform_blocks.h>
 #include <string>
 
@@ -43,7 +44,7 @@ void main()
 /// Supports point, directional and spot lights (same uniform names as basic shader),
 /// optional PBR texture maps, optional environment cubemap reflection, and
 /// derivative-based TBN for normal mapping without extra vertex attributes.
-inline const std::string pbr_frag_shader_source = R"(
+inline const std::string pbr_frag_shader_source = std::string(R"(
 #version 330 core
 
 out vec4 fragColor;
@@ -60,6 +61,8 @@ uniform bool useLighting     = true;
 uniform bool useVertexColors = false;
 
 )" IVF_CAMERA_BLOCK_GLSL R"(
+// ---- Shadows (shared with the basic shader) --------------------------------
+)") + shadow_glsl + R"(
 // ---- Selection (identical to basic shader) ---------------------------------
 uniform bool selectionRendering = false;
 uniform uint objectId;
@@ -225,6 +228,8 @@ void main()
             if (!dirLights[i].enabled) continue;
             vec3 L        = normalize(-dirLights[i].direction);
             vec3 radiance = dirLights[i].diffuseColor;
+            float shadow  = ivfShadowFactor(dirLights[i].shadowIndex, fragPos, normalize(vNormal), L);
+            radiance *= 1.0 - shadow * dirLights[i].shadowStrength;
             Lo += evalBRDF(N, V, L, radiance, albedo, roughness, metallic, F0);
         }
 
@@ -238,6 +243,8 @@ void main()
                                   + pointLights[i].linear * dist
                                   + pointLights[i].quadratic * dist * dist);
             vec3 radiance  = pointLights[i].diffuseColor * att;
+            float shadow   = ivfShadowFactor(pointLights[i].shadowIndex, fragPos, normalize(vNormal), L);
+            radiance *= 1.0 - shadow * pointLights[i].shadowStrength;
             Lo += evalBRDF(N, V, L, radiance, albedo, roughness, metallic, F0);
         }
 

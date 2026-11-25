@@ -1,6 +1,8 @@
 #include <ivf/light.h>
 #include <glm/glm.hpp>
 
+#include <algorithm>
+
 using namespace ivf;
 
 ivf::Light::Light()
@@ -56,15 +58,8 @@ int ivf::Light::index() const
 
 void ivf::Light::setCastShadows(bool flag)
 {
+    // The shadow map is created by LightManager::renderShadowMaps() when it is first needed
     m_castsShadows = flag;
-
-    if (m_castsShadows)
-    {
-        // Create shadow map if it doesn't exist
-
-        if (m_shadowMap == nullptr)
-            m_shadowMap = ShadowMap::create(2048, 2048);
-    }
 }
 
 bool ivf::Light::castsShadows() const
@@ -74,10 +69,69 @@ bool ivf::Light::castsShadows() const
 
 void ivf::Light::setShadowMapSize(size_t width, size_t height)
 {
-    m_shadowMapWidth = width;
-    m_shadowMapHeight = height;
-    if (m_shadowMap)
-        m_shadowMap->resize(static_cast<int>(m_shadowMapWidth), static_cast<int>(m_shadowMapHeight));
+    // Applied by LightManager::renderShadowMaps() (the map's size also depends on the light type)
+    m_shadowMapWidth = std::max<size_t>(width, 16);
+    m_shadowMapHeight = std::max<size_t>(height, 16);
+}
+
+size_t ivf::Light::shadowMapWidth() const
+{
+    return m_shadowMapWidth;
+}
+
+size_t ivf::Light::shadowMapHeight() const
+{
+    return m_shadowMapHeight;
+}
+
+void ivf::Light::setShadowFilter(ShadowFilter filter)
+{
+    m_shadowFilter = filter;
+}
+
+ShadowFilter ivf::Light::shadowFilter() const
+{
+    return m_shadowFilter;
+}
+
+void ivf::Light::setShadowFilterRadius(int radius)
+{
+    m_shadowFilterRadius = std::clamp(radius, 0, 4);
+}
+
+int ivf::Light::shadowFilterRadius() const
+{
+    return m_shadowFilterRadius;
+}
+
+void ivf::Light::setShadowSoftness(float softness)
+{
+    m_shadowSoftness = std::max(softness, 0.0f);
+}
+
+float ivf::Light::shadowSoftness() const
+{
+    return m_shadowSoftness;
+}
+
+void ivf::Light::setShadowBias(float bias)
+{
+    m_shadowBias = std::max(bias, 0.0f);
+}
+
+float ivf::Light::shadowBias() const
+{
+    return m_shadowBias;
+}
+
+void ivf::Light::setShadowNormalBias(float texels)
+{
+    m_shadowNormalBias = std::max(texels, 0.0f);
+}
+
+float ivf::Light::shadowNormalBias() const
+{
+    return m_shadowNormalBias;
 }
 
 void ivf::Light::setShadowMap(ShadowMapPtr shadowMap)

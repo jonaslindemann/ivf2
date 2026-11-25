@@ -34,6 +34,7 @@ struct CollectState {
     glm::mat4 world{1.0f};              ///< Model matrix accumulated from the ancestors.
     std::shared_ptr<Material> material; ///< Material of the nearest ancestor that has one.
     Node *textureSource{nullptr};       ///< Nearest ancestor that has textures.
+    bool castShadows{true};             ///< False below a node with setCastShadows(false).
 };
 
 /**
@@ -53,6 +54,8 @@ struct DrawItem {
     /// The one mesh of a MeshNode this item draws (MeshNode emits an item per mesh); nullptr
     /// for items that draw the whole node. Owned by the node, valid while the node lives.
     Mesh *mesh{nullptr};
+    /// Drawn into shadow maps (Node::setCastShadows(), inherited from the ancestors).
+    bool castShadows{true};
 };
 
 /**

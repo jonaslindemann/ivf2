@@ -18,6 +18,7 @@ private:
     float m_constAttenuation;     ///< Constant attenuation factor.
     float m_linearAttenuation;    ///< Linear attenuation factor.
     float m_quadraticAttenuation; ///< Quadratic attenuation factor.
+    float m_shadowRange{0.0f};    ///< Far plane of the shadow faces (0 = automatic).
 
 public:
     /**
@@ -61,6 +62,18 @@ public:
      * @brief Apply the point light's parameters to the rendering context.
      */
     void apply() override;
+
+    /**
+     * @brief Distance up to which the light casts shadows (far plane of its six shadow
+     * faces). 0, the default, reaches the farthest point of the scene.
+     *
+     * Point lights cast shadows in all directions with a cube of six shadow maps; enable
+     * them with setCastShadows(true) (at most four shadow-casting lights in total).
+     */
+    void setShadowRange(float range);
+
+    /** @brief Distance up to which the light casts shadows (0 = automatic). */
+    [[nodiscard]] float shadowRange() const;
 };
 
 /**

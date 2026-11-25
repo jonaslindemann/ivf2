@@ -1,0 +1,1 @@
+add_ivf2_example(point_shadows1 SOURCES point_shadows1.cpp)

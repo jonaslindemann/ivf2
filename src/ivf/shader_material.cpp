@@ -160,6 +160,9 @@ void ShaderMaterial::apply()
 
     auto shaderMgr = ShaderManager::instance();
     m_previousPrograms.push_back(shaderMgr->currentProgram());
+    if (shaderMgr->programLocked())
+        return; // shadow pass: drawn with the depth program, the uniforms belong to m_program
+
     shaderMgr->setCurrentProgram(m_program);
 
     refreshManagers();

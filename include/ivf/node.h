@@ -48,7 +48,8 @@ private:
     bool m_useTexture{false};                      ///< Whether to use the texture for rendering.
     bool m_useMultiTexturing{false};               ///< Whether to use multitexturing.
     bool m_visible{true};                          ///< Whether the node is visible.
-    uint32_t m_objectId{0};                        ///< Object ID for selection.
+    bool m_castShadows{true};                      ///< Whether the node is drawn into shadow maps.
+uint32_t m_objectId{0};                        ///< Object ID for selection.
     std::weak_ptr<Node> m_parent{};                ///< Parent node (for hierarchy).
     std::string m_name;                            ///< Name of the node (for identification).
     std::optional<RenderLayer> m_renderLayer;      ///< Explicit draw order group (see setRenderLayer()).
@@ -255,6 +256,16 @@ public:
      * @return bool True if visible.
      */
     [[nodiscard]] inline bool visible() const noexcept { return m_visible; }
+
+    /**
+     * @brief Draw the node (and its children) into shadow maps (default true).
+     *
+     * Only opaque nodes cast shadows; transparent, background and overlay layers never do.
+     */
+    inline void setCastShadows(bool flag) noexcept { m_castShadows = flag; }
+
+    /** @brief Whether the node is drawn into shadow maps. */
+    [[nodiscard]] inline bool castsShadows() const noexcept { return m_castShadows; }
 
     /**
      * @brief Set the object ID for the node (used for selection).

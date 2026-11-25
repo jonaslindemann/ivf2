@@ -87,6 +87,20 @@ bool Program::link()
         const GLuint lightsBlock = glGetUniformBlockIndex(m_id, LightsBlockName);
         if (lightsBlock != GL_INVALID_INDEX)
             glUniformBlockBinding(m_id, lightsBlock, LightsBlockBinding);
+
+        // Shadow map samplers (ivf/shadow_shaders.h) always use the same texture units
+        const GLint shadowMaps = glGetUniformLocation(m_id, "shadowMaps[0]");
+        if (shadowMaps != -1)
+        {
+            GLint previous = 0;
+            glGetIntegerv(GL_CURRENT_PROGRAM, &previous);
+            GLint units[MaxShadowMaps];
+            for (int i = 0; i < MaxShadowMaps; ++i)
+                units[i] = static_cast<GLint>(ShadowMapUnit) + i;
+            glUseProgram(m_id);
+            glUniform1iv(shadowMaps, MaxShadowMaps, units);
+            glUseProgram(static_cast<GLuint>(previous));
+        }
     }
 
     return result == GL_TRUE;

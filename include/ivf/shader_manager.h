@@ -41,6 +41,7 @@ private:
 
     std::map<std::string, std::shared_ptr<Program>> m_programs; ///< Map of program name to ProgramPtr.
     ProgramPtr m_currentProgram;                                ///< Currently active shader program.
+    bool m_programLocked{false};                                ///< setCurrentProgram() keeps the current program.
 
 public:
     /**
@@ -162,6 +163,20 @@ public:
      * @return bool True if the program was non-null and set.
      */
     bool setCurrentProgram(ProgramPtr program);
+
+    /**
+     * @brief Keep the current program: setCurrentProgram() does nothing until unlockProgram().
+     *
+     * Used for the shadow pass, where every node is drawn with the depth program whatever
+     * its material uses (materials can still set uniforms on the current program).
+     */
+    void lockProgram();
+
+    /** @brief Let setCurrentProgram() change the program again. */
+    void unlockProgram();
+
+    /** @brief True between lockProgram() and unlockProgram(). */
+    [[nodiscard]] bool programLocked() const;
 
     /**
      * @brief Get a shader program by name.

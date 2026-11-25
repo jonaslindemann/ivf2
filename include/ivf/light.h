@@ -2,6 +2,7 @@
 
 #include <ivf/glbase.h>
 #include <ivf/shadow_map.h>
+#include <ivf/shadow_math.h>
 #include <ivf/bounding_box.h>
 
 #include <glm/glm.hpp>
@@ -36,6 +37,12 @@ private:
 
     size_t m_shadowMapWidth{2048};  ///< Width of the shadow map.
     size_t m_shadowMapHeight{2048}; ///< Height of the shadow map.
+
+    ShadowFilter m_shadowFilter{ShadowFilter::Pcf}; ///< Filtering of the shadow edges.
+    int m_shadowFilterRadius{1};                    ///< PCF kernel radius in texels.
+    float m_shadowSoftness{0.02f};                  ///< PCSS light size.
+    float m_shadowBias{0.001f};                     ///< Depth bias (fraction of the depth range).
+    float m_shadowNormalBias{0.0f};                 ///< Normal offset in texels.
 
 public:
     /**
@@ -147,10 +154,69 @@ public:
 
     /**
      * @brief Set the size of the shadow map.
+     *
+     * For a directional light with cascades, the cascades share the map (2 x 2 tiles for
+     * 3 or 4 cascades). A point light uses six faces of half this size (3 x 2 tiles).
+     *
      * @param width Shadow map width.
      * @param height Shadow map height.
      */
     void setShadowMapSize(size_t width, size_t height);
+
+    /** @brief Width of the shadow map (setShadowMapSize()). */
+    [[nodiscard]] size_t shadowMapWidth() const;
+
+    /** @brief Height of the shadow map (setShadowMapSize()). */
+    [[nodiscard]] size_t shadowMapHeight() const;
+
+    /**
+     * @brief Set how shadow edges are filtered (default ShadowFilter::Pcf).
+     *
+     * Pcf averages a square of samples (setShadowFilterRadius()); Pcss makes penumbras
+     * that grow with the distance between caster and receiver (setShadowSoftness()).
+     */
+    void setShadowFilter(ShadowFilter filter);
+
+    /** @brief Filtering of the shadow edges. */
+    [[nodiscard]] ShadowFilter shadowFilter() const;
+
+    /** @brief PCF kernel radius in texels: (2r + 1)^2 samples (default 1, clamped to 0-4). */
+    void setShadowFilterRadius(int radius);
+
+    /** @brief PCF kernel radius in texels. */
+    [[nodiscard]] int shadowFilterRadius() const;
+
+    /**
+     * @brief Size of the light for ShadowFilter::Pcss.
+     *
+     * Directional lights: tangent of the light's angular radius (default 0.02, about a
+     * degree; the sun is 0.005). Point lights: radius of the light in world units
+     * (default 0.1).
+     */
+    void setShadowSoftness(float softness);
+
+    /** @brief Size of the light for ShadowFilter::Pcss. */
+    [[nodiscard]] float shadowSoftness() const;
+
+    /**
+     * @brief Depth bias against shadow acne, as a fraction of the shadow map's depth range.
+     *
+     * Doubled on surfaces facing away from the light (default 0.001).
+     */
+    void setShadowBias(float bias);
+
+    /** @brief Depth bias (setShadowBias()). */
+    [[nodiscard]] float shadowBias() const;
+
+    /**
+     * @brief Move the receiver along its normal by this many shadow map texels before the
+     * lookup (default 0). Removes acne on surfaces at grazing angles; too much detaches
+     * shadows from their casters.
+     */
+    void setShadowNormalBias(float texels);
+
+    /** @brief Normal offset in texels (setShadowNormalBias()). */
+    [[nodiscard]] float shadowNormalBias() const;
 
     /**
      * @brief Set the shadow map resource.

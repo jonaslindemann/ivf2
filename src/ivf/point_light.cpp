@@ -13,6 +13,17 @@ using namespace ivf;
 PointLight::PointLight() : m_constAttenuation(1.0), m_linearAttenuation(0.0), m_quadraticAttenuation(0.0)
 {
     setLightArrayName("pointLights");
+    setShadowSoftness(0.1f); // PCSS: radius of the light in world units
+}
+
+void ivf::PointLight::setShadowRange(float range)
+{
+    m_shadowRange = range > 0.0f ? range : 0.0f;
+}
+
+float ivf::PointLight::shadowRange() const
+{
+    return m_shadowRange;
 }
 
 std::shared_ptr<PointLight> ivf::PointLight::create()

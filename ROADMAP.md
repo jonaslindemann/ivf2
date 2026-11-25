@@ -13,15 +13,15 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **Next: 2.5 better shadows**. 2.5-2.9 not started |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done** (spot light shadows open). **Next: 2.6 SSAO and screen-space reflections**. 2.6-2.9 not started|
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
 
 - Render queue (2.1): materials applied with the renderer's explicit context (completes
-  step B; meshes already are); alpha for the PBR material; `setCastsShadows()` per node;
-  `setMaterialOverride()` (decided, opt-in).
+  step B; meshes already are); alpha for the PBR material; `setMaterialOverride()`
+  (decided, opt-in).
 - Render context (1.2): `ivf::Key`/`ivf::MouseButton`; drop the `instance()` forwarders after
   a deprecation period.
 - Dependencies (1.3): ImGui out of the core (`DebugDraw::drawUi()` labels).
@@ -569,9 +569,35 @@ Goal: make the library trustworthy to depend on.
    `writeHdr()` and `imageFlipVerticallyOnLoad()` in `image_io.h`. Orientation checked
    (camera aimed at the sun sees the disc in the centre). New example `ibl1`, unit test
    `test_environment`, guide page *PBR and Image-Based Lighting*. Existing images
-   unchanged. Open: `.exr` (needs an EXR library), shadows for the PBR shader, PBR alpha.
+   unchanged. Open: `.exr` (needs an EXR library), PBR alpha. (PBR shadows: 2.5.)
 5. **Better shadows.** Cascaded shadow maps for directional lights, PCF/PCSS soft
    shadows, cube-map shadows for point lights.
+   *Done (except spot lights):* a shadow map is an atlas of tiles in one 2D depth
+   texture (GL 3.3, no texture arrays or layered rendering needed): the cascades of a
+   directional light (2 x 2) or the six cube faces of a point light (3 x 2, each slightly
+   wider than 90 degrees so filters near an edge find depth). Up to `MaxShadowMaps` (4)
+   shadow-casting lights share `shadowMaps[4]` on texture units 8-11 (set by
+   `Program::link()`; before, units 1-4 clashed with multitexturing and the PBR maps); the
+   `IvfLights` block gained `ShadowData shadows[4]` (type, tile count, filter, bias,
+   splits, atlas layout, six matrices) and `shadowIndex` per directional and point light,
+   replacing `lightSpaceMatrices`. Shared GLSL `shadow_glsl` (`shadow_shaders.h`):
+   cascade by view depth or cube face by major axis, normal offset, PCF square
+   (`setShadowFilterRadius()`), PCSS (16-tap rotated Poisson blocker search and filter,
+   penumbra from the blocker distance, `setShadowSoftness()`) with a receiver-slope bias
+   for wide kernels; used by the stock, bump and PBR shaders (PBR now receives shadows).
+   `DirectionalLight::setShadowCascades()` (1 = the old single map fitted to the scene,
+   still the default and pixel-identical), `setShadowDistance()` (auto: farthest scene
+   point), `setCascadeSplitLambda()`; cascades fit the bounding sphere of their frustum
+   slice, extend towards the light over the scene's casters and snap to texels
+   (`shadow_math.h`, unit test `test_shadow_math`). `PointLight::setShadowRange()`.
+   Shadow pass: `ShaderManager::lockProgram()` keeps the stock depth program whatever the
+   materials switch to (PBR, bump and `ShaderMaterial` nodes cast correct shadows; before,
+   they drew with their own program's camera projection), only opaque items with
+   `Node::setCastShadows()` (inherited, `DrawItem::castShadows`) are drawn, and
+   `LightManager::apply()` does nothing inside it. `setDebugShadow(5)` tints cascades.
+   Shadow maps are created lazily at the needed size. New examples `cascaded_shadows1`,
+   `point_shadows1`; guide page *Shadows* rewritten. `auto_instancing1` changed (its
+   `ShaderMaterial` copies now cast shadows); other images unchanged.
 6. **SSAO** and screen-space reflections as effects.
 7. **glTF 2.0** as the primary model format: PBR materials, node hierarchy, skinning and
    morph-target animation (fastgltf or cgltf; keep assimp for legacy formats).

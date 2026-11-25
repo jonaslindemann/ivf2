@@ -1,0 +1,1 @@
+add_ivf2_example(cascaded_shadows1 SOURCES cascaded_shadows1.cpp)

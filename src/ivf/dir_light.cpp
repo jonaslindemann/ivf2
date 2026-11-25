@@ -4,6 +4,7 @@
 #include <ivf/light_manager.h>
 #include <ivf/shader_manager.h>
 
+#include <algorithm>
 #include <sstream>
 #include <iostream>
 #include <string>
@@ -32,6 +33,36 @@ void ivf::DirectionalLight::setDirection(glm::vec3 direction)
 glm::vec3 ivf::DirectionalLight::direction() const
 {
     return m_direction;
+}
+
+void ivf::DirectionalLight::setShadowCascades(int count)
+{
+    m_shadowCascades = std::clamp(count, 1, 4);
+}
+
+int ivf::DirectionalLight::shadowCascades() const
+{
+    return m_shadowCascades;
+}
+
+void ivf::DirectionalLight::setShadowDistance(float distance)
+{
+    m_shadowDistance = std::max(distance, 0.0f);
+}
+
+float ivf::DirectionalLight::shadowDistance() const
+{
+    return m_shadowDistance;
+}
+
+void ivf::DirectionalLight::setCascadeSplitLambda(float lambda)
+{
+    m_cascadeSplitLambda = std::clamp(lambda, 0.0f, 1.0f);
+}
+
+float ivf::DirectionalLight::cascadeSplitLambda() const
+{
+    return m_cascadeSplitLambda;
 }
 
 glm::mat4 ivf::DirectionalLight::calculateLightSpaceMatrix(BoundingBox &sceneBBox)
@@ -92,6 +123,4 @@ void ivf::DirectionalLight::apply()
     ShaderManager::instance()->currentProgram()->uniformVec3(prefix + "direction", direction());
     ShaderManager::instance()->currentProgram()->uniformBool(prefix + "castShadows", castsShadows());
     ShaderManager::instance()->currentProgram()->uniformFloat(prefix + "shadowStrength", shadowStrength());
-    // ShaderManager::instance()->currentProgram()->uniformMat4(
-    //     "lightSpaceMatrix", calculateLightSpaceMatrix(LightManager::instance()->sceneBoundingBox()));
 }

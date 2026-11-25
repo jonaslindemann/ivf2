@@ -7,6 +7,8 @@
 #include <ivf/transform_manager.h>
 #include <ivf/shadow_shaders.h>
 #include <ivf/gl_debug.h>
+#include <ivf/logger.h>
+#include <ivf/shadow_math.h>
 
 #include <algorithm>
 #include <array>
@@ -128,6 +130,7 @@ void ivf::LightManager::clearPointLights()
         m_pointLights[i]->apply();
     }
     m_pointLights.clear();
+    m_shadowSlots.clear();
     syncLightsBlock();
 }
 
@@ -139,6 +142,7 @@ void ivf::LightManager::clearDirectionalLights()
         m_dirLights[i]->apply();
     }
     m_dirLights.clear();
+    m_shadowSlots.clear();
     syncLightsBlock();
 }
 
@@ -205,6 +209,16 @@ LightsBlock LightManager::buildLightsBlock()
 {
     LightsBlock block;
 
+    // Shadow maps and the lights they belong to
+    for (std::size_t s = 0; s < m_shadowSlots.size(); ++s)
+        block.shadows[s] = m_shadowSlots[s].data;
+    auto shadowIndex = [this](const Light *light) {
+        for (std::size_t s = 0; s < m_shadowSlots.size(); ++s)
+            if (m_shadowSlots[s].light == light)
+                return static_cast<std::int32_t>(s);
+        return std::int32_t{-1};
+    };
+
     const int points = std::min(static_cast<int>(m_pointLights.size()), MaxPointLights);
     for (int i = 0; i < points; i++)
     {
@@ -218,9 +232,11 @@ LightsBlock LightManager::buildLightsBlock()
         data.constant = light.constAttenuation();
         data.linear = light.linearAttenutation();
         data.quadratic = light.quadraticAttenuation();
+        data.shadowIndex = shadowIndex(&light);
+        data.shadowStrength = light.shadowStrength();
     }
 
-    const int dirs = std::min(static_cast<int>(m_dirLights.size()), MaxDirLights);
+    const int dirs= std::min(static_cast<int>(m_dirLights.size()), MaxDirLights);
     for (int i = 0; i < dirs; i++)
     {
         auto &light = *m_dirLights[i];
@@ -232,9 +248,7 @@ LightsBlock LightManager::buildLightsBlock()
         data.specularColor = light.specularColor();
         data.castShadows = light.castsShadows() ? 1 : 0;
         data.shadowStrength = light.shadowStrength();
-        // The matrix the shadow pass renders with (renderShadowMaps() uses the same box).
-        if (light.enabled() && light.castsShadows() && light.shadowMap())
-            block.lightSpaceMatrices[i] = light.calculateLightSpaceMatrix(m_sceneBBox);
+        data.shadowIndex = shadowIndex(&light);
     }
 
     const int spots = std::min(static_cast<int>(m_spotLights.size()), MaxSpotLights);
@@ -307,8 +321,6 @@ void LightManager::applyLegacyUniforms(Program &program)
         light->apply();
     for (auto &light : m_spotLights)
         light->apply();
-
-    program.uniformMatrix4Array("lightSpaceMatrices", MaxDirLights, m_lightsBlock.lightSpaceMatrices);
 }
 
 namespace {
@@ -328,6 +340,9 @@ bool hasLegacyLightUniforms(Program &program)
 
 void ivf::LightManager::apply()
 {
+    if (m_renderingShadows)
+        return; // materials drawn into a shadow map: the depth program needs no lights
+
     for (size_t i = 0; i < m_pointLights.size(); i++)
         m_pointLights[i]->setIndex(static_cast<int>(i));
     for (size_t i = 0; i < m_dirLights.size(); i++)
@@ -344,36 +359,21 @@ void ivf::LightManager::apply()
     if (hasLegacyLightUniforms(*program))
         applyLegacyUniforms(*program);
 
-    // Shadow maps: samplers cannot be in a uniform block. dirLights[i] uses shadowMaps[i]
-    // on texture unit 1 + i (unit 0 is used for regular textures).
-    std::array<int, MaxDirLights> shadowMapUnits{};
-    bool anyShadows = false;
-    const int dirs = std::min(static_cast<int>(m_dirLights.size()), MaxDirLights);
-    for (int i = 0; i < dirs; i++)
+    // Shadow maps: samplers cannot be in a uniform block. shadows[i] uses shadowMaps[i] on
+    // texture unit ShadowMapUnit + i (Program::link() sets the samplers).
+    for (std::size_t s = 0; s < m_shadowSlots.size(); ++s)
     {
-        auto &light = m_dirLights[i];
-        if (!light->enabled() || !light->castsShadows() || !light->shadowMap())
+        const auto &map = m_shadowSlots[s].light->shadowMap();
+        if (!map)
             continue;
-
-        const int unit = 1 + i;
-        glActiveTexture(GL_TEXTURE0 + unit);
-        glBindTexture(GL_TEXTURE_2D, light->shadowMap()->depthTexture());
-        shadowMapUnits[i] = unit;
-
-        if (!anyShadows)
-        {
-            // Single matrix of the first shadow-casting light (used by the debug views).
-            program->uniformMatrix4("lightSpaceMatrix", m_lightsBlock.lightSpaceMatrices[i]);
-            anyShadows = true;
-        }
+        glActiveTexture(GL_TEXTURE0 + ShadowMapUnit + static_cast<GLuint>(s));
+        glBindTexture(GL_TEXTURE_2D, map->depthTexture());
     }
     glActiveTexture(GL_TEXTURE0);
 
-    if (anyShadows)
-    {
-        program->uniformBool("useShadows", true);
-        program->uniformIntArray("shadowMaps", MaxDirLights, shadowMapUnits.data());
-    }
+    // Matrix of the first shadow tile (used by the debug views)
+    if (!m_shadowSlots.empty())
+        program->uniformMatrix4("lightSpaceMatrix", m_shadowSlots.front().data.matrices[0]);
 }
 
 void LightManager::renderShadowMaps(CompositeNodePtr scene)
@@ -389,14 +389,137 @@ void LightManager::renderShadowMaps(CompositeNodePtr scene)
     renderShadowMaps(context, queue);
 }
 
+void LightManager::updateShadowSlots(const glm::mat4 &view, const glm::mat4 &projection)
+{
+    m_shadowSlots.clear();
+    if (!m_useShadows)
+        return;
+
+    const glm::vec3 eye = glm::vec3(glm::inverse(view)[3]);
+    const glm::vec2 nearFar = projectionNearFar(projection);
+    const bool sceneValid = m_sceneBBox.isValid();
+
+    // Distance from a point to the farthest corner of the scene
+    auto farthest = [this](const glm::vec3 &from) {
+        float d = 0.0f;
+        for (const auto &corner : m_sceneBBox.corners())
+            d = std::max(d, glm::length(corner - from));
+        return d;
+    };
+
+    auto addSlot = [this](Light &light) -> ShadowSlot * {
+        if (static_cast<int>(m_shadowSlots.size()) >= MaxShadowMaps)
+        {
+            if (!m_shadowLimitWarned)
+                logWarning(logStr("More than ", MaxShadowMaps, " lights cast shadows; the others are ignored"),
+                           "LightManager");
+            m_shadowLimitWarned = true;
+            return nullptr;
+        }
+        ShadowSlot &slot = m_shadowSlots.emplace_back();
+        slot.light = &light;
+        slot.data.info.z = static_cast<int>(light.shadowFilter());
+        slot.data.info.w = light.shadowFilterRadius();
+        slot.data.params = glm::vec4(light.shadowBias(), light.shadowNormalBias(), light.shadowSoftness(), 0.0f);
+        return &slot;
+    };
+
+    const int dirs = std::min(static_cast<int>(m_dirLights.size()), MaxDirLights);
+    for (int i = 0; i < dirs; ++i)
+    {
+        DirectionalLight &light = *m_dirLights[static_cast<std::size_t>(i)];
+        if (!light.enabled() || !light.castsShadows())
+            continue;
+        ShadowSlot *slot = addSlot(light);
+        if (slot == nullptr)
+            break;
+
+        const int cascades = light.shadowCascades();
+        slot->tiles = cascades;
+        slot->columns = cascades == 1 ? 1 : 2;
+        const int rows = cascades <= 2 ? 1 : 2;
+        slot->tileSize = std::max(16, std::min(static_cast<int>(light.shadowMapWidth()) / slot->columns,
+                                               static_cast<int>(light.shadowMapHeight()) / rows));
+        slot->width = slot->tileSize * slot->columns;
+        slot->height = slot->tileSize * rows;
+        slot->data.info.x = static_cast<int>(ShadowType::Directional);
+        slot->data.info.y = cascades;
+        slot->data.atlas = glm::vec4(float(slot->tileSize), float(slot->columns), float(rows), 0.0f);
+
+        if (cascades == 1)
+        {
+            // One map around the whole scene
+            slot->data.matrices[0] = light.calculateLightSpaceMatrix(m_sceneBBox);
+            continue;
+        }
+
+        // Cascades: slices of the camera's view range, each in its own tile
+        float distance = light.shadowDistance();
+        if (distance <= 0.0f)
+            distance = sceneValid ? farthest(eye) : nearFar.y;
+        distance = std::clamp(distance, nearFar.x * 1.01f, nearFar.y);
+        const std::vector<float> splits = cascadeSplits(nearFar.x, distance, cascades, light.cascadeSplitLambda());
+        float from = nearFar.x;
+        for (int k = 0; k < cascades; ++k)
+        {
+            const float to = splits[static_cast<std::size_t>(k)];
+            slot->data.matrices[k] = fitCascade(frustumSliceCorners(view, projection, from, to), light.direction(),
+                                                m_sceneBBox, slot->tileSize);
+            slot->data.splits[k] = to;
+            from = to;
+        }
+    }
+
+    const int points = std::min(static_cast<int>(m_pointLights.size()), MaxPointLights);
+    for (int i = 0; i < points; ++i)
+    {
+        PointLight &light = *m_pointLights[static_cast<std::size_t>(i)];
+        if (!light.enabled() || !light.castsShadows())
+            continue;
+        ShadowSlot *slot = addSlot(light);
+        if (slot == nullptr)
+            break;
+
+        // Six cube faces in a 3 x 2 atlas, each a bit wider than 90 degrees so filtering
+        // near a face's edge still finds depth values
+        const int face = std::max(16, static_cast<int>(light.shadowMapWidth()) / 2);
+        const float tanHalfFov = 1.0f + 16.0f / float(face);
+        float range = light.shadowRange();
+        if (range <= 0.0f)
+            range = sceneValid ? farthest(light.position()) * 1.01f : 100.0f;
+        range = std::max(range, 0.1f);
+        const float nearDist = std::max(range * 0.002f, 0.01f);
+
+        slot->tiles = 6;
+        slot->columns = 3;
+        slot->tileSize = face;
+        slot->width = face * 3;
+        slot->height = face * 2;
+        slot->data.info.x = static_cast<int>(ShadowType::Point);
+        slot->data.info.y = 6;
+        slot->data.splits = glm::vec4(nearDist, range, 0.0f, 0.0f);
+        slot->data.lightPos = glm::vec4(light.position(), 1.0f);
+        slot->data.atlas = glm::vec4(float(face), 3.0f, 2.0f, tanHalfFov);
+        const auto matrices = pointShadowMatrices(light.position(), nearDist, range, tanHalfFov);
+        for (int k = 0; k < 6; ++k)
+            slot->data.matrices[k] = matrices[static_cast<std::size_t>(k)];
+    }
+}
+
 void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &queue)
 {
     m_shadowStats = Renderer::Stats{};
     if (!m_useShadows)
+    {
+        if (!m_shadowSlots.empty())
+        {
+            m_shadowSlots.clear();
+            this->apply();
+        }
         return;
+    }
 
-    // Fit the shadow maps to the scene (before apply(), which uploads the same light
-    // matrix for the main pass). Keeps the previous box if no item has bounds.
+    // Fit the shadow maps to the scene. Keeps the previous box if no item has bounds.
     if (m_autoCalcBBox)
     {
         const BoundingBox bounds = queue.bounds();
@@ -404,7 +527,8 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
             m_sceneBBox = bounds;
     }
 
-    this->apply();
+    auto *xfm = context.transforms();
+    updateShadowSlots(xfm->viewMatrix(), xfm->projectionMatrix());
 
     // Save current OpenGL state
 
@@ -414,21 +538,8 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
     glGetIntegerv(GL_POLYGON_MODE, polygonMode);
     GLboolean cullFace;
     glGetBooleanv(GL_CULL_FACE, &cullFace);
-
-    // Set shadow rendering state
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS); // Use default depth function
-    glCullFace(GL_FRONT); // Can help with shadow acne (or try GL_BACK)
-
-    BoundingBox sceneBBox = m_sceneBBox;
-
-    // Use the current shader (stock shader)
-
-    ProgramPtr shader = context.shaders()->currentProgram();
-
-    // Save current OpenGL state
-
+    GLint cullFaceMode = GL_BACK;
+    glGetIntegerv(GL_CULL_FACE_MODE, &cullFaceMode);
     GLint previousViewport[4];
     glGetIntegerv(GL_VIEWPORT, previousViewport);
 
@@ -437,47 +548,55 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
     GLint previousFramebuffer = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
 
+    // Set shadow rendering state
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glCullFace(GL_FRONT); // Can help with shadow acne (when culling is enabled)
+
+    // Every node is drawn with the current (stock) program in its shadow mode, whatever
+    // program its material would switch to
+    ShaderManager *shaders = context.shaders();
+    ProgramPtr shader = shaders->currentProgram();
+    shader->use();
+    shader->uniformBool("shadowPass", true);
+    shaders->lockProgram();
+    m_renderingShadows = true;
+
+    // Only opaque nodes cast shadows (not the sky, overlays or blended objects)
+    const Renderer::SkipFn skip = [](const DrawItem &item) {
+        return item.layer != RenderLayer::Opaque || !item.castShadows;
+    };
     Renderer renderer(context, RenderPass::Shadow);
 
-    // For each shadow-casting light:
-
-    for (auto &light : m_dirLights)
+    for (auto &slot : m_shadowSlots)
     {
-        if (!light->enabled() || !light->castsShadows() || !light->shadowMap())
-            continue;
+        Light &light = *slot.light;
+        if (!light.shadowMap())
+            light.setShadowMap(ShadowMap::create(slot.width, slot.height));
+        else
+            light.shadowMap()->resize(slot.width, slot.height);
+        auto map = light.shadowMap();
+        map->setLightSpaceMatrix(slot.data.matrices[0]);
 
-        // Calculate the light space matrix with the current scene bbox
-
-        glm::mat4 lightSpaceMatrix = light->calculateLightSpaceMatrix(sceneBBox);
-        light->shadowMap()->setLightSpaceMatrix(lightSpaceMatrix);
-
-        // Bind the shadow map's framebuffer
-
-        light->shadowMap()->bind();
-
-        // Clear the depth buffer
-
+        map->bind();
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        // Set shader to shadow pass mode
+        for (int k = 0; k < slot.tiles; ++k)
+        {
+            const glm::mat4 &matrix = slot.data.matrices[k];
+            glViewport((k % slot.columns) * slot.tileSize, (k / slot.columns) * slot.tileSize, slot.tileSize,
+                       slot.tileSize);
+            shader->uniformMatrix4("lightSpaceMatrix", matrix);
+            renderer.execute(queue, Frustum(matrix), skip); // only what this tile sees
+            m_shadowStats += renderer.stats();
+        }
 
-        shader->use();
-        shader->uniformBool("shadowPass", true);
-        shader->uniformMatrix4("lightSpaceMatrix", lightSpaceMatrix);
-
-        // Render the scene
-
-        renderer.execute(queue, Frustum(lightSpaceMatrix)); // only what the light sees
-        m_shadowStats += renderer.stats();
-
-        // Reset shader mode
-
-        shader->uniformBool("shadowPass", false);
-
-        // Unbind the shadow map's framebuffer
-
-        light->shadowMap()->unbind();
+        map->unbind();
     }
+
+    m_renderingShadows = false;
+    shaders->unlockProgram();
 
     // Restore framebuffer and viewport
 
@@ -486,7 +605,7 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
 
     // Restore regular shader
 
-    shader->use();
+    shaders->setCurrentProgram(shader);
     shader->uniformBool("shadowPass", false);
 
     // Restore OpenGL state
@@ -496,11 +615,15 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
         glDisable(GL_DEPTH_TEST);
 
     glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+    glCullFace(static_cast<GLenum>(cullFaceMode));
 
     if (cullFace)
         glEnable(GL_CULL_FACE);
     else
         glDisable(GL_CULL_FACE);
+
+    // The matrices and maps of this frame for the main pass
+    this->apply();
 }
 
 void ivf::LightManager::setDiffuseColor(glm::vec3 color)
@@ -565,7 +688,8 @@ void ivf::LightManager::setAlpha(float alpha)
 void ivf::LightManager::setUseShadows(bool flag)
 {
     m_useShadows = flag;
-    ShaderManager::instance()->currentProgram()->uniformBool("useShadows", flag);
+    if (!flag)
+        m_shadowSlots.clear(); // the next apply() turns them off in the shaders
 }
 
 bool ivf::LightManager::useShadows() const

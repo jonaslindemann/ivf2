@@ -8,7 +8,7 @@ You do not need any of this to build scenes: `GLFWSceneWindow` runs the passes f
 
 ```
 scene --collect()--> RenderQueue [DrawItem, ...] --sortForView()-->
-    shadow pass      (per shadow-casting light, culled with the light's view)
+    shadow pass      (per shadow map tile - cascade or cube face - culled with its view)
     reflection pass  (per PlanarReflection, culled with the mirrored camera)
     main pass        (culled with the camera)
     selection pass   (only after mouse input or camera changes)

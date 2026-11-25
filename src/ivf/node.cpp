@@ -51,6 +51,7 @@ DrawItem Node::drawItem(const CollectState &state) const
     item.world = childState(state).world;
     item.material = state.material;
     item.textureSource = state.textureSource;
+    item.castShadows = state.castShadows && m_castShadows;
 
     // Explicit layer, else the layer of the material actually used
     const Material *material = (m_material && m_useMaterial) ? m_material.get() : state.material.get();
@@ -83,6 +84,7 @@ CollectState Node::childState(const CollectState &state) const
         child.material = m_material;
     if (m_useTexture)
         child.textureSource = const_cast<Node *>(this);
+    child.castShadows = state.castShadows && m_castShadows;
     return child;
 }
 

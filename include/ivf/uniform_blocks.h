@@ -29,10 +29,12 @@
  * `projection` and `viewPos` uniforms instead still get them set as before.
  *
  * Lights work the same way with the `IvfLights` block (IVF_LIGHTS_BLOCK_GLSL declares the
- * `PointLight`, `DirLight` and `SpotLight` structs, the arrays `pointLights`,
- * `dirLights`, `spotLights`, `lightSpaceMatrices` and the counts). Shadow map samplers
- * cannot live in a uniform block and stay plain uniforms (`shadowMaps[i]` belongs to
- * `dirLights[i]`).
+ * `PointLight`, `DirLight`, `SpotLight` and `ShadowData` structs, the arrays
+ * `pointLights`, `dirLights`, `spotLights`, `shadows` and the counts). A light that casts
+ * shadows refers to `shadows[shadowIndex]`; shadow map samplers cannot live in a uniform
+ * block and stay plain uniforms (`shadowMaps[shadowIndex]` on texture unit
+ * ShadowMapUnit + shadowIndex, set by Program::link()). IVF_SHADOWS_GLSL
+ * (ivf/shadow_shaders.h) has the GLSL functions that sample them.
  */
 
 #include <glad/glad.h>
@@ -75,6 +77,15 @@ inline constexpr int MaxPointLights = 8;
 inline constexpr int MaxDirLights = 4;
 inline constexpr int MaxSpotLights = 8;
 
+/// Number of shadow maps (shadow-casting directional and point lights) the shaders sample.
+inline constexpr int MaxShadowMaps = 4;
+
+/// Tiles of one shadow map: cascades of a directional light or the six cube faces of a point light.
+inline constexpr int MaxShadowTiles = 6;
+
+/// Texture unit of `shadowMaps[0]`; `shadowMaps[i]` uses ShadowMapUnit + i.
+inline constexpr GLuint ShadowMapUnit = 8;
+
 /// One point light in the `IvfLights` block (std140; GLSL struct `PointLight`).
 struct PointLightData {
     glm::vec3 position{0.0f};
@@ -85,6 +96,9 @@ struct PointLightData {
     float linear{0.0f};
     glm::vec3 specularColor{0.0f};
     float quadratic{0.0f};
+    std::int32_t shadowIndex{-1}; ///< Index into `shadows`, -1 if the light casts no shadow.
+    float shadowStrength{0.0f};
+    float padding[2]{};
 };
 
 /// One directional light in the `IvfLights` block (std140; GLSL struct `DirLight`).
@@ -96,7 +110,7 @@ struct DirLightData {
     glm::vec3 diffuseColor{0.0f};
     float shadowStrength{0.0f};
     glm::vec3 specularColor{0.0f};
-    float padding{0.0f};
+    std::int32_t shadowIndex{-1}; ///< Index into `shadows`, -1 if the light casts no shadow.
 };
 
 /// One spot light in the `IvfLights` block (std140; GLSL struct `SpotLight`).
@@ -115,6 +129,28 @@ struct SpotLightData {
     float padding[3]{};
 };
 
+/// Shadow map types in ShadowData::info.x.
+enum class ShadowType : std::int32_t {
+    None = 0,
+    Directional = 1, ///< Orthographic tiles: one map or cascades split by view depth.
+    Point = 2        ///< Six perspective tiles (cube faces) around the light.
+};
+
+/**
+ * @brief One shadow map in the `IvfLights` block (std140; GLSL struct `ShadowData`).
+ *
+ * The tiles of a light (cascades or cube faces) share one depth texture as an atlas of
+ * `atlas.y` columns and `atlas.z` rows; tile k is at column k % cols, row k / cols.
+ */
+struct ShadowData {
+    glm::ivec4 info{0};       ///< x ShadowType, y tile count, z ShadowFilter, w PCF radius in texels.
+    glm::vec4 params{0.0f};   ///< x depth bias, y normal offset in texels, z PCSS light size.
+    glm::vec4 splits{0.0f};   ///< Directional: far view depth of each cascade. Point: (near, far).
+    glm::vec4 lightPos{0.0f}; ///< Point: light position (xyz).
+    glm::vec4 atlas{0.0f};    ///< x tile size in texels, y columns, z rows, w tan of half the tile's field of view.
+    glm::mat4 matrices[MaxShadowTiles]{}; ///< World to light clip space of each tile.
+};
+
 /**
  * @brief Contents of the `IvfLights` uniform block (std140 layout).
  *
@@ -124,17 +160,18 @@ struct LightsBlock {
     PointLightData pointLights[MaxPointLights];
     DirLightData dirLights[MaxDirLights];
     SpotLightData spotLights[MaxSpotLights];
-    glm::mat4 lightSpaceMatrices[MaxDirLights]{}; ///< Shadow map matrix of dirLights[i].
+    ShadowData shadows[MaxShadowMaps]; ///< Shadow maps, referred to by the lights' shadowIndex.
     std::int32_t pointLightCount{0};
     std::int32_t dirLightCount{0};
     std::int32_t spotLightCount{0};
     std::int32_t padding{0};
 };
 
-static_assert(sizeof(PointLightData) == 64, "PointLightData must match the std140 layout of PointLight");
+static_assert(sizeof(PointLightData) == 80, "PointLightData must match the std140 layout of PointLight");
 static_assert(sizeof(DirLightData) == 64, "DirLightData must match the std140 layout of DirLight");
 static_assert(sizeof(SpotLightData) == 96, "SpotLightData must match the std140 layout of SpotLight");
-static_assert(sizeof(LightsBlock) == 1808, "LightsBlock must match the std140 layout of IvfLights");
+static_assert(sizeof(ShadowData) == 464, "ShadowData must match the std140 layout of ShadowData");
+static_assert(sizeof(LightsBlock) == 3536, "LightsBlock must match the std140 layout of IvfLights");
 
 } // namespace ivf
 
@@ -148,23 +185,27 @@ static_assert(sizeof(LightsBlock) == 1808, "LightsBlock must match the std140 la
     "};\n"
 
 /// GLSL declaration of the light structs and the lights uniform block, for pasting into
-/// shader source strings (fragment stage). Defines IVF_MAX_POINT_LIGHTS, IVF_MAX_DIR_LIGHTS
-/// and IVF_MAX_SPOT_LIGHTS (the same sizes as MaxPointLights etc.).
+/// shader source strings (fragment stage). Defines IVF_MAX_POINT_LIGHTS, IVF_MAX_DIR_LIGHTS,
+/// IVF_MAX_SPOT_LIGHTS, IVF_MAX_SHADOW_MAPS and IVF_MAX_SHADOW_TILES (the same sizes as
+/// MaxPointLights etc.).
 #define IVF_LIGHTS_BLOCK_GLSL \
     "#define IVF_MAX_POINT_LIGHTS 8\n" \
     "#define IVF_MAX_DIR_LIGHTS 4\n" \
     "#define IVF_MAX_SPOT_LIGHTS 8\n" \
+    "#define IVF_MAX_SHADOW_MAPS 4\n" \
+    "#define IVF_MAX_SHADOW_TILES 6\n" \
     "struct PointLight {\n" \
     "    vec3 position; bool enabled;\n" \
     "    vec3 ambientColor; float constant;\n" \
     "    vec3 diffuseColor; float linear;\n" \
     "    vec3 specularColor; float quadratic;\n" \
+    "    int shadowIndex; float shadowStrength;\n" \
     "};\n" \
     "struct DirLight {\n" \
     "    vec3 direction; bool enabled;\n" \
     "    vec3 ambientColor; bool castShadows;\n" \
     "    vec3 diffuseColor; float shadowStrength;\n" \
-    "    vec3 specularColor;\n" \
+    "    vec3 specularColor; int shadowIndex;\n" \
     "};\n" \
     "struct SpotLight {\n" \
     "    vec3 position; bool enabled;\n" \
@@ -174,11 +215,15 @@ static_assert(sizeof(LightsBlock) == 1808, "LightsBlock must match the std140 la
     "    vec3 specularColor; float linear;\n" \
     "    float quadratic;\n" \
     "};\n" \
+    "struct ShadowData {\n" \
+    "    ivec4 info; vec4 params; vec4 splits; vec4 lightPos; vec4 atlas;\n" \
+    "    mat4 matrices[IVF_MAX_SHADOW_TILES];\n" \
+    "};\n" \
     "layout(std140) uniform IvfLights {\n" \
     "    PointLight pointLights[IVF_MAX_POINT_LIGHTS];\n" \
     "    DirLight dirLights[IVF_MAX_DIR_LIGHTS];\n" \
     "    SpotLight spotLights[IVF_MAX_SPOT_LIGHTS];\n" \
-    "    mat4 lightSpaceMatrices[IVF_MAX_DIR_LIGHTS];\n" \
+    "    ShadowData shadows[IVF_MAX_SHADOW_MAPS];\n" \
     "    int pointLightCount;\n" \
     "    int dirLightCount;\n" \
     "    int spotLightCount;\n" \

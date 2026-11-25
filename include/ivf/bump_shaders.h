@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ivf/shadow_shaders.h>
 #include <ivf/uniform_blocks.h>
 #include <string>
 
@@ -45,7 +46,7 @@ void main()
 /// Extends the basic fragment shader with derivative-based TBN reconstruction
 /// and normal-map sampling. When useNormalMap is false the shader is
 /// functionally identical to the basic fragment shader.
-inline const std::string bump_frag_shader_source = R"(
+inline const std::string bump_frag_shader_source = std::string(R"(
 #version 400 core
 
 #define TEX_BLEND_NORMAL   0
@@ -113,12 +114,9 @@ uniform bool selectionRendering = false;
 uniform uint objectId;
 
 uniform bool      shadowPass  = false;
-uniform sampler2D shadowMap;
 uniform mat4      lightSpaceMatrix;
-uniform bool      useShadows  = false;
 uniform int       debugShadow = 0;
-
-uniform sampler2D shadowMaps[IVF_MAX_DIR_LIGHTS];
+)") + shadow_glsl + R"(
 
 uniform samplerCube envMap;
 uniform bool        useEnvMap       = false;
@@ -126,10 +124,9 @@ uniform float       envReflectivity = 0.0;
 
 vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
 vec4 applyTexBlendModeIndexed(vec4 textureColor, vec4 baseColor, int mode, float factor);
-vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir, mat4 lightMat, sampler2D sMap);
+vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir);
-float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap);
 
 float rand(vec2 co) {
     return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
@@ -165,7 +162,7 @@ void main()
         vec3  projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         projCoords = projCoords * 0.5 + 0.5;
 
-        float closestDepth = texture(shadowMap, projCoords.xy).r;
+        float closestDepth = texture(shadowMaps[0], projCoords.xy).r;
         float currentDepth = projCoords.z;
 
         if (debugShadow == 1) {
@@ -204,7 +201,7 @@ void main()
 
     for (int i = 0; i < dirLightCount; i++)
         if (dirLights[i].enabled)
-            result += calcDirLight(dirLights[i], norm, viewDir, lightSpaceMatrices[i], shadowMaps[i]);
+            result += calcDirLight(dirLights[i], norm, viewDir);
 
     for (int i = 0; i < spotLightCount; i++)
         if (spotLights[i].enabled)
@@ -278,7 +275,7 @@ void main()
     }
 }
 
-vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir, mat4 lightMat, sampler2D sMap)
+vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir)
 {
     vec3 n = normalize(norm);
     n = dot(n, viewDir) < -0.1 ? -n : n;
@@ -292,12 +289,7 @@ vec3 calcDirLight(DirLight light, vec3 norm, vec3 viewDir, mat4 lightMat, sample
     vec3 diffuse  = light.diffuseColor  * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
 
-    float shadow = 0.0;
-    if (useShadows && light.castShadows)
-    {
-        vec4 fragPosLightSpace = lightMat * vec4(fragPos, 1.0);
-        shadow = calculateShadow(fragPosLightSpace, sMap);
-    }
+    float shadow = ivfShadowFactor(light.shadowIndex, fragPos, normalize(normal), lightDir);
 
     return ambient + (1.0 - shadow * light.shadowStrength) * (diffuse + specular);
 }
@@ -318,7 +310,8 @@ vec3 calcPointLight(PointLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
     vec3 diffuse  = light.diffuseColor  * diff * material.diffuseColor  * att;
     vec3 specular = light.specularColor * spec * material.specularColor * att;
 
-    return ambient + diffuse + specular;
+    float shadow = ivfShadowFactor(light.shadowIndex, fragPos, normalize(normal), lightDir);
+    return ambient + (1.0 - shadow * light.shadowStrength) * (diffuse + specular);
 }
 
 vec3 calcSpotLight(SpotLight light, vec3 norm, vec3 fragPos, vec3 viewDir)
@@ -393,34 +386,6 @@ vec4 applyTexBlendModeIndexed(vec4 textureColor, vec4 baseColor, int mode, float
     return mix(baseColor, result, factor);
 }
 
-float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap)
-{
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    projCoords = projCoords * 0.5 + 0.5;
-
-    if (projCoords.x < 0.0 || projCoords.x > 1.0 ||
-        projCoords.y < 0.0 || projCoords.y > 1.0 ||
-        projCoords.z < 0.0 || projCoords.z > 1.0)
-        return 0.0;
-
-    float closestDepth = texture(sMap, projCoords.xy).r;
-    float currentDepth = projCoords.z;
-
-    vec3  n        = normalize(normal);
-    vec3  lightDir = normalize(-dirLights[0].direction);
-    float bias     = max(0.002 * (1.0 - dot(n, lightDir)), 0.001);
-
-    float shadow    = 0.0;
-    vec2  texelSize = 1.0 / textureSize(sMap, 0);
-    for (int x = -1; x <= 1; ++x)
-        for (int y = -1; y <= 1; ++y)
-        {
-            float pcfDepth = texture(sMap, projCoords.xy + vec2(x, y) * texelSize).r;
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-        }
-
-    return shadow / 9.0;
-}
 )";
 
 } // namespace ivf

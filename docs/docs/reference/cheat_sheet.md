@@ -76,7 +76,8 @@ All classes are created with `ClassName::create(...)` and returned as `std::shar
 |-------|------------|-------|
 | `LightManager` | Creates and applies lights | [Lighting](../core/lighting.md) |
 | `PointLight`, `DirectionalLight`, `SpotLight` | Light types | [Lighting](../core/lighting.md) |
-| `ShadowMap` | Shadow mapping for directional lights | [Shadows](../advanced/shadows.md) |
+| `ShadowMap` | Depth texture of a shadow-casting light (cascades or cube faces as tiles) | [Shadows](../advanced/shadows.md) |
+| `ShadowFilter` | Hard, PCF or PCSS shadow edges (`Light::setShadowFilter()`) | [Shadows](../advanced/shadows.md#soft-shadows) |
 
 ## Post-processing effects
 

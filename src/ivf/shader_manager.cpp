@@ -278,6 +278,9 @@ std::shared_ptr<Program> ShaderManager::currentProgram()
 
 bool ivf::ShaderManager::setCurrentProgram(const std::string &name)
 {
+    if (m_programLocked)
+        return m_programs.find(name) != m_programs.end();
+
     auto it = m_programs.find(name);
     if (it != m_programs.end())
     {
@@ -295,10 +298,27 @@ bool ivf::ShaderManager::setCurrentProgram(ProgramPtr program)
 {
     if (!program)
         return false;
+    if (m_programLocked)
+        return true;
 
     m_currentProgram = program;
     m_currentProgram->use();
     return true;
+}
+
+void ivf::ShaderManager::lockProgram()
+{
+    m_programLocked = true;
+}
+
+void ivf::ShaderManager::unlockProgram()
+{
+    m_programLocked = false;
+}
+
+bool ivf::ShaderManager::programLocked() const
+{
+    return m_programLocked;
 }
 
 ProgramPtr ivf::ShaderManager::program(const std::string &name)

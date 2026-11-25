@@ -18,6 +18,9 @@ namespace ivf {
 class DirectionalLight : public Light {
 private:
     glm::vec3 m_direction; ///< Direction vector of the light.
+    int m_shadowCascades{1};          ///< Number of shadow cascades (1 = one map fitted to the scene).
+    float m_shadowDistance{0.0f};     ///< View distance covered by the cascades (0 = automatic).
+    float m_cascadeSplitLambda{0.75f}; ///< Logarithmic (1) or uniform (0) cascade splits.
 
 public:
     /**
@@ -49,6 +52,37 @@ public:
      * @return glm::mat4 Light space matrix.
      */
     virtual glm::mat4 calculateLightSpaceMatrix(BoundingBox &sceneBBox) override;
+
+    /**
+     * @brief Number of shadow cascades, 1-4 (default 1).
+     *
+     * With one, the shadow map covers the whole scene (LightManager's scene bounding box).
+     * With more, cascaded shadow maps split the camera's view range: nearby shadows get
+     * a small, sharp map, distant ones larger, coarser ones. The cascades share the map
+     * (setShadowMapSize()) as tiles. Shadows end at setShadowDistance().
+     */
+    void setShadowCascades(int count);
+
+    /** @brief Number of shadow cascades. */
+    [[nodiscard]] int shadowCascades() const;
+
+    /**
+     * @brief View distance covered by the cascades (0, the default: up to the farthest
+     * point of the scene, at most the camera's far plane). Beyond it there are no shadows.
+     */
+    void setShadowDistance(float distance);
+
+    /** @brief View distance covered by the cascades (0 = automatic). */
+    [[nodiscard]] float shadowDistance() const;
+
+    /**
+     * @brief Placement of the cascade splits: 1 logarithmic (more resolution near the
+     * camera), 0 uniform; default 0.75.
+     */
+    void setCascadeSplitLambda(float lambda);
+
+    /** @brief Placement of the cascade splits. */
+    [[nodiscard]] float cascadeSplitLambda() const;
 
     /**
      * @brief Apply the light's parameters to the rendering context.

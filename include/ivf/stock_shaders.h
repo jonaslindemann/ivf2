@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ivf/shadow_shaders.h>
 #include <ivf/uniform_blocks.h>
 #include <string>
 
@@ -65,7 +66,7 @@ void main()
 )";
 
 /// Fragment shader for basic rendering with lighting, shadow mapping, and texture blending (OpenGL 4.0+).
-inline const std::string basic_frag_shader_source = R"(
+inline const std::string basic_frag_shader_source = std::string(R"(
 #version 400 core
 
 //
@@ -138,11 +139,20 @@ uniform bool selectionRendering = false;
 uniform uint objectId;
 
 uniform bool shadowPass = false;
-uniform mat4 lightSpaceMatrix;
-uniform bool useShadows = false;
+uniform mat4 lightSpaceMatrix; // shadow pass: the tile being drawn; else the first shadow tile (debug views)
 uniform int debugShadow = 0;
-
-uniform sampler2D shadowMaps[IVF_MAX_DIR_LIGHTS];
+)") + shadow_glsl + R"(
+// Colours of the shadow tiles (cascades) for debugShadow == 5
+vec3 ivfShadowTileColor(int tile)
+{
+    if (tile == 0) return vec3(1.0, 0.25, 0.25);
+    if (tile == 1) return vec3(0.25, 1.0, 0.25);
+    if (tile == 2) return vec3(0.3, 0.45, 1.0);
+    if (tile == 3) return vec3(1.0, 1.0, 0.25);
+    if (tile == 4) return vec3(1.0, 0.25, 1.0);
+    if (tile == 5) return vec3(0.25, 1.0, 1.0);
+    return vec3(0.5);
+}
 
 uniform samplerCube envMap;
 uniform bool useEnvMap = false;
@@ -150,10 +160,9 @@ uniform float envReflectivity = 0.0;
 
 vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor);
 vec4 applyTexBlendModeIndexed(vec4 textureColor, vec4 baseColor, int mode, float factor);
-vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap);
+vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir);
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
-float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap);
 
 float rand(vec2 co){
   return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
@@ -222,14 +231,11 @@ void main()
                 result += calcPointLight(pointLights[i], norm, fragPos, viewDir);
         }
 
-        if (dirLightCount > 0 && dirLights[0].enabled)
-            result += calcDirLight(dirLights[0], norm, viewDir, lightSpaceMatrices[0], shadowMaps[0]);
-        if (dirLightCount > 1 && dirLights[1].enabled)
-            result += calcDirLight(dirLights[1], norm, viewDir, lightSpaceMatrices[1], shadowMaps[1]);
-        if (dirLightCount > 2 && dirLights[2].enabled)
-            result += calcDirLight(dirLights[2], norm, viewDir, lightSpaceMatrices[2], shadowMaps[2]);
-        if (dirLightCount > 3 && dirLights[3].enabled)
-            result += calcDirLight(dirLights[3], norm, viewDir, lightSpaceMatrices[3], shadowMaps[3]);
+        for (int i = 0; i < dirLightCount; i++)
+        {
+            if (dirLights[i].enabled)
+                result += calcDirLight(dirLights[i], norm, viewDir);
+        }
 
         for(int i = 0; i < spotLightCount; i++)
         {
@@ -322,10 +328,17 @@ void main()
         }
 
         fragColor *= instanceColor;
+
+        if (debugShadow == 5)
+        {
+            // Shadow tiles (cascades) of the first directional light
+            int slot = dirLightCount > 0 ? dirLights[0].shadowIndex : -1;
+            fragColor.rgb = mix(fragColor.rgb, ivfShadowTileColor(ivfShadowTileIndex(slot, fragPos)), 0.4);
+        }
     }
 }
 
-vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, sampler2D sMap)
+vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
     vec3 norm = safeNormalize(normal, vec3(0.0, 0.0, 1.0));
     
@@ -340,14 +353,9 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir, mat4 lightMat, samp
     vec3 ambient = light.ambientColor * material.ambientColor;
     vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
     vec3 specular = light.specularColor * spec * material.specularColor;
-    float shadow = 0.0;
-    if(useShadows && light.castShadows)
-    {
-        vec4 fragPosLightSpace = lightMat * vec4(fragPos, 1.0);
-        shadow = calculateShadow(fragPosLightSpace, sMap);
-    }
-    
-    return (ambient + (1.0 - shadow * light.shadowStrength) * (diffuse + specular));
+    float shadow = ivfShadowFactor(light.shadowIndex, fragPos, normalize(normal), normalize(-light.direction));
+
+    return (ambient+ (1.0 - shadow * light.shadowStrength) * (diffuse + specular));
 }
 
 vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -370,7 +378,8 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient *= attenuation;
     diffuse *= attenuation;
     specular *= attenuation;
-    return (ambient + diffuse + specular);
+    float shadow = ivfShadowFactor(light.shadowIndex, fragPos, normalize(normal), lightDir);
+    return (ambient + (1.0 - shadow * light.shadowStrength) * (diffuse + specular));
 }
 
 vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
@@ -483,40 +492,6 @@ vec4 applyTexBlendModeIndexed(vec4 textureColor, vec4 baseColor, int mode, float
     return mix(baseColor, result, factor);
 }
 
-float calculateShadow(vec4 fragPosLightSpace, sampler2D sMap)
-{
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-    
-    projCoords = projCoords * 0.5 + 0.5;
-    
-    if(projCoords.x < 0.0 || projCoords.x > 1.0 || 
-       projCoords.y < 0.0 || projCoords.y > 1.0 ||
-       projCoords.z < 0.0 || projCoords.z > 1.0) {
-        return 0.0;
-    }
-    
-    float closestDepth = texture(sMap, projCoords.xy).r; 
-    
-    float currentDepth = projCoords.z;
-    
-    vec3 norm = normalize(normal);
-    vec3 lightDir = normalize(-dirLights[0].direction);
-
-    float bias = max(0.002 * (1.0 - dot(norm, lightDir)), 0.001);
-    
-    float shadow = 0.0;
-    vec2 texelSize = 1.0 / textureSize(sMap, 0);
-    for(int x = -1; x <= 1; ++x) {
-        for(int y = -1; y <= 1; ++y) {
-            float pcfDepth = texture(sMap, projCoords.xy + vec2(x, y) * texelSize).r; 
-            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
-        }    
-    }
-
-    shadow /= 9.0;
-    
-    return shadow;
-}
 
 )";
 

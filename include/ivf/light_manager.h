@@ -64,6 +64,23 @@ private:
     Renderer::Stats m_shadowStats; ///< Counts of the last renderShadowMaps(), all lights.
     int m_debugShadow{0};       ///< Debug flag for shadow rendering.
 
+    /// One shadow map: a shadow-casting light, its tiles and what the shaders get.
+    struct ShadowSlot {
+        Light *light{nullptr};
+        ShadowData data;   ///< Matrices, splits and settings (copied into the IvfLights block).
+        int tiles{1};      ///< Cascades or cube faces.
+        int columns{1};    ///< Tiles per row of the atlas.
+        int tileSize{0};   ///< Tile size in texels.
+        int width{0};      ///< Size of the depth texture.
+        int height{0};
+    };
+    std::vector<ShadowSlot> m_shadowSlots; ///< Shadow maps of the current frame (renderShadowMaps()).
+    bool m_renderingShadows{false};        ///< Inside renderShadowMaps(): apply() does nothing.
+    bool m_shadowLimitWarned{false};       ///< Warned about more than MaxShadowMaps shadow casters.
+
+    /// Choose the shadow-casting lights and compute their matrices for this camera.
+    void updateShadowSlots(const glm::mat4 &view, const glm::mat4 &projection);
+
     GLuint m_lightsBuffer{0};       ///< Uniform buffer of the IvfLights block (created on first upload).
     LightsBlock m_lightsBlock;      ///< Contents last uploaded to m_lightsBuffer.
     bool m_lightsBlockValid{false}; ///< m_lightsBlock has been uploaded.
@@ -250,6 +267,14 @@ public:
     void renderShadowMaps(RenderContext &context, const RenderQueue &queue);
 
     /**
+     * @brief Number of shadow maps rendered by the last renderShadowMaps() (at most MaxShadowMaps).
+     */
+    [[nodiscard]] int shadowMapCount() const
+    {
+        return static_cast<int>(m_shadowSlots.size());
+    }
+
+    /**
      * @brief Counts of the last renderShadowMaps(), added up over all shadow-casting lights.
      *
      * Zero when shadows are off.
@@ -359,8 +384,12 @@ public:
     bool autoCalcBBox() const;
 
     /**
-     * @brief Set the debug flag for shadow rendering.
-     * @param flag Debug flag value.
+     * @brief Show shadow information in the stock shader instead of the lit scene.
+     *
+     * 0 off, 1 stored depth, 2 shadowed (red) or lit (green), 3 shadow map coordinates,
+     * 4 surface against stored depth (modes 1-4: first tile of the first shadow map),
+     * 5 the lit scene tinted by cascade (first directional light).
+     * @param flag Debug mode.
      */
     void setDebugShadow(int flag);
 

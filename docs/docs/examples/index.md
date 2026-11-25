@@ -1,6 +1,6 @@
 # Example Index
 
-ivf2 comes with around 50 small example programs. Each is a standalone executable that shows one feature, and they are the quickest way to learn the library: run one, read its source, change something, run it again.
+ivf2 comes with around 60 small example programs. Each is a standalone executable that shows one feature, and they are the quickest way to learn the library: run one, read its source, change something, run it again.
 
 ## Running the examples
 
@@ -12,7 +12,7 @@ build/release/bin/hello_ivf
 
 Run them from that folder, or anywhere else as long as the `shaders/`, `fonts/` and `assets/` folders next to the executable are present. CMake copies them there during the build.
 
-The sources are in `examples/<name>/`.
+The sources are in `examples/<name>/`. The [Example Gallery](gallery.md) shows a picture of each.
 
 ## Getting started
 
@@ -33,8 +33,6 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `text1` | 3D text with live editing | [Text](../primitives/text.md) |
 | `custom_mesh1` | `DynamicMesh` for generated geometry: a Lissajous curve and a Lorenz attractor | |
 | `instancing1` | Thousands of copies of a mesh with `InstancedMeshNode` | |
-| `ibl1` | PBR spheres lit by an HDR environment (procedural sky or `.hdr` file), with the environment as skybox | [PBR and Image-Based Lighting](../core/pbr_and_ibl.md) |
-| `hdr1` | Lights brighter than white with tone mapping (None, Reinhard, ACES, AgX), exposure, bloom in HDR, FXAA and MSAA | [HDR and Tone Mapping](../effects/hdr.md) |
 | `auto_instancing1` | `InstanceNode` copies merged into instanced draw calls automatically; on/off switch and statistics | [Nodes](../core/nodes.md#instancenode-class) |
 | `bbox1` | Bounding boxes of nested nodes | [Nodes](../core/nodes.md) |
 | `deformer1` | Twist and bend deformers with inspectors | [Deformers](../core/deformers.md) |
@@ -49,6 +47,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `textures2` | Multitexturing with blend modes | [Materials and Textures](../core/materials_and_textures.md) |
 | `textures3` | Textures generated on the GPU | |
 | `textures4` | `PBRMaterial`: a grid of spheres from rough to smooth and dielectric to metal | [PBR and Image-Based Lighting](../core/pbr_and_ibl.md) |
+| `ibl1` | PBR spheres lit by an HDR environment (procedural sky or `.hdr` file), with the environment as skybox | [PBR and Image-Based Lighting](../core/pbr_and_ibl.md) |
 | `procedural1` | Textures generated on the CPU: noise, marble, wood | |
 | `procedural2` | Animated GPU procedural textures | |
 | `bump1` | Normal maps with `BumpMaterial` | |
@@ -66,6 +65,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | Example | Shows | Guide |
 |---------|-------|-------|
 | `effects1` | Every stylisation effect, switchable from a panel | [Post-Processing](../effects/index.md) |
+| `hdr1` | Lights brighter than white with tone mapping (None, Reinhard, ACES, AgX), exposure, bloom in HDR, FXAA and MSAA | [HDR and Tone Mapping](../effects/hdr.md) |
 | `fog1` | Distance and height fog | [Blur, Bloom and Depth](../effects/blur.md#fog) |
 | `dof1` | Depth of field | [Blur, Bloom and Depth](../effects/blur.md#depth-of-field) |
 | `ssao1` | Screen-space ambient occlusion | [Ambient Occlusion and Reflections](../effects/screen_space.md#ambient-occlusion) |
@@ -104,6 +104,8 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `cursor1`, `cursor_optimization` | The 3D cursor and its ground projection | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `editor1` | Starting point for an editor: floor grid and the 3D mouse position | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `ui1`, `ui2`, `scene_ui1` | ImGui windows combined with a scene | [UI Windows](../ui/ui_windows.md) |
+| `multi_window1` | Two windows, each with its own scene, lights and user interface | [Render Context](../advanced/render_context.md) |
+| `embedding1` | ivf inside an application that owns its OpenGL context (plain GLFW, as Qt or SDL would) | [Render Context](../advanced/render_context.md) |
 | `assimp1` | Opening any model file through a file dialog | [Model Loading](../advanced/model_loading.md) |
 | `serialization1` | Saving, loading and clearing a scene as JSON | |
 | `debug_draw1` | Immediate-mode debug lines and shapes | |

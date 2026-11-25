@@ -2,9 +2,28 @@
 
 ![ivf2](images/logo.png)
 
-ivf2 is a modern C++20 library for real-time 3D graphics, visualisation and creative coding, built on OpenGL 3.3+. You build a scene from nodes, such as primitives, models, text and lights, give them materials and effects, and animate them over time. A thin application layer handles windows, input and ImGui panels, so a working interactive scene takes only a few dozen lines.
+ivf2 is a modern C++23 library for real-time 3D graphics, visualisation and creative coding, built on OpenGL 3.3+. You build a scene from nodes, such as primitives, models, text and lights, give them materials and effects, and animate them over time. A thin application layer handles windows, input and ImGui panels, so a working interactive scene takes only a few dozen lines.
 
 ivf2 is a complete rewrite of [ivfplusplus](https://github.com/jonaslindemann/ivfplusplus), the C++ OpenGL wrapper behind [ObjectiveFrame](https://jonaslindemann.github.io/objectiveframe/). It aims to be easy to start with and easy to extend, for teaching, research visualisation and generative art alike.
+
+## Highlights
+
+Physically based materials lit by HDR environments, soft shadows from the sun and from lamps, ambient occlusion and reflections, and an HDR image with filmic tone mapping:
+
+<div class="ivf-gallery ivf-gallery-wide" markdown>
+
+- [![Image-based lighting](images/gallery/ibl1.jpg) Image-based lighting](core/pbr_and_ibl.md)
+- [![Screen-space reflections](images/gallery/ssr1.jpg) Reflections and SSAO](effects/screen_space.md)
+- [![Cascaded shadows](images/gallery/cascaded_shadows1.jpg) Cascaded soft shadows](advanced/shadows.md#cascaded-shadow-maps)
+- [![Point and spot light shadows](images/gallery/point_shadows1.jpg) Point and spot light shadows](advanced/shadows.md#point-lights)
+- [![HDR and tone mapping](images/gallery/hdr1.jpg) HDR and tone mapping](effects/hdr.md)
+- [![Ambient occlusion](images/gallery/ssao1.jpg) Ambient occlusion](effects/screen_space.md#ambient-occlusion)
+- [![Bloom, glow and mist](images/gallery/mip_bloom1.jpg) Bloom, glow and mist](effects/blur.md#mipbloomeffect)
+- [![Water reflections](images/gallery/reflection1.jpg) Water reflections](core/shader_materials.md#watermaterial)
+
+</div>
+
+All of these are example programs you can run and change. The [Example Gallery](examples/gallery.md) shows every example; the topics below lead to the guides.
 
 <div class="ivf-gallery" markdown>
 
@@ -21,19 +40,28 @@ ivf2 is a complete rewrite of [ivfplusplus](https://github.com/jonaslindemann/iv
 
 ## Features
 
+### Rendering
+
+- [Physically based materials](core/pbr_and_ibl.md) with image-based lighting: an HDR environment (`.hdr` file or a procedural sky) lights the scene with diffuse light and reflections that blur with roughness, and shows as the background
+- [HDR rendering](effects/hdr.md): exposure, tone mapping (Reinhard, ACES, AgX), gamma, FXAA and multisampling, for lights far brighter than white
+- [Shadows](advanced/shadows.md) from directional, point and spot lights: cascaded shadow maps for large scenes, shadows in all directions around lamps, and soft edges (PCF, or PCSS penumbras that widen with distance)
+- [Ambient occlusion and screen-space reflections](effects/screen_space.md) as post-processing effects
+- A [render queue](advanced/render_queue.md) that walks the scene once per frame, culls against each view, sorts to save state changes, merges copies of a mesh into instanced draw calls, and counts what it draws
+- Several windows, or [ivf inside your own application](advanced/render_context.md) (Qt, SDL, ...), each with its own OpenGL context
+
 ### Scene and geometry
 
 - A [scene graph](core/nodes.md) of nodes, transforms and groups, with `create()` factories and `shared_ptr` throughout
 - [Basic primitives](primitives/basic_primitives.md) such as cubes, spheres, cylinders and cones, and [complex ones](primitives/complex_primitives.md) such as extrusions, rounded boxes, capsules and polyhedra
 - [Procedural geometry](core/procedural_geometry.md) from the bundled `generator` library, with around 80 composable shapes, paths and meshes
 - [3D text](primitives/text.md), and [model loading](advanced/model_loading.md) through Assimp
-- [Lighting](core/lighting.md) with point, directional and spot lights, plus [shadow mapping](advanced/shadows.md)
+- [Lighting](core/lighting.md) with point, directional and spot lights
 
 ### Materials and effects
 
 - [Materials and textures](core/materials_and_textures.md), including physically based and normal-mapped materials, plus custom GLSL with [`ShaderMaterial`](core/shader_materials.md)
 - Additive and alpha blending with `BlendShaderMaterial`, and [ready-made glow, mist, gradient sky and water materials](core/shader_materials.md#ready-made-materials)
-- [Over 20 post-processing effects](effects/index.md): bloom with tone mapping, depth of field, fog, colour grading, film grain, chromatic aberration, halftone, kaleidoscope, glitch, video feedback and more, or [your own](effects/custom_effects.md)
+- [Over 25 post-processing effects](effects/index.md): bloom, depth of field, fog, ambient occlusion, reflections, colour grading,film grain, chromatic aberration, halftone, kaleidoscope, glitch, video feedback and more, or [your own](effects/custom_effects.md)
 - [Mesh deformers](core/deformers.md): twist, bend, scale, wave, turbulence, noise and custom functions
 
 ### Animation and time
@@ -60,7 +88,7 @@ ivf2 is a complete rewrite of [ivfplusplus](https://github.com/jonaslindemann/iv
 2. Read [Basic Concepts](getting_started/basic_concepts.md) for how scenes, nodes and windows fit together.
 3. Build [your first application](getting_started/your_first_app.md).
 
-Then browse the [Example Index](examples/index.md). Every example is a small, standalone program you can run and change. The [Cheat Sheet](reference/cheat_sheet.md) lists every class on one page. For generative and music-driven work, start with [Creative Programming](creative/index.md).
+Then browse the [Example Gallery](examples/gallery.md) or the [Example Index](examples/index.md). Every example is a small, standalone program you can run and change.The [Cheat Sheet](reference/cheat_sheet.md) lists every class on one page. For generative and music-driven work, start with [Creative Programming](creative/index.md).
 
 ## API reference
 

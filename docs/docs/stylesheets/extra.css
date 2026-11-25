@@ -170,3 +170,24 @@ body,
   color: var(--md-primary-fg-color);
   transform: translateY(-2px);
 }
+
+/* Gallery of 16:9 screenshots (landing page highlights): large tiles, no cropping */
+.md-typeset .ivf-gallery-wide ul {
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+}
+
+.md-typeset .ivf-gallery-wide img {
+  aspect-ratio: 16 / 9;
+}
+
+/* Contact sheet of all examples (Example Gallery): small tiles captioned with the program name */
+.md-typeset .ivf-gallery-sheet ul {
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.6rem;
+}
+
+.md-typeset .ivf-gallery-sheet a {
+  font-family: var(--md-code-font-family, monospace);
+  font-weight: 400;
+  font-size: 0.65rem;
+}

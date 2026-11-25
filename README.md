@@ -10,12 +10,16 @@ Lightweight scene graph library and wrapper over modern OpenGL.
 ## Features
 
 - **Modern OpenGL wrapper** with scene graph architecture
+- **Rendering** - PBR materials with image-based lighting, HDR with tone mapping, cascaded,
+  point and spot light shadows with soft edges, SSAO and screen-space reflections, and a render
+  queue with culling and automatic instancing
 - **Modern CMake build** - presets, automatic vcpkg detection, `find_package(ivf2)` / FetchContent support
 - **Unified library target** (`ivf2::ivf2`) for easy integration
 - **Automatic asset management** - shaders, fonts, and models copied automatically
 - **Cross-platform** - Windows, Linux, and macOS support
 - **Music-driven scenes** (`ivf2::ivfmusic`) - song playback as the master clock, bar-keyed automation with live reload, note events from Renoise songs, presentation mode and frame export
-- **Rich examples** demonstrating lighting, animations, physics, UI, and more
+- **Rich examples** demonstrating lighting, animations, physics, UI, and more - see the
+  [Example Gallery](https://interactive-visualisation-framework-2.readthedocs.io/en/latest/examples/gallery/)
 
 # Documentation
 

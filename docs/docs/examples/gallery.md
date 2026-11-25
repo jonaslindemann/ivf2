@@ -101,6 +101,7 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
 - [![selection1](../images/gallery/selection1.jpg) selection1](../advanced/selection.md "Highlighting objects under the mouse")
+- [![picking1](../images/gallery/picking1.jpg) picking1](../advanced/selection.md#ray-picking "Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model")
 - [![editor1](../images/gallery/editor1.jpg) editor1](../advanced/selection.md#the-3d-cursor-position "Starting point for an editor: floor grid and the 3D mouse position")
 - [![ui1](../images/gallery/ui1.jpg) ui1](../ui/ui_windows.md "ImGui windows combined with a scene")
 - [![ui2](../images/gallery/ui2.jpg) ui2](../ui/ui_windows.md "ImGui windows combined with a scene")

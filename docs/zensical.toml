@@ -1,5 +1,5 @@
 [project]
-site_name = "Interactive Visual Framework 2"
+site_name = "Interactive Visualisation Framework 2"
 site_description = "Documentation for the Ivf2 C++ graphics library"
 site_author = "Jonas Lindemann"
 site_url = "https://interactive-visualisation-framework-2.readthedocs.io/"

@@ -1,19 +1,252 @@
-@import url('https://fonts.googleapis.com/css2?family=Gidole:wght@300;400;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Space Mono:wght@300;400;600&display=swap');
+/*
+ * ivf2 API reference: Doxygen's dark style (HTML_COLORSTYLE = DARK) adjusted to match the user
+ * guide (docs/docs/stylesheets/extra.css): Geist fonts, the #191B1F background and the yellow
+ * header. Uses selectors that Doxygen has had for a long time (1.9.x - 1.13), since the dark
+ * style writes colours directly instead of CSS variables.
+ */
 
-/* Universal font override */
-* {
-    font-family: "Gidole", Arial, sans-serif !important;
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap');
+
+/* --- Fonts ---------------------------------------------------------------------------------- */
+
+body, table, div, p, dl, td, th, li, input, button,
+.title, #projectname, #projectbrief, #projectnumber,
+.sm-dox a, .navpath li, .navpath li.footer, #nav-tree, #nav-tree .label,
+h1, h2, h3, h4, h5, h6, .groupheader, .memtitle, .directory, .fieldtable,
+.qindex, .tabs, .tabs2, .tabs3, .tablist, .navpath {
+    font-family: "Geist", Roboto, Arial, sans-serif !important;
 }
 
-/* Specific code font override */
-code, pre, .fragment, .line, .lineno, .keyword, .comment, 
-.preprocessor, .string, .charliteral, .stringliteral,
-span[class*="keyword"], span[class*="comment"] {
-    font-family: "Space Mono", Consolas, monospace !important;
+body, table, div, p, dl {
+    font-size: 15px;
+    line-height: 1.6;
 }
 
-/* Headers */
-h1, h2, h3, h4, h5, h6, .title, .summary {
-    font-family: "Gidole", Georgia, serif !important;
+code, pre, tt, kbd, .fragment, div.line, span.lineno, .memname, .memname td, .memproto td,
+.mdescLeft, .memItemLeft, .memTemplItemLeft, .memTemplParams, .paramname, .paramtype,
+span.keyword, span.keywordtype, span.keywordflow, span.comment, span.preprocessor,
+span.stringliteral, span.charliteral, span.vhdlchar, span.vhdlkeyword, span.vhdllogic {
+    font-family: "Geist Mono", "JetBrains Mono", Consolas, monospace !important;
+    font-variant-ligatures: none;
+}
+
+/* --- Page --------------------------------------------------------------------------------- */
+
+body, #doc-content, div.contents, div.header, div.headertitle, div.summary,
+.classindex dl.even, #nav-tree-contents {
+    background-color: #191B1F !important;
+    color: #D7DADF;
+}
+
+.classindex dl.odd {
+    background-color: #1E2025 !important;
+}
+
+div.header {
+    background-image: none !important;
+    border-bottom: 1px solid #2C2F35 !important;
+}
+
+.title {
+    color: #F2F3F5;
+    font-weight: 600 !important;
+}
+
+h2.groupheader {
+    color: #FFD43B !important;
+    border-bottom: 1px solid #3A3520 !important;
+    font-weight: 600 !important;
+}
+
+a, a.el, a.code, .contents a:visited {
+    color: #FFD43B;
+}
+
+a:hover {
+    color: #FFE066;
+}
+
+/* --- Title bar: the guide's yellow header ------------------------------------------------- */
+
+#titlearea {
+    background-color: #FFD43B !important;
+    border-bottom: none !important;
+}
+
+#titlearea table, #titlearea td {
+    background-color: transparent !important;
+}
+
+#projectname, #projectnumber {
+    color: #000000 !important;
+    font-weight: 600 !important;
+}
+
+#projectbrief {
+    color: #2B2B2B !important;
+}
+
+#projectlogo img {
+    max-height: 48px;
+}
+
+/* --- Menu and navigation ------------------------------------------------------------------ */
+
+#main-menu, .sm-dox, .sm-dox ul, #main-nav {
+    background: #23262B !important;
+    background-image: none !important;
+    border: none !important;
+}
+
+.sm-dox a, .sm-dox a:focus, .sm-dox a:active, .sm-dox a.highlighted {
+    color: #E6E8EB !important;
+    text-shadow: none !important;
+    background-image: none !important;
+}
+
+.sm-dox a:hover {
+    color: #FFD43B !important;
+}
+
+.sm-dox ul a:hover, .sm-dox ul a:active, .sm-dox ul a.highlighted {
+    background: #2C2F35 !important;
+}
+
+#side-nav, #nav-tree, .ui-resizable-e, #nav-sync {
+    background-color: #16181C !important;
+    background-image: none !important;
+}
+
+#nav-tree .selected {
+    background-image: none !important;
+    background-color: #3A3520 !important;
+    text-shadow: none !important;
+}
+
+#nav-tree .selected a {
+    color: #FFD43B !important;
+}
+
+#nav-tree a, #nav-tree .label a {
+    color: #C9CDD3;
+}
+
+.navpath ul, #nav-path ul {
+    background-image: none !important;
+    background-color: #16181C !important;
+    border-color: #2C2F35 !important;
+}
+
+.navpath li {
+    background-image: none !important;
+}
+
+.navpath li.navelem a, .navpath li.footer {
+    color: #AEB3BA !important;
+    text-shadow: none !important;
+}
+
+/* --- Search ------------------------------------------------------------------------------- */
+
+#MSearchBox, .SRPage, #MSearchResultsWindow {
+    background-color: #23262B !important;
+}
+
+#MSearchField {
+    background-color: transparent !important;
+    color: #E6E8EB !important;
+}
+
+/* --- Code --------------------------------------------------------------------------------- */
+
+div.fragment, pre.fragment {
+    background-color: #16181C !important;
+    border: 1px solid #2C2F35 !important;
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+div.line {
+    line-height: 1.5;
+}
+
+/* --- Members ------------------------------------------------------------------------------ */
+
+.memtitle {
+    background-image: none !important;
+    background-color: #23262B !important;
+    border-color: #2C2F35 !important;
+    color: #F2F3F5;
+}
+
+.memproto, dl.reflist dt {
+    background-image: none !important;
+    background-color: #1E2025 !important;
+    border-color: #2C2F35 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    color: #E6E8EB;
+}
+
+.memdoc, dl.reflist dd {
+    background-image: none !important;
+    background-color: #191B1F !important;
+    border-color: #2C2F35 !important;
+    box-shadow: none !important;
+}
+
+table.memberdecls .memItemLeft, table.memberdecls .memItemRight, table.memberdecls .mdescLeft,
+table.memberdecls .mdescRight, table.memberdecls .memTemplItemLeft, table.memberdecls .memTemplItemRight,
+table.memberdecls .memTemplParams, table.memberdecls .memSeparator {
+    background-color: #191B1F !important;
+    border-color: #2C2F35 !important;
+}
+
+.memSeparator {
+    border-bottom: 1px solid #2C2F35 !important;
+}
+
+.fieldtable th, table.doxtable th, table.markdownTable th {
+    background-image: none !important;
+    background-color: #23262B !important;
+    color: #F2F3F5 !important;
+}
+
+.fieldtable, table.doxtable td, table.markdownTable td, table.markdownTable th {
+    border-color: #2C2F35 !important;
+}
+
+.directory tr.even {
+    background-color: #1E2025 !important;
+}
+
+/* --- Notes -------------------------------------------------------------------------------- */
+
+dl.note, dl.warning, dl.attention, dl.see, dl.deprecated, dl.todo, dl.remark {
+    border-radius: 4px;
+}
+
+/* --- Footer ------------------------------------------------------------------------------- */
+
+hr.footer {
+    border-color: #2C2F35 !important;
+}
+
+address.footer, address.footer small {
+    color: #8A9099;
+}
+
+/* --- Declarations: code font throughout, links not bold (as in the guide) ------------------ */
+
+.memItemRight, .memTemplItemRight, .memname a, td.memItemRight a, td.memTemplItemRight a {
+    font-family: "Geist Mono", "JetBrains Mono", Consolas, monospace !important;
+}
+
+a.el {
+    font-weight: 500 !important;
+}
+
+.mdescRight, .mdescLeft {
+    font-family: "Geist", Roboto, Arial, sans-serif !important;
+    color: #AEB3BA !important;
 }

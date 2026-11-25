@@ -5,11 +5,6 @@
 #include <ivf/shader_manager.h>
 #include <ivf/render_context.h>
 
-#if IVF2_HAS_FREETYPE
-#include <ft2build.h>
-#include FT_FREETYPE_H
-#endif
-
 #include <ivf/utils.h>
 #include <ivf/logger.h>
 
@@ -68,6 +63,50 @@ float ivf::TextNode::size()
     return m_scale;
 }
 
+void ivf::TextNode::setResolution(int pixels)
+{
+    if (pixels <= 0 || pixels == m_maxPixels)
+        return;
+    m_maxPixels = pixels;
+    updateCharMap();
+    updateTextSize();
+}
+
+int ivf::TextNode::resolution() const
+{
+    return m_maxPixels;
+}
+
+void ivf::TextNode::setColor(const glm::vec3 &color)
+{
+    m_textColor = color;
+    m_useFixedTextColor = true;
+}
+
+glm::vec3 ivf::TextNode::color() const
+{
+    return m_textColor;
+}
+
+void ivf::TextNode::setUseColor(bool flag)
+{
+    m_useFixedTextColor = flag;
+}
+
+bool ivf::TextNode::useColor() const
+{
+    return m_useFixedTextColor;
+}
+
+const CharacterInfo &ivf::TextNode::glyph(char c) const
+{
+    static const CharacterInfo none{};
+    if (m_glyphs == nullptr)
+        return none;
+    auto it = m_glyphs->find(c);
+    return it != m_glyphs->end() ? it->second : none;
+}
+
 void ivf::TextNode::setAlignX(const TextAlignX align)
 {
     m_textAlignX = align;
@@ -97,8 +136,8 @@ void ivf::TextNode::updateTextSize()
 
     for (c = m_text.begin(); c != m_text.end(); c++)
     {
-        CharacterInfo ch = m_charMap[*c];
-        m_textWidth += (ch.glyphAdvance >> 6);
+        const CharacterInfo &ch = glyph(*c);
+        m_textWidth += static_cast<float>(ch.glyphAdvance >> 6);
         if (ch.glyphSize.y > m_textHeight)
             m_textHeight = static_cast<float>(ch.glyphSize.y);
     }
@@ -118,71 +157,18 @@ float ivf::TextNode::textHeight()
 
 void ivf::TextNode::updateCharMap()
 {
-    if (m_charMap.size() != 0)
-        for (auto &it : m_charMap)
-            glDeleteTextures(1, &it.second.textureID);
-
-    m_charMap.clear();
-
     m_textWidth = 0.0;
     m_textHeight = 0.0;
 
 #if IVF2_HAS_FREETYPE
-    FT_Face face = FontManager::instance()->currentFace();
-
-    if (face == nullptr)
+    auto *fonts = FontManager::instance();
+    if (fonts->currentFace() == nullptr)
     {
         logWarning("No font loaded - call FontManager::loadFace() before creating text", "TextNode");
+        m_glyphs = nullptr;
         return;
     }
-
-    FT_Set_Pixel_Sizes(face, 0, m_maxPixels);
-
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
-    glActiveTexture(GL_TEXTURE0);
-
-    for (unsigned char c = 0; c < 128; c++)
-    {
-        if (FT_Load_Char(face, c, FT_LOAD_RENDER))
-        {
-            logErrorfc("TextNode", "Failed to load Glyph {}", c);
-            continue;
-        }
-
-        unsigned int texture;
-
-        glGenTextures(1, &texture);
-        glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED,
-                     GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer);
-
-        /*
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            GL_RED,
-            face->glyph->bitmap.width,
-            face->glyph->bitmap.rows,
-            0,
-            GL_RED,
-            GL_UNSIGNED_BYTE,
-            face->glyph->bitmap.buffer
-            );
-        */
-
-        // set texture options
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        // now store character for later use
-        CharacterInfo character = {texture, glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
-                                   glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
-                                   static_cast<unsigned int>(face->glyph->advance.x)};
-        m_charMap.insert(std::pair<char, CharacterInfo>(c, character));
-        glBindTexture(GL_TEXTURE_2D, 0);
-    }
+    m_glyphs = fonts->glyphs(m_maxPixels);
 #else
     logWarning("ivf2 was built without FreeType (IVF2_WITH_FREETYPE=OFF) - text is not rendered", "TextNode");
 #endif
@@ -287,9 +273,9 @@ void ivf::TextNode::doDraw()
 
     for (c = m_text.begin(); c != m_text.end(); c++)
     {
-        CharacterInfo ch = m_charMap[*c];
+        const CharacterInfo &ch = glyph(*c);
 
-        float xpos = x + ch.glyphBearing.x * scale;
+        float xpos= x + ch.glyphBearing.x * scale;
         float ypos = -(ch.glyphSize.y - ch.glyphBearing.y) * scale - dy;
 
         float w = ch.glyphSize.x * scale;
@@ -343,9 +329,7 @@ void ivf::TextNode::onPropertyChanged(const std::string &propertyName)
 {
     if (propertyName == "Text")
     {
-        this->updateCharMap();
         this->updateTextSize();
-        this->prepareBuffers();
     }
     else if (propertyName == "Size")
     {

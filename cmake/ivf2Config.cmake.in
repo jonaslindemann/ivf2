@@ -1,7 +1,8 @@
 # ivf2 CMake package configuration
 #
-# Targets:  ivf2::ivf2 (everything except ivfmusic), ivf2::ivf, ivf2::ivfui,
-#           ivf2::ivfmath, ivf2::generator, ivf2::glad, and ivf2::ivfmusic when built.
+# Targets:  ivf2::ivf2 (everything except ivfmusic and ivfvis), ivf2::ivf, ivf2::ivfui,
+#           ivf2::ivfmath, ivf2::generator, ivf2::glad, and ivf2::ivfmusic and
+#           ivf2::ivfvis when built.
 # Components (optional features), e.g. find_package(ivf2 REQUIRED COMPONENTS Assimp):
 #           Assimp, FreeType, Audio, Midi, Music
 # Functions: ivf2_copy_runtime_files(<target> [ASSETS <dirs...>])

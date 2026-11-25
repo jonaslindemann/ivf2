@@ -84,7 +84,8 @@ private:
         std::uint64_t dataVersion{0};         ///< m_dataVersion when uploaded.
         std::uint64_t vertexVersion{0};       ///< m_vertexVersion when uploaded.
         std::uint64_t normalVersion{0};       ///< m_normalVersion when uploaded.
-    };
+        std::uint64_t colorVersion{0};        ///< m_colorVersion when uploaded.
+};
     std::vector<std::unique_ptr<GpuCopy>> m_gpu; ///< One GPU copy per context that drew the mesh.
 
     std::uint64_t m_dataVersion{0};   ///< Incremented by end(); 0 = never ended, nothing to draw.
@@ -93,7 +94,8 @@ private:
     std::uint64_t m_bvhDataVersion{0};          ///< m_dataVersion when m_bvh was built.
     std::uint64_t m_bvhVertexVersion{0};        ///< m_vertexVersion when m_bvh was built.
     std::uint64_t m_normalVersion{0}; ///< Incremented by updateNormals().
-    bool m_clockwise{false};          ///< Front faces are clockwise (decided in end()).
+    std::uint64_t m_colorVersion{0};  ///< Incremented by updateColors().
+bool m_clockwise{false};          ///< Front faces are clockwise (decided in end()).
 
     glm::vec3 m_position; ///< Mesh position in world space.
 
@@ -418,6 +420,11 @@ public:
     void updateNormals();
 
     /**
+     * @brief Mark the vertex colors (colors()) as changed; they are uploaded before the next draw.
+     */
+    void updateColors();
+
+    /**
      * @brief Draw the mesh using the current OpenGL state, in the current RenderContext.
      */
     void draw();
@@ -532,6 +539,14 @@ public:
      * @return std::shared_ptr<Vertices> Vertices array.
      */
     std::shared_ptr<Vertices> vertices();
+
+    /**
+     * @brief The vertex colors (one RGBA row per vertex); call updateColors() after changing them.
+     */
+    [[nodiscard]] std::shared_ptr<Colors> colors() const;
+
+    /** @brief Number of vertices of the mesh. */
+    [[nodiscard]] GLuint vertexCount() const;
 
     /**
      * @brief Get the indices array.

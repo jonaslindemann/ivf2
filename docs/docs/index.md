@@ -77,6 +77,11 @@ All of these are example programs you can run and change. The [Example Gallery](
 - [Flow fields](creative/flow_field.md): curl-noise particle motion that looks organic and fluid
 - [Music-driven scenes](creative/music_scenes.md): the song is the clock. Parameters are keyed to bars in a JSON file that reloads while the music plays, notes from Renoise songs drive values, and MIDI controllers can be played live and recorded. Frame export renders the same picture as playback.
 
+### Scientific visualisation
+
+- [Data sets](visualisation/index.md) on regular grids and at scattered points, with named scalar and vector arrays, interpolation and gradients
+- [Colormaps](visualisation/colormaps.md) (viridis, magma, cividis, turbo, coolwarm and more, or your own) with linear or log scales and discrete steps, mesh colouring by values, and colour bars over the scene
+
 ### User interface
 
 - [GLFW windows](ui/scene_window.md) with built-in camera control and input events

@@ -27,7 +27,10 @@ All classes are created with `ClassName::create(...)` and returned as `std::shar
 | `SceneSerializer` | Saves and loads scenes as JSON | `serialization1` example |
 | `GltfModel` | glTF 2.0 model: hierarchy, PBR materials, skinning, morph targets, animations | [Model Loading](../advanced/model_loading.md#gltf-models) |
 | `ModelLoader` | Loads glTF and, through Assimp, OBJ, FBX, 3DS, ... | [Model Loading](../advanced/model_loading.md) |
-| `pick()`, `RayHit`, `Ray` | Ray picking: the object, point and normal under the mouse | [Selection](../advanced/selection.md#ray-picking) |
+| `ivfvis::Colormap`, `ColorBar` | Map values to colours; show the scale over the scene | [Colormaps](../visualisation/colormaps.md) |
+| `ivfvis::UniformGrid`, `PointSet` | Data on grids and at points: named scalar and vector arrays, interpolation | [Visualisation](../visualisation/index.md) |
+| `OverlayNode` | Children drawn in window pixels over the scene (HUDs, legends) | [Overlays](../visualisation/colormaps.md#overlays) |
+| `pick()`, `RayHit`, `Ray` |Ray picking: the object, point and normal under the mouse | [Selection](../advanced/selection.md#ray-picking) |
 | `ResourceWatcher` |Reloads textures, models, shaders and other files when they are saved | [Hot Reload](../advanced/hot_reload.md) |
 
 ## Primitives

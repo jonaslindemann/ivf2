@@ -59,6 +59,10 @@ nav = [
     { "Diagnostics" = "advanced/diagnostics.md" },
     { "Error Handling" = "advanced/error_handling.md" },
   ] },
+  { "Visualisation" = [
+    { "Overview" = "visualisation/index.md" },
+    { "Colormaps and Colour Bars" = "visualisation/colormaps.md" },
+  ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },
     { "Flow Fields" = "creative/flow_field.md" },

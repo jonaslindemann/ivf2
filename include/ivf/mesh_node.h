@@ -142,6 +142,11 @@ public:
     void updateNormals();
 
     /**
+     * @brief Mark the vertex colors of all meshes as changed (see Mesh::updateColors()).
+     */
+    void updateColors();
+
+    /**
      * @brief Automatically compute and update the local bounding box from mesh data.
      */
     void updateBoundingBox();

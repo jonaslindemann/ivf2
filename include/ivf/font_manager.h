@@ -21,6 +21,20 @@ namespace ivf {
 using FontFace = FT_FaceRec_ *;
 
 /**
+ * @struct CharacterInfo
+ * @brief Stores glyph texture and metrics for a single character.
+ */
+struct CharacterInfo {
+    GLuint textureID{0};           ///< ID handle of the glyph texture
+    glm::ivec2 glyphSize{0};       ///< Size of glyph
+    glm::ivec2 glyphBearing{0};    ///< Offset from baseline to left/top of glyph
+    unsigned int glyphAdvance{0};  ///< Horizontal offset to advance to next glyph (1/64 pixels)
+};
+
+/** @brief Glyphs of the ASCII characters of one face at one pixel size. */
+using GlyphMap = std::map<char, CharacterInfo>;
+
+/**
  * @class FontManager
  * @brief Singleton class for managing FreeType font faces.
  *
@@ -42,6 +56,7 @@ private:
     FT_LibraryRec_ *m_freetype{nullptr};       ///< FreeType library handle.
     std::map<std::string, FontFace> m_faces;   ///< Map of font face names to face handles.
     FontFace m_currentFace{nullptr};           ///< Currently active font face.
+    std::map<std::pair<FontFace, int>, GlyphMap> m_glyphs; ///< Glyph textures by face and pixel size.
 
 public:
     /**
@@ -81,6 +96,15 @@ public:
      * @return Handle to the requested font face, or nullptr if not found.
      */
     FontFace face(const std::string &name);
+
+    /**
+     * @brief Glyph textures of the ASCII characters of the current face at @p pixelSize.
+     *
+     * Rendered on first use and shared by all text of this context (the textures belong to
+     * the manager). Returns nullptr if no face is loaded or FreeType is not available.
+     * @param pixelSize Height in pixels the glyphs are rasterised at.
+     */
+    [[nodiscard]] const GlyphMap *glyphs(int pixelSize);
 };
 
 /**

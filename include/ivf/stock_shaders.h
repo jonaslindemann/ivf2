@@ -338,6 +338,17 @@ void main()
     }
 }
 
+// Surface colours lit by the lights: the vertex colour (if used) or the material's
+vec3 surfaceDiffuse()
+{
+    return useVertexColors ? color.rgb : material.diffuseColor;
+}
+
+vec3 surfaceAmbient()
+{
+    return useVertexColors ? color.rgb : material.ambientColor;
+}
+
 vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
 {
     vec3 norm = safeNormalize(normal, vec3(0.0, 0.0, 1.0));
@@ -350,8 +361,8 @@ vec3 calcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 reflectDir = reflect(-lightDir, norm);
     float shininess = clamp(material.shininess, 1.0, 256.0);
     float spec = pow(clamp(dot(viewDir, reflectDir), 0.0, 1.0), shininess);
-    vec3 ambient = light.ambientColor * material.ambientColor;
-    vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
+    vec3 ambient = light.ambientColor * surfaceAmbient();
+    vec3 diffuse = light.diffuseColor * diff * surfaceDiffuse();
     vec3 specular = light.specularColor * spec * material.specularColor;
     float shadow = ivfShadowFactor(light.shadowIndex, fragPos, normalize(normal), normalize(-light.direction));
 
@@ -372,8 +383,8 @@ vec3 calcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float spec = pow(clamp(dot(viewDir, reflectDir), 0.0, 1.0), shininess);
     float distance = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));    
-    vec3 ambient = light.ambientColor * material.ambientColor;
-    vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
+    vec3 ambient = light.ambientColor * surfaceAmbient();
+    vec3 diffuse = light.diffuseColor * diff * surfaceDiffuse();
     vec3 specular = light.specularColor * spec * material.specularColor;
     ambient *= attenuation;
     diffuse *= attenuation;
@@ -399,8 +410,8 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float theta = dot(lightDir, safeNormalize(-light.direction, vec3(0.0, 0.0, 1.0)));
     float epsilon = light.cutOff - light.outerCutOff;
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
-    vec3 ambient = light.ambientColor * material.ambientColor;
-    vec3 diffuse = light.diffuseColor * diff * material.diffuseColor;
+    vec3 ambient = light.ambientColor * surfaceAmbient();
+    vec3 diffuse = light.diffuseColor * diff * surfaceDiffuse();
     vec3 specular = light.specularColor * spec * material.specularColor;
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;

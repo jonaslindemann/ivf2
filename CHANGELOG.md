@@ -59,7 +59,19 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Added
 
-- Transparency: materials with alpha < 1 are drawn after all opaque objects, back to front, with
+- `ivfvis`, a new library for scientific visualisation (`ivf2::ivfvis`, `<ivfvis/ivfvis.h>`,
+  option `IVF2_BUILD_VIS`): data sets with named scalar and vector arrays (`UniformGrid` with
+  trilinear `sample()` and `gradient()`, `PointSet`), `VectorField` (from grids, functions or
+  `FlowField`), `Colormap` (viridis, magma, inferno, plasma, cividis, turbo, coolwarm, gray, or
+  your own stops; range, log scale, reversal, steps, out-of-range and NaN colours),
+  `colorVertices()`/`useVertexColors()` for colouring meshes by values, `ColorBar` and
+  nice-number ticks (`niceTicks()`, `logTicks()`, `formatTick()`). New example `vis_colormaps1`.
+- `OverlayNode`: children drawn in window pixel coordinates over the scene (HUDs, legends).
+- `TextNode::setResolution()` (glyph pixel size, for sharp text at a known size),
+  `TextNode::setColor()`/`setUseColor()` (fixed colour independent of lighting).
+- `Mesh::colors()`, `Mesh::updateColors()`, `MeshNode::updateColors()` and `Mesh::vertexCount()`:
+  change vertex colours after a mesh was built.
+- Transparency: materialswith alpha < 1 are drawn after all opaque objects, back to front, with
   alpha blending (`setAlpha()` had no visible effect before). Blended materials (`GlowMaterial`,
   `MistMaterial`, ...), particles and billboards are ordered the same way, so blended nodes no
   longer need to be added last. `Node::setRenderLayer()` chooses a layer explicitly
@@ -152,7 +164,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
-- A window with selection enabled drew its first frame into the selection buffer
+- Lit materials with vertex colours (`Material::setUseVertexColor(true)`) used the material's
+  diffuse and ambient colour for the light; the vertex colour now takes their place.
+- Every `TextNode` rendered its own 128 glyph textures (never freed); glyphs are now created once
+  per font and size by the `FontManager` (`FontManager::glyphs()`) and shared.
+- A window with selection enableddrew its first frame into the selection buffer
   (`BufferSelection::initialize()` left its framebuffer bound).
 - Nodes with a `PBRMaterial`, `BumpMaterial` or `ShaderMaterial`were drawn into shadow maps
   with their own program (the camera's projection) instead of the light's: their shadows were

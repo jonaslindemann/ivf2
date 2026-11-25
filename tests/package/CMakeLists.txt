@@ -19,6 +19,11 @@ add_executable(package_test main.cpp)
 target_link_libraries(package_test PRIVATE ivf2::ivf2)
 ivf2_copy_runtime_files(package_test)
 
+if(TARGET ivf2::ivfvis)
+    add_executable(package_test_vis main.cpp)
+    target_link_libraries(package_test_vis PRIVATE ivf2::ivf2 ivf2::ivfvis)
+endif()
+
 if(TARGET ivf2::ivfmusic)
     add_executable(package_test_music main.cpp)
     target_link_libraries(package_test_music PRIVATE ivf2::ivfmusic)

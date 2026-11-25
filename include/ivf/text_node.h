@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ivf/font_manager.h>
 #include <ivf/transform_node.h>
 
 #include <glad/glad.h>
@@ -9,17 +10,6 @@
 #include <string>
 
 namespace ivf {
-
-/**
- * @struct CharacterInfo
- * @brief Stores glyph texture and metrics for a single character.
- */
-struct CharacterInfo {
-    GLuint textureID;          ///< ID handle of the glyph texture
-    glm::ivec2 glyphSize;      ///< Size of glyph
-    glm::ivec2 glyphBearing;   ///< Offset from baseline to left/top of glyph
-    unsigned int glyphAdvance; ///< Horizontal offset to advance to next glyph
-};
 
 /**
  * @enum TextAlignX
@@ -53,7 +43,7 @@ enum class TextAlignY {
 class TextNode : public TransformNode {
 private:
     std::string m_text;                        ///< Text string to render.
-    std::map<GLchar, CharacterInfo> m_charMap; ///< Glyph info for each character.
+    const GlyphMap *m_glyphs{nullptr};         ///< Glyphs (owned by the FontManager).
 
     GLuint m_vertexAttrId; ///< Vertex attribute location.
     GLuint m_texAttrId;    ///< Texture coordinate attribute location.
@@ -69,7 +59,7 @@ private:
     bool m_useFixedTextColor; ///< Whether to use a fixed text color.
     glm::vec3 m_textColor;    ///< Text color.
 
-    int m_maxPixels; ///< Maximum pixel size for text rendering.
+    int m_maxPixels; ///< Pixel size the glyphs are rasterised at (see setResolution()).
     float m_scale;   ///< Text scale factor.
 
     TextAlignX m_textAlignX; ///< Horizontal alignment.
@@ -99,6 +89,8 @@ private:
      * @brief Update the computed text width and height.
      */
     void updateTextSize();
+
+    [[nodiscard]] const CharacterInfo &glyph(char c) const;
 
 public:
     /**
@@ -135,6 +127,32 @@ public:
      * @return float Text size.
      */
     float size();
+
+    /**
+     * @brief Pixel size the glyphs are rasterised at (default 400).
+     *
+     * Large values suit text scaled in 3D. For text drawn at a known pixel size (an
+     * OverlayNode), set it to the same value as setSize(): glyphs are then drawn one texel
+     * per pixel and stay sharp. Glyph textures are shared per font and size.
+     */
+    void setResolution(int pixels);
+
+    /** @brief See setResolution(). */
+    [[nodiscard]] int resolution() const;
+
+    /**
+     * @brief Draw the text in a fixed colour, independent of material and lighting.
+     */
+    void setColor(const glm::vec3 &color);
+
+    /** @brief The fixed text colour (see setColor()). */
+    [[nodiscard]] glm::vec3 color() const;
+
+    /** @brief Use the fixed colour of setColor() (true) or the lit material colour (false, default). */
+    void setUseColor(bool flag);
+
+    /** @brief See setUseColor(). */
+    [[nodiscard]] bool useColor() const;
 
     /**
      * @brief Set the horizontal text alignment.

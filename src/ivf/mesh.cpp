@@ -357,6 +357,11 @@ void ivf::Mesh::updateVertices()
     ++m_vertexVersion;
 }
 
+void ivf::Mesh::updateColors()
+{
+    ++m_colorVersion;
+}
+
 void ivf::Mesh::updateNormals()
 {
     glm::vec3 points[3];
@@ -422,6 +427,11 @@ Mesh::GpuCopy *Mesh::gpuCopy(RenderContext &renderContext)
             copy->normals->updateArray(m_normals.get());
             copy->normalVersion = m_normalVersion;
         }
+        if (copy->colorVersion != m_colorVersion && copy->colors)
+        {
+            copy->colors->updateArray(m_colors.get());
+            copy->colorVersion = m_colorVersion;
+        }
     }
     return copy;
 }
@@ -484,6 +494,7 @@ void Mesh::upload(GpuCopy &copy)
     copy.dataVersion = m_dataVersion;
     copy.vertexVersion = m_vertexVersion;
     copy.normalVersion = m_normalVersion;
+    copy.colorVersion = m_colorVersion;
 }
 
 void Mesh::release(GpuCopy &copy)
@@ -720,6 +731,16 @@ std::shared_ptr<Normals> ivf::Mesh::normals() const
 std::shared_ptr<Vertices> ivf::Mesh::vertices()
 {
     return m_verts;
+}
+
+std::shared_ptr<Colors> ivf::Mesh::colors() const
+{
+    return m_colors;
+}
+
+GLuint ivf::Mesh::vertexCount() const
+{
+    return m_verts ? m_verts->rows() : 0;
 }
 
 std::shared_ptr<Indices> ivf::Mesh::indices() const

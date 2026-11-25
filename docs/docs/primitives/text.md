@@ -38,6 +38,8 @@ add(title);
 | `setSize(s)` | Height of the text in world units (default 1.0) |
 | `setAlignX(a)` | `TextAlignX::LEFT` (default), `CENTER` or `RIGHT` relative to the node's position |
 | `setAlignY(a)` | `TextAlignY::BOTTOM` (default), `MIDDLE` or `TOP` |
+| `setColor(c)` | Draw in a fixed colour, independent of material and lighting (`setUseColor(false)` goes back to the material) |
+| `setResolution(px)` | Pixel size the glyphs are rasterised at (default 400); see [screen text](#text-on-screen) |
 | `textWidth()` / `textHeight()` | Size of the current text, for layout |
 
 The text lies in the node's XY plane, facing along +Z. Rotate the node to place it elsewhere, for example flat on the ground:
@@ -50,6 +52,19 @@ label->setRotAngle(-90.0f);
 ## Colour and materials
 
 The text's colour comes from its material, so it is lit like other surfaces. For text that should stay bright regardless of lighting, give the material a strong ambient colour with `setAmbientColor()`.
+
+## Text on screen
+
+For labels in window pixels (HUDs, legends), put text nodes in an [`OverlayNode`](../visualisation/colormaps.md#overlays): one unit is then one pixel. Set the resolution to the size, so each glyph texel lands on one pixel and the text stays sharp:
+
+```cpp
+label->setSize(14.0f);
+label->setResolution(14);
+label->setColor({1.0f, 1.0f, 1.0f});
+label->setPos({20.0f, 20.0f, 0.0f});   // whole pixels
+```
+
+Glyph textures are created once per font and resolution and shared by all text in a window.
 
 ## Updating text
 

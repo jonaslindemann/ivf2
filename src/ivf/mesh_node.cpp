@@ -196,6 +196,12 @@ void ivf::MeshNode::updateNormals()
     }
 }
 
+void ivf::MeshNode::updateColors()
+{
+    for (auto &mesh : m_meshes)
+        mesh->updateColors();
+}
+
 void ivf::MeshNode::print()
 {
     for (auto &mesh : m_meshes)

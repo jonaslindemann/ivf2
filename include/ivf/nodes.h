@@ -8,6 +8,7 @@
 #include <ivf/capped_tube.h>
 #include <ivf/capsule.h>
 #include <ivf/composite_node.h>
+#include <ivf/overlay_node.h>
 #include <ivf/cone.h>
 #include <ivf/cube.h>
 #include <ivf/cursor.h>

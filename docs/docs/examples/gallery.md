@@ -102,6 +102,7 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 - [![selection1](../images/gallery/selection1.jpg) selection1](../advanced/selection.md "Highlighting objects under the mouse")
 - [![picking1](../images/gallery/picking1.jpg) picking1](../advanced/selection.md#ray-picking "Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model")
+- [![vis_dashboard1](../images/gallery/vis_dashboard1.jpg) vis_dashboard1](../visualisation/plots.md "ivfvis: a 3D slice linked to ImPlot plots - a probe profile and a histogram whose drag lines set the colour range")
 - [![vis_readers1](../images/gallery/vis_readers1.jpg) vis_readers1](../visualisation/readers.md "ivfvis: reading a CSV table as a point cloud, a NumPy array as an isosurface and a VTK XML mesh coloured by curvature")
 - [![vis_axes1](../images/gallery/vis_axes1.jpg) vis_axes1](../visualisation/axes.md "ivfvis: a surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera")
 - [![vis_volume1](../images/gallery/vis_volume1.jpg) vis_volume1](../visualisation/volumes.md "ivfvis: volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor")

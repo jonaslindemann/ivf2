@@ -261,6 +261,8 @@ void main()
             float epsilon  = spotLights[i].cutOff - spotLights[i].outerCutOff;
             float intensity = clamp((theta - spotLights[i].outerCutOff) / epsilon, 0.0, 1.0);
             vec3 radiance  = spotLights[i].diffuseColor * att * intensity;
+            float shadow   = ivfShadowFactor(spotLights[i].shadowIndex, fragPos, normalize(vNormal), L);
+            radiance *= 1.0 - shadow * spotLights[i].shadowStrength;
             Lo += evalBRDF(N, V, L, radiance, albedo, roughness, metallic, F0);
         }
     }

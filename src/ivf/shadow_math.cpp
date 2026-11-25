@@ -137,6 +137,18 @@ std::array<glm::mat4, 6> ivf::pointShadowMatrices(const glm::vec3 &position, flo
     return matrices;
 }
 
+glm::mat4 ivf::spotShadowMatrix(const glm::vec3 &position, const glm::vec3 &direction, float outerAngleDeg,
+                                float nearDist, float farDist, float *tanHalfFov)
+{
+    const float angle = glm::radians(std::clamp(outerAngleDeg, 1.0f, 80.0f));
+    const float tanHalf = std::tan(angle) * 1.05f;
+    if (tanHalfFov != nullptr)
+        *tanHalfFov = tanHalf;
+    const glm::vec3 dir = glm::length(direction) > 0.0f ? glm::normalize(direction) : glm::vec3(0.0f, 0.0f, -1.0f);
+    const glm::mat4 projection = glm::perspective(2.0f * std::atan(tanHalf), 1.0f, nearDist, farDist);
+    return projection * glm::lookAt(position, position + dir, upFor(dir));
+}
+
 int ivf::cubeFace(const glm::vec3 &v)
 {
     const glm::vec3 a = glm::abs(v);

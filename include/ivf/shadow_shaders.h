@@ -30,8 +30,8 @@ namespace ivf {
  * @endcode
  *
  * A shadow map is an atlas of tiles in one depth texture: the cascades of a directional
- * light (chosen by view depth) or the six faces of a point light (chosen by the major axis
- * of the direction from the light). Filters: hard (one sample), PCF (a square of
+ * light (chosen by view depth), the six faces of a point light (chosen by the major axis
+ * of the direction from the light) or the one perspective view of a spot light.Filters: hard (one sample), PCF (a square of
  * (2r + 1)^2 samples) and PCSS (blocker search, then a filter as wide as the penumbra).
  */
 inline const std::string shadow_glsl = R"(
@@ -62,6 +62,8 @@ int ivfShadowTileIndex(int slot, vec3 worldPos)
             return v.y > 0.0 ? 2 : 3;
         return v.z > 0.0 ? 4 : 5;
     }
+    if (type == 3)
+        return 0;
     if (type != 1)
         return -1;
     if (count <= 1)
@@ -74,11 +76,11 @@ int ivfShadowTileIndex(int slot, vec3 worldPos)
 }
 
 // Depth comparable with the receiver's: the stored depth (directional) or the linear
-// distance along the face axis (point)
+// distance along the view axis (point face, spot)
 float ivfShadowDepth(sampler2D map, vec2 uv, int type, vec2 nearFar)
 {
     float d = texture(map, uv).r;
-    if (type != 2)
+    if (type < 2)
         return d;
     float z = d * 2.0 - 1.0;
     return 2.0 * nearFar.x * nearFar.y / (nearFar.y + nearFar.x - z * (nearFar.y - nearFar.x));
@@ -104,6 +106,11 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
     {
         vec3 a = abs(worldPos - shadows[slot].lightPos.xyz);
         texelWorld = 2.0 * max(a.x, max(a.y, a.z)) * atlas.w / res;
+    }
+    else if (type == 3)
+    {
+        float axis = (shadows[slot].matrices[0] * vec4(worldPos, 1.0)).w; // distance along the spot axis
+        texelWorld = 2.0 * max(axis, 0.0) * atlas.w / res;
     }
     else
     {
@@ -141,15 +148,20 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
         current = max(a.x, max(a.y, a.z));
         bias = b * nearFar.y;
     }
+    else if (type == 3)
+    {
+        current = p.w;
+        bias = b * nearFar.y;
+    }
 
     // Samples away from the centre see the receiving surface itself nearer to the light
     // when it is tilted; wide kernels (PCSS, point lights) raise the bias with the offset
     float worldPerDepth = 1.0;
-    if (type != 2)
+    if (type < 2)
         worldPerDepth = 2.0 / length(vec3(M[0][2], M[1][2], M[2][2]));
     float ndl = clamp(abs(dot(N, L)), 0.1, 1.0);
     float slope = 0.0;
-    if (filterMode == 2 || type == 2)
+    if (filterMode == 2 || type >= 2)
         slope = sqrt(1.0 - ndl * ndl) / ndl * texelWorld / worldPerDepth;
 
     if (filterMode == 0)
@@ -176,7 +188,7 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
     mat2 rotation = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     float lightSize = params.z; // directional: tan of the light's angular radius; point: radius
 
-    float searchWorld = type == 2 ? lightSize : lightSize * current * worldPerDepth;
+    float searchWorld = type >= 2 ? lightSize: lightSize * current * worldPerDepth;
     float searchTexels = clamp(searchWorld / texelWorld, 1.0, 24.0);
     float blockerSum = 0.0;
     float blockers = 0.0;
@@ -194,7 +206,7 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
         return 0.0;
 
     float blocker = blockerSum / blockers;
-    float penumbraWorld = type == 2 ? (current - blocker) / max(blocker, 1e-4) * lightSize
+    float penumbraWorld = type >= 2 ? (current- blocker) / max(blocker, 1e-4) * lightSize
                                     : (current - blocker) * worldPerDepth * lightSize;
     float filterTexels = clamp(penumbraWorld / texelWorld, 1.0, 24.0);
     float shadow = 0.0;

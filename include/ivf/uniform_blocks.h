@@ -77,7 +77,7 @@ inline constexpr int MaxPointLights = 8;
 inline constexpr int MaxDirLights = 4;
 inline constexpr int MaxSpotLights = 8;
 
-/// Number of shadow maps (shadow-casting directional and point lights) the shaders sample.
+/// Number of shadow maps (shadow-casting directional, point and spot lights) the shaders sample.
 inline constexpr int MaxShadowMaps = 4;
 
 /// Tiles of one shadow map: cascades of a directional light or the six cube faces of a point light.
@@ -126,14 +126,17 @@ struct SpotLightData {
     glm::vec3 specularColor{0.0f};
     float linear{0.0f};
     float quadratic{0.0f};
-    float padding[3]{};
+    std::int32_t shadowIndex{-1}; ///< Index into `shadows`, -1 if the light casts no shadow.
+    float shadowStrength{0.0f};
+    float padding{0.0f};
 };
 
 /// Shadow map types in ShadowData::info.x.
 enum class ShadowType : std::int32_t {
     None = 0,
     Directional = 1, ///< Orthographic tiles: one map or cascades split by view depth.
-    Point = 2        ///< Six perspective tiles (cube faces) around the light.
+    Point = 2,       ///< Six perspective tiles (cube faces) around the light.
+    Spot = 3         ///< One perspective tile along the light's direction.
 };
 
 /**
@@ -213,7 +216,7 @@ static_assert(sizeof(LightsBlock) == 3536, "LightsBlock must match the std140 la
     "    vec3 ambientColor; float outerCutOff;\n" \
     "    vec3 diffuseColor; float constant;\n" \
     "    vec3 specularColor; float linear;\n" \
-    "    float quadratic;\n" \
+    "    float quadratic; int shadowIndex; float shadowStrength;\n" \
     "};\n" \
     "struct ShadowData {\n" \
     "    ivec4 info; vec4 params; vec4 splits; vec4 lightPos; vec4 atlas;\n" \

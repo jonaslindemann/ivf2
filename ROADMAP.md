@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done** (spot light shadows open). **Next: 2.6 SSAO and screen-space reflections**. 2.6-2.9 not started|
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**.**Next: 2.6 SSAO and screen-space reflections**. 2.6-2.9 not started|
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -572,7 +572,7 @@ Goal: make the library trustworthy to depend on.
    unchanged. Open: `.exr` (needs an EXR library), PBR alpha. (PBR shadows: 2.5.)
 5. **Better shadows.** Cascaded shadow maps for directional lights, PCF/PCSS soft
    shadows, cube-map shadows for point lights.
-   *Done (except spot lights):* a shadow map is an atlas of tiles in one 2D depth
+   *Done:* a shadow map is an atlasof tiles in one 2D depth
    texture (GL 3.3, no texture arrays or layered rendering needed): the cascades of a
    directional light (2 x 2) or the six cube faces of a point light (3 x 2, each slightly
    wider than 90 degrees so filters near an edge find depth). Up to `MaxShadowMaps` (4)
@@ -597,7 +597,11 @@ Goal: make the library trustworthy to depend on.
    `LightManager::apply()` does nothing inside it. `setDebugShadow(5)` tints cascades.
    Shadow maps are created lazily at the needed size. New examples `cascaded_shadows1`,
    `point_shadows1`; guide page *Shadows* rewritten. `auto_instancing1` changed (its
-   `ShaderMaterial` copies now cast shadows); other images unchanged.
+   `ShaderMaterial` copies now cast shadows); other images unchanged. Spot lights
+   (`ShadowType::Spot`): one perspective tile covering the outer cone (`spotShadowMatrix()`,
+   5% wider for filtering), linear depth compare like point faces, `SpotLight::setShadowRange()`;
+   `shadowIndex`/`shadowStrength` use the spot struct's padding (size unchanged).
+   `point_shadows1` gained a spot light.
 6. **SSAO** and screen-space reflections as effects.
 7. **glTF 2.0** as the primary model format: PBR materials, node hierarchy, skinning and
    morph-target animation (fastgltf or cgltf; keep assimp for legacy formats).

@@ -405,7 +405,8 @@ vec3 calcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
-    return (ambient + diffuse + specular);
+    float shadow = ivfShadowFactor(light.shadowIndex, fragPos, normalize(normal), lightDir);
+    return (ambient + (1.0 - shadow * light.shadowStrength) * (diffuse + specular));
 }
 
 vec4 applyTexBlendMode(vec4 textureColor, vec4 baseColor) 

@@ -6,7 +6,7 @@ Shadows make it much easier to read where objects are in space: without them, a 
 
 ## Turning shadows on
 
-Shadows need two switches: shadow mapping in the `LightManager`, and shadow casting on the light. Directional and point lights cast shadows, up to four lights at a time.
+Shadows need two switches: shadow mapping in the `LightManager`, and shadow casting on the light. Directional, point and spot lights cast shadows, up to four lights at a time.
 
 ```cpp
 auto lm = renderContext()->lights();
@@ -81,6 +81,21 @@ lamp->setShadowMapSize(1024, 1024); // six faces of 512 x 512
 
 `setShadowRange(r)` sets how far the shadows reach (the far plane of the faces); the default, 0, reaches the farthest point of the scene. A smaller range gives more depth precision. The `point_shadows1` example shows two moving lamps in a room, one inside a cage that throws its pattern on the walls.
 
+## Spot lights
+
+A spot light renders one shadow map: a perspective view along its direction that covers the outer cone (`setCutoff()`). A narrower cone gives sharper shadows from the same map size.
+
+```cpp
+auto spot = lm->addSpotLight();
+spot->setPosition({-5.0f, 2.5f, 1.5f});
+spot->setDirection({1.0f, -0.4f, -0.5f});
+spot->setCutoff(18.0f, 24.0f);
+spot->setCastShadows(true);
+spot->setShadowMapSize(1024, 1024);
+```
+
+As for point lights, `setShadowRange(r)` limits how far the shadows reach and `setShadowSoftness()` is the light's radius in world units (default 0.1). `point_shadows1` has a spot light aimed at the brass sphere.
+
 ## Soft shadows
 
 `setShadowFilter()` decides how shadow edges are filtered:
@@ -95,7 +110,7 @@ lamp->setShadowMapSize(1024, 1024); // six faces of 512 x 512
 sun->setShadowFilter(ivf::ShadowFilter::Pcss);
 sun->setShadowSoftness(0.02f); // directional: tangent of the light's angular radius
 lamp->setShadowFilter(ivf::ShadowFilter::Pcss);
-lamp->setShadowSoftness(0.1f); // point: radius of the light in world units
+lamp->setShadowSoftness(0.1f); // point and spot: radius of the light in world units
 ```
 
 For a directional light the softness is the tangent of its angular radius: the real sun is about 0.005, an overcast sky much more. The default 0.02 is a clearly visible penumbra. PCSS penumbras are limited to 24 texels, so very soft shadows need a smaller map or cascades. PCSS adds slight noise to the penumbra, which is less visible than banding.
@@ -104,7 +119,7 @@ For a directional light the softness is the tangent of its angular radius: the r
 
 | Setting | Effect |
 |---------|--------|
-| `setShadowMapSize(w, h)` | Resolution of the shadow map; default 2048 × 2048 (cascades share it, point lights use six faces of half the width). Higher gives sharper shadows and costs memory and time |
+| `setShadowMapSize(w, h)` | Resolution of the shadow map; default 2048 × 2048 (cascades share it, point lights use six faces of half the width, spot lights one square map). Higher gives sharper shadows and costs memory and time |
 | `setShadowStrength(s)` | How dark shadows are, from 0 (none) to 1 (black). Lower values look more natural with ambient light |
 | `setShadowBias(b)` | Depth offset against acne, as a fraction of the map's depth range; default 0.001, doubled on surfaces facing away from the light |
 | `setShadowNormalBias(t)` | Moves the lookup along the surface normal by `t` texels; default 0. Around 1 removes acne at grazing angles; too much detaches shadows from their casters |
@@ -129,8 +144,8 @@ Common causes of problems:
 
 | Symptom | Likely cause |
 |---------|--------------|
-| No shadows at all | `setUseShadows(true)` or `setCastShadows(true)` missing, more than four shadow-casting lights (a warning is logged), or a spot light (no shadows yet) |
-| Everything in shadow around a point light | A node encloses the light (a bulb or lamp shade): `setCastShadows(false)` on it |
+| No shadows at all | `setUseShadows(true)` or `setCastShadows(true)` missing, or more than four shadow-casting lights (a warning is logged) |
+| Everything in shadow around a point or spot light | A node encloses the light (a bulb or lamp shade): `setCastShadows(false)` on it |
 | Shadows cut off at an edge | The scene bounding box is too small, or `setShadowDistance()` ends the cascades |
 | Blocky, jagged shadows | Map too small for the area it covers; use cascades for large scenes |
 | Striped patterns on lit surfaces ("shadow acne") | Light at a grazing angle to the surface: raise `setShadowNormalBias()` or `setShadowBias()` |

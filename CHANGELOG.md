@@ -91,7 +91,7 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - Better shadows: cascaded shadow maps for directional lights
   (`DirectionalLight::setShadowCascades()`, `setShadowDistance()`, `setCascadeSplitLambda()`),
   shadows from point lights in all directions (`setCastShadows(true)` on a `PointLight`,
-  `setShadowRange()`), and soft shadows (`Light::setShadowFilter()` with `ShadowFilter::Hard`,
+  `setShadowRange()`) and from spot lights (`SpotLight::setShadowRange()`), and soft shadows(`Light::setShadowFilter()` with `ShadowFilter::Hard`,
   `Pcf` or `Pcss`, `setShadowFilterRadius()`, `setShadowSoftness()`), with `setShadowBias()`
   and `setShadowNormalBias()` against acne. PBR materials receive shadows. `Node::setCastShadows()`
   leaves a node out of the shadow maps; `setDebugShadow(5)` shows the cascades. Custom shaders

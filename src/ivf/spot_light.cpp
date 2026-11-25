@@ -14,6 +14,17 @@ SpotLight::SpotLight()
       m_linearAttenuation(0.0), m_quadraticAttenuation(0.0)
 {
     setLightArrayName("spotLights");
+    setShadowSoftness(0.1f); // PCSS: radius of the light in world units
+}
+
+void ivf::SpotLight::setShadowRange(float range)
+{
+    m_shadowRange = range > 0.0f ? range : 0.0f;
+}
+
+float ivf::SpotLight::shadowRange() const
+{
+    return m_shadowRange;
 }
 
 std::shared_ptr<SpotLight> ivf::SpotLight::create()

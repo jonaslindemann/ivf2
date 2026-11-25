@@ -58,7 +58,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `lighting1` | Point, directional and spot lights with editing windows | [Lighting](../core/lighting.md) |
 | `shadows1` | Shadow mapping from a directional light | [Shadows](../advanced/shadows.md) |
 | `cascaded_shadows1` | Cascaded shadow maps and PCF/PCSS soft shadows for a sun over a large scene | [Shadows](../advanced/shadows.md#cascaded-shadow-maps) |
-| `point_shadows1` | Point lights casting soft shadows in all directions onto PBR materials | [Shadows](../advanced/shadows.md#point-lights) |
+| `point_shadows1` | Point lights casting soft shadows in all directions, and a spot light, onto PBR materials | [Shadows](../advanced/shadows.md#point-lights) |
 | `transparency1` | Transparent materials, a transparent group and a glow orb, sorted back to front | [Materials and Textures](../core/materials_and_textures.md#transparency) |
 
 ## Effects

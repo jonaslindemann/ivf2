@@ -267,6 +267,8 @@ LightsBlock LightManager::buildLightsBlock()
         data.quadratic = light.quadraticAttenuation();
         data.cutOff = glm::cos(glm::radians(light.innerCutoff()));
         data.outerCutOff = glm::cos(glm::radians(light.outerCutoff()));
+        data.shadowIndex = shadowIndex(&light);
+        data.shadowStrength = light.shadowStrength();
     }
 
     block.pointLightCount = points;
@@ -503,6 +505,39 @@ void LightManager::updateShadowSlots(const glm::mat4 &view, const glm::mat4 &pro
         const auto matrices = pointShadowMatrices(light.position(), nearDist, range, tanHalfFov);
         for (int k = 0; k < 6; ++k)
             slot->data.matrices[k] = matrices[static_cast<std::size_t>(k)];
+    }
+
+    const int spots = std::min(static_cast<int>(m_spotLights.size()), MaxSpotLights);
+    for (int i = 0; i < spots; ++i)
+    {
+        SpotLight &light = *m_spotLights[static_cast<std::size_t>(i)];
+        if (!light.enabled() || !light.castsShadows())
+            continue;
+        ShadowSlot *slot = addSlot(light);
+        if (slot == nullptr)
+            break;
+
+        // One perspective view covering the outer cone
+        const int size = std::max(16, static_cast<int>(std::min(light.shadowMapWidth(), light.shadowMapHeight())));
+        float range = light.shadowRange();
+        if (range <= 0.0f)
+            range = sceneValid ? farthest(light.position()) * 1.01f : 100.0f;
+        range = std::max(range, 0.1f);
+        const float nearDist = std::max(range * 0.002f, 0.01f);
+        float tanHalfFov = 1.0f;
+
+        slot->tiles = 1;
+        slot->columns = 1;
+        slot->tileSize = size;
+        slot->width = size;
+        slot->height = size;
+        slot->data.info.x = static_cast<int>(ShadowType::Spot);
+        slot->data.info.y = 1;
+        slot->data.splits = glm::vec4(nearDist, range, 0.0f, 0.0f);
+        slot->data.lightPos = glm::vec4(light.position(), 1.0f);
+        slot->data.matrices[0] =
+            spotShadowMatrix(light.position(), light.direction(), light.outerCutoff(), nearDist, range, &tanHalfFov);
+        slot->data.atlas = glm::vec4(float(size), 1.0f, 1.0f, tanHalfFov);
     }
 }
 

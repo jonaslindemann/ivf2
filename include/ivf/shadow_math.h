@@ -75,7 +75,17 @@ inline constexpr int ShadowFilterCount = 3;
 [[nodiscard]] std::array<glm::mat4, 6> pointShadowMatrices(const glm::vec3 &position, float nearDist, float farDist,
                                                            float tanHalfFov = 1.0f);
 
-/** @brief Index of the cube face (+X, -X, +Y, -Y, +Z, -Z) that direction @p v points into. */
+/**
+ * @brief Light matrix of a spot light: a perspective view from @p position along
+ * @p direction whose square image just contains the cone of half angle @p outerAngleDeg.
+ *
+ * @param tanHalfFov Receives the tangent of half the field of view (a little wider than
+ *        the cone, so filters at its edge still find depth values).
+ */
+[[nodiscard]] glm::mat4 spotShadowMatrix(const glm::vec3 &position, const glm::vec3 &direction, float outerAngleDeg,
+                                         float nearDist, float farDist, float *tanHalfFov = nullptr);
+
+/** @brief Index of the cube face(+X, -X, +Y, -Y, +Z, -Z) that direction @p v points into. */
 [[nodiscard]] int cubeFace(const glm::vec3 &v);
 
 } // namespace ivf

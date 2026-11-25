@@ -8,6 +8,7 @@
 #include <ivf/render_queue.h>
 #include <ivf/shadow_math.h>
 
+#include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <algorithm>
@@ -126,6 +127,30 @@ IVF_TEST(point_light_faces_cover_all_directions)
     }
     IVF_CHECK(cubeFace({0.0f, 0.0f, -2.0f}) == 5);
     IVF_CHECK(cubeFace({0.0f, 3.0f, 1.0f}) == 2);
+}
+
+IVF_TEST(spot_light_map_contains_its_cone)
+{
+    const glm::vec3 light(0.0f, 4.0f, 1.0f);
+    const glm::vec3 dir = glm::normalize(glm::vec3(0.3f, -1.0f, -0.2f));
+    float tanHalf = 0.0f;
+    const glm::mat4 m = spotShadowMatrix(light, dir, 30.0f, 0.05f, 20.0f, &tanHalf);
+    IVF_CHECK(tanHalf > std::tan(glm::radians(30.0f)));
+
+    // Points on the cone's edge, in any direction around the axis, are inside the map
+    const glm::vec3 side = glm::normalize(glm::cross(dir, glm::vec3(0.0f, 0.0f, 1.0f)));
+    const glm::vec3 up = glm::cross(side, dir);
+    for (int i = 0; i < 12; ++i)
+    {
+        const float a = float(i) * glm::two_pi<float>() / 12.0f;
+        const glm::vec3 edge = glm::normalize(dir + std::tan(glm::radians(30.0f)) *
+                                                        (std::cos(a) * side + std::sin(a) * up));
+        IVF_CHECK(insideClip(m, light + edge * 10.0f));
+    }
+    // Behind the light: not in the map
+    IVF_CHECK((m * glm::vec4(light - dir * 2.0f, 1.0f)).w < 0.0f);
+    // The clip w is the distance along the axis (the shader compares linear depths with it)
+    IVF_CHECK_NEAR((m * glm::vec4(light + dir * 7.0f, 1.0f)).w, 7.0, 1e-3);
 }
 
 IVF_TEST(cast_shadows_flag_is_inherited)

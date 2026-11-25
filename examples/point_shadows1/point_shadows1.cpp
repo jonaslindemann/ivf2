@@ -1,11 +1,12 @@
 /**
  * @file point_shadows1.cpp
- * @brief Point lights casting shadows in all directions onto PBR materials.
+ * @brief Point and spot lights casting shadows onto PBR materials.
  * @ingroup effects_examples
  *
  * Demonstrates:
  *  - PointLight::setCastShadows(): six shadow map faces around the light (a cube map
  *    packed into one texture), so shadows fall on the floor and on every wall
+ *  - A spot light casting shadows from one perspective shadow map covering its cone
  *  - Soft shadows with ShadowFilter::Pcss, the light radius set by setShadowSoftness()
  *  - PBRMaterial receiving shadows from point and directional lights
  *  - Node::setCastShadows(false) for the lamp bulbs, which would otherwise enclose their
@@ -28,6 +29,7 @@ using namespace ivfui;
 class PointShadowWindow : public GLFWSceneWindow {
 private:
     std::array<PointLightPtr, 2> m_lights;
+    SpotLightPtr m_spot;
     std::array<TransformNodePtr, 2> m_lamps;
     TransformNodePtr m_cage;
 
@@ -37,6 +39,7 @@ private:
     float m_strength{1.0f};
     bool m_animate{true};
     bool m_secondLight{true};
+    bool m_spotLight{true};
     float m_angle{0.0f};
 
 public:
@@ -66,6 +69,11 @@ public:
             light->setShadowSoftness(m_lightRadius);
             light->setShadowStrength(m_strength);
         }
+        m_spot->setShadowFilter(static_cast<ShadowFilter>(m_filter));
+        m_spot->setShadowFilterRadius(m_filterRadius);
+        m_spot->setShadowSoftness(m_lightRadius);
+        m_spot->setShadowStrength(m_strength);
+        m_spot->setEnabled(m_spotLight);
         m_lights[1]->setEnabled(m_secondLight);
         m_lamps[1]->setVisible(m_secondLight);
         placeLights();
@@ -111,6 +119,19 @@ public:
             m_lamps[i] = bulb;
             add(bulb);
         }
+
+        // A spot light low on the left wall, aimed at the sphere: long shadows to the right
+        m_spot = lights->addSpotLight();
+        const glm::vec3 spotPos{-5.6f, 2.2f, 1.6f};
+        m_spot->setPosition(spotPos);
+        m_spot->setDirection(glm::normalize(glm::vec3(-1.2f, 0.4f, -0.6f) - spotPos));
+        m_spot->setCutoff(18.0f, 24.0f);
+        m_spot->setDiffuseColor({9.0f, 9.0f, 8.0f});
+        m_spot->setSpecularColor({9.0f, 9.0f, 8.0f});
+        m_spot->setAmbientColor({0.0f, 0.0f, 0.0f});
+        m_spot->setAttenuation(1.0f, 0.09f, 0.032f);
+        m_spot->setCastShadows(true);
+        m_spot->setShadowMapSize(1024, 1024);
 
         // Room: floor and three walls
         auto plaster = pbr({0.8f, 0.78f, 0.74f}, 0.9f);
@@ -194,7 +215,7 @@ public:
     void onDrawUi() override
     {
         ImGui::SetNextWindowSize({360, 260}, ImGuiCond_FirstUseEver);
-        ImGui::Begin("Point light shadows");
+        ImGui::Begin("Point and spot light shadows");
 
         bool changed = false;
         const char *filters[ShadowFilterCount];
@@ -207,6 +228,7 @@ public:
             changed |= ImGui::SliderFloat("Light radius", &m_lightRadius, 0.0f, 0.4f, "%.2f");
         changed |= ImGui::SliderFloat("Shadow strength", &m_strength, 0.0f, 1.0f, "%.2f");
         changed |= ImGui::Checkbox("Second light", &m_secondLight);
+        changed |= ImGui::Checkbox("Spot light", &m_spotLight);
         ImGui::Checkbox("Animate", &m_animate);
         if (!m_animate)
             changed |= ImGui::SliderAngle("Angle", &m_angle, 0.0f, 360.0f);
@@ -226,7 +248,7 @@ int main()
     app->hint(GLFW_CONTEXT_VERSION_MINOR, 3);
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    auto win = PointShadowWindow::create(1280, 720, "Point light shadows");
+    auto win = PointShadowWindow::create(1280, 720, "Point and spot light shadows");
     app->addWindow(win);
     return app->loop();
 }

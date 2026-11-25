@@ -66,6 +66,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   your own stops; range, log scale, reversal, steps, out-of-range and NaN colours),
   `colorVertices()`/`useVertexColors()` for colouring meshes by values, `ColorBar` and
   nice-number ticks (`niceTicks()`, `logTicks()`, `formatTick()`). New example `vis_colormaps1`.
+- `ivfvis::PointCloud`: draws a `PointSet` as point sprites (discs, shaded spheres or squares) in
+  one draw call, coloured by a scalar array through a colormap looked up on the GPU, sized in
+  world units or pixels and optionally by an array, with transparency and point picking
+  (`RayHit::point`). New example `vis_points1`.
+- `Node::intersectRay()`: nodes without triangles can provide their own ray test for `pick()`.
 - `OverlayNode`: children drawn in window pixel coordinates over the scene (HUDs, legends).
 - `TextNode::setResolution()` (glyph pixel size, for sharp text at a known size),
   `TextNode::setColor()`/`setUseColor()` (fixed colour independent of lighting).

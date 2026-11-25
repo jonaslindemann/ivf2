@@ -14,7 +14,7 @@
  * ivf::RayHit ground = ivf::pick(queue, ray);
  * @endcode
  *
- * Meshes are tested triangle by triangle through their bounding volume hierarchy
+ * Nodes with their own ray test (Node::intersectRay(), e.g. point clouds) use it. Meshes are tested triangle by triangle through their bounding volume hierarchy
  * (Mesh::bvh()), in the world transform they are drawn with, so instanced copies, deformed
  * and skinned meshes are hit where they appear. The picking happens on the CPU and needs no
  * rendering, unlike the selection buffer.
@@ -40,6 +40,7 @@ struct RayHit {
     glm::vec3 position{0.0f};   ///< Hit point in world space.
     glm::vec3 normal{0.0f};     ///< Surface normal in world space, facing the ray's origin.
     int triangle{-1};           ///< Triangle of the mesh (-1 for a bounding-box hit).
+    int point{-1};              ///< Point of a point cloud that was hit (-1 otherwise).
     glm::vec2 barycentric{0.0f}; ///< Weights of the triangle's second and third vertex.
     bool exact{true};           ///< False if only the node's bounding box was hit (no mesh).
 

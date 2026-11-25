@@ -24,6 +24,8 @@ namespace ivf {
 
 class RenderContext;
 struct DrawContext;
+struct Ray;
+struct RayHit;
 
 template <typename T>
 concept ValidNodeType = std::is_base_of_v<Node, T>;
@@ -266,6 +268,20 @@ public:
 
     /** @brief Whether the node is drawn into shadow maps. */
     [[nodiscard]] inline bool castsShadows() const noexcept { return m_castShadows; }
+
+    /**
+     * @brief Ray test of nodes drawn without triangles (point clouds, ...), used by pick().
+     *
+     * Override it for nodes that know where they are hit better than their meshes or
+     * bounding box. On a hit nearer than @p maxDistance, fill @p hit's distance, position,
+     * normal (and point, for point clouds) and return true; pick() sets the node.
+     * @param ray World-space ray (unit direction).
+     * @param world The node's world matrix as drawn (DrawItem::world).
+     * @return std::nullopt (the default) if the node has no own test: pick() then tests its
+     *         meshes, or its bounding box.
+     */
+    [[nodiscard]] virtual std::optional<bool> intersectRay(const Ray &ray, const glm::mat4 &world, float maxDistance,
+                                                           RayHit &hit) const;
 
     /**
      * @brief Set the object ID for the node (used for selection).

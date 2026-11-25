@@ -10,6 +10,7 @@
 #include <ivfvis/color_bar.h>
 #include <ivfvis/colormap.h>
 #include <ivfvis/data_set.h>
+#include <ivfvis/point_cloud.h>
 #include <ivfvis/point_set.h>
 #include <ivfvis/scalar_coloring.h>
 #include <ivfvis/ticks.h>

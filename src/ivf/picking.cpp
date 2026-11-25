@@ -67,6 +67,14 @@ bool hitItem(const DrawItem &item, const Ray &ray, float maxT, const PickOptions
     if (item.bounds.isValid() && (!intersectBox(ray, item.bounds, tNear, tFar) || tNear > maxT))
         return false;
 
+    // Nodes with their own ray test (point clouds, ...)
+    if (const auto custom = item.node->intersectRay(ray, item.world, maxT, hit))
+    {
+        if (*custom)
+            hit.node = item.node;
+        return *custom;
+    }
+
     bool found = false;
     bool anyTriangles = false;
     auto test = [&](Mesh &mesh) {

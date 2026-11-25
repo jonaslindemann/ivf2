@@ -117,7 +117,7 @@ void onMouseButton(int button, int action, int mods) override
 }
 ```
 
-A `RayHit` holds the `node` (the drawn node, as in hover events), the `mesh`, the `distance` from the camera, the world-space `position` and `normal` (facing the camera), and the `triangle` with its `barycentric` coordinates. It converts to `false` when nothing was hit.
+A `RayHit` holds the `node` (the drawn node, as in hover events), the `mesh`, the `point` of a [point cloud](../visualisation/point_clouds.md#picking),the `distance` from the camera, the world-space `position` and `normal` (facing the camera), and the `triangle` with its `barycentric` coordinates. It converts to `false` when nothing was hit.
 
 | Option (`PickOptions`) | Default | Description |
 |------------------------|---------|-------------|

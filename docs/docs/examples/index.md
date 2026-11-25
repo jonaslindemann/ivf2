@@ -102,7 +102,8 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 |---------|-------|-------|
 | `selection1` | Highlighting objects under the mouse | [Selection](../advanced/selection.md) |
 | `picking1` | Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model | [Selection](../advanced/selection.md#ray-picking) |
-| `vis_colormaps1` | ivfvis: the built-in colormaps on a height field, vertex colouring from grid data, and a colour bar | [Colormaps](../visualisation/colormaps.md) |
+| `vis_points1` | ivfvis: half a million points of the Lorenz attractor, coloured by speed on the GPU; sizes, shapes, transparency and point picking | [Point Clouds](../visualisation/point_clouds.md) |
+| `vis_colormaps1` |ivfvis: the built-in colormaps on a height field, vertex colouring from grid data, and a colour bar | [Colormaps](../visualisation/colormaps.md) |
 | `cursor1`, `cursor_optimization` | The 3D cursor and its ground projection | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `editor1` | Starting point for an editor: floor grid and the 3D mouse position | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `ui1`, `ui2`, `scene_ui1` | ImGui windows combined with a scene | [UI Windows](../ui/ui_windows.md) |

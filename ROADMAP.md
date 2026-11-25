@@ -14,7 +14,7 @@ see `CHANGELOG.md`).
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **step 1 done** (data model, colormaps, colour bar); **next: step 2** (point clouds) |
+| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-2 done** (data model, colormaps, colour bar, point clouds); **next: step 3** (isosurfaces, slices) |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -725,7 +725,16 @@ clearest way to stand out.
       texture) for crisp band edges with `setSteps()`; overlay size on high-DPI screens.
 2. *Point clouds.* `PointCloud` (distance-attenuated round sprites, colormapped or solid,
       optional size array, bounds for culling and picking). Example `vis_points1`.
-   3. *Scalar fields.* `Isosurface` (marching cubes, gradient normals, colour by a second
+      *Done:* `PointCloud` (`TransformNode`): one `GL_POINTS` draw with its own program per
+      context (`ivfvis_points`, compiled through the context's `ShaderManager`), buffers and a
+      256-entry colormap texture per context (released with `deleteLater()`); colours looked up
+      on the GPU (range, log scale, out-of-range and NaN colours as uniforms, nearest sampling
+      for steps), world or pixel sizes, `setSizeBy()`, disc/sphere/square shapes, opacity
+      (transparent layer), selection-buffer ids, no shadows. Core: `Node::intersectRay()` for
+      custom ray tests in `pick()`, `RayHit::point`; `PointCloud` tests every point against
+      the ray (radius from the drawn size). Example `vis_points1` (500 000 Lorenz points).
+      Open: an acceleration structure for picking very large clouds; shadows of points.
+3. *Scalar fields.* `Isosurface` (marching cubes, gradient normals, colour by a second
       array, rebuild on iso change), `SlicePlane` (arbitrary plane resampled to a
       colormapped texture, optional contour lines). Example `vis_scalar1`.
    4. *Vector fields.* `Glyphs` (instanced arrows oriented, scaled and coloured by the

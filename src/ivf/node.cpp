@@ -278,6 +278,12 @@ void Node::doPreDraw()
 void ivf::Node::doDraw()
 {}
 
+std::optional<bool> ivf::Node::intersectRay(const Ray & /*ray*/, const glm::mat4 & /*world*/, float /*maxDistance*/,
+                                           RayHit & /*hit*/) const
+{
+    return std::nullopt;
+}
+
 void ivf::Node::doDrawPass(const DrawContext & /*context*/)
 {
     doDraw();

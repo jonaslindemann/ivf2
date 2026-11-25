@@ -106,6 +106,7 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 - [![ui2](../images/gallery/ui2.jpg) ui2](../ui/ui_windows.md "ImGui windows combined with a scene")
 - [![scene_ui1](../images/gallery/scene_ui1.jpg) scene_ui1](../ui/ui_windows.md "ImGui windows combined with a scene")
 - [![multi_window1](../images/gallery/multi_window1.jpg) multi_window1](../advanced/render_context.md "Two windows, each with its own scene, lights and user interface")
+- [![gltf1](../images/gallery/gltf1.jpg) gltf1](../advanced/model_loading.md#gltf-models "A glTF 2.0 model with PBR textures, alpha, a skinned tentacle, morph targets and animations (or any .glb given on the command line)")
 - [![assimp1](../images/gallery/assimp1.jpg) assimp1](../advanced/model_loading.md "Opening any model file through a file dialog")
 - [![serialization1](../images/gallery/serialization1.jpg) serialization1](https://github.com/jonaslindemann/ivf2/tree/main/examples/serialization1 "Saving, loading and clearing a scene as JSON")
 - [![debug_draw1](../images/gallery/debug_draw1.jpg) debug_draw1](https://github.com/jonaslindemann/ivf2/tree/main/examples/debug_draw1 "Immediate-mode debug lines and shapes")

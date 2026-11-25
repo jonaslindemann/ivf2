@@ -102,6 +102,7 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 - [![selection1](../images/gallery/selection1.jpg) selection1](../advanced/selection.md "Highlighting objects under the mouse")
 - [![picking1](../images/gallery/picking1.jpg) picking1](../advanced/selection.md#ray-picking "Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model")
+- [![vis_points1](../images/gallery/vis_points1.jpg) vis_points1](../visualisation/point_clouds.md "ivfvis: half a million points of the Lorenz attractor, coloured by speed on the GPU; sizes, shapes, transparency and point picking")
 - [![vis_colormaps1](../images/gallery/vis_colormaps1.jpg) vis_colormaps1](../visualisation/colormaps.md "ivfvis: the built-in colormaps on a height field, vertex colouring from grid data, and a colour bar")
 - [![editor1](../images/gallery/editor1.jpg) editor1](../advanced/selection.md#the-3d-cursor-position "Starting point for an editor: floor grid and the 3D mouse position")
 - [![ui1](../images/gallery/ui1.jpg) ui1](../ui/ui_windows.md "ImGui windows combined with a scene")

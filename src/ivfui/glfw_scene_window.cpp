@@ -1110,13 +1110,21 @@ void ivfui::GLFWSceneWindow::updateSelection()
     m_selectionView = xfm.viewMatrix();
     m_selectionProj = xfm.projectionMatrix();
 
-    m_selectionRendering = true;
+    const bool useBuffer = m_selectionMethod == SelectionMethod::Buffer;
+    if (useBuffer)
+    {
+        m_selectionRendering = true;
+        m_bufferSelection->begin();
+        this->renderSelection(false);
+    }
 
-    m_bufferSelection->begin();
-
-    this->renderSelection(false);
     // Stored in the member: doMouseButton() sends click notifications to it.
-    m_currentNode = cursorOverWindow() ? m_bufferSelection->nodeAtPixel(mouseX(), mouseY()) : nullptr;
+    if (!cursorOverWindow())
+        m_currentNode = nullptr;
+    else if (useBuffer)
+        m_currentNode = m_bufferSelection->nodeAtPixel(mouseX(), mouseY());
+    else
+        m_currentNode = pick(mouseX(), mouseY()).node;
 
     if (m_currentNode != nullptr)
     {
@@ -1141,8 +1149,36 @@ void ivfui::GLFWSceneWindow::updateSelection()
         }
     }
 
-    m_bufferSelection->end();
-    m_selectionRendering = false;
+    if (useBuffer)
+    {
+        m_bufferSelection->end();
+        m_selectionRendering = false;
+    }
+}
+
+void ivfui::GLFWSceneWindow::setSelectionMethod(SelectionMethod method)
+{
+    m_selectionMethod = method;
+    m_selectionDirty = true;
+}
+
+ivfui::SelectionMethod ivfui::GLFWSceneWindow::selectionMethod() const
+{
+    return m_selectionMethod;
+}
+
+ivf::Ray ivfui::GLFWSceneWindow::cameraRay(double x, double y)
+{
+    // Mouse positions are in window coordinates (not framebuffer pixels on high-DPI displays)
+    int w = 1, h = 1;
+    glfwGetWindowSize(ref(), &w, &h);
+    auto *xfm = renderContext()->transforms();
+    return ivf::rayFromScreen(float(x), float(y), float(w), float(h), xfm->viewMatrix(), xfm->projectionMatrix());
+}
+
+ivf::RayHit ivfui::GLFWSceneWindow::pick(double x, double y, const ivf::PickOptions &options)
+{
+    return ivf::pick(m_queue, cameraRay(x, y), options);
 }
 
 void ivfui::GLFWSceneWindow::doDrawComplete()
@@ -1393,7 +1429,11 @@ void ivfui::GLFWSceneWindow::doMouseButton(int button, int action, int mods)
 
     // The hover result can be several frames old (selection is rendered on demand) and the
     // scene may have changed since: pick the node under the cursor again for the click.
-    if (action == GLFW_PRESS && m_selectionEnabled)
+    if (action == GLFW_PRESS && m_selectionEnabled && m_selectionMethod == SelectionMethod::Ray)
+    {
+        m_currentNode = cursorOverWindow() ? pick(mouseX(), mouseY()).node : nullptr;
+    }
+    else if (action == GLFW_PRESS && m_selectionEnabled)
     {
         m_selectionRendering = true;
         m_bufferSelection->begin();

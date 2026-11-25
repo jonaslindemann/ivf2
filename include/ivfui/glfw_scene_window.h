@@ -23,6 +23,7 @@
 #include <ivf/effect.h>
 #include <ivf/cursor.h>
 #include <ivf/planar_reflection.h>
+#include <ivf/picking.h>
 #include <ivf/renderer.h>
 #include <ivf/tone_mapping.h>
 
@@ -36,6 +37,15 @@
 #include <optional>
 
 namespace ivfui {
+
+/**
+ * @brief How the window finds the node under the mouse for onEnterNode(), onOverNode(),
+ *        onLeaveNode() and clicks.
+ */
+enum class SelectionMethod {
+    Buffer, ///< Render object ids into a selection buffer and read the pixel (default; pixel-exact).
+    Ray     ///< Cast a ray against the meshes on the CPU (ivf::pick(); no extra rendering).
+};
 
 /**
  * @class GLFWSceneWindow
@@ -65,6 +75,7 @@ private:
     glm::vec4 m_clearColor{0.07f, 0.13f, 0.17f, 1.0f}; ///< Clear color for the scene.
 
     bool m_selectionEnabled{false}; ///< Selection mode enabled.
+    SelectionMethod m_selectionMethod{SelectionMethod::Buffer}; ///< See setSelectionMethod().
     ivf::Node *m_lastNode;          ///< Last node under the cursor.
     ivf::Node *m_currentNode;       ///< Current node under the cursor.
 
@@ -188,6 +199,33 @@ public:
      * @return bool True if selection is enabled.
      */
     bool selectionEnabled() const;
+
+    /**
+     * @brief How the node under the mouse is found (default SelectionMethod::Buffer).
+     *
+     * SelectionMethod::Ray casts a ray from the camera through the mouse (pick()) instead of
+     * rendering the selection buffer: no extra pass, and every node can be hit, but
+     * nodes are hit by their triangles (lines and points only by their bounding box).
+     * Box selection always uses the buffer.
+     */
+    void setSelectionMethod(SelectionMethod method);
+
+    /** @brief How the node under the mouse is found. */
+    [[nodiscard]] SelectionMethod selectionMethod() const;
+
+    /**
+     * @brief The ray from the camera through window position (@p x, @p y) (mouse coordinates).
+     */
+    [[nodiscard]] ivf::Ray cameraRay(double x, double y);
+
+    /**
+     * @brief The nearest node and surface point under window position (@p x, @p y), by ray
+     *        casting the items of the last drawn frame (see ivf::pick()).
+     *
+     * Works whether or not selection is enabled, e.g. to place objects where the user
+     * clicks: `if (auto hit = pick(mouseX(), mouseY())) marker->setPos(hit.position);`
+     */
+    [[nodiscard]] ivf::RayHit pick(double x, double y, const ivf::PickOptions &options = {});
 
     /**
      * @brief Enable or disable render-to-texture mode.

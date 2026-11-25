@@ -727,6 +727,69 @@ std::shared_ptr<Indices> ivf::Mesh::indices() const
     return m_indices;
 }
 
+MeshBvhPtr ivf::Mesh::bvh()
+{
+    if (m_bvh && m_bvhDataVersion == m_dataVersion && m_bvhVertexVersion == m_vertexVersion)
+        return m_bvh;
+    m_bvhDataVersion = m_dataVersion;
+    m_bvhVertexVersion = m_vertexVersion;
+    m_bvh.reset();
+    if (!m_verts || m_dataVersion == 0)
+        return nullptr;
+
+    const GLuint vertexCount = m_verts->rows();
+    std::vector<glm::vec3> positions(vertexCount);
+    for (GLuint i = 0; i < vertexCount; ++i)
+        positions[i] = m_verts->vertex(i);
+
+    // The vertex order the mesh draws (indexed or not)
+    std::vector<GLuint> order;
+    if (m_indices)
+    {
+        const GLuint cols = m_indices->cols();
+        order.reserve(static_cast<std::size_t>(m_indices->rows()) * cols);
+        for (GLuint r = 0; r < m_indices->rows(); ++r)
+            for (GLuint c = 0; c < cols; ++c)
+                order.push_back(m_indices->at(r, c));
+    }
+    else
+    {
+        order.resize(vertexCount);
+        for (GLuint i = 0; i < vertexCount; ++i)
+            order[i] = i;
+    }
+
+    std::vector<glm::uvec3> triangles;
+    switch (m_primType)
+    {
+    case GL_TRIANGLES:
+        for (std::size_t i = 0; i + 2 < order.size(); i += 3)
+            triangles.emplace_back(order[i], order[i + 1], order[i + 2]);
+        break;
+    case GL_TRIANGLE_STRIP:
+        for (std::size_t i = 2; i < order.size(); ++i)
+            triangles.emplace_back(order[i - 2], order[i - 1], order[i]);
+        break;
+    case GL_TRIANGLE_FAN:
+        for (std::size_t i = 2; i < order.size(); ++i)
+            triangles.emplace_back(order[0], order[i - 1], order[i]);
+        break;
+    case GL_QUADS:
+        for (std::size_t i = 0; i + 3 < order.size(); i += 4)
+        {
+            triangles.emplace_back(order[i], order[i + 1], order[i + 2]);
+            triangles.emplace_back(order[i], order[i + 2], order[i + 3]);
+        }
+        break;
+    default:
+        return nullptr; // lines and points cannot be hit
+    }
+    if (triangles.empty())
+        return nullptr;
+    m_bvh = std::make_shared<const MeshBvh>(std::move(positions), std::move(triangles));
+    return m_bvh;
+}
+
 ivf::MaterialPtr ivf::Mesh::material() const
 {
     return m_material;

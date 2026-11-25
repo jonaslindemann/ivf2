@@ -91,7 +91,13 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
-- Hot reload: `ResourceWatcher` (`RenderContext::resourceWatcher()`) reloads textures
+- Ray picking: `ivf::pick(queue, ray)` and `GLFWSceneWindow::pick(x, y)` return the nearest object
+  under a ray with the exact surface point, normal and triangle (`RayHit`), tested against the
+  meshes' triangles through a bounding volume hierarchy per mesh (`Mesh::bvh()`, `MeshBvh`);
+  `pickAll()`, `PickOptions`, `Ray`, `rayFromScreen()`, `cameraRay()`.
+  `setSelectionMethod(SelectionMethod::Ray)` drives hover and click events by ray casting
+  instead of the selection buffer. New example `picking1`.
+- Hot reload: `ResourceWatcher`(`RenderContext::resourceWatcher()`) reloads textures
   (`watchTexture()`, into the same texture), models (`watchModel()`; `GltfModel::reload()` keeps
   the animation and time) and any other files (`watch()` with a reload function) when they are
   saved, after the file has stopped changing. Failed reloads keep the old version. Shader hot
@@ -146,7 +152,9 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
-- Nodes with a `PBRMaterial`, `BumpMaterial` or `ShaderMaterial` were drawn into shadow maps
+- A window with selection enabled drew its first frame into the selection buffer
+  (`BufferSelection::initialize()` left its framebuffer bound).
+- Nodes with a `PBRMaterial`, `BumpMaterial` or `ShaderMaterial`were drawn into shadow maps
   with their own program (the camera's projection) instead of the light's: their shadows were
   wrong or missing. The shadow pass now keeps the depth program (`ShaderManager::lockProgram()`).
 - Shadow maps were bound to texture units 1-4, shared with multitexturing and the PBR maps.

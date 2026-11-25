@@ -81,6 +81,10 @@ void BufferSelection::initialize(int width, int height)
 
     logInfofc("BufferSelection", "BufferSelection::initialize: {} nodes in scene", m_nodeMap.size());
 
+    // Keep the caller's framebuffer bound (the window draws into it after this)
+    GLint previousFramebuffer = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
+
     glGenFramebuffers(1, &m_fbo);
     glGenTextures(1, &m_colorTexture);
     glBindTexture(GL_TEXTURE_2D, m_colorTexture);
@@ -93,6 +97,7 @@ void BufferSelection::initialize(int width, int height)
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthRenderBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, static_cast<GLuint>(previousFramebuffer));
 }
 
 Node *BufferSelection::nodeFromId(unsigned int objectId)

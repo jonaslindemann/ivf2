@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **Next: 2.9 CPU picking**. 2.9 not started|
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -660,6 +660,24 @@ Goal: make the library trustworthy to depend on.
    *Hot Reload*.
 9. **CPU picking** via ray casting against a per-mesh BVH, complementing the existing
    color-buffer selection.
+   *Done:* `ray.h` (`Ray` with t kept under affine transforms, `rayFromScreen()`,
+   `intersectBox()`, `intersectTriangle()` two-sided Möller-Trumbore), `MeshBvh`
+   (`mesh_bvh.h`: median split on the longest centroid axis, leaves of up to 4
+   triangles, nodes with children side by side, near-first traversal; `intersect()`,
+   `occluded()`), `Mesh::bvh()` (lazy, rebuilt when `end()`/`updateVertices()` change the
+   versions; triangles, strips, fans, quads; null for lines and points),
+   `Mesh::primType()`. `pick()`/`pickAll()` (`picking.h`) over a `RenderQueue` with the
+   items' world matrices and bounds (instances, animation and CPU-deformed glTF meshes
+   hit where drawn), skipping background/overlay items, `PickOptions` (skip, maxDistance,
+   includeTransparent, boundsFallback for meshless nodes), `RayHit` (node, mesh,
+   distance, position, normal facing the ray, triangle, barycentrics, exact).
+   `GLFWSceneWindow::pick()`, `cameraRay()` (window coordinates, high-DPI safe) and
+   `setSelectionMethod(SelectionMethod::Ray)` for hover and click events without the
+   selection buffer. Fixed on the way: `BufferSelection::initialize()` left its
+   framebuffer bound, so a selection-enabled window drew its first frame into it. Unit
+   test `test_picking` (BVH against brute force with 2000 random rays, instances, layers,
+   transforms); new example `picking1`; guide section *Ray picking*. Existing images
+   unchanged.
 
 ## Phase 3 - Features that set ivf2 apart (6-12 months)
 

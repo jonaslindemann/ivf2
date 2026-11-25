@@ -81,7 +81,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 
 - [GLFW windows](ui/scene_window.md) with built-in camera control and input events
 - [ImGui panels](ui/ui_windows.md) that you compose into your own tools, [ready-made widgets](ui/widgets.md), and [built-in inspectors](ui/scene_ui_integration.md) for the scene, effects and camera
-- Mouse [selection](advanced/selection.md) of objects, by hover, click or rectangle
+- Mouse [selection](advanced/selection.md) of objects, by hover, click or rectangle, and [ray picking](advanced/selection.md#ray-picking) with exact surface points and normals
 
 ## Getting started
 

@@ -101,6 +101,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | Example | Shows | Guide |
 |---------|-------|-------|
 | `selection1` | Highlighting objects under the mouse | [Selection](../advanced/selection.md) |
+| `picking1` | Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model | [Selection](../advanced/selection.md#ray-picking) |
 | `cursor1`, `cursor_optimization` | The 3D cursor and its ground projection | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `editor1` | Starting point for an editor: floor grid and the 3D mouse position | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `ui1`, `ui2`, `scene_ui1` | ImGui windows combined with a scene | [UI Windows](../ui/ui_windows.md) |

@@ -7,6 +7,7 @@
 #include <ivf/indices.h>
 #include <ivf/tex_coords.h>
 #include <ivf/material.h>
+#include <ivf/mesh_bvh.h>
 
 #include <ivf/vertex_array.h>
 #include <ivf/vertex_buffer.h>
@@ -88,6 +89,9 @@ private:
 
     std::uint64_t m_dataVersion{0};   ///< Incremented by end(); 0 = never ended, nothing to draw.
     std::uint64_t m_vertexVersion{0}; ///< Incremented by updateVertices().
+    MeshBvhPtr m_bvh;                           ///< See bvh().
+    std::uint64_t m_bvhDataVersion{0};          ///< m_dataVersion when m_bvh was built.
+    std::uint64_t m_bvhVertexVersion{0};        ///< m_vertexVersion when m_bvh was built.
     std::uint64_t m_normalVersion{0}; ///< Incremented by updateNormals().
     bool m_clockwise{false};          ///< Front faces are clockwise (decided in end()).
 
@@ -534,6 +538,20 @@ public:
      * @return std::shared_ptr<Indices> Indices array.
      */
     std::shared_ptr<Indices> indices() const;
+
+    /** @brief OpenGL primitive type (GL_TRIANGLES, GL_LINES, ...). */
+    [[nodiscard]] GLuint primType() const
+    {
+        return m_primType;
+    }
+
+    /**
+     * @brief Bounding volume hierarchy of the mesh's triangles, for ray casts (see pick()).
+     *
+     * Built on first use and again after the geometry changed (end(), updateVertices()).
+     * Null for meshes without triangles (lines, points). Needs no OpenGL context.
+     */
+    [[nodiscard]] MeshBvhPtr bvh();
 
     ivf::MaterialPtr material() const;
     void setMaterial(ivf::MaterialPtr material);

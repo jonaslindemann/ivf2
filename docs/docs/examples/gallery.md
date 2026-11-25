@@ -102,6 +102,7 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 - [![selection1](../images/gallery/selection1.jpg) selection1](../advanced/selection.md "Highlighting objects under the mouse")
 - [![picking1](../images/gallery/picking1.jpg) picking1](../advanced/selection.md#ray-picking "Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model")
+- [![vis_axes1](../images/gallery/vis_axes1.jpg) vis_axes1](../visualisation/axes.md "ivfvis: a surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera")
 - [![vis_volume1](../images/gallery/vis_volume1.jpg) vis_volume1](../visualisation/volumes.md "ivfvis: volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor")
 - [![vis_vectors1](../images/gallery/vis_vectors1.jpg) vis_vectors1](../visualisation/vector_fields.md "ivfvis: arrow glyphs and field-line tubes of a magnetic dipole, coloured on a log scale; click an arrow for its vector")
 - [![vis_scalar1](../images/gallery/vis_scalar1.jpg) vis_scalar1](../visualisation/scalar_fields.md "ivfvis: isosurfaces (a translucent shell and a surface coloured by height) and contoured slice planes through a 3D field, with live sliders")

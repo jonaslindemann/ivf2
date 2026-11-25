@@ -57,14 +57,14 @@ Cases makeCases()
     int edgeOf[8][8];
     for (auto &row : edgeOf)
         std::fill(std::begin(row), std::end(row), -1);
-    int n = 0;
+    int edgeCount = 0;
     for (int a = 0; a < 8; ++a)
         for (int bit = 1; bit < 8; bit <<= 1)
             if (!(a & bit))
             {
                 const int b = a | bit;
-                cases.edges[static_cast<std::size_t>(n)] = {a, b};
-                edgeOf[a][b] = edgeOf[b][a] = n++;
+                cases.edges[static_cast<std::size_t>(edgeCount)] = {a, b};
+                edgeOf[a][b] = edgeOf[b][a] = edgeCount++;
             }
 
     // Faces as corner cycles, with their outward normals

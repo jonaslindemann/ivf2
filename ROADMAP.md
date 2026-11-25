@@ -14,7 +14,7 @@ see `CHANGELOG.md`).
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-3 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices); **next: step 4** (glyphs, streamlines) |
+| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-4 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines); **next: step 5** (volume rendering) |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -751,7 +751,19 @@ clearest way to stand out.
 4. *Vector fields.* `Glyphs` (instanced arrows oriented, scaled and coloured by the
       vector), `Streamlines` (RK4, point/line/plane seeds, stop criteria; lines or stream
       tubes via `PathFrames`/`Extrusion`). Example `vis_vectors1`.
-   5. *Volume rendering.* `Texture3D` in core; `VolumeNode` (box proxy, ray marching in the
+      *Done:* `Glyphs` builds one merged, lit mesh (arrow: shaft, head and caps with 10
+      sides; cone; or unlit lines) instead of `InstancedMeshNode`, which has a single
+      context's buffer and no bounds or picking: works in several windows, casts shadows,
+      culled, picked per triangle (`glyphIndex()`). Magnitude or constant scaling, tail or
+      centre anchor, minimum magnitude, colormap by |v| following its changes.
+      `traceStreamline()` steps along the normalised field (RK4, equal step lengths) until
+      it leaves the bounds, weakens below `minSpeed` or hits the limits; `Streamlines` draws
+      unlit lines or tubes with frames transported along the line (own generator rather than
+      `ExtrusionBuilder`, to colour every ring by speed). Seed helpers. Tests: circles of a
+      rotation field, wall-to-wall uniform flow, stopping, node geometry. Example
+      `vis_vectors1` (dipole with log colormap). Open: instanced glyphs for very large
+      counts.
+5. *Volume rendering.* `Texture3D` in core; `VolumeNode` (box proxy, ray marching in the
       transparent layer, transfer function = colormap + opacity curve, jittered start,
       early termination, stops at opaque scene depth). Example `vis_volume1`.
    6. *Axes and annotation.* `Axes3D` (bounding box with nice-number ticks, camera-facing

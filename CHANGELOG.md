@@ -75,6 +75,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   array, live iso value) and `ivfvis::SlicePlane` (axis-aligned or any plane through the grid,
   unlit colormapped values, contour lines); `extractIsosurface()`, `extractSlice()` and
   `contourLines()` return the geometry as `SurfaceData` without OpenGL. New example `vis_scalar1`.
+- `ivfvis::Glyphs` (arrows, cones or lines on a sample grid or given positions, scaled by
+  magnitude or constant, coloured through a colormap, picked per glyph) and
+  `ivfvis::Streamlines` (RK4 tracing forward, backward or both, as lines or tubes coloured by
+  field strength); `traceStreamline()`/`traceStreamlines()` without OpenGL and seed helpers
+  (`seedLine`, `seedPlane`, `seedCircle`, `seedRandom`). New example `vis_vectors1`.
 - `OverlayNode`: children drawn in window pixel coordinates over the scene (HUDs, legends).
 - `TextNode::setResolution()` (glyph pixel size, for sharp text at a known size),
   `TextNode::setColor()`/`setUseColor()` (fixed colour independent of lighting).

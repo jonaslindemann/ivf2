@@ -83,6 +83,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 - [Colormaps](visualisation/colormaps.md) (viridis, magma, cividis, turbo, coolwarm and more, or your own) with linear or log scales and discrete steps, mesh colouring by values, and colour bars over the scene
 - [Point clouds](visualisation/point_clouds.md) of millions of points, coloured and sized by their values and picked point by point
 - [Isosurfaces and slice planes](visualisation/scalar_fields.md) through 3D fields, with contour lines
+- [Glyphs and streamlines](visualisation/vector_fields.md) for vector fields: arrows, field lines and stream tubes
 
 ### User interface
 

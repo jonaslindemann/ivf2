@@ -458,4 +458,104 @@ IVF_TEST(isosurface_and_slice_nodes)
     ivf::RenderContext::clearCurrent();
 }
 
+IVF_TEST(streamline_tracing)
+{
+    // Rotation about z: streamlines are circles
+    auto rotation = VectorField::fromFunction([](const glm::vec3 &p) { return glm::vec3(-p.y, p.x, 0.0f); });
+    StreamlineOptions options;
+    options.step = 0.01f;
+    options.maxLength = 2.0f * 3.14159265f * 0.999f;
+    options.direction = TraceDirection::Forward;
+    const Streamline circle = traceStreamline(*rotation, {1.0f, 0.0f, 0.0f}, options);
+    IVF_CHECK(circle.points.size() > 600);
+    float worst = 0.0f;
+    for (const glm::vec3 &p : circle.points)
+        worst = std::max(worst, std::abs(glm::length(p) - 1.0f));
+    IVF_CHECK(worst < 1e-4f);
+    IVF_CHECK_NEAR(circle.length(), 2.0 * 3.14159265, 0.02);
+    IVF_CHECK(circle.speeds.size() == circle.points.size());
+    IVF_CHECK(near(circle.points.front(), {1, 0, 0})); // forward only: starts at the seed
+
+    // Uniform flow in a box: both ways, from wall to wall
+    auto uniform = VectorField::fromFunction([](const glm::vec3 &) { return glm::vec3(2.0f, 0.0f, 0.0f); },
+                                             ivf::BoundingBox({-1, -1, -1}, {1, 1, 1}));
+    StreamlineOptions both;
+    both.step = 0.05f;
+    const Streamline straight = traceStreamline(*uniform, {0.0f, 0.3f, 0.0f}, both);
+    IVF_CHECK(straight.points.front().x < -0.94f && straight.points.front().x >= -1.0f);
+    IVF_CHECK(straight.points.back().x > 0.94f && straight.points.back().x <= 1.0f);
+    IVF_CHECK(straight.points.front().x < straight.points.back().x); // ordered along the field
+    IVF_CHECK_NEAR(straight.speeds[3], 2.0, 1e-5);
+
+    // Stops where the field vanishes; seeds outside give nothing
+    auto halfway = VectorField::fromFunction(
+        [](const glm::vec3 &p) { return p.x < 0.5f ? glm::vec3(1, 0, 0) : glm::vec3(0.0f); });
+    options.maxLength = 0.0f;
+    options.step = 0.01f;
+    const Streamline stopped = traceStreamline(*halfway, {0.0f, 0.0f, 0.0f}, options);
+    IVF_CHECK(stopped.points.back().x < 0.5f && stopped.points.back().x > 0.45f);
+    IVF_CHECK(traceStreamline(*uniform, {5.0f, 0.0f, 0.0f}).points.empty());
+    const std::vector<glm::vec3> seeds{{0, 0, 0}, {5, 0, 0}};
+    IVF_CHECK(traceStreamlines(*uniform, seeds).size() == 1);
+
+    // Seed helpers
+    IVF_CHECK(seedLine({0, 0, 0}, {1, 0, 0}, 5).size() == 5 && near(seedLine({0, 0, 0}, {1, 0, 0}, 5)[4], {1, 0, 0}));
+    IVF_CHECK(seedPlane({0, 0, 0}, {1, 0, 0}, {0, 1, 0}, 3, 4).size() == 12);
+    for (const glm::vec3 &p : seedCircle({0, 1, 0}, {0, 1, 0}, 2.0f, 8))
+        IVF_CHECK(std::abs(glm::length(p - glm::vec3(0, 1, 0)) - 2.0f) < 1e-5f && std::abs(p.y - 1.0f) < 1e-6f);
+    const auto random = seedRandom(ivf::BoundingBox({0, 0, 0}, {1, 2, 3}), 50, 3);
+    IVF_CHECK(random.size() == 50 && random == seedRandom(ivf::BoundingBox({0, 0, 0}, {1, 2, 3}), 50, 3));
+}
+
+IVF_TEST(glyph_and_streamline_nodes)
+{
+    auto ctx = ivf::RenderContext::create(nullptr);
+    ctx->makeCurrent();
+
+    // Vectors pointing away from the origin, zero at the origin
+    auto field = VectorField::fromFunction([](const glm::vec3 &p) { return p; },
+                                           ivf::BoundingBox({-1, -1, -1}, {1, 1, 1}));
+    auto glyphs = Glyphs::create(field);
+    glyphs->setSampleGrid({3, 3, 3});
+    IVF_CHECK(glyphs->positions().size() == 27);
+    IVF_CHECK(glyphs->glyphCount() == 26); // the zero vector at the centre is left out
+    IVF_CHECK_NEAR(glyphs->magnitudeRange().min, 1.0, 1e-5);
+    IVF_CHECK_NEAR(glyphs->magnitudeRange().max, std::sqrt(3.0), 1e-5);
+
+    // Triangles map back to glyphs
+    auto mesh = glyphs->meshes().at(0);
+    IVF_CHECK(glyphs->glyphIndex(0) == 0);
+    const int triangles = static_cast<int>(mesh->indices()->rows());
+    IVF_CHECK(glyphs->glyphIndex(triangles - 1) == 25);
+    IVF_CHECK(glyphs->glyphIndex(triangles) == -1);
+    IVF_CHECK(near(glyphs->glyphVector(0), glyphs->glyphPosition(0)));
+
+    // Magnitude scaling with the tail at the sample: the corner arrows reach 2x out
+    IVF_CHECK(glyphs->localBoundingBox().max().x > 1.9f);
+    glyphs->setScaling(GlyphScaling::Constant);
+    glyphs->setScale(0.2f);
+    IVF_CHECK(glyphs->localBoundingBox().max().x < 1.25f);
+
+    glyphs->setShape(GlyphShape::Line);
+    IVF_CHECK(glyphs->meshes().size() == 1 && glyphs->meshes()[0]->vertexCount() == 52);
+    glyphs->setMinMagnitude(1.5f); // only the 8 corners
+    IVF_CHECK(glyphs->glyphCount() == 8);
+
+    // Streamlines as tubes: a ring of sides per point
+    auto uniform = VectorField::fromFunction([](const glm::vec3 &) { return glm::vec3(0.0f, 0.0f, 1.0f); },
+                                             ivf::BoundingBox({-1, -1, -1}, {1, 1, 1}));
+    auto stream = Streamlines::create(uniform, seedLine({-0.5f, 0, 0}, {0.5f, 0, 0}, 3));
+    IVF_CHECK(stream->lines().size() == 3);
+    IVF_CHECK(stream->meshes().size() == 1 && stream->meshes()[0]->primType() == GL_LINES);
+    stream->setTubes(true);
+    stream->setTubeSides(6);
+    std::size_t points = 0;
+    for (const Streamline &line : stream->lines())
+        points += line.points.size();
+    IVF_CHECK(stream->meshes()[0]->vertexCount() == points * 6);
+    IVF_CHECK_NEAR(stream->speedRange().max, 1.0, 1e-5);
+
+    ivf::RenderContext::clearCurrent();
+}
+
 IVF_TEST_MAIN()

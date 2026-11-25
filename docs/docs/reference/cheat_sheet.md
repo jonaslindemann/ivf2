@@ -29,7 +29,8 @@ All classes are created with `ClassName::create(...)` and returned as `std::shar
 | `ModelLoader` | Loads glTF and, through Assimp, OBJ, FBX, 3DS, ... | [Model Loading](../advanced/model_loading.md) |
 | `ivfvis::Colormap`, `ColorBar` | Map values to colours; show the scale over the scene | [Colormaps](../visualisation/colormaps.md) |
 | `ivfvis::UniformGrid`, `PointSet` | Data on grids and at points: named scalar and vector arrays, interpolation | [Visualisation](../visualisation/index.md) |
-| `ivfvis::Isosurface`, `SlicePlane` | Surfaces of constant value and contoured cuts through grid data | [Isosurfaces and Slices](../visualisation/scalar_fields.md) |
+| `ivfvis::Glyphs`, `Streamlines` | Arrows and field lines (or tubes) of vector fields | [Glyphs and Streamlines](../visualisation/vector_fields.md) |
+| `ivfvis::Isosurface`, `SlicePlane` |Surfaces of constant value and contoured cuts through grid data | [Isosurfaces and Slices](../visualisation/scalar_fields.md) |
 | `ivfvis::PointCloud` |Millions of points coloured and sized by data, picked point by point | [Point Clouds](../visualisation/point_clouds.md) |
 | `OverlayNode` |Children drawn in window pixels over the scene (HUDs, legends) | [Overlays](../visualisation/colormaps.md#overlays) |
 | `pick()`, `RayHit`, `Ray` |Ray picking: the object, point and normal under the mouse | [Selection](../advanced/selection.md#ray-picking) |

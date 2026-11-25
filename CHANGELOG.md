@@ -71,6 +71,10 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   world units or pixels and optionally by an array, with transparency and point picking
   (`RayHit::point`). New example `vis_points1`.
 - `Node::intersectRay()`: nodes without triangles can provide their own ray test for `pick()`.
+- `ivfvis::Isosurface` (marching cubes on a `UniformGrid`, gradient normals, colouring by another
+  array, live iso value) and `ivfvis::SlicePlane` (axis-aligned or any plane through the grid,
+  unlit colormapped values, contour lines); `extractIsosurface()`, `extractSlice()` and
+  `contourLines()` return the geometry as `SurfaceData` without OpenGL. New example `vis_scalar1`.
 - `OverlayNode`: children drawn in window pixel coordinates over the scene (HUDs, legends).
 - `TextNode::setResolution()` (glyph pixel size, for sharp text at a known size),
   `TextNode::setColor()`/`setUseColor()` (fixed colour independent of lighting).

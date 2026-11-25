@@ -63,6 +63,7 @@ nav = [
     { "Overview" = "visualisation/index.md" },
     { "Colormaps and Colour Bars" = "visualisation/colormaps.md" },
     { "Point Clouds" = "visualisation/point_clouds.md" },
+    { "Isosurfaces and Slices" = "visualisation/scalar_fields.md" },
 ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },

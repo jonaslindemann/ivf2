@@ -10,6 +10,8 @@
 #include <ivf/sphere.h>
 
 #include <cmath>
+#include <map>
+#include <random>
 #include <limits>
 #include <stdexcept>
 
@@ -295,6 +297,163 @@ IVF_TEST(point_cloud_bounds_and_picking)
     cloud->setSizeBy("w", 0.25f, 1.0f);
     const ivf::Ray edge{{0.08f, 3.0f, 10.0f}, {0.0f, 0.0f, -1.0f}}; // inside 0.1, outside 0.025
     IVF_CHECK(!ivf::pick(queue, edge));
+
+    ivf::RenderContext::clearCurrent();
+}
+
+namespace {
+
+/** Number of triangles using each undirected edge */
+std::map<std::pair<unsigned, unsigned>, int> edgeUse(const SurfaceData &s)
+{
+    std::map<std::pair<unsigned, unsigned>, int> use;
+    for (const glm::uvec3 &t : s.indices)
+        for (int e = 0; e < 3; ++e)
+        {
+            unsigned a = t[e], b = t[(e + 1) % 3];
+            if (a > b)
+                std::swap(a, b);
+            ++use[{a, b}];
+        }
+    return use;
+}
+
+} // namespace
+
+IVF_TEST(isosurface_of_a_sphere)
+{
+    auto grid = UniformGrid::create({41, 41, 41}, ivf::BoundingBox({-1, -1, -1}, {1, 1, 1}));
+    grid->fillScalars("r", [](const glm::vec3 &p) { return glm::length(p); });
+    grid->fillScalars("x", [](const glm::vec3 &p) { return p.x; });
+    const SurfaceData s = extractIsosurface(*grid, "r", 0.6f, "x");
+    IVF_CHECK(s.triangleCount() > 1000);
+    IVF_CHECK(s.values.size() == s.positions.size());
+
+    // Closed: every edge belongs to exactly two triangles
+    bool closed = true;
+    for (const auto &[edge, count] : edgeUse(s))
+        closed = closed && count == 2;
+    IVF_CHECK(closed);
+
+    // On the sphere, with the right area; normals towards lower values (the centre)
+    float maxError = 0.0f;
+    int inward = 0, consistent = 0;
+    for (std::size_t i = 0; i < s.positions.size(); ++i)
+    {
+        maxError = std::max(maxError, std::abs(glm::length(s.positions[i]) - 0.6f));
+        inward += glm::dot(s.normals[i], s.positions[i]) < 0.0f ? 1 : 0;
+        IVF_CHECK_NEAR(s.values[i], s.positions[i].x, 1e-4);
+    }
+    IVF_CHECK(maxError < 0.01f);
+    IVF_CHECK(inward == static_cast<int>(s.positions.size()));
+    IVF_CHECK_NEAR(s.area(), 4.0 * 3.14159265 * 0.36, 0.05);
+
+    // Triangles wound counter-clockwise seen from the normals' side (slivers, where the
+    // surface passes close to a grid point, have no meaningful direction)
+    const float meanArea = s.area() / static_cast<float>(s.triangleCount());
+    int checked = 0;
+    for (const glm::uvec3 &t : s.indices)
+    {
+        const glm::vec3 n = glm::cross(s.positions[t.y] - s.positions[t.x], s.positions[t.z] - s.positions[t.x]);
+        if (0.5f * glm::length(n) < 0.01f * meanArea)
+            continue;
+        ++checked;
+        consistent += glm::dot(n, s.normals[t.x] + s.normals[t.y] + s.normals[t.z]) > 0.0f ? 1 : 0;
+    }
+    IVF_CHECK(checked > static_cast<int>(s.triangleCount()) * 9 / 10);
+    IVF_CHECK(consistent == checked);
+
+    // Nothing outside the value range
+    IVF_CHECK(extractIsosurface(*grid, "r", 5.0f).indices.empty());
+}
+
+IVF_TEST(isosurface_has_no_cracks)
+{
+    // Random fields exercise all cases, including ambiguous faces: inside the grid every
+    // edge is shared by exactly two triangles
+    std::mt19937 rng(7);
+    std::uniform_real_distribution<float> value(0.0f, 1.0f);
+    for (int round = 0; round < 20; ++round)
+    {
+        auto grid = UniformGrid::create({7, 6, 5});
+        for (float &v : grid->addScalars("f"))
+            v = value(rng);
+        const SurfaceData s = extractIsosurface(*grid, "f", 0.5f);
+        const glm::vec3 hi = grid->bounds().max();
+        auto onBoundary = [&](const glm::vec3 &p) {
+            for (int a = 0; a < 3; ++a)
+                if (p[a] < 1e-5f || p[a] > hi[a] - 1e-5f)
+                    return true;
+            return false;
+        };
+        for (const auto &[edge, count] : edgeUse(s))
+            if (count != 2)
+                IVF_CHECK(count == 1 && onBoundary(s.positions[edge.first]) && onBoundary(s.positions[edge.second]));
+    }
+}
+
+IVF_TEST(slices_and_contours)
+{
+    auto grid = UniformGrid::create({21, 21, 21}, ivf::BoundingBox({-1, -1, -1}, {1, 1, 1}));
+    grid->fillScalars("f", [](const glm::vec3 &p) { return p.x + 2.0f * p.y; });
+
+    const SurfaceData z = extractSlice(*grid, "f", {0, 0, 0.3f}, {0, 0, 1}, 32);
+    IVF_CHECK_NEAR(z.area(), 4.0, 1e-3);
+    for (std::size_t i = 0; i < z.positions.size(); i += 17)
+    {
+        IVF_CHECK_NEAR(z.positions[i].z, 0.3, 1e-5);
+        IVF_CHECK_NEAR(z.values[i], z.positions[i].x + 2.0f * z.positions[i].y, 1e-4);
+    }
+
+    // A tilted plane through the box: a 2 x 2*sqrt(2) rectangle
+    const SurfaceData d = extractSlice(*grid, "f", {0, 0, 0}, {1, 1, 0}, 40);
+    IVF_CHECK_NEAR(d.area(), 4.0 * std::sqrt(2.0), 1e-3);
+
+    // Missing the box: empty
+    IVF_CHECK(extractSlice(*grid, "f", {0, 0, 3}, {0, 0, 1}).indices.empty());
+
+    // Contour f = 0 on the z slice: the line x = -2y from y = -0.5 to 0.5, length sqrt(5)
+    const float level = 0.0f;
+    const auto lines = contourLines(z, std::span<const float>(&level, 1));
+    float length = 0.0f;
+    for (std::size_t i = 0; i + 1 < lines.size(); i += 2)
+    {
+        length += glm::length(lines[i + 1] - lines[i]);
+        IVF_CHECK_NEAR(lines[i].x + 2.0f * lines[i].y, 0.0, 1e-4);
+    }
+    IVF_CHECK_NEAR(length, std::sqrt(5.0), 1e-3);
+}
+
+IVF_TEST(isosurface_and_slice_nodes)
+{
+    auto ctx = ivf::RenderContext::create(nullptr);
+    ctx->makeCurrent();
+
+    auto grid = UniformGrid::create({17, 17, 17}, ivf::BoundingBox({-1, -1, -1}, {1, 1, 1}));
+    grid->fillScalars("d", [](const glm::vec3 &p) { return 1.0f - glm::length(p); });
+    auto cmap = Colormap::create(BuiltinColormap::Gray);
+
+    auto iso = Isosurface::create(grid, "d", 0.5f);
+    const std::size_t before = iso->triangleCount();
+    IVF_CHECK(before > 0 && iso->meshes().size() == 1);
+    iso->setIsoValue(0.2f); // larger sphere
+    IVF_CHECK(iso->triangleCount() > before);
+    IVF_CHECK(iso->localBoundingBox().max().x > 0.75f);
+    iso->setColorBy("d", cmap);
+    IVF_CHECK(iso->material() && iso->material()->useVertexColor());
+    iso->setIsoValue(2.0f); // nothing
+    IVF_CHECK(iso->triangleCount() == 0 && !iso->localBoundingBox().isValid());
+
+    auto slice = SlicePlane::create(grid, "d", cmap);
+    slice->setAxis(SliceAxis::Y, 0.25f);
+    IVF_CHECK_NEAR(slice->localBoundingBox().min().y, 0.25, 1e-4);
+    slice->setContours(3);
+    cmap->setRange(0.0f, 1.0f);
+    IVF_CHECK(slice->contourValues().size() == 3);
+    IVF_CHECK_NEAR(slice->contourValues()[1], 0.5, 1e-5);
+    ivf::RenderQueue queue;
+    slice->collect(queue, ivf::CollectState{}); // builds the contour lines
+    IVF_CHECK(slice->meshes().size() == 2);
 
     ivf::RenderContext::clearCurrent();
 }

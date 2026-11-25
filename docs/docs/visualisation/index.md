@@ -15,7 +15,7 @@ target_link_libraries(my_app PRIVATE ivf2::ivf2 ivf2::ivfvis)
 It is built by default; `-DIVF2_BUILD_VIS=OFF` leaves it out. It needs no libraries beyond ivf itself.
 
 !!! note "Work in progress"
-    `ivfvis` grows in steps (see `ROADMAP.md`, phase 3.1). Available now: data sets, colormaps, vertex colouring, colour bars and point clouds. Next come isosurfaces and slices,glyphs and streamlines, volume rendering, axes, file readers and 2D plots.
+    `ivfvis` grows in steps (see `ROADMAP.md`, phase 3.1). Available now: data sets, colormaps, vertex colouring, colour bars, point clouds, isosurfaces and slice planes. Next comeglyphs and streamlines, volume rendering, axes, file readers and 2D plots.
 
 ## Data sets
 
@@ -66,3 +66,4 @@ bool inside = fromGrid->contains({3.0f, 0.0f, 0.0f});                      // fa
 
 - [Colormaps and Colour Bars](colormaps.md): turn values into colours, and show the scale.
 - [Point Clouds](point_clouds.md): draw millions of points coloured and sized by their values.
+- [Isosurfaces and Slices](scalar_fields.md): surfaces of constant value and cuts through 3D fields.

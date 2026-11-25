@@ -14,7 +14,7 @@ see `CHANGELOG.md`).
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-2 done** (data model, colormaps, colour bar, point clouds); **next: step 3** (isosurfaces, slices) |
+| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-3 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices); **next: step 4** (glyphs, streamlines) |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -737,7 +737,18 @@ clearest way to stand out.
 3. *Scalar fields.* `Isosurface` (marching cubes, gradient normals, colour by a second
       array, rebuild on iso change), `SlicePlane` (arbitrary plane resampled to a
       colormapped texture, optional contour lines). Example `vis_scalar1`.
-   4. *Vector fields.* `Glyphs` (instanced arrows oriented, scaled and coloured by the
+      *Done:* `extractIsosurface()` with marching cubes cases generated at start-up from the
+      cube's geometry (no hand-typed table): face segments directed with the inside corners
+      on the left chain into oriented loops; ambiguous faces cut off their inside corners
+      (the same in both cells, so no cracks); loops are fanned from a vertex whose diagonals
+      leave the cube faces, else around a centre vertex. Shared vertices per grid edge,
+      gradient normals, values of a second array. `extractSlice()` (plane grid clipped to the
+      box, shared interior vertices), `contourLines()`, `SurfaceData`. Nodes `Isosurface`
+      and `SlicePlane` (unlit vertex colours instead of a texture: the stock shader samples
+      textures only when lit; contour lines as a second mesh lifted off both sides). Tests:
+      closed sphere with correct area and orientation, crack-free random fields, slice areas,
+      contour length. Example `vis_scalar1`.
+4. *Vector fields.* `Glyphs` (instanced arrows oriented, scaled and coloured by the
       vector), `Streamlines` (RK4, point/line/plane seeds, stop criteria; lines or stream
       tubes via `PathFrames`/`Extrusion`). Example `vis_vectors1`.
    5. *Volume rendering.* `Texture3D` in core; `VolumeNode` (box proxy, ray marching in the

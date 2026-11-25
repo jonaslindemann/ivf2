@@ -87,6 +87,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 - [Volume rendering](visualisation/volumes.md) with colour and opacity transfer functions, embedded among opaque objects
 - [3D axes](visualisation/axes.md) with grid walls, ticks and labels that follow the camera
 - [Readers](visualisation/readers.md) for CSV tables, NumPy arrays and VTK files (legacy and XML)
+- [2D plots](visualisation/plots.md) with ImPlot next to the 3D view: profiles, histograms and linked controls
 
 ### User interface
 

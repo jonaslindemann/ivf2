@@ -68,6 +68,7 @@ nav = [
     { "Volume Rendering" = "visualisation/volumes.md" },
     { "Axes and Labels" = "visualisation/axes.md" },
     { "Reading Data Files" = "visualisation/readers.md" },
+    { "2D Plots" = "visualisation/plots.md" },
 ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },

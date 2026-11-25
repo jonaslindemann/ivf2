@@ -101,6 +101,9 @@ vcpkg will download and compile all required dependencies on the first run. This
 | `IVF2_WITH_FREETYPE` | ON | Text rendering (`ivf::TextNode`) with FreeType |
 | `IVF2_WITH_AUDIO` | ON | Audio playback/analysis (`ivf::AudioManager`) with miniaudio; required by ivfmusic |
 | `IVF2_WITH_MIDI` | ON | MIDI input (`ivf::MidiController`) with RtMidi |
+| `IVF2_WITH_IMPLOT` | ON | 2D plots in ImGui windows with ImPlot (ivfui) |
+| `IVF2_BUILD_VIS` | ON | Build `ivfvis` (scientific visualisation) |
+| `IVF2_WITH_VTK_XML` | ON | VTK XML file reading (.vtu, .vtp, .vti) in ivfvis (miniz, pugixml) |
 | `IVF2_INSTALL` | ON (top level) | Install rules and CMake package |
 | `IVF2_USE_PCH` | ON | Precompiled headers |
 | `IVF2_WARNINGS` | ON (top level) | Warnings for ivf2's own code: `/W4` (MSVC), `-Wall -Wextra -Wpedantic` |

@@ -29,3 +29,5 @@
 #define IVF2_HAS_AUDIO @IVF2_HAS_AUDIO@
 /// MIDI input with RtMidi (ivf::MidiController). CMake option IVF2_WITH_MIDI.
 #define IVF2_HAS_MIDI @IVF2_HAS_MIDI@
+/// 2D plots with ImPlot in ImGui windows (ivfui; include <implot.h>). CMake option IVF2_WITH_IMPLOT.
+#define IVF2_HAS_IMPLOT @IVF2_HAS_IMPLOT@

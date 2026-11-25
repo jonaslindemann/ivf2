@@ -54,6 +54,12 @@
         "reactphysics3d"
       ]
     },
+    "implot": {
+      "description": "2D plots in ImGui windows (ImPlot) - CMake option IVF2_WITH_IMPLOT",
+      "dependencies": [
+        "implot"
+      ]
+    },
     "vtk-xml": {
       "description": "Read VTK XML files (.vtu, .vti) in ivfvis - CMake option IVF2_WITH_VTK_XML",
       "dependencies": [

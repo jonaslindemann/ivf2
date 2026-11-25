@@ -12,10 +12,10 @@ target_link_libraries(my_app PRIVATE ivf2::ivf2 ivf2::ivfvis)
 #include <ivfvis/ivfvis.h>
 ```
 
-It is built by default; `-DIVF2_BUILD_VIS=OFF` leaves it out. It needs no libraries beyond ivf itself.
+It is built by default; `-DIVF2_BUILD_VIS=OFF` leaves it out. It needs no libraries beyond ivf itself; reading VTK XML files uses pugixml and miniz (`IVF2_WITH_VTK_XML`), and 2D plots use ImPlot in ivfui (`IVF2_WITH_IMPLOT`), both on by default.
 
 !!! note "Work in progress"
-    `ivfvis` grows in steps (see `ROADMAP.md`, phase 3.1). Available now: data sets, colormaps, vertex colouring, colour bars, point clouds, isosurfaces, slice planes, glyphs, streamlines, volume rendering, 3D axes and readers for CSV, NumPy and VTK files. Next come 2D plots.
+    `ivfvis` grows in steps (see `ROADMAP.md`, phase 3.1). Available now: data sets, colormaps, vertex colouring, colour bars, point clouds, isosurfaces, slice planes, glyphs, streamlines, volume rendering, 3D axes, readers for CSV, NumPy and VTK files, and 2D plots with ImPlot.
 
 ## Data sets
 
@@ -71,3 +71,4 @@ bool inside = fromGrid->contains({3.0f, 0.0f, 0.0f});                      // fa
 - [Volume Rendering](volumes.md): whole 3D fields as semi-transparent clouds.
 - [Axes and Labels](axes.md): 3D axes with ticks, labels and grid walls that follow the camera.
 - [Reading Data Files](readers.md): CSV tables, NumPy arrays and VTK files.
+- [2D Plots](plots.md): profiles, histograms and other charts next to the 3D view, with ImPlot.

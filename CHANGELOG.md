@@ -86,6 +86,10 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - `ivfvis::Axes3D`: axes around a box with grid lines on the walls facing away from the camera,
   ticks and screen-space labels on one outline edge per axis, and titles; `axisEdge()`. New example
   `vis_axes1`.
+- 2D plots with ImPlot: ivfui creates an ImPlot context per window with its ImGui context (CMake
+  option `IVF2_WITH_IMPLOT`, vcpkg feature `implot`, `IVF2_HAS_IMPLOT` in `<ivf/config.h>`); ivfvis
+  prepares plot data with `sampleLine()` (`LineSamples`) and `histogram()` (`Histogram`). New example
+  `vis_dashboard1`.
 - ivfvis readers: `readCsv()` (`Table`, `pointsFromTable()`), `readNpy()` (`gridFromNpy()`,
   `pointsFromNpy()`) and `readVtk()` for legacy `.vtk` files (ASCII and binary, versions up to 5.1)
   and VTK XML `.vtu`, `.vtp` and `.vti` files (ASCII, base64 and appended data, zlib); results as

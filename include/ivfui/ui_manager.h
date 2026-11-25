@@ -22,6 +22,7 @@ namespace ivfui {
 class UiRenderer {
 private:
     ImGuiContext *m_context{nullptr}; ///< This window's ImGui context (one per window).
+    void *m_plotContext{nullptr};     ///< This window's ImPlot context (IVF2_HAS_IMPLOT), opaque here.
 
 public:
     /**

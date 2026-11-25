@@ -29,6 +29,7 @@ All classes are created with `ClassName::create(...)` and returned as `std::shar
 | `ModelLoader` | Loads glTF and, through Assimp, OBJ, FBX, 3DS, ... | [Model Loading](../advanced/model_loading.md) |
 | `ivfvis::Colormap`, `ColorBar` | Map values to colours; show the scale over the scene | [Colormaps](../visualisation/colormaps.md) |
 | `ivfvis::UniformGrid`, `PointSet` | Data on grids and at points: named scalar and vector arrays, interpolation | [Visualisation](../visualisation/index.md) |
+| `ivfvis::sampleLine()`, `histogram()`, ImPlot | Data for 2D plots and the plots themselves, in ImGui windows | [2D Plots](../visualisation/plots.md) |
 | `ivfvis::readCsv()`, `readNpy()`, `readVtk()` | Read CSV tables, NumPy arrays and VTK files (.vtk, .vtu, .vtp, .vti) | [Reading Data Files](../visualisation/readers.md) |
 | `ivfvis::Axes3D` | Axes with grid walls, ticks, labels and titles around data | [Axes and Labels](../visualisation/axes.md) |
 | `ivfvis::Volume` |Volume rendering with a colour and opacity transfer function | [Volume Rendering](../visualisation/volumes.md) |

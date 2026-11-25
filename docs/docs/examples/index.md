@@ -102,6 +102,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 |---------|-------|-------|
 | `selection1` | Highlighting objects under the mouse | [Selection](../advanced/selection.md) |
 | `picking1` | Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model | [Selection](../advanced/selection.md#ray-picking) |
+| `vis_dashboard1` | ivfvis: a 3D slice linked to ImPlot plots - a probe profile and a histogram whose drag lines set the colour range | [2D Plots](../visualisation/plots.md) |
 | `vis_readers1` | ivfvis: reading a CSV table as a point cloud, a NumPy array as an isosurface and a VTK XML mesh coloured by curvature | [Reading Data Files](../visualisation/readers.md) |
 | `vis_axes1` | ivfvis: a surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera | [Axes and Labels](../visualisation/axes.md) |
 | `vis_volume1` |ivfvis: volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor | [Volume Rendering](../visualisation/volumes.md) |

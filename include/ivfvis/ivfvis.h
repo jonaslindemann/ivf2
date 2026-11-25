@@ -14,6 +14,7 @@
 #include <ivfvis/glyphs.h>
 #include <ivfvis/isosurface.h>
 #include <ivfvis/point_cloud.h>
+#include <ivfvis/plot_data.h>
 #include <ivfvis/point_set.h>
 #include <ivfvis/readers.h>
 #include <ivfvis/scalar_coloring.h>

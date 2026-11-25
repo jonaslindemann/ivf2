@@ -6,3 +6,8 @@ file(GLOB _headers CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/include/ivfui/*.h)
 ivf2_add_library(ivfui PCH pch.h SOURCES ${_sources} ${_headers})
 
 target_link_libraries(ivfui PUBLIC ivf glfw imgui::imgui)
+
+# ImPlot is public like ImGui: applications call its API in their UI code
+if(IVF2_WITH_IMPLOT)
+    target_link_libraries(ivfui PUBLIC implot::implot)
+endif()

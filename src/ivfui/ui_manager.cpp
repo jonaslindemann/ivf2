@@ -5,6 +5,12 @@
 
 #include <ivfui/ui_font.h>
 
+#include <ivf/config.h>
+
+#if IVF2_HAS_IMPLOT
+#include <implot.h>
+#endif
+
 #include <cstdlib>
 #include <string_view>
 
@@ -18,6 +24,12 @@ UiRenderer::UiRenderer(GLFWwindow *window)
     // together with the window's GL context and RenderContext.
     m_context = ImGui::CreateContext();
     ImGui::SetCurrentContext(m_context);
+#if IVF2_HAS_IMPLOT
+    // ImPlot keeps its own context next to ImGui's, switched together in makeCurrent()
+    auto *plot = ImPlot::CreateContext();
+    ImPlot::SetCurrentContext(plot);
+    m_plotContext = plot;
+#endif
 
     ImGuiIO &io = ImGui::GetIO();
     // io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
@@ -78,6 +90,10 @@ void UiRenderer::makeCurrent()
 {
     if (m_context != nullptr)
         ImGui::SetCurrentContext(m_context);
+#if IVF2_HAS_IMPLOT
+    if (m_plotContext != nullptr)
+        ImPlot::SetCurrentContext(static_cast<ImPlotContext *>(m_plotContext));
+#endif
 }
 
 void UiRenderer::beginFrame()
@@ -106,6 +122,11 @@ void UiRenderer::shutdown()
     ImGui::SetCurrentContext(m_context);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
+#if IVF2_HAS_IMPLOT
+    if (m_plotContext != nullptr)
+        ImPlot::DestroyContext(static_cast<ImPlotContext *>(m_plotContext));
+    m_plotContext = nullptr;
+#endif
     ImGui::DestroyContext(m_context);
     m_context = nullptr;
 }

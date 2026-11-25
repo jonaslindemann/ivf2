@@ -639,4 +639,26 @@ IVF_TEST(axes_edges_and_ticks)
     ivf::RenderContext::clearCurrent();
 }
 
+IVF_TEST(plot_data)
+{
+    auto grid = UniformGrid::create({11, 11, 11}, ivf::BoundingBox({0, 0, 0}, {1, 1, 1}));
+    grid->fillScalars("f", [](const glm::vec3 &p) { return 2.0f * p.x + p.y; });
+    const LineSamples line = sampleLine(*grid, "f", {0, 0.5f, 0}, {1, 0.5f, 0}, 5);
+    IVF_CHECK(line.values.size() == 5 && line.distance.size() == 5 && line.positions.size() == 5);
+    IVF_CHECK_NEAR(line.distance[4], 1.0, 1e-6);
+    IVF_CHECK_NEAR(line.values[2], 1.5, 1e-5); // 2 * 0.5 + 0.5
+    IVF_CHECK(near(line.positions[1], {0.25f, 0.5f, 0.0f}));
+
+    const std::vector<float> values{0.0f, 0.1f, 0.5f, 0.9f, 1.0f, std::numeric_limits<float>::quiet_NaN()};
+    const Histogram h = histogram(values, 4);
+    IVF_CHECK(h.counts.size() == 4 && h.edges.size() == 5 && h.centers.size() == 4);
+    IVF_CHECK(h.counts[0] == 2.0f && h.counts[2] == 1.0f && h.counts[3] == 2.0f); // 1.0 in the last bin
+    IVF_CHECK_NEAR(h.binWidth(), 0.25, 1e-6);
+    IVF_CHECK(h.peak() == 2.0f);
+    const Histogram clipped = histogram(values, 2, ValueRange{0.2f, 0.95f});
+    IVF_CHECK(clipped.counts[0] + clipped.counts[1] == 2.0f); // 0.5 and 0.9
+    IVF_CHECK(histogram(std::vector<float>{}, 3).counts.empty());
+    IVF_CHECK(histogram(std::vector<float>{2.0f, 2.0f}, 3).counts[0] == 2.0f);
+}
+
 IVF_TEST_MAIN()

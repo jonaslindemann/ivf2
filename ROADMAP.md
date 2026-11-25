@@ -14,7 +14,7 @@ see `CHANGELOG.md`).
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-7 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers); **next: step 8** (2D plots with ImPlot) |
+| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-8 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots); **next: step 9** (wrap-up) |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -805,6 +805,11 @@ clearest way to stand out.
       multi-block `.vtm`, NumPy `.npz`.
    8. *2D plots.* ImPlot as optional `IVF2_WITH_IMPLOT` in `ivfui` (context per ImGui
       context), helpers for grid lines and histograms. Example `vis_dashboard1`.
+      *Done:* ImPlot 1.0 through the vcpkg feature `implot`, linked publicly by ivfui (like
+      ImGui; `IVF2_HAS_IMPLOT`); `UiRenderer` creates, switches and destroys one ImPlot
+      context per window with its ImGui context. `plot_data.h`: `sampleLine()`,
+      `histogram()` (GL- and UI-free, tested). Example `vis_dashboard1`: probe profile and
+      histogram with drag lines setting the colormap range (fallback without ImPlot).
    9. *Wrap-up.* Guide section "Scientific visualisation", gallery, changelog.
 
    Decisions: CPU vertex colours first (work with every material, shadows and picking; a

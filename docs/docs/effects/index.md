@@ -76,6 +76,8 @@ void onUpdateEffects() override
 | `DepthOfFieldEffect` | Camera-style focus with bokeh blur | [Blur, Bloom and Depth](blur.md) |
 | `FogEffect` | Distance and height fog from the depth buffer | [Blur, Bloom and Depth](blur.md) |
 | `MotionBlurEffect` | Smears moving content using the previous frame | [Blur, Bloom and Depth](blur.md) |
+| `SsaoEffect` | Ambient occlusion: darker creases, corners and contacts | [Ambient Occlusion and Reflections](screen_space.md) |
+| `ScreenSpaceReflectionEffect` | Reflections of the visible scene in floors and water | [Ambient Occlusion and Reflections](screen_space.md) |
 | `TintEffect` | Colourise towards a tint colour | [Colour Effects](color_effects.md) |
 | `ColorGradingEffect` | Shadows, midtones and highlights, contrast and saturation | [Colour Effects](color_effects.md) |
 | `PosterizeEffect` | Reduce the number of colour levels | [Colour Effects](color_effects.md) |

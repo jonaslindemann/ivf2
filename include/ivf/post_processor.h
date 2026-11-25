@@ -124,8 +124,9 @@ public:
     /**
      * @brief Set the camera matrices the processed frame was rendered with.
      *
-     * Effects receive `invProjection` and `invView` uniforms, which together with
-     * `depthTexture` reconstruct view- and world-space positions per pixel.
+     * Effects receive `projection`, `view`, `invProjection` and `invView` uniforms, which
+     * together with `depthTexture` reconstruct view- and world-space positions per pixel
+     * (and project positions back to the screen).
      */
     void setCameraMatrices(const glm::mat4 &view, const glm::mat4 &projection);
 
@@ -133,7 +134,8 @@ public:
      * @brief Apply all post-processing effects to the given texture.
      *
      * Every effect receives `screenTexture` (unit 0), `previousFrame` (unit 1),
-     * `depthTexture` (unit 2), `invProjection`, `invView` and `time`. An effect
+     * `depthTexture` (unit 2), `projection`, `view`, `invProjection`, `invView` and
+     * `time`. An effect
      * that declares `uniform int screenTextureLevels` also gets a mip chain of
      * its input, for wide blurs with textureLod().
      * @param texture OpenGL texture ID to process.

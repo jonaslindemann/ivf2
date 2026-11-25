@@ -86,6 +86,7 @@ Added to the window with `addEffect()`. See the [overview](../effects/index.md).
 | Group | Effects |
 |-------|---------|
 | [Blur, bloom and depth](../effects/blur.md) | `BlurEffect`, `BloomEffect`, `MipBloomEffect`, `DepthOfFieldEffect`, `FogEffect`, `MotionBlurEffect` |
+| [Ambient occlusion and reflections](../effects/screen_space.md) | `SsaoEffect`, `ScreenSpaceReflectionEffect` |
 | [Colour](../effects/color_effects.md) | `TintEffect`, `ColorGradingEffect`, `PosterizeEffect`, `DitheringEffect`, `HalftoneEffect`, `NightVisionEffect`, `EdgeDetectionEffect`, `FadeEffect` |
 | [Film and distortion](../effects/film_effects.md) | `FilmgrainEffect`, `VignetteEffect`, `ChromaticEffect`, `ScanlineEffect`, `GlitchEffect`, `PixelationEffect`, `WaveDistortionEffect`, `SwirlEffect`, `KaleidoscopeEffect`, `FeedbackEffect` |
 | [Your own](../effects/custom_effects.md) | Subclass `Effect` |

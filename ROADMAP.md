@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**.**Next: 2.6 SSAO and screen-space reflections**. 2.6-2.9 not started|
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **Next: 2.7 glTF 2.0**. 2.7-2.9 not started|
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -603,6 +603,20 @@ Goal: make the library trustworthy to depend on.
    `shadowIndex`/`shadowStrength` use the spot struct's padding (size unchanged).
    `point_shadows1` gained a spot light.
 6. **SSAO** and screen-space reflections as effects.
+   *Done:* both from the depth buffer only (no G-buffer): positions from `invProjection`,
+   normals from neighbouring depths (the side with the smaller step, so silhouettes stay
+   sharp). `SsaoEffect`: pre-pass with cosine-weighted golden-spiral hemisphere samples
+   turned by interleaved gradient noise and a range check, occlusion in alpha; main pass
+   with a depth-aware blur (`setRadius`, `setIntensity`, `setPower`, `setBias`,
+   `setSamples`, `setBlurRadius`, `setShowOcclusion`). `ScreenSpaceReflectionEffect`:
+   view-space ray march with quadratically growing, jittered steps, binary refinement,
+   hits read from the image's mip chain for roughness (`screenTextureLevels`), Fresnel,
+   edge and distance fades; reflecting surfaces chosen by world normal
+   (`setSurfaceAngle`, `setUpDirection`), since there is no per-material reflectivity
+   without a G-buffer. `PostProcessor` passes `projection` and `view` to effects. New
+   examples `ssao1`, `ssr1`, guide page *Ambient Occlusion and Reflections*. Existing
+   images unchanged. Open: per-material reflectivity and normals (would need a normal /
+   material pass), temporal accumulation against noise.
 7. **glTF 2.0** as the primary model format: PBR materials, node hierarchy, skinning and
    morph-target animation (fastgltf or cgltf; keep assimp for legacy formats).
 8. **Resource hot reload** generalized from `ShaderWatcher` to textures and models.

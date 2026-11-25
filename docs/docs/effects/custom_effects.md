@@ -115,6 +115,7 @@ The post processor binds these inputs for every effect. Declare the ones you nee
 | `depthTexture` | `sampler2D` | Scene depth buffer, from 0 (near plane) to 1 (far plane) |
 | `invProjection` | `mat4` | Inverse projection matrix, to turn depth into view-space positions |
 | `invView` | `mat4` | Inverse view matrix, to go from view space to world space |
+| `projection`, `view` | `mat4` | The camera's projection and view matrices, to project positions back onto the screen |
 
 `TexCoords` runs from (0, 0) in the bottom-left corner to (1, 1) in the top-right. For sizes in pixels, use `textureSize(screenTexture, 0)`.
 

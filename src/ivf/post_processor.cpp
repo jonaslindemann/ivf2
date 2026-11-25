@@ -240,7 +240,9 @@ void PostProcessor::apply(GLuint inputTexture)
         active[i]->uniformInt("depthTexture", 2);
         active[i]->uniformMatrix4("invProjection", invProjection);
         active[i]->uniformMatrix4("invView", invView);
-        active[i]->uniformFloat("time", m_time);
+        active[i]->uniformMatrix4("projection", m_projectionMatrix);
+        active[i]->uniformMatrix4("view", m_viewMatrix);
+active[i]->uniformFloat("time", m_time);
 
         // Draw full-screen quad
         glBindVertexArray(m_quadVAO);

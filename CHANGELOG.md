@@ -88,7 +88,12 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
-- Better shadows: cascaded shadow maps for directional lights
+- Screen-space effects: `SsaoEffect` (ambient occlusion from the depth buffer: darker creases,
+  corners and contacts) and `ScreenSpaceReflectionEffect` (reflections of the visible scene in
+  floors and other surfaces facing one direction, with roughness and Fresnel). Effects also get
+  the `projection` and `view` matrices. New examples `ssao1` and `ssr1`, guide page
+  *Ambient Occlusion and Reflections*.
+- Better shadows: cascaded shadow mapsfor directional lights
   (`DirectionalLight::setShadowCascades()`, `setShadowDistance()`, `setCascadeSplitLambda()`),
   shadows from point lights in all directions (`setCastShadows(true)` on a `PointLight`,
   `setShadowRange()`) and from spot lights (`SpotLight::setShadowRange()`), and soft shadows(`Light::setShadowFilter()` with `ShadowFilter::Hard`,

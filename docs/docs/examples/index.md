@@ -68,6 +68,8 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `effects1` | Every stylisation effect, switchable from a panel | [Post-Processing](../effects/index.md) |
 | `fog1` | Distance and height fog | [Blur, Bloom and Depth](../effects/blur.md#fog) |
 | `dof1` | Depth of field | [Blur, Bloom and Depth](../effects/blur.md#depth-of-field) |
+| `ssao1` | Screen-space ambient occlusion | [Ambient Occlusion and Reflections](../effects/screen_space.md#ambient-occlusion) |
+| `ssr1` | Screen-space reflections on a polished floor, with SSAO | [Ambient Occlusion and Reflections](../effects/screen_space.md#screen-space-reflections) |
 | `mip_bloom1` | Wide bloom with glow, mist and sky materials and a guided camera | [Blur, Bloom and Depth](../effects/blur.md#mipbloomeffect) |
 
 ## Animation and time

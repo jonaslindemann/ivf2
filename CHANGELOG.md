@@ -83,7 +83,12 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - `ivfvis::Volume`: volume rendering of a grid's scalar array by ray marching, with a transfer
   function (colormap colours, opacity curve; `opacityAt()`, `transferTable()`), density, sample
   count and gradient shading; rays stop at opaque geometry. New example `vis_volume1`.
-- `Texture3D`: single-channel 3D textures (R8, R16F, R32F) kept on the CPU and uploaded per render
+- `ivfvis::Axes3D`: axes around a box with grid lines on the walls facing away from the camera,
+  ticks and screen-space labels on one outline edge per axis, and titles; `axisEdge()`. New example
+  `vis_axes1`.
+- `OverlayNode::project()`, `sceneView()`, `sceneProjection()`, `parentWorld()`: overlays can
+  place children at the screen positions of 3D points.
+- `Texture3D`: single-channel 3D textures(R8, R16F, R32F) kept on the CPU and uploaded per render
   context when bound.
 - `OverlayNode`: children drawn in window pixel coordinates over the scene (HUDs, legends).
 - `TextNode::setResolution()` (glyph pixel size, for sharp text at a known size),

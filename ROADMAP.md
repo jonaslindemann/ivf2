@@ -14,7 +14,7 @@ see `CHANGELOG.md`).
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-5 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering); **next: step 6** (axes and annotation) |
+| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-6 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes); **next: step 7** (readers) |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -779,7 +779,16 @@ clearest way to stand out.
       editor widget.
 6. *Axes and annotation.* `Axes3D` (bounding box with nice-number ticks, camera-facing
       labels, titles, back-face grid planes; sized from a node's bounds).
-   7. *Readers.* CSV, `.npy`, VTK legacy (structured points, polydata, unstructured grid),
+      *Done:* `Axes3D` (`CompositeNode`): six walls (grid lines and outline) that draw only
+      while facing away from the camera, twelve tick edges of which each axis draws the one
+      chosen by `axisEdge()` (outline edges, lowest on screen for x/z, leftmost for y), all
+      deciding in `doDrawPass()` from the pass's camera (no frame lag), and a labels
+      `OverlayNode` that projects tick points to the screen and pushes labels and titles
+      outward. Core: `OverlayNode` keeps the scene camera and parent matrix of its draw
+      (`project()`). Children are built after construction (`create()` or first collect),
+      because `CompositeNode::add()` needs `shared_from_this()`. Example `vis_axes1`.
+      Open: labels hidden behind data are still drawn; minor ticks; log axes.
+7. *Readers.* CSV, `.npy`, VTK legacy (structured points, polydata, unstructured grid),
       VTU (ASCII/base64/zlib; optional). All return `ivf::Result<T>`; unit tests.
    8. *2D plots.* ImPlot as optional `IVF2_WITH_IMPLOT` in `ivfui` (context per ImGui
       context), helpers for grid lines and histograms. Example `vis_dashboard1`.

@@ -66,6 +66,7 @@ nav = [
     { "Isosurfaces and Slices" = "visualisation/scalar_fields.md" },
     { "Glyphs and Streamlines" = "visualisation/vector_fields.md" },
     { "Volume Rendering" = "visualisation/volumes.md" },
+    { "Axes and Labels" = "visualisation/axes.md" },
 ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },

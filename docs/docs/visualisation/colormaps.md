@@ -129,4 +129,4 @@ hud->add(label);
 scene->add(hud);
 ```
 
-Subclasses place their children in `onLayout(width, height)`, which receives the viewport size before each draw. Overlays are part of the scene image, so effects and the window's tone mapping apply to them too.
+Subclasses place their children in `onLayout(width, height)`, which receives the viewport size before each draw; `project(point)` gives the pixel position of a 3D point, for [labels that follow objects](axes.md#labels-at-3d-points).Overlays are part of the scene image, so effects and the window's tone mapping apply to them too.

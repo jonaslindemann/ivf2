@@ -102,7 +102,8 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 |---------|-------|-------|
 | `selection1` | Highlighting objects under the mouse | [Selection](../advanced/selection.md) |
 | `picking1` | Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model | [Selection](../advanced/selection.md#ray-picking) |
-| `vis_volume1` | ivfvis: volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor | [Volume Rendering](../visualisation/volumes.md) |
+| `vis_axes1` | ivfvis: a surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera | [Axes and Labels](../visualisation/axes.md) |
+| `vis_volume1` |ivfvis: volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor | [Volume Rendering](../visualisation/volumes.md) |
 | `vis_vectors1` |ivfvis: arrow glyphs and field-line tubes of a magnetic dipole, coloured on a log scale; click an arrow for its vector | [Glyphs and Streamlines](../visualisation/vector_fields.md) |
 | `vis_scalar1` |ivfvis: isosurfaces (a translucent shell and a surface coloured by height) and contoured slice planes through a 3D field, with live sliders | [Isosurfaces and Slices](../visualisation/scalar_fields.md) |
 | `vis_points1` |ivfvis: half a million points of the Lorenz attractor, coloured by speed on the GPU; sizes, shapes, transparency and point picking | [Point Clouds](../visualisation/point_clouds.md) |

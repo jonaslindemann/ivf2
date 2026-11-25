@@ -49,6 +49,31 @@ void OverlayNode::onLayout(int /*width*/, int /*height*/)
 {
 }
 
+const glm::mat4 &OverlayNode::sceneView() const
+{
+    return m_view;
+}
+
+const glm::mat4 &OverlayNode::sceneProjection() const
+{
+    return m_projection;
+}
+
+const glm::mat4 &OverlayNode::parentWorld() const
+{
+    return m_parentWorld;
+}
+
+std::optional<glm::vec3> OverlayNode::project(const glm::vec3 &p) const
+{
+    const glm::vec4 clip = m_projection * m_view * m_parentWorld * glm::vec4(p, 1.0f);
+    if (clip.w <= 1e-6f)
+        return std::nullopt;
+    const glm::vec3 ndc = glm::vec3(clip) / clip.w;
+    return glm::vec3((ndc.x * 0.5f + 0.5f) * static_cast<float>(m_width),
+                     (ndc.y * 0.5f + 0.5f) * static_cast<float>(m_height), ndc.z * 0.5f + 0.5f);
+}
+
 void OverlayNode::doDrawPass(const DrawContext &context)
 {
     if (context.pass != RenderPass::Main)
@@ -61,6 +86,9 @@ void OverlayNode::doDrawPass(const DrawContext &context)
     if (m_width <= 0 || m_height <= 0)
         return;
 
+    m_view = context.view;
+    m_projection = context.projection;
+    m_parentWorld = context.item.parentWorld;
     onLayout(m_width, m_height);
 
     // Pixel camera

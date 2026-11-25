@@ -5,6 +5,7 @@
 #include <ivfvis/ivfvis.h>
 
 #include <ivf/colors.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <ivf/picking.h>
 #include <ivf/render_context.h>
 #include <ivf/sphere.h>
@@ -605,6 +606,36 @@ IVF_TEST(volume_node_without_gl)
     t3->setData({3, 3, 3}, values); // too few values: unchanged
     IVF_CHECK(t3->dimensions() == glm::ivec3(2, 2, 2));
 
+    ivf::RenderContext::clearCurrent();
+}
+
+IVF_TEST(axes_edges_and_ticks)
+{
+    const ivf::BoundingBox box({0, 0, 0}, {1, 1, 1});
+    const glm::mat4 projection = glm::perspective(glm::radians(45.0f), 1.5f, 0.1f, 100.0f);
+
+    // In front of the +z face, a little to the right and above
+    const glm::vec3 eye(0.7f, 0.8f, 5.0f);
+    const glm::mat4 vp = projection * glm::lookAt(eye, glm::vec3(0.5f), glm::vec3(0, 1, 0));
+    IVF_CHECK(axisEdge(box, 0, eye, vp) == 2);  // x: the lower front edge (y low, z high)
+    IVF_CHECK(axisEdge(box, 1, eye, vp) == 1);  // y: the left front edge (z high, x low)
+    IVF_CHECK(axisEdge(box, 2, eye, vp) == -1); // z: looking along it
+    IVF_CHECK(axisEdge(box, 0, glm::vec3(0.5f), vp) == -1); // from inside
+
+    // Above and to the side: x and z on the bottom outline
+    const glm::vec3 high(4.0f, 3.0f, 5.0f);
+    const glm::mat4 vp2 = projection * glm::lookAt(high, glm::vec3(0.5f), glm::vec3(0, 1, 0));
+    for (int axis = 0; axis < 3; ++axis)
+        IVF_CHECK(axisEdge(box, axis, high, vp2) >= 0);
+
+    auto ctx = ivf::RenderContext::create(nullptr);
+    ctx->makeCurrent();
+    auto axes = Axes3D::create(ivf::BoundingBox({-1.0f, 0.0f, 0.0f}, {1.0f, 0.35f, 10.0f}));
+    IVF_CHECK((axes->ticks(0) == std::vector<double>{-1.0, -0.5, 0.0, 0.5, 1.0}));
+    IVF_CHECK(axes->ticks(2).front() == 0.0 && axes->ticks(2).back() == 10.0);
+    IVF_CHECK(axes->count() == 12 + 12 + 1); // walls and outlines, edges, labels
+    axes->setTitles("a", "b", "c");
+    IVF_CHECK(axes->title(1) == "b");
     ivf::RenderContext::clearCurrent();
 }
 

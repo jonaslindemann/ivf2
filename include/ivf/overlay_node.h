@@ -8,6 +8,10 @@
 
 #include <ivf/composite_node.h>
 
+#include <glm/glm.hpp>
+
+#include <optional>
+
 namespace ivf {
 
 /**
@@ -36,7 +40,8 @@ namespace ivf {
  * @endcode
  *
  * Subclasses lay out their children in onLayout(), which receives the viewport size
- * before each draw. Overlays are drawn into the scene image, so post-processing effects
+ * before each draw; sceneView(), sceneProjection() and project() tell where 3D points of
+ * the scene appear, for labels that follow objects. Overlays are drawn into the scene image, so post-processing effects
  * and the window's tone mapping apply to them as well.
  */
 class OverlayNode : public CompositeNode {
@@ -64,9 +69,28 @@ protected:
      */
     virtual void onLayout(int width, int height);
 
+    /** @brief View matrix of the scene's camera at this draw (for onLayout()). */
+    [[nodiscard]] const glm::mat4 &sceneView() const;
+
+    /** @brief Projection matrix of the scene's camera at this draw. */
+    [[nodiscard]] const glm::mat4 &sceneProjection() const;
+
+    /** @brief Model matrix of the overlay's parent (world matrix of the group it is in). */
+    [[nodiscard]] const glm::mat4 &parentWorld() const;
+
+    /**
+     * @brief Where point @p p (in the coordinates of the overlay's parent) appears: x and y
+     * in overlay pixels (origin bottom left), z the depth (0 near to 1 far). std::nullopt if
+     * the point is behind the camera. For labels attached to 3D points, in onLayout().
+     */
+    [[nodiscard]] std::optional<glm::vec3> project(const glm::vec3 &p) const;
+
 private:
     int m_width{0};
     int m_height{0};
+    glm::mat4 m_view{1.0f};
+    glm::mat4 m_projection{1.0f};
+    glm::mat4 m_parentWorld{1.0f};
 };
 
 using OverlayNodePtr = std::shared_ptr<OverlayNode>;

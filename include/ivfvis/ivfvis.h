@@ -7,6 +7,7 @@
  * Link with ivf2::ivfvis. See the guide section "Scientific visualisation".
  */
 
+#include <ivfvis/axes.h>
 #include <ivfvis/color_bar.h>
 #include <ivfvis/colormap.h>
 #include <ivfvis/data_set.h>

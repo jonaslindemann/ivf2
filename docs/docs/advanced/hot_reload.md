@@ -1,0 +1,78 @@
+# Hot Reload
+
+Edit a texture, a model or a shader in another program, save, and the running application shows the new version, without a restart. `ResourceWatcher` checks the files twice a second and reloads what changed.
+
+```cpp
+#include <ivf/resource_watcher.h>
+
+auto *watcher = renderContext()->resourceWatcher();
+```
+
+`GLFWSceneWindow` updates the watcher every frame; nothing else is needed.
+
+## Textures
+
+```cpp
+auto texture = ivf::Texture::create();
+if (!texture->load("assets/brick.png"))
+    return -1;
+watcher->watchTexture(texture);   // the file it was loaded from
+```
+
+The new image goes into the same OpenGL texture, so every material and node using the texture shows it.
+
+## Models
+
+```cpp
+auto model = ivf::GltfModel::load("assets/models/robot.glb");
+if (!model)
+    return -1;
+add(*model);
+watcher->watchModel(*model, "assets/models/robot.glb", [&](ivf::CompositeNode &node) {
+    // the reloaded model has new materials: set them up again
+    for (auto &material : static_cast<ivf::GltfModel &>(node).materials())
+        material->setEnvironment(environment);
+});
+```
+
+The model node stays in the scene and keeps its own position, rotation and scale; only its contents are replaced. A `GltfModel` keeps its current animation (if the new file still has one of that name), its time and looping (`GltfModel::reload()` does this, and can be called directly). Models in other formats get the children of a fresh `ModelLoader::load()`. The optional callback runs after each successful reload, for settings the application applied to the old contents.
+
+## Shaders
+
+Shader materials made from files reload when created with `watch = true`:
+
+```cpp
+auto material = ivf::ShaderMaterial::createFromFiles("shaders/glow.vert", "shaders/glow.frag", "glow", true);
+```
+
+See [Shader Materials](../core/shader_materials.md). `ShaderWatcher` registers these programs with the resource watcher.
+
+## Anything else
+
+Watch any files with a function that reloads them:
+
+```cpp
+watcher->watch({"data/level.json", "data/items.json"}, [this] {
+    return loadLevel();   // false: loading failed, keep the current state
+}, "level");
+```
+
+## When files are reloaded
+
+- Files are checked every half second (`update(dt, interval)`; `check()` checks at once).
+- A change is reloaded when the file's modification time has stayed the same for one check, so an editor that saves in several steps does not produce a half-written file. A reload takes 0.5 to 1 second after saving.
+- If a reload fails (a broken image, a model that does not parse, a shader with an error), the previous version stays and a warning is logged. The next save tries again.
+- `setOnReload(callback)` reports every reload with the resource's name and whether it worked, for example for a status line. `reloadCount()` counts the successful ones.
+- `reloadNow(id)` reloads at once, `unwatch(id)` and `clear()` stop watching, `setEnabled(false)` pauses the watcher.
+
+Each window has its own watcher (`RenderContext::resourceWatcher()`, or `ResourceWatcher::instance()` for the current context), because the reloaded textures and programs belong to that window's OpenGL context.
+
+## Example
+
+`hot_reload1` creates a folder `hot_reload_live/` next to the program with a glTF model, a texture and a shader pair, and shows them in the scene. Open the files in an editor and save, or use the buttons, which repaint the texture, recolour or break the shader, and save the model again. The window lists every reload.
+
+## Related
+
+- [Model Loading](model_loading.md)
+- [Shader Materials](../core/shader_materials.md)
+- [Render Context](render_context.md)

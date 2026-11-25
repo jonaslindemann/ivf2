@@ -91,7 +91,13 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
-- glTF 2.0 models: `GltfModel::load()` reads `.gltf`/`.glb` files (also without assimp) into
+- Hot reload: `ResourceWatcher` (`RenderContext::resourceWatcher()`) reloads textures
+  (`watchTexture()`, into the same texture), models (`watchModel()`; `GltfModel::reload()` keeps
+  the animation and time) and any other files (`watch()` with a reload function) when they are
+  saved, after the file has stopped changing. Failed reloads keep the old version. Shader hot
+  reload (`ShaderWatcher`) uses it and no longer retries a broken shader every half second.
+  `Texture::filename()`. New example `hot_reload1` and guide page *Hot Reload*.
+- glTF 2.0 models:`GltfModel::load()` reads `.gltf`/`.glb` files (also without assimp) into
   the scene graph with their node hierarchy, PBR materials (base colour, metallic-roughness,
   normal, occlusion and emissive textures, alpha modes, vertex colours), skinned meshes, morph
   targets and animations (`setAnimation()`, `setTime()`, `setLooping()`, `setMorphWeights()`).

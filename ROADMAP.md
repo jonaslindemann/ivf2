@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **Next: 2.8 resource hot reload**. 2.8-2.9 not started|
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **Next: 2.9 CPU picking**. 2.9 not started|
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -643,6 +643,21 @@ Goal: make the library trustworthy to depend on.
    unchanged. Open: GPU skinning for large meshes, glTF lights and cameras, texture
    transforms, Draco/meshopt, alpha-mask shadows.
 8. **Resource hot reload** generalized from `ShaderWatcher` to textures and models.
+   *Done:* `ResourceWatcher` (`resource_watcher.h`, one per `RenderContext`,
+   `resourceWatcher()`; `GLFWSceneWindow::doUpdate()` updates it): watches files with a
+   reload function (`watch()`), `watchTexture()` (reloads into the same GL texture;
+   `Texture::filename()`), `watchModel()` (a `GltfModel` reloads in place with
+   `GltfModel::reload()`, keeping animation by name, time, looping and the node
+   transform; other nodes get the children of `ModelLoader::load()`; an onReload callback
+   re-applies settings). Polls every 0.5 s; reloads once the modification time has been
+   stable for one check (debounce against partial saves); a failed reload keeps the old
+   resource and is not retried until the next save (the old ShaderWatcher retried every
+   poll). `setOnReload()`, `reloadNow()`, `reloadCount()`, `setEnabled()`. `ShaderWatcher`
+   keeps its API but registers with the resource watcher (one polling loop; its `update()`
+   forwards). Unit test `test_resource_watcher` (debounce, failures, several files,
+   unwatch, model reload in place); new example `hot_reload1` (writes its own live files;
+   tested live with edits during a run, also with the GL debug context); guide page
+   *Hot Reload*.
 9. **CPU picking** via ray casting against a per-mesh BVH, complementing the existing
    color-buffer selection.
 

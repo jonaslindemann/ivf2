@@ -8,6 +8,7 @@
 #include <ivf/mesh_manager.h>
 #include <ivf/selection_manager.h>
 #include <ivf/shader_manager.h>
+#include <ivf/resource_watcher.h>
 #include <ivf/shader_watcher.h>
 #include <ivf/texture_manager.h>
 #include <ivf/transform_manager.h>
@@ -83,6 +84,7 @@ RenderContext::~RenderContext()
 
     // Managers that look up uniforms in the shader manager's programs first,
     // the shader manager (owning the programs) last.
+    delete m_resourceWatcher;
     delete m_shaderWatcher;
     delete m_debugDraw;
     delete m_selection;
@@ -247,6 +249,13 @@ DebugDraw *RenderContext::debugDraw()
     if (!m_debugDraw)
         m_debugDraw = new DebugDraw();
     return m_debugDraw;
+}
+
+ResourceWatcher *RenderContext::resourceWatcher()
+{
+    if (!m_resourceWatcher)
+        m_resourceWatcher = new ResourceWatcher();
+    return m_resourceWatcher;
 }
 
 ShaderWatcher *RenderContext::shaderWatcher()

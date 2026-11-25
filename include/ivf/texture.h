@@ -27,6 +27,7 @@ private:
     GLint m_wrapT;     ///< Texture wrapping mode for T coordinate.
     GLint m_wrapS;     ///< Texture wrapping mode for S coordinate.
     GLint m_minFilter; ///< Minification filter.
+    std::string m_filename; ///< File of the last load().
     GLint m_magFilter; ///< Magnification filter.
     GLint m_intFormat; ///< Internal format.
     GLint m_level;     ///< Mipmap level.
@@ -81,6 +82,9 @@ public:
      * @param name Used in messages and as the OpenGL debug label.
      */
     Result<void> loadFromMemory(const unsigned char *bytes, std::size_t size, std::string_view name);
+
+    /** @brief File the texture was last loaded from with load() (empty otherwise). */
+    [[nodiscard]] const std::string &filename() const noexcept { return m_filename; }
 
     /**
      * @brief Upload 8-bit pixels (1-4 channels, rows from the first image row) with mipmaps.

@@ -13,6 +13,7 @@ using namespace ivfui;
 #include <ivf/tween.h>
 #include <ivf/timer_manager.h>
 #include <ivf/debug_draw.h>
+#include <ivf/resource_watcher.h>
 #include <ivf/shader_watcher.h>
 #include <ivf/time_controller.h>
 #include <ivf/transform_manager.h>
@@ -957,7 +958,7 @@ void GLFWSceneWindow::doUpdate()
     float dt = static_cast<float>(frameTime());
     TweenManager::instance()->update(dt);
     TimerManager::instance()->update(dt);
-    ShaderWatcher::instance()->update(dt);
+    renderContext()->resourceWatcher()->update(dt); // textures, models and shaders (ShaderWatcher)
     TimeController::instance()->update(frameTime());
     updateSceneBehaviors(m_scene.get(), dt);
     GLFWWindow::doUpdate();  // calls onUpdate()

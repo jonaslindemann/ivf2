@@ -17,12 +17,13 @@
  * or linking fails the old program is kept and the error is logged.
  * If it succeeds, the existing ProgramPtr's GL program is replaced transparently.
  *
- * GLFWSceneWindow calls ShaderWatcher::instance()->update(dt) in doUpdateOtherUi(),
- * so registered programs are automatically kept up to date.
+ * The files are watched by the context's ResourceWatcher (ivf/resource_watcher.h), which
+ * GLFWSceneWindow updates every frame; update() only needs calling in other hosts.
  */
 
 #include <ivf/program.h>
 
+#include <cstdint>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -54,7 +55,8 @@ public:
     void clear();
 
     /**
-     * @brief Poll watched files and recompile any that changed.
+     * @brief Poll watched files and recompile any that changed (forwards to
+     *        ResourceWatcher::update(), which also reloads watched textures and models).
      * @param dt            Frame delta-time in seconds.
      * @param checkInterval Minimum seconds between file checks (default: 0.5s).
      */
@@ -67,14 +69,12 @@ private:
         ProgramPtr program;
         std::string vertPath;
         std::string fragPath;
-        std::filesystem::file_time_type lastVertTime;
-        std::filesystem::file_time_type lastFragTime;
+        std::uint64_t watchId{0}; ///< ResourceWatcher id.
     };
 
     std::vector<Entry> m_entries;
-    float m_accum{0.0f};
 
-    bool tryReload(Entry& e);
+    static bool tryReload(const Entry& e);
 };
 
 } // namespace ivf

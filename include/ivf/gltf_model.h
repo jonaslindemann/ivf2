@@ -66,6 +66,18 @@ public:
      */
     [[nodiscard]] static Result<GltfModelPtr> load(const std::string &path);
 
+    /**
+     * @brief Load the file again and replace the model's contents in place (the node stays
+     *        in the scene). Keeps the current animation (if the file still has it), time and
+     *        looping, and the model's own transform; materials are new.
+     * @param path File to load; empty: the file the model was loaded from.
+     * @return Nothing, or an Error (the model is unchanged then).
+     */
+    Result<void> reload(const std::string &path = {});
+
+    /** @brief File the model was loaded from. */
+    [[nodiscard]] const std::string &path() const;
+
     // ---- Nodes ----------------------------------------------------------------
 
     /** @brief Number of glTF nodes. */

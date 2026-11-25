@@ -29,6 +29,7 @@ class SelectionManager;
 class TransformManager;
 class DebugDraw;
 class ShaderWatcher;
+class ResourceWatcher;
 
 /**
  * @brief Function that returns the address of an OpenGL function, e.g.
@@ -139,6 +140,7 @@ public:
     TransformManager *transforms();
     DebugDraw *debugDraw();
     ShaderWatcher *shaderWatcher();
+    ResourceWatcher *resourceWatcher();
     ///@}
 
     /** @brief 1x1 white 2D texture bound to unused sampler slots (created on first use). */
@@ -281,6 +283,7 @@ private:
     TransformManager *m_transforms{nullptr};
     DebugDraw *m_debugDraw{nullptr};
     ShaderWatcher *m_shaderWatcher{nullptr};
+    ResourceWatcher *m_resourceWatcher{nullptr};
 
     GLuint m_fallbackTexture2D{0};
     GLuint m_fallbackCubemap{0};

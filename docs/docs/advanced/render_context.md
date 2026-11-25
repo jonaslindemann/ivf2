@@ -31,6 +31,7 @@ int onSetup() override
 | `transforms()` | `TransformManager` |
 | `debugDraw()` | `DebugDraw` |
 | `shaderWatcher()` | `ShaderWatcher` |
+| `resourceWatcher()` | `ResourceWatcher` ([Hot Reload](hot_reload.md)) |
 
 Managers are created on first use and released when the window closes, while its OpenGL context still exists.
 

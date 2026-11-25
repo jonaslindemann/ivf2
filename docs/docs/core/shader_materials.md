@@ -119,7 +119,7 @@ m_mat = ivf::ShaderMaterial::createFromStrings(vertSource, fragSource, "my_shade
 sphere->setMaterial(m_glow);
 ```
 
-With `watch` set to `true` (the last argument of `createFromFiles`), the window reloads the shader whenever the file changes. Edit the GLSL, save, and see the result immediately without restarting.
+With `watch` set to `true` (the last argument of `createFromFiles`), the window reloads the shader whenever the file changes. Edit the GLSL, save, and see the result immediately without restarting. Textures and models can be reloaded the same way; see [Hot Reload](../advanced/hot_reload.md).
 
 Shader files in `shaders/` are copied next to the executable at build time. When you add a new one, register it in the asset copy rules in `CMakeLists.txt`.
 

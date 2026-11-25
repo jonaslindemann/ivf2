@@ -91,6 +91,7 @@ Result<void> Texture::load(const std::string_view filename)
     {
         logInfofc("Texture", "Loaded texture: {} ({}x{}, {} channels)", filename, width, height, nrChannels);
         setImage(width, height, nrChannels, data, std::filesystem::path(filename).filename().string());
+        m_filename = std::string(filename);
     }
     else
     {

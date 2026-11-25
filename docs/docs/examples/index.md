@@ -109,5 +109,6 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `gltf1` | A glTF 2.0 model with PBR textures, alpha, a skinned tentacle, morph targets and animations (or any `.glb` given on the command line) | [Model Loading](../advanced/model_loading.md#gltf-models) |
 | `assimp1` | Opening any model file through a file dialog | [Model Loading](../advanced/model_loading.md) |
 | `serialization1` | Saving, loading and clearing a scene as JSON | |
+| `hot_reload1` | A model, a texture and a shader that reload when their files are saved | [Hot Reload](../advanced/hot_reload.md) |
 | `debug_draw1` | Immediate-mode debug lines and shapes | |
 | `rigid_body1` | Rigid-body physics with ReactPhysics3D | |

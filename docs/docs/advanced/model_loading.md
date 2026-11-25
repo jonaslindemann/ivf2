@@ -130,5 +130,6 @@ To scale and position the model, set the transform on the returned node with `se
 ## Related
 
 - [PBR and Image-Based Lighting](../core/pbr_and_ibl.md)
+- [Hot Reload](hot_reload.md): reload a model when its file is saved
 - [Nodes](../core/nodes.md)
 - `gltf1` and `assimp1` in the [examples](../examples/index.md)

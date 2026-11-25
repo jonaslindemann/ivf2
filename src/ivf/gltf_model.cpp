@@ -99,6 +99,7 @@ struct ivf::GltfModel::Impl {
     std::vector<Skin> skins;
     std::vector<Animation> animations;
     std::vector<PBRMaterialPtr> materials;
+    std::string path;
     int animation{-1};
     bool looping{true};
     float time{0.0f};
@@ -866,10 +867,41 @@ Result<GltfModelPtr> GltfModel::load(const std::string &path)
     loader.fileName = std::filesystem::path(path).filename().string();
     auto model = loader.build();
     if (model)
+        (*model)->m_impl->path = path;
+    if (model)
         logInfo(logStr("Loaded ", loader.fileName, ": ", data->nodes_count, " nodes, ", data->meshes_count, " meshes, ",
                        data->materials_count, " materials, ", data->animations_count, " animations"),
                 "GltfModel");
     return model;
+}
+
+Result<void> GltfModel::reload(const std::string &path)
+{
+    const std::string file = path.empty() ? m_impl->path : path;
+    auto fresh = load(file);
+    if (!fresh)
+        return std::unexpected(fresh.error());
+
+    // Keep what the application chose
+    const std::string animationName = this->animationName(m_impl->animation);
+    const bool looping = m_impl->looping;
+    const float time = m_impl->time;
+
+    clear();
+    for (auto &child : (*fresh)->nodes())
+        add(child);
+    (*fresh)->clear();
+    std::swap(m_impl, (*fresh)->m_impl);
+
+    m_impl->looping = looping;
+    m_impl->time = time;
+    setAnimation(animationName.empty() ? -1 : findAnimation(animationName));
+    return {};
+}
+
+const std::string &GltfModel::path() const
+{
+    return m_impl->path;
 }
 
 // ---- Nodes and animation ----------------------------------------------------

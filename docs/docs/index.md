@@ -63,6 +63,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 - Additive and alpha blending with `BlendShaderMaterial`, and [ready-made glow, mist, gradient sky and water materials](core/shader_materials.md#ready-made-materials)
 - [Over 25 post-processing effects](effects/index.md): bloom, depth of field, fog, ambient occlusion, reflections, colour grading,film grain, chromatic aberration, halftone, kaleidoscope, glitch, video feedback and more, or [your own](effects/custom_effects.md)
 - [Mesh deformers](core/deformers.md): twist, bend, scale, wave, turbulence, noise and custom functions
+- [Hot reload](advanced/hot_reload.md): textures, models and shaders update while the program runs when their files are saved
 
 ### Animation and time
 

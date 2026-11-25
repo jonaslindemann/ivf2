@@ -354,7 +354,7 @@ void ColorBar::rebuild(int width, int height)
         auto text = label(used++);
         setupText(text, tick.label, m_textSize);
         const float textWidth = text->textWidth();
-        glm::vec3 pos;
+        glm::vec3 pos(0.0f);
         if (vertical)
         {
             const float y = std::round(y0 + tick.t * length - capHeight * 0.5f);
@@ -380,7 +380,7 @@ void ColorBar::rebuild(int width, int height)
         setupText(m_titleNode, m_title, titleSize);
         const float titleWidth = m_titleNode->textWidth();
         const float titleCap = std::round(static_cast<float>(titleSize) * 0.7f);
-        glm::vec3 pos;
+        glm::vec3 pos(0.0f);
         switch (m_placement)
         {
         case ColorBarPlacement::Right:

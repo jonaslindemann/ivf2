@@ -13,7 +13,7 @@ see `CHANGELOG.md`).
 |-------|-------|
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
-| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **Next: 2.4 image-based lighting**. 2.4-2.9 not started |
+| 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **Next: 2.5 better shadows**. 2.5-2.9 not started |
 | 3 - Differentiators | Not started |
 | 4 - Reach | Not started |
 
@@ -553,6 +553,23 @@ Goal: make the library trustworthy to depend on.
 4. **Image-based lighting.** Load HDR environment maps (`.hdr`/`.exr`), precompute
    irradiance and prefiltered specular maps for the existing PBR material; skybox from
    the same map.
+   *Done (except `.exr`):* `EnvironmentMap` (`environment_map.h`) loads an
+   equirectangular Radiance `.hdr` (stb), raw float data or a procedural HDR sky
+   (`loadSky(SkySettings)`, `skyImage()`; deterministic, so CI needs no HDRI asset) and
+   precomputes on the GPU with full-screen passes into cube faces: an RGB16F environment
+   cube map with mips, irradiance (32, cosine convolution from a coarse mip), GGX
+   prefiltered radiance (128, 5 roughness levels, 256 Hammersley samples reading the
+   source mip that matches each sample's solid angle, against fireflies from the sun) and
+   the split-sum BRDF LUT (RG16F 256). `GL_TEXTURE_CUBE_MAP_SEAMLESS` is enabled when an
+   environment is created. `PBRMaterial::setEnvironment()`, `setEnvironmentIntensity()`
+   and `setToneMapping(false)` (linear HDR for the window's tone mapping; the shader's own
+   Reinhard + gamma stays the default); the PBR shader's ambient term uses
+   `fresnelSchlickRoughness`, irradiance, `textureLod(prefilter, R, roughness * maxLod)`
+   and the LUT (units 12-14). `Skybox::setLod()` blurs the background; `Cubemap::allocate()`;
+   `writeHdr()` and `imageFlipVerticallyOnLoad()` in `image_io.h`. Orientation checked
+   (camera aimed at the sun sees the disc in the centre). New example `ibl1`, unit test
+   `test_environment`, guide page *PBR and Image-Based Lighting*. Existing images
+   unchanged. Open: `.exr` (needs an EXR library), shadows for the PBR shader, PBR alpha.
 5. **Better shadows.** Cascaded shadow maps for directional lights, PCF/PCSS soft
    shadows, cube-map shadows for point lights.
 6. **SSAO** and screen-space reflections as effects.

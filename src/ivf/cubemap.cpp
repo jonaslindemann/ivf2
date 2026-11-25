@@ -87,6 +87,28 @@ Result<void> Cubemap::load(std::string_view posX, std::string_view negX,
     return result;
 }
 
+void Cubemap::allocate(int size, GLenum internalFormat, int levels)
+{
+    m_size = size;
+    m_levels = std::max(levels, 1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
+    for (int level = 0; level < m_levels; ++level)
+    {
+        const int s = std::max(size >> level, 1);
+        for (int face = 0; face < 6; ++face)
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, level, static_cast<GLint>(internalFormat), s, s, 0,
+                         GL_RGBA, GL_FLOAT, nullptr);
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, m_levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BASE_LEVEL, 0);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, m_levels - 1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
 std::string Cubemap::findFile(std::string_view dir, std::string_view stem)
 {
     for (auto& ext : {".jpg", ".jpeg", ".png", ".hdr", ".tga"}) {

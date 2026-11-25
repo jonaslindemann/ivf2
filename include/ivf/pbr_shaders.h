@@ -90,6 +90,15 @@ uniform sampler2D metallicMap;
 uniform sampler2D aoMap;
 uniform samplerCube envCubemap;
 
+// ---- Image-based lighting (EnvironmentMap) ---------------------------------
+uniform bool        useIBL          = false;
+uniform samplerCube irradianceMap;          // diffuse irradiance (cosine convolution)
+uniform samplerCube prefilterMap;           // GGX prefiltered radiance, roughness per mip level
+uniform sampler2D   brdfLUT;                // split-sum scale and bias for F0
+uniform float       prefilterMaxLod = 4.0;  // mip level of roughness 1
+uniform float       envIntensity    = 1.0;  // scale of the environment light
+uniform bool        pbrToneMap      = true; // own Reinhard + gamma (off: linear HDR for the window)
+
 // ---- Constants -------------------------------------------------------------
 const float PI = 3.14159265359;
 
@@ -123,6 +132,12 @@ float geometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
+// Fresnel for the environment: rough surfaces reflect less at grazing angles
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
 // ---- Derivative-based TBN reconstruction -----------------------------------
@@ -245,7 +260,21 @@ void main()
 
     // --- Ambient / environment ---
     vec3 ambient;
-    if (useEnvCubemap)
+    if (useIBL)
+    {
+        // Split-sum image-based lighting (Karis 2013): diffuse from the irradiance map,
+        // specular from the prefiltered map at the roughness's mip level and the BRDF LUT
+        float NdotV = max(dot(N, V), 0.0);
+        vec3 R = reflect(-V, N);
+        vec3 F = fresnelSchlickRoughness(NdotV, F0, roughness);
+        vec3 kD = (vec3(1.0) - F) * (1.0 - metallic);
+        vec3 diffuse = texture(irradianceMap, N).rgb * albedo;
+        vec3 prefiltered = textureLod(prefilterMap, R, roughness * prefilterMaxLod).rgb;
+        vec2 brdf = texture(brdfLUT, vec2(NdotV, roughness)).rg;
+        vec3 specular = prefiltered * (F * brdf.x + brdf.y);
+        ambient = (kD * diffuse + specular) * ao * envIntensity;
+    }
+    else if (useEnvCubemap)
     {
         vec3 R = reflect(-V, N);
         float lod = roughness * 4.0; // crude mip selection
@@ -261,9 +290,12 @@ void main()
 
     vec3 outColor = ambient + Lo + pbr.emissive;
 
-    // Tone mapping (Reinhard) + gamma correction
-    outColor = outColor / (outColor + vec3(1.0));
-    outColor = pow(outColor, vec3(1.0 / 2.2));
+    // Tone mapping (Reinhard) + gamma correction, unless the window maps the HDR image
+    if (pbrToneMap)
+    {
+        outColor = outColor / (outColor + vec3(1.0));
+        outColor = pow(outColor, vec3(1.0 / 2.2));
+    }
 
     fragColor = vec4(outColor, albedo4.a);
 }

@@ -20,6 +20,7 @@ nav = [
     { "Nodes" = "core/nodes.md" },
     { "Materials and Textures" = "core/materials_and_textures.md" },
     { "Shader Materials" = "core/shader_materials.md" },
+    { "PBR and Image-Based Lighting" = "core/pbr_and_ibl.md" },
     { "Lighting" = "core/lighting.md" },
     { "Deformers" = "core/deformers.md" },
     { "Procedural Geometry" = "core/procedural_geometry.md" },

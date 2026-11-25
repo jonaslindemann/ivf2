@@ -66,6 +66,7 @@ All classes are created with `ClassName::create(...)` and returned as `std::shar
 | `CheckerboardTexture`, `PerlinNoiseTexture`, `GradientTexture`, `MarbleTexture`, `WoodTexture` | Textures generated on the CPU | `procedural1` example |
 | `GPUCheckerboardTexture`, `GPUNoiseTexture`, `GPUGradientTexture` | Textures generated on the GPU | `procedural2` example |
 | `Cubemap`, `Skybox` | Six-sided environment images and a sky behind the scene | `skybox1` example |
+| `EnvironmentMap` | HDR environment (`.hdr` or procedural sky) for image-based lighting of `PBRMaterial` and as skybox | `ibl1` example |
 | `PlanarReflection` | Mirror image of the scene in a plane | [Shader Materials](../core/shader_materials.md#watermaterial) |
 | `Palette` | Named colour palettes and colour harmonies | |
 

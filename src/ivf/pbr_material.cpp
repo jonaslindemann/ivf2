@@ -149,6 +149,26 @@ void PBRMaterial::bindMaps()
         prog->uniformBool("useEnvCubemap", false);
     }
     prog->uniformInt("envCubemap", kEnvCubemapUnit);
+
+    // Image-based lighting
+    const bool ibl = m_environment && m_environment->isValid();
+    if (ibl)
+    {
+        m_environment->bind();
+        prog->uniformFloat("prefilterMaxLod", float(m_environment->prefiltered()->levels() - 1));
+    }
+    else
+    {
+        bindFallbackCubemap(IrradianceMapUnit);
+        bindFallbackCubemap(PrefilterMapUnit);
+        bindFallbackTexture2D(BrdfLutUnit);
+    }
+    prog->uniformBool("useIBL", ibl);
+    prog->uniformFloat("envIntensity", m_environmentIntensity);
+    prog->uniformInt("irradianceMap", static_cast<int>(IrradianceMapUnit));
+    prog->uniformInt("prefilterMap", static_cast<int>(PrefilterMapUnit));
+    prog->uniformInt("brdfLUT", static_cast<int>(BrdfLutUnit));
+    prog->uniformBool("pbrToneMap", m_toneMapping);
 }
 
 void PBRMaterial::unbindMaps()

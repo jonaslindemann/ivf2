@@ -58,6 +58,29 @@ public:
                       glm::vec3 bottomColor  = {0.18f, 0.12f, 0.08f},
                       int size = 64);
 
+    /**
+     * @brief Allocate empty faces of @p size x @p size pixels, for rendering into.
+     *
+     * Used by EnvironmentMap for its HDR cube maps.
+     * @param size Edge length of a face in pixels.
+     * @param internalFormat Sized format, e.g. GL_RGBA16F (RGB float formats are not
+     *        guaranteed to be renderable).
+     * @param levels Mip levels to allocate (1: none); filtering is trilinear if more than one.
+     */
+    void allocate(int size, GLenum internalFormat, int levels = 1);
+
+    /** @brief Edge length of a face of an allocated cube map (0 for loaded images). */
+    [[nodiscard]] int size() const
+    {
+        return m_size;
+    }
+
+    /** @brief Mip levels of an allocated cube map. */
+    [[nodiscard]] int levels() const
+    {
+        return m_levels;
+    }
+
     void bind(int unit = 0);
     void unbind();
 
@@ -65,6 +88,8 @@ public:
 
 private:
     GLuint m_id{0};
+    int m_size{0};   ///< See size().
+    int m_levels{1}; ///< See levels().
 
     static Result<void> loadFace(GLenum target, std::string_view path);
     static std::string findFile(std::string_view dir, std::string_view stem);

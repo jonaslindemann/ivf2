@@ -1,4 +1,5 @@
 #include <ivf/shader_manager.h>
+#include <ivf/environment_map.h>
 #include <ivf/render_context.h>
 
 #include <ivf/fragment_shader.h>
@@ -228,6 +229,11 @@ Result<ProgramPtr> ivf::ShaderManager::loadPBRShader()
     program->uniformInt("metallicMap", 3);
     program->uniformInt("aoMap", 4);
     program->uniformInt("envCubemap", kDefaultCubemapUnit);
+    // Image-based lighting maps (see EnvironmentMap); distinct units so the sampler
+    // types never share one
+    program->uniformInt("irradianceMap", static_cast<int>(IrradianceMapUnit));
+    program->uniformInt("prefilterMap", static_cast<int>(PrefilterMapUnit));
+    program->uniformInt("brdfLUT", static_cast<int>(BrdfLutUnit));
 
     if (previousProgram)
         previousProgram->use();

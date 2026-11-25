@@ -36,8 +36,9 @@ in vec3 vTexCoord;
 out vec4 fragColor;
 uniform samplerCube skybox;
 uniform float exposure;
+uniform float lod;
 void main() {
-    vec3 color = texture(skybox, normalize(vTexCoord)).rgb * exposure;
+    vec3 color = textureLod(skybox, normalize(vTexCoord), lod).rgb * exposure;
     fragColor  = vec4(color, 1.0);
 }
 )";
@@ -112,6 +113,7 @@ void Skybox::doDraw()
     glUniformMatrix4fv(glGetUniformLocation(m_program, "inverseView"), 1, GL_FALSE,
                        glm::value_ptr(inverseView));
     glUniform1f(glGetUniformLocation(m_program, "exposure"), m_exposure);
+    glUniform1f(glGetUniformLocation(m_program, "lod"), m_lod);
 
     m_cubemap->bind(0);
     glUniform1i(glGetUniformLocation(m_program, "skybox"), 0);

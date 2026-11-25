@@ -30,6 +30,12 @@ public:
 
     void setCubemap(CubemapPtr cubemap)    { m_cubemap  = cubemap; }
     void setExposure(float exposure)       { m_exposure = exposure; }
+    /**
+     * @brief Mip level to show (default 0, sharp). Higher levels of a cube map with mip
+     *        levels, such as EnvironmentMap::cubemap(), give a blurred background.
+     */
+    void setLod(float lod)                 { m_lod = lod; }
+    [[nodiscard]] float lod() const        { return m_lod; }
     CubemapPtr cubemap() const             { return m_cubemap; }
 
     void doSetup() override;
@@ -38,6 +44,7 @@ public:
 private:
     CubemapPtr m_cubemap;
     float      m_exposure{1.0f};
+    float      m_lod{0.0f};
 
     GLuint m_vao{0}, m_program{0};
     bool   m_gpuReady{false};

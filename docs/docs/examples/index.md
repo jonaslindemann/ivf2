@@ -33,6 +33,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `text1` | 3D text with live editing | [Text](../primitives/text.md) |
 | `custom_mesh1` | `DynamicMesh` for generated geometry: a Lissajous curve and a Lorenz attractor | |
 | `instancing1` | Thousands of copies of a mesh with `InstancedMeshNode` | |
+| `ibl1` | PBR spheres lit by an HDR environment (procedural sky or `.hdr` file), with the environment as skybox | [PBR and Image-Based Lighting](../core/pbr_and_ibl.md) |
 | `hdr1` | Lights brighter than white with tone mapping (None, Reinhard, ACES, AgX), exposure, bloom in HDR, FXAA and MSAA | [HDR and Tone Mapping](../effects/hdr.md) |
 | `auto_instancing1` | `InstanceNode` copies merged into instanced draw calls automatically; on/off switch and statistics | [Nodes](../core/nodes.md#instancenode-class) |
 | `bbox1` | Bounding boxes of nested nodes | [Nodes](../core/nodes.md) |
@@ -47,7 +48,7 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `textures1` | Image textures and texture modes | [Texture Examples](texture_examples.md) |
 | `textures2` | Multitexturing with blend modes | [Materials and Textures](../core/materials_and_textures.md) |
 | `textures3` | Textures generated on the GPU | |
-| `textures4` | `PBRMaterial`: a grid of spheres from rough to smooth and dielectric to metal | |
+| `textures4` | `PBRMaterial`: a grid of spheres from rough to smooth and dielectric to metal | [PBR and Image-Based Lighting](../core/pbr_and_ibl.md) |
 | `procedural1` | Textures generated on the CPU: noise, marble, wood | |
 | `procedural2` | Animated GPU procedural textures | |
 | `bump1` | Normal maps with `BumpMaterial` | |

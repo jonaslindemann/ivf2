@@ -3,6 +3,7 @@
 #include <ivf/material.h>
 #include <ivf/texture.h>
 #include <ivf/cubemap.h>
+#include <ivf/environment_map.h>
 
 #include <glm/glm.hpp>
 #include <memory>
@@ -58,6 +59,28 @@ public:
     void setAOMap(std::shared_ptr<Texture> tex)        { m_aoMap        = tex; }
     void setEnvCubemap(std::shared_ptr<Cubemap> cm)    { m_envCubemap   = cm; }
 
+    // ---- Image-based lighting ----------------------------------------------
+    /**
+     * @brief Light the material with an HDR environment (diffuse irradiance and
+     *        roughness-dependent reflections; see EnvironmentMap). Replaces the plain
+     *        reflection of setEnvCubemap() while set.
+     */
+    void setEnvironment(EnvironmentMapPtr environment) { m_environment = std::move(environment); }
+    [[nodiscard]] EnvironmentMapPtr environment() const { return m_environment; }
+
+    /** @brief Scale of the environment's light (default 1). */
+    void setEnvironmentIntensity(float intensity) { m_environmentIntensity = intensity; }
+    [[nodiscard]] float environmentIntensity() const { return m_environmentIntensity; }
+
+    /**
+     * @brief Tone map (Reinhard) and gamma-encode in the shader (default on).
+     *
+     * Turn it off when the window tone maps (GLFWSceneWindow::setToneMapping() with
+     * setGamma(2.2f)): the material then outputs linear HDR values.
+     */
+    void setToneMapping(bool enabled) { m_toneMapping = enabled; }
+    [[nodiscard]] bool toneMapping() const { return m_toneMapping; }
+
     // ---- Material interface ------------------------------------------------
     /**
      * @brief Switch to the "pbr" shader, refresh manager cached IDs, and upload
@@ -84,6 +107,9 @@ private:
     std::shared_ptr<Texture> m_metallicMap;
     std::shared_ptr<Texture> m_aoMap;
     std::shared_ptr<Cubemap> m_envCubemap;
+    EnvironmentMapPtr m_environment;
+    float m_environmentIntensity{1.0f};
+    bool m_toneMapping{true};
 
     void bindMaps();
     void unbindMaps();

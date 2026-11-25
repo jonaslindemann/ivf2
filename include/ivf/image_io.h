@@ -37,6 +37,9 @@ void freeImage(void *data);
 /** @brief Flip images vertically while loading (global setting, default off). */
 void setImageFlipVerticallyOnLoad(bool flip);
 
+/** @brief See setImageFlipVerticallyOnLoad(). */
+[[nodiscard]] bool imageFlipVerticallyOnLoad();
+
 /** @brief Description of the last loading error. */
 const char *imageFailureReason();
 
@@ -46,5 +49,11 @@ const char *imageFailureReason();
  * @return true on success.
  */
 bool writePng(const char *filename, int width, int height, int channels, const void *data, int strideBytes);
+
+/**
+ * @brief Write 32-bit float pixels (top row first) to a Radiance HDR (.hdr) file.
+ * @return true on success.
+ */
+bool writeHdr(const char *filename, int width, int height, int channels, const float *data);
 
 } // namespace ivf

@@ -47,9 +47,19 @@ void freeImage(void *data)
     stbi_image_free(data);
 }
 
+namespace {
+bool g_flipVertically = false; // mirrors stb's global setting, which has no getter
+}
+
 void setImageFlipVerticallyOnLoad(bool flip)
 {
+    g_flipVertically = flip;
     stbi_set_flip_vertically_on_load(flip ? 1 : 0);
+}
+
+bool imageFlipVerticallyOnLoad()
+{
+    return g_flipVertically;
 }
 
 const char *imageFailureReason()
@@ -60,6 +70,11 @@ const char *imageFailureReason()
 bool writePng(const char *filename, int width, int height, int channels, const void *data, int strideBytes)
 {
     return stbi_write_png(filename, width, height, channels, data, strideBytes) != 0;
+}
+
+bool writeHdr(const char *filename, int width, int height, int channels, const float *data)
+{
+    return stbi_write_hdr(filename, width, height, channels, data) != 0;
 }
 
 } // namespace ivf

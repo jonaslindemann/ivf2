@@ -82,6 +82,13 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   Shaders declare the block (`IVF_CAMERA_BLOCK_GLSL` for C++ strings) and need no per-program
   upload; `Program::link()` binds it, `TransformManager::syncCameraBlock()` writes it when the
   camera changes.
+- Image-based lighting: `EnvironmentMap` loads an equirectangular `.hdr` environment (or
+  generates an HDR sky with `loadSky()`) and precomputes irradiance, prefiltered reflections and a
+  BRDF table on the GPU; `PBRMaterial::setEnvironment()` lights materials with it (diffuse light
+  and reflections that blur with roughness), `Skybox::create(env->cubemap())` shows it and
+  `Skybox::setLod()` blurs it. `PBRMaterial::setEnvironmentIntensity()`, `setToneMapping(false)`
+  for linear HDR output, `Cubemap::allocate()`, `ivf::writeHdr()`. New example `ibl1` and user
+  guide page *PBR and Image-Based Lighting*.
 - HDR output: `GLFWSceneWindow::setToneMapping()` (`ivf::ToneMapping`: None, Reinhard, ACES, AgX),
   `setExposure()`, `setGamma()` and `setFxaa()` map the floating-point scene image to the display
   as the last step after all effects; `setMsaaSamples()` sets the multisampling of the offscreen

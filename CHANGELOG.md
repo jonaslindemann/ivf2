@@ -86,6 +86,12 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - `ivfvis::Axes3D`: axes around a box with grid lines on the walls facing away from the camera,
   ticks and screen-space labels on one outline edge per axis, and titles; `axisEdge()`. New example
   `vis_axes1`.
+- ivfvis readers: `readCsv()` (`Table`, `pointsFromTable()`), `readNpy()` (`gridFromNpy()`,
+  `pointsFromNpy()`) and `readVtk()` for legacy `.vtk` files (ASCII and binary, versions up to 5.1)
+  and VTK XML `.vtu`, `.vtp` and `.vti` files (ASCII, base64 and appended data, zlib); results as
+  `VtkData` (grid or points with arrays, triangles, lines) and `createMeshNode()`. XML reading uses
+  pugixml and miniz behind the new CMake option `IVF2_WITH_VTK_XML` (vcpkg feature `vtk-xml`).
+  New example `vis_readers1`.
 - `OverlayNode::project()`, `sceneView()`, `sceneProjection()`, `parentWorld()`: overlays can
   place children at the screen positions of 3D points.
 - `Texture3D`: single-channel 3D textures(R8, R16F, R32F) kept on the CPU and uploaded per render

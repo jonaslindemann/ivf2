@@ -67,6 +67,7 @@ nav = [
     { "Glyphs and Streamlines" = "visualisation/vector_fields.md" },
     { "Volume Rendering" = "visualisation/volumes.md" },
     { "Axes and Labels" = "visualisation/axes.md" },
+    { "Reading Data Files" = "visualisation/readers.md" },
 ] },
   { "Creative Programming" = [
     { "Overview" = "creative/index.md" },

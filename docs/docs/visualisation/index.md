@@ -15,7 +15,7 @@ target_link_libraries(my_app PRIVATE ivf2::ivf2 ivf2::ivfvis)
 It is built by default; `-DIVF2_BUILD_VIS=OFF` leaves it out. It needs no libraries beyond ivf itself.
 
 !!! note "Work in progress"
-    `ivfvis` grows in steps (see `ROADMAP.md`, phase 3.1). Available now: data sets, colormaps, vertex colouring, colour bars, point clouds, isosurfaces, slice planes, glyphs, streamlines, volume rendering and 3D axes. Next come file readers and 2D plots.
+    `ivfvis` grows in steps (see `ROADMAP.md`, phase 3.1). Available now: data sets, colormaps, vertex colouring, colour bars, point clouds, isosurfaces, slice planes, glyphs, streamlines, volume rendering, 3D axes and readers for CSV, NumPy and VTK files. Next come 2D plots.
 
 ## Data sets
 
@@ -70,3 +70,4 @@ bool inside = fromGrid->contains({3.0f, 0.0f, 0.0f});                      // fa
 - [Glyphs and Streamlines](vector_fields.md): arrows and field lines of vector fields.
 - [Volume Rendering](volumes.md): whole 3D fields as semi-transparent clouds.
 - [Axes and Labels](axes.md): 3D axes with ticks, labels and grid walls that follow the camera.
+- [Reading Data Files](readers.md): CSV tables, NumPy arrays and VTK files.

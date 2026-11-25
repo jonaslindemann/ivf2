@@ -54,6 +54,13 @@
         "reactphysics3d"
       ]
     },
+    "vtk-xml": {
+      "description": "Read VTK XML files (.vtu, .vti) in ivfvis - CMake option IVF2_WITH_VTK_XML",
+      "dependencies": [
+        "miniz",
+        "pugixml"
+      ]
+    },
     "renoise": {
       "description": "Read Renoise songs (.xrns) in ivfmusic",
       "dependencies": [

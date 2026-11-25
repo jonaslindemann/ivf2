@@ -24,6 +24,9 @@ ivf2_add_test(test_resource_watcher LIBS ivf2::ivf)
 ivf2_add_test(test_picking LIBS ivf2::ivf)
 if(TARGET ivf2::ivfvis)
     ivf2_add_test(test_ivfvis LIBS ivf2::ivfvis)
+    ivf2_add_test(test_ivfvis_readers LIBS ivf2::ivfvis)
+    target_compile_definitions(test_ivfvis_readers PRIVATE IVF2_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
+                               $<$<BOOL:${IVF2_WITH_VTK_XML}>:IVF2_TEST_VTK_XML>)
 endif()
 
 # Public headers must compile on their own with only public dependencies.

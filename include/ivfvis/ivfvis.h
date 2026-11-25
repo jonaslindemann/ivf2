@@ -15,6 +15,7 @@
 #include <ivfvis/isosurface.h>
 #include <ivfvis/point_cloud.h>
 #include <ivfvis/point_set.h>
+#include <ivfvis/readers.h>
 #include <ivfvis/scalar_coloring.h>
 #include <ivfvis/slice_plane.h>
 #include <ivfvis/streamlines.h>

@@ -67,7 +67,7 @@
     {
       "name": "minimal",
       "displayName": "Minimal (no optional dependencies)",
-      "description": "Release build with assimp, FreeType, audio, MIDI and ivfmusic disabled. Uses its own vcpkg_installed so it does not disturb the other presets.",
+      "description": "Release build with assimp, FreeType, audio, MIDI, ivfmusic and VTK XML reading disabled. Uses its own vcpkg_installed so it does not disturb the other presets.",
       "inherits": "base",
       "generator": "Ninja",
       "cacheVariables": {
@@ -77,6 +77,7 @@
         "IVF2_WITH_AUDIO": "OFF",
         "IVF2_WITH_MIDI": "OFF",
         "IVF2_BUILD_MUSIC": "OFF",
+        "IVF2_WITH_VTK_XML": "OFF",
         "VCPKG_INSTALLED_DIR": "${sourceDir}/build/${presetName}/vcpkg_installed"
       }
     }

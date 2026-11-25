@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<VTKFile type="ImageData" version="0.1" byte_order="LittleEndian" header_type="UInt32" compressor="vtkZLibDataCompressor">
+  <ImageData WholeExtent="0 3 0 2 0 1" Origin="1 2 3" Spacing="0.5 1 2" Direction="1 0 0 0 1 0 0 0 1">
+  <Piece Extent="0 3 0 2 0 1">
+    <PointData Scalars="f" Vectors="v">
+      <DataArray type="Float32" Name="f" format="binary" RangeMin="321" RangeMax="542.5">
+        AQAAAACAAABgAAAASAAAAA==eF4VyUENgDAUBNENoakNpDTpF1IpK+VzgEMxUSlIYTi8w2Tk7FrQ2dXgi4ZuGp409NC/LTRgJNYeeqESOtAqH0bW+AAt9xgN
+      </DataArray>
+      <DataArray type="Float32" Name="v" NumberOfComponents="3" format="binary" RangeMin="3.7416573867739413" RangeMax="6.87386354243376">
+        AQAAAACAAAAgAQAATgAAAA==eF5NztEJACAMA9GM0k3saI7iKI5mix4GFB70PiLNISnr1d9m5XeYu0/rMXd63P20HnePw8yelX/Pej0OM3voMXvoMXvoMXvorw8rdiq1
+        <InformationKey name="L2_NORM_RANGE" location="vtkDataArray" length="2">
+          <Value index="0">
+            3.7416573868
+          </Value>
+          <Value index="1">
+            6.8738635424
+          </Value>
+        </InformationKey>
+      </DataArray>
+    </PointData>
+    <CellData>
+    </CellData>
+  </Piece>
+  </ImageData>
+</VTKFile>

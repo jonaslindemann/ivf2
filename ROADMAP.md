@@ -14,7 +14,7 @@ see `CHANGELOG.md`).
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-6 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes); **next: step 7** (readers) |
+| 3 - Differentiators | **3.1 `ivfvis`**: planned in nine steps; **steps 1-7 done** (data model, colormaps, colour bar, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers); **next: step 8** (2D plots with ImPlot) |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -790,6 +790,19 @@ clearest way to stand out.
       Open: labels hidden behind data are still drawn; minor ticks; log axes.
 7. *Readers.* CSV, `.npy`, VTK legacy (structured points, polydata, unstructured grid),
       VTU (ASCII/base64/zlib; optional). All return `ivf::Result<T>`; unit tests.
+      *Done:* `readers.h`: `readCsv()` (delimiter and header detection, quotes, comments;
+      `Table`, `pointsFromTable()`), `readNpy()` (v1-3, b/i/u/f, both byte orders, C and
+      Fortran order; `gridFromNpy()` incl. vector arrays, `pointsFromNpy()`), `readVtk()`:
+      legacy 2.0-5.1 ASCII/binary (structured points, polydata, unstructured grids,
+      structured/rectilinear grids as points; METADATA and FIELD blocks skipped) and XML
+      .vtu/.vtp/.vti (ASCII, inline base64, appended raw/base64, UInt32/UInt64 headers,
+      zlib blocks; appended data cut out before parsing with pugixml). Cells to triangles
+      (polygons, strips, quads, pixels; outer faces of volume cells by face counting) and
+      lines. Option `IVF2_WITH_VTK_XML` (vcpkg feature `vtk-xml`: pugixml, miniz; off in the
+      minimal preset, where XML gives `NotSupported`). Test files written by VTK 9.6 and
+      numpy (`tests/data/make_test_data.py`), `test_ivfvis_readers` checks every encoding.
+      Example `vis_readers1` (data from `make_data.py`). Open: cell data, `.vts`/`.vtr`,
+      multi-block `.vtm`, NumPy `.npz`.
    8. *2D plots.* ImPlot as optional `IVF2_WITH_IMPLOT` in `ivfui` (context per ImGui
       context), helpers for grid lines and histograms. Example `vis_dashboard1`.
    9. *Wrap-up.* Guide section "Scientific visualisation", gallery, changelog.

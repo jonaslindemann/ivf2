@@ -32,10 +32,12 @@ std::string tempFile(const std::string &name, const std::string &contents)
     return path;
 }
 
-/// Pretend the file was saved again (a later modification time)
-void touch(const std::string &path, int seconds = 2)
+/// Pretend the file was saved again: a modification time later than any set before (two quick
+/// writes can get the same time from the file system, so the times here only go up)
+void touch(const std::string &path)
 {
-    fs::last_write_time(path, fs::last_write_time(path) + std::chrono::seconds(seconds));
+    static int saves = 0;
+    fs::last_write_time(path, fs::file_time_type::clock::now() + std::chrono::seconds(10 + 2 * ++saves));
 }
 
 const char *gltfWithNodes(int count)

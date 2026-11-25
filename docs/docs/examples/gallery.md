@@ -109,6 +109,7 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 - [![gltf1](../images/gallery/gltf1.jpg) gltf1](../advanced/model_loading.md#gltf-models "A glTF 2.0 model with PBR textures, alpha, a skinned tentacle, morph targets and animations (or any .glb given on the command line)")
 - [![assimp1](../images/gallery/assimp1.jpg) assimp1](../advanced/model_loading.md "Opening any model file through a file dialog")
 - [![serialization1](../images/gallery/serialization1.jpg) serialization1](https://github.com/jonaslindemann/ivf2/tree/main/examples/serialization1 "Saving, loading and clearing a scene as JSON")
+- [![hot_reload1](../images/gallery/hot_reload1.jpg) hot_reload1](../advanced/hot_reload.md "A model, a texture and a shader that reload when their files are saved")
 - [![debug_draw1](../images/gallery/debug_draw1.jpg) debug_draw1](https://github.com/jonaslindemann/ivf2/tree/main/examples/debug_draw1 "Immediate-mode debug lines and shapes")
 - [![rigid_body1](../images/gallery/rigid_body1.jpg) rigid_body1](https://github.com/jonaslindemann/ivf2/tree/main/examples/rigid_body1 "Rigid-body physics with ReactPhysics3D")
 

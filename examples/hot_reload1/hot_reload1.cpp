@@ -126,7 +126,6 @@ private:
     std::deque<std::string> m_log;
     float m_hue{0.08f};
     int m_colorIndex{0};
-    float m_time{0.0f};
 
 public:
     HotReloadWindow(int w, int h, const std::string &title) : GLFWSceneWindow(w, h, title)

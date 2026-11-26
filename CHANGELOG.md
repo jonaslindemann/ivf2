@@ -8,18 +8,29 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ## [Unreleased]
 
+## [2.0.0-alpha.3] - 2026-11-26
+
+The rendering pipeline and scientific visualisation release: scenes are drawn through a render
+queue (culling, sorting, transparency, automatic instancing) with camera and light uniform blocks,
+an HDR pipeline (tone mapping, FXAA, MSAA), image-based lighting, cascaded and soft shadows for
+directional, point and spot lights, SSAO and screen-space reflections, glTF 2.0 models with
+skinning, morph targets and animations, hot reload of resources and CPU picking. The new
+`ivf2::ivfvis` library adds data sets, colormaps, colour bars, point clouds, isosurfaces, slices,
+glyphs, streamlines, volume rendering, 3D axes, readers for CSV, NumPy and VTK files, and 2D
+plots with ImPlot.
+
 ### Changed (may require changes in your code)
 
 - `PBRMaterial`: an albedo map is now multiplied by `setAlbedo()` (it replaced it before; the
   default albedo is white, so materials that set only the map look the same). The shader writes
   alpha 1 unless `setAlphaMode(AlphaMode::Blend)`.
-- Shadows: the `IvfLights` blockhas `ShadowData shadows[4]` and a `shadowIndex` per directional
+- Shadows: the `IvfLights` block has `ShadowData shadows[4]` and a `shadowIndex` per directional
   and point light instead of `lightSpaceMatrices`; shadow maps are sampled as `shadowMaps[i]`
   on texture units 8-11 (`ivf::ShadowMapUnit`) instead of 1-4. Shaders that sampled
   `shadowMaps[i]` with `lightSpaceMatrices[i]` use `ivf::shadow_glsl` and `ivfShadowFactor()`.
   Only opaque nodes cast shadows (transparent ones did before). A light's `ShadowMap` is created
   by the first shadow pass instead of `setCastShadows(true)`.
-- Meshes are uploadedto the GPU when first drawn instead of in `end()`: creating and changing
+- Meshes are uploaded to the GPU when first drawn instead of in `end()`: creating and changing
   geometry (primitives, `MeshNode`, `Mesh::updateVertices()`/`updateNormals()`) needs no OpenGL
   context, so scenes can be built before the window exists. `Mesh::vertexArray()` uploads on
   demand and returns the vertex array of the current context.
@@ -105,7 +116,7 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   `TextNode::setColor()`/`setUseColor()` (fixed colour independent of lighting).
 - `Mesh::colors()`, `Mesh::updateColors()`, `MeshNode::updateColors()` and `Mesh::vertexCount()`:
   change vertex colours after a mesh was built.
-- Transparency: materialswith alpha < 1 are drawn after all opaque objects, back to front, with
+- Transparency: materials with alpha < 1 are drawn after all opaque objects, back to front, with
   alpha blending (`setAlpha()` had no visible effect before). Blended materials (`GlowMaterial`,
   `MistMaterial`, ...), particles and billboards are ordered the same way, so blended nodes no
   longer need to be added last. `Node::setRenderLayer()` chooses a layer explicitly
@@ -308,6 +319,7 @@ First public pre-release of ivf2: scene graph, primitives, materials and lightin
 text rendering, model loading with assimp, keyframe animation, procedural geometry (generator),
 ImGui-based user interface and around 20 examples.
 
-[Unreleased]: https://github.com/jonaslindemann/ivf2/compare/v2.0.0-alpha.2...HEAD
+[Unreleased]: https://github.com/jonaslindemann/ivf2/compare/v2.0.0-alpha.3...HEAD
+[2.0.0-alpha.3]: https://github.com/jonaslindemann/ivf2/compare/v2.0.0-alpha.2...v2.0.0-alpha.3
 [2.0.0-alpha.2]: https://github.com/jonaslindemann/ivf2/compare/2.0.0-alpha...v2.0.0-alpha.2
 [2.0.0-alpha]: https://github.com/jonaslindemann/ivf2/releases/tag/2.0.0-alpha

@@ -6,8 +6,7 @@ visualisation and creative coding. Based on a review of the code base in Novembe
 
 ## Status (26 November 2026)
 
-Latest release: **2.0.0-alpha.2** (22 November 2026). `main` adds the render queue (unreleased,
-see `CHANGELOG.md`).
+Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHANGELOG.md`).
 
 | Phase | State |
 |-------|-------|

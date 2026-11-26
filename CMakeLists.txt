@@ -83,7 +83,7 @@ project(ivf2
 # Semantic versioning (see CONTRIBUTING.md): the version above plus an optional
 # pre-release label ("alpha.2", "beta.1", "rc.1"; empty for a final release).
 # Releases are tagged v<version>, e.g. v2.0.0-alpha.2.
-set(IVF2_VERSION_PRERELEASE "alpha.2")
+set(IVF2_VERSION_PRERELEASE "alpha.3")
 if(IVF2_VERSION_PRERELEASE)
     set(IVF2_VERSION_FULL "${PROJECT_VERSION}-${IVF2_VERSION_PRERELEASE}")
 else()

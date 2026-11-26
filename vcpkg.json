@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "ivf2",
-  "version-semver": "2.0.0-alpha.2",
+  "version-semver": "2.0.0-alpha.3",
   "description": "Interactive Visualisation Framework 2 - a C++23 scene graph library for OpenGL",
   "homepage": "https://github.com/jonaslindemann/ivf2",
   "license": "MIT",

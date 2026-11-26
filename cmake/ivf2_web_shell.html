@@ -12,7 +12,7 @@
                font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
   #canvas { display: block; width: 100vw; height: 100vh; outline: none; touch-action: none; }
   #status { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
-            justify-content: center; gap: 14px; pointer-events: none; }
+            justify-content: center; gap: 14px; pointer-events: none; padding: 0 10%; text-align: center; }
   #status.hidden { display: none; }
   #status.error { color: #ff8a80; }
   #bar { width: 220px; height: 3px; background: #33363d; border-radius: 2px; overflow: hidden; }
@@ -30,6 +30,8 @@
   let failed = false;
 
   function showError(text) {
+    if (failed)
+      return; // keep the first message: later ones follow from it
     failed = true;
     message.textContent = text;
     statusBox.className = 'error';
@@ -60,7 +62,11 @@
     },
     onAbort: (what) => showError('The program stopped: ' + what),
   };
-  if (!document.createElement('canvas').getContext('webgl2'))
+  if (location.protocol === 'file:')
+    showError('Browsers do not load WebAssembly from files opened directly. Serve this folder over HTTP, ' +
+              'e.g. "python -m http.server" in it, and open http://localhost:8000/' +
+              location.pathname.split('/').pop() + ' (or run "emrun ' + location.pathname.split('/').pop() + '").');
+  else if (!document.createElement('canvas').getContext('webgl2'))
     showError('This page needs WebGL 2, which this browser does not provide.');
   window.addEventListener('error', (e) => showError('Error: ' + e.message));
 </script>

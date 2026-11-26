@@ -1,7 +1,7 @@
 /**
  * @file reflection1.cpp
  * @brief Planar reflections on a water surface with PlanarReflection and WaterMaterial.
- * @ingroup effect_examples
+ * @ingroup effects_examples
  *
  * Demonstrates:
  *  - PlanarReflection rendering the scene mirrored in the water plane

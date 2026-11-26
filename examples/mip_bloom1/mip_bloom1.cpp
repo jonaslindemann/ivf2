@@ -1,7 +1,7 @@
 /**
  * @file mip_bloom1.cpp
  * @brief Wide glow with MipBloomEffect, blended shader materials and a guided camera path.
- * @ingroup effect_examples
+ * @ingroup effects_examples
  *
  * Demonstrates:
  *  - MipBloomEffect: a wide, soft halo from the mip chain with soft tone mapping

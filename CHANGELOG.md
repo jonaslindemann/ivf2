@@ -198,6 +198,8 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
+- API reference: examples grouped by topic, wrong parameter names and duplicate example names in
+  the documentation comments fixed, `ivfvis` and `ivfmath` included, styled like the user guide.
 - Lit materials with vertex colours (`Material::setUseVertexColor(true)`) used the material's
   diffuse and ambient colour for the light; the vertex colour now takes their place.
 - Every `TextNode` rendered its own 128 glyph textures (never freed); glyphs are now created once

@@ -3,7 +3,7 @@
  * @brief Primitives example
  * @author Jonas Lindemann
  * @example primitives1.cpp
- * @ingroup primivites_examples
+ * @ingroup primitives_examples
  *
  * This example demonstrates the creation and rendering of various 3D geometric primitives
  * including spheres, boxes, cylinders, cones, and more. It sets up a basic scene with an axis,

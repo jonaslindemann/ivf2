@@ -17,7 +17,7 @@ private:
 public:
     /**
      * @brief Constructor.
-     * @param size Length of each edge of the cube (default is 1.0).
+     * @param bbox Bounding box to show.
      */
     Extents(BoundingBox bbox);
 
@@ -28,8 +28,8 @@ public:
     [[nodiscard]] static std::shared_ptr<Extents> create(BoundingBox bbox);
 
     /**
-     * @brief Set the size of the cube.
-     * @param size New length for each edge of the cube.
+     * @brief Set the bounding box to show.
+     * @param bbox New bounding box.
      */
     void setBoundingBox(BoundingBox bbox);
 

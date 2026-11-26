@@ -1,8 +1,8 @@
 /**
- * @file scene_ui1.cpp
- * @brief Hello IVF example
+ * @file bbox1.cpp
+ * @brief Bounding boxes of nodes
  * @author Jonas Lindemann
- * @example scene_ui1.cpp
+ * @example bbox1.cpp
  * @ingroup ui_examples
  *
  * This example demonstrates the use of the IVF library to create a scene with

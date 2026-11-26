@@ -1,7 +1,7 @@
 /**
  * @file vis_colormaps1.cpp
  * @brief ivfvis: colormaps, vertex colouring by scalar values and a colour bar.
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates the foundation of the ivfvis module:
  *  - the built-in colormaps (viridis, magma, inferno, plasma, cividis, turbo, coolwarm, gray),

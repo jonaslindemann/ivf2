@@ -1,7 +1,7 @@
 /**
  * @file dof1.cpp
  * @brief Depth of field with DepthOfFieldEffect.
- * @ingroup effect_examples
+ * @ingroup effects_examples
  *
  * Demonstrates DepthOfFieldEffect:
  *  - Manual focus distance with a sharp focus range and a blur ramp

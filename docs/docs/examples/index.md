@@ -85,6 +85,21 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 | `time_control1` | Pause, slow motion and time scaling for a whole scene | [Time Control](../core/time_controller.md) |
 | `behaviors1` | Reusable behaviours attached to nodes: spin, pulse, follow a spline | |
 
+## Scientific visualisation
+
+The `ivfvis` examples; see [Scientific Visualisation](../visualisation/index.md) and the [Visualisation Examples](visualisation_examples.md).
+
+| Example | Shows | Guide |
+|---------|-------|-------|
+| `vis_colormaps1` | The built-in colormaps on a height field, vertex colouring from grid data, and a colour bar | [Colormaps](../visualisation/colormaps.md) |
+| `vis_points1` | Half a million points of the Lorenz attractor, coloured by speed on the GPU; sizes, shapes, transparency and point picking | [Point Clouds](../visualisation/point_clouds.md) |
+| `vis_scalar1` | Isosurfaces (a translucent shell and a surface coloured by height) and contoured slice planes through a 3D field, with live sliders | [Isosurfaces and Slices](../visualisation/scalar_fields.md) |
+| `vis_vectors1` | Arrow glyphs and field-line tubes of a magnetic dipole, coloured on a log scale; click an arrow for its vector | [Glyphs and Streamlines](../visualisation/vector_fields.md) |
+| `vis_volume1` | Volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor | [Volume Rendering](../visualisation/volumes.md) |
+| `vis_axes1` | A surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera | [Axes and Labels](../visualisation/axes.md) |
+| `vis_readers1` | Reading a CSV table as a point cloud, a NumPy array as an isosurface and a VTK XML mesh coloured by curvature | [Reading Data Files](../visualisation/readers.md) |
+| `vis_dashboard1` | A 3D slice linked to ImPlot plots: a probe profile and a histogram whose drag lines set the colour range | [2D Plots](../visualisation/plots.md) |
+
 ## Creative coding and sound
 
 | Example | Shows | Guide |
@@ -102,14 +117,6 @@ Most other examples use `GLFWSceneWindow`, which does the setup in `hello_ivf` f
 |---------|-------|-------|
 | `selection1` | Highlighting objects under the mouse | [Selection](../advanced/selection.md) |
 | `picking1` | Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model | [Selection](../advanced/selection.md#ray-picking) |
-| `vis_dashboard1` | ivfvis: a 3D slice linked to ImPlot plots - a probe profile and a histogram whose drag lines set the colour range | [2D Plots](../visualisation/plots.md) |
-| `vis_readers1` | ivfvis: reading a CSV table as a point cloud, a NumPy array as an isosurface and a VTK XML mesh coloured by curvature | [Reading Data Files](../visualisation/readers.md) |
-| `vis_axes1` | ivfvis: a surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera | [Axes and Labels](../visualisation/axes.md) |
-| `vis_volume1` |ivfvis: volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor | [Volume Rendering](../visualisation/volumes.md) |
-| `vis_vectors1` |ivfvis: arrow glyphs and field-line tubes of a magnetic dipole, coloured on a log scale; click an arrow for its vector | [Glyphs and Streamlines](../visualisation/vector_fields.md) |
-| `vis_scalar1` |ivfvis: isosurfaces (a translucent shell and a surface coloured by height) and contoured slice planes through a 3D field, with live sliders | [Isosurfaces and Slices](../visualisation/scalar_fields.md) |
-| `vis_points1` |ivfvis: half a million points of the Lorenz attractor, coloured by speed on the GPU; sizes, shapes, transparency and point picking | [Point Clouds](../visualisation/point_clouds.md) |
-| `vis_colormaps1` |ivfvis: the built-in colormaps on a height field, vertex colouring from grid data, and a colour bar | [Colormaps](../visualisation/colormaps.md) |
 | `cursor1`, `cursor_optimization` | The 3D cursor and its ground projection | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `editor1` | Starting point for an editor: floor grid and the 3D mouse position | [Selection](../advanced/selection.md#the-3d-cursor-position) |
 | `ui1`, `ui2`, `scene_ui1` | ImGui windows combined with a scene | [UI Windows](../ui/ui_windows.md) |

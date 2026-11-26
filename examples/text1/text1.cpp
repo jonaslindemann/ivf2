@@ -3,7 +3,7 @@
  * @brief Text example
  * @author Jonas Lindemann
  * @example text1.cpp
- * @ingroup primitive_examples
+ * @ingroup primitives_examples
  *
  * This example demonstrates how to create a simple scene with text rendering
  * using the IVF library. It sets up a window, initializes a text node, and

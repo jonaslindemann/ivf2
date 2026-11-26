@@ -1,0 +1,72 @@
+/**
+ * @defgroup examples Examples by topic
+ * @brief The example programs in examples/, grouped by what they show.
+ *
+ * Every example is a standalone program built with the library; the user guide's
+ * Example Gallery shows what each one draws.
+ */
+
+/** @defgroup general_examples General
+ *  @ingroup examples
+ *  @brief Scene setup, rendering features, materials and windows. */
+
+/** @defgroup primitives_examples Primitives
+ *  @ingroup examples
+ *  @brief Basic and complex primitives. */
+
+/** @defgroup mesh_examples Meshes
+ *  @ingroup examples
+ *  @brief Building meshes by hand. */
+
+/** @defgroup texture_examples Textures
+ *  @ingroup examples
+ *  @brief Texture mapping, procedural textures and skyboxes. */
+
+/** @defgroup lighting_examples Lighting
+ *  @ingroup examples
+ *  @brief Point, directional and spot lights. */
+
+/** @defgroup effects_examples Effects and shadows
+ *  @ingroup examples
+ *  @brief Post-processing, HDR, shadows and reflections. */
+
+/** @defgroup deformer_examples Deformers
+ *  @ingroup examples
+ *  @brief Mesh deformation. */
+
+/** @defgroup animation_examples Animation
+ *  @ingroup examples
+ *  @brief Keyframes, splines and procedural motion. */
+
+/** @defgroup tween_examples Tweens
+ *  @ingroup examples
+ *  @brief Event-driven transitions. */
+
+/** @defgroup behavior_examples Behaviours
+ *  @ingroup examples
+ *  @brief Reusable behaviours attached to nodes. */
+
+/** @defgroup particle_examples Particles
+ *  @ingroup examples
+ *  @brief Particle systems. */
+
+/** @defgroup physics_examples Physics
+ *  @ingroup examples
+ *  @brief Rigid bodies with ReactPhysics3D. */
+
+/** @defgroup file_io_examples Files and models
+ *  @ingroup examples
+ *  @brief Model loading and scene files. */
+
+/** @defgroup ui_examples User interface
+ *  @ingroup examples
+ *  @brief ImGui windows and scene tools. */
+
+/** @defgroup debug_examples Debugging
+ *  @ingroup examples
+ *  @brief Debug drawing and diagnostics. */
+
+/** @defgroup visualisation_examples Scientific visualisation
+ *  @ingroup examples
+ *  @brief ivfvis: colormaps, point clouds, isosurfaces, slices, glyphs, streamlines,
+ *  volumes, axes, file readers and 2D plots. */

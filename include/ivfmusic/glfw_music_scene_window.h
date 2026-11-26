@@ -184,7 +184,7 @@ protected:
      * @param time Song time in seconds.
      * @param dt Frame time in seconds.
      */
-    virtual void onSceneUpdate(double /*time*/, double /*dt*/) {}
+    virtual void onSceneUpdate([[maybe_unused]] double time, [[maybe_unused]] double dt) {}
 
     /** @brief Draw scene-specific development UI (not called in presentation mode). */
     virtual void onSceneUi() {}

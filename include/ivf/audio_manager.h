@@ -4,14 +4,14 @@
  * @file audio_manager.h
  * @brief Audio playback and capture singleton using miniaudio.
  *
- * @section Requirements
+ * @section audio_requirements Requirements
  * Requires miniaudio (CMake option IVF2_WITH_AUDIO, default ON; check
  * IVF2_HAS_AUDIO in ivf/config.h). Without it every method is a safe no-op.
  *
  * AudioManager uses a pimpl so this header has zero dependency on miniaudio types.
  * `audio_manager.cpp` is the only translation unit that includes miniaudio.
  *
- * @section Usage
+ * @section audio_usage Usage
  * @code
  * // In onSetup():
  * auto audio = AudioManager::create();

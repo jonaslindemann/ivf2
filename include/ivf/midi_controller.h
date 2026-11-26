@@ -4,20 +4,20 @@
  * @file midi_controller.h
  * @brief MIDI input wrapper using RtMidi.
  *
- * @section Requirements
+ * @section midi_requirements Requirements
  * Requires RtMidi (CMake option IVF2_WITH_MIDI, default ON; check IVF2_HAS_MIDI
  * in ivf/config.h). Without it every method is a safe no-op.
  *
  * MidiController uses a pimpl so this header has zero dependency on RtMidi types.
  * `midi_controller.cpp` is the only translation unit that includes RtMidi.
  *
- * @section Threading
+ * @section midi_threading Threading
  * RtMidi delivers messages on its own thread. MidiController parses them into
  * MidiMessage values and pushes them onto an internal mutex-guarded queue. The
  * application drains the queue from its main/render thread via poll(), so all
  * downstream parameter writes happen on the main thread.
  *
- * @section Usage
+ * @section midi_usage Usage
  * @code
  * // In onSetup():
  * auto midi = MidiController::create();

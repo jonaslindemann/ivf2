@@ -1,7 +1,7 @@
 /**
  * @file vis_volume1.cpp
  * @brief ivfvis: volume rendering of a CT-like scalar field, mixed with opaque geometry.
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates ivfvis::Volume:
  *  - a synthetic "scan" on a 128^3 ivfvis::UniformGrid: a shell, soft tissue with structure

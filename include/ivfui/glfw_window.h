@@ -481,8 +481,14 @@ public:
      * @param action Key action.
      * @param mods Modifier flags.
      */
-    virtual void doScroll(double xoffset, double yoffset);
     virtual void doKey(int key, int scancode, int action, int mods);
+
+    /**
+     * @brief Handle scroll events (override for custom behavior).
+     * @param xoffset Horizontal scroll offset.
+     * @param yoffset Vertical scroll offset.
+     */
+    virtual void doScroll(double xoffset, double yoffset);
 
     /**
      * @brief Handle mouse position events (override for custom behavior).

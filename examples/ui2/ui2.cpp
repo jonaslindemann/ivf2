@@ -1,8 +1,8 @@
 /**
- * @file ui1.cpp
+ * @file ui2.cpp
  * @brief UI example with multiple transforms
  * @author Jonas Lindemann
- * @example ui1.cpp
+ * @example ui2.cpp
  * @ingroup ui_examples
  *
  * This example demonstrates the use of the IVF library to create a scene with

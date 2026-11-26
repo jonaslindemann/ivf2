@@ -10,11 +10,11 @@
  *  - Frames are captured without the UI and written on background threads
  *
  * Interactive: E exports 4 seconds starting at t = 0, S saves a screenshot.
- * Batch:       frame_export1 --export <dir> [--fps N] [--frames N]
+ * Batch:       frame_export1 --export \<dir\> [--fps N] [--frames N]
  *              renders the frames and exits.
  *
  * Make a video with:
- *   ffmpeg -framerate 30 -i <dir>/frame_%06d.png -c:v libx264 -pix_fmt yuv420p -crf 16 out.mp4
+ *   ffmpeg -framerate 30 -i \<dir\>/frame_%06d.png -c:v libx264 -pix_fmt yuv420p -crf 16 out.mp4
  */
 
 #include <imgui.h>

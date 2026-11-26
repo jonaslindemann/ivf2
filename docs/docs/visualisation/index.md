@@ -14,8 +14,68 @@ target_link_libraries(my_app PRIVATE ivf2::ivf2 ivf2::ivfvis)
 
 It is built by default; `-DIVF2_BUILD_VIS=OFF` leaves it out. It needs no libraries beyond ivf itself; reading VTK XML files uses pugixml and miniz (`IVF2_WITH_VTK_XML`), and 2D plots use ImPlot in ivfui (`IVF2_WITH_IMPLOT`), both on by default.
 
-!!! note "Work in progress"
-    `ivfvis` grows in steps (see `ROADMAP.md`, phase 3.1). Available now: data sets, colormaps, vertex colouring, colour bars, point clouds, isosurfaces, slice planes, glyphs, streamlines, volume rendering, 3D axes, readers for CSV, NumPy and VTK files, and 2D plots with ImPlot.
+<div class="ivf-gallery" markdown>
+
+- [![Colormaps](../images/gallery/vis_colormaps1.jpg) Colormaps and colour bars](colormaps.md)
+- [![Point clouds](../images/gallery/vis_points1.jpg) Point clouds](point_clouds.md)
+- [![Isosurfaces and slices](../images/gallery/vis_scalar1.jpg) Isosurfaces and slices](scalar_fields.md)
+- [![Glyphs and streamlines](../images/gallery/vis_vectors1.jpg) Glyphs and streamlines](vector_fields.md)
+- [![Volume rendering](../images/gallery/vis_volume1.jpg) Volume rendering](volumes.md)
+- [![Axes](../images/gallery/vis_axes1.jpg) Axes and labels](axes.md)
+- [![Readers](../images/gallery/vis_readers1.jpg) Reading data files](readers.md)
+- [![2D plots](../images/gallery/vis_dashboard1.jpg) 2D plots](plots.md)
+
+</div>
+
+## A first visualisation
+
+A complete program: a density field on a grid, shown by an isosurface and a contoured slice, with axes and a colour bar.
+
+```cpp
+#include <ivfui/ui.h>
+#include <ivfvis/ivfvis.h>
+
+#include <cmath>
+
+class FieldWindow : public ivfui::GLFWSceneWindow {
+public:
+    using GLFWSceneWindow::GLFWSceneWindow;
+
+    int onSetup() override
+    {
+        // Data: a density field on a 64^3 grid
+        auto grid = ivfvis::UniformGrid::create({64, 64, 64}, ivf::BoundingBox({-1, -1, -1}, {1, 1, 1}));
+        grid->fillScalars("density", [](const glm::vec3 &p) {
+            const glm::vec3 q = p - glm::vec3(0.5f);
+            return std::exp(-4.0f * glm::dot(p, p)) + 0.5f * std::exp(-20.0f * glm::dot(q, q));
+        });
+
+        auto cmap = ivfvis::Colormap::create(ivfvis::BuiltinColormap::Viridis);
+        cmap->setRange(grid->range("density"));
+
+        // A surface of constant density, a cut through the field, axes and a colour bar
+        add(ivfvis::Isosurface::create(grid, "density", 0.4f));
+        auto slice = ivfvis::SlicePlane::create(grid, "density", cmap);
+        slice->setAxis(ivfvis::SliceAxis::Z, -0.3f);
+        slice->setContours(6);
+        add(slice);
+        add(ivfvis::Axes3D::create(grid->bounds()));
+        add(ivfvis::ColorBar::create(cmap));
+
+        cameraManipulator()->setCameraPosition({2.4f, 1.6f, 3.2f});
+        return 0;
+    }
+};
+
+int main()
+{
+    auto app = ivfui::GLFWApplication::create();
+    app->addWindow(std::make_shared<FieldWindow>(1280, 720, "My first visualisation"));
+    return app->loop();
+}
+```
+
+Link it with `ivf2::ivf2` and `ivf2::ivfvis`. The rest of this section explains the parts: [data sets](#data-sets) hold the values, [colormaps](colormaps.md) turn them into colours, and the nodes ([point clouds](point_clouds.md), [isosurfaces and slices](scalar_fields.md), [glyphs and streamlines](vector_fields.md), [volumes](volumes.md), [axes](axes.md)) draw them. Data can also come from [files](readers.md), and [2D plots](plots.md) go next to the 3D view. The [Visualisation Examples](../examples/visualisation_examples.md) show each part in a complete program.
 
 ## Data sets
 

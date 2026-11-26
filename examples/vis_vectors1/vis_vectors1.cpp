@@ -1,7 +1,7 @@
 /**
  * @file vis_vectors1.cpp
  * @brief ivfvis: glyphs and streamlines of a vector field (a magnetic dipole).
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates vector field visualisation with ivfvis:
  *  - an ivfvis::VectorField given by a function (the field of a magnetic dipole)

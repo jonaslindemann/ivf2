@@ -98,6 +98,7 @@ nav = [
     { "UI Examples" = "examples/ui_examples.md" },
     { "Time Control Examples" = "examples/time_control_examples.md" },
     { "Flow Field Examples" = "examples/flow_field_examples.md" },
+    { "Visualisation Examples" = "examples/visualisation_examples.md" },
     { "Camera Animation Examples" = "examples/camera_anim_examples.md" },
     { "Music Scene Examples" = "examples/music_examples.md" },
   ] },

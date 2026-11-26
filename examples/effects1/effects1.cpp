@@ -3,7 +3,7 @@
  * @brief Post-processing effects example
  * @author Jonas Lindemann
  * @example effects1.cpp
- * @ingroup effect_examples
+ * @ingroup effects_examples
  *
  * This example demonstrates the use of various post-processing effects
  * including blur, tint, film grain, chromatic aberration, vignette,

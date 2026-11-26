@@ -1,8 +1,8 @@
 /**
- * @file assimp1.cpp
- * @brief Assimp model loading example
+ * @file editor_example.cpp
+ * @brief Scene editor example
  * @author Jonas Lindemann
- * @example assimp1.cpp
+ * @example editor_example.cpp
  * @ingroup file_io_examples
  *
  * This example demonstrates loading and displaying a 3D model using the Assimp library.

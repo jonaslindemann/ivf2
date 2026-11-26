@@ -1,7 +1,7 @@
 /**
  * @file vis_scalar1.cpp
  * @brief ivfvis: isosurfaces and slice planes through a 3D scalar field.
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates scalar field visualisation with ivfvis:
  *  - an ivfvis::UniformGrid (96^3 points) with a "density" field of Gaussian blobs and a

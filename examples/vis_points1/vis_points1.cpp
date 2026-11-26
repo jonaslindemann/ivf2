@@ -1,7 +1,7 @@
 /**
  * @file vis_points1.cpp
  * @brief ivfvis: a point cloud of half a million points, coloured and sized by data.
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates ivfvis::PointCloud:
  *  - 500 000 points along a trajectory of the Lorenz attractor (an ivfvis::PointSet with

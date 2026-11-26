@@ -17,6 +17,9 @@ Lightweight scene graph library and wrapper over modern OpenGL.
 - **Unified library target** (`ivf2::ivf2`) for easy integration
 - **Automatic asset management** - shaders, fonts, and models copied automatically
 - **Cross-platform** - Windows, Linux, and macOS support
+- **Scientific visualisation** (`ivf2::ivfvis`) - data on grids and at points shown as point
+  clouds, isosurfaces, slices, glyphs, streamlines and volumes, with colormaps, colour bars, 3D
+  axes, readers for CSV, NumPy and VTK files, and 2D plots with ImPlot
 - **Music-driven scenes** (`ivf2::ivfmusic`) - song playback as the master clock, bar-keyed automation with live reload, note events from Renoise songs, presentation mode and frame export
 - **Rich examples** demonstrating lighting, animations, physics, UI, and more - see the
   [Example Gallery](https://interactive-visualisation-framework-2.readthedocs.io/en/latest/examples/gallery/)

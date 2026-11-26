@@ -1,7 +1,7 @@
 /**
  * @file vis_axes1.cpp
  * @brief ivfvis: a surface plot with 3D axes, ticks, labels and grid walls.
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates ivfvis::Axes3D:
  *  - axes fitted to the data's bounding box, with "nice" tick values in data units

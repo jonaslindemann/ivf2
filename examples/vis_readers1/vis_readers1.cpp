@@ -1,7 +1,7 @@
 /**
  * @file vis_readers1.cpp
  * @brief ivfvis: reading data files - CSV, NumPy and VTK XML.
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates the ivfvis readers, one file of each kind (assets/data, written by
  * make_data.py):

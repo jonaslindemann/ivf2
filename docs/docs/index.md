@@ -23,6 +23,17 @@ Physically based materials lit by HDR environments, soft shadows from the sun an
 
 </div>
 
+Scientific visualisation with [ivfvis](visualisation/index.md): data on grids and at points shown as point clouds, isosurfaces, slices, glyphs, streamlines and volumes, with colormaps, axes, file readers and 2D plots:
+
+<div class="ivf-gallery ivf-gallery-wide" markdown>
+
+- [![Volume rendering](images/gallery/vis_volume1.jpg) Volume rendering](visualisation/volumes.md)
+- [![Isosurfaces and slices](images/gallery/vis_scalar1.jpg) Isosurfaces and slices](visualisation/scalar_fields.md)
+- [![Glyphs and streamlines](images/gallery/vis_vectors1.jpg) Glyphs and field lines](visualisation/vector_fields.md)
+- [![Point clouds](images/gallery/vis_points1.jpg) Point clouds](visualisation/point_clouds.md)
+
+</div>
+
 All of these are example programs you can run and change. The [Example Gallery](examples/gallery.md) shows every example; the topics below lead to the guides.
 
 <div class="ivf-gallery" markdown>
@@ -35,6 +46,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 - [![Deformers](images/sc_deformer2.png) Deformers](examples/deformer_examples.md)
 - [![Animation](images/sc_animation3.png) Animation](examples/animation_examples.md)
 - [![Model loading](images/sc_assimp1.png) Models](examples/asset_examples.md)
+- [![Visualisation](images/gallery/vis_axes1.jpg) Visualisation](examples/visualisation_examples.md)
 
 </div>
 

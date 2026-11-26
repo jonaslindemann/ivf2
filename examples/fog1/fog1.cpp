@@ -1,7 +1,7 @@
 /**
  * @file fog1.cpp
  * @brief Depth-based distance and height fog with FogEffect.
- * @ingroup effect_examples
+ * @ingroup effects_examples
  *
  * Demonstrates FogEffect:
  *  - Distance fog reconstructed from the scene depth buffer

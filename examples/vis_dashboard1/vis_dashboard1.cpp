@@ -1,7 +1,7 @@
 /**
  * @file vis_dashboard1.cpp
  * @brief ivfvis: a 3D view linked to 2D plots (ImPlot) - a probe profile and a histogram.
- * @ingroup general_examples
+ * @ingroup visualisation_examples
  *
  * Demonstrates 2D plots next to the 3D scene:
  *  - a temperature field on an ivfvis::UniformGrid, shown by a slice plane with contours,

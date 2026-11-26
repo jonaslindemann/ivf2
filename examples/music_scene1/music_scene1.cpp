@@ -1,7 +1,7 @@
 /**
  * @file music_scene1.cpp
  * @brief A scene driven by a song with GLFWMusicSceneWindow, SongTransport and Automation.
- * @ingroup effect_examples
+ * @ingroup effects_examples
  *
  * Demonstrates the ivfmusic library:
  *  - GLFWMusicSceneWindow: the song position drives the scene; transport bar,

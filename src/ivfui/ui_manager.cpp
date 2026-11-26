@@ -6,6 +6,7 @@
 #include <ivfui/ui_font.h>
 
 #include <ivf/config.h>
+#include <ivf/render_context.h>
 
 #if IVF2_HAS_IMPLOT
 #include <implot.h>
@@ -73,7 +74,7 @@ UiRenderer::UiRenderer(GLFWwindow *window)
 
     // Setup Platform/Renderer backends
 
-    const char *glsl_version = "#version 150";
+    const char *glsl_version = ivf::RenderContext::isGles() ? "#version 300 es" : "#version 150";
     ImGui_ImplGlfw_InitForOpenGL(window, false);
     ImGui_ImplOpenGL3_Init(glsl_version);
 }

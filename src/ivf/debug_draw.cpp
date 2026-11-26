@@ -1,5 +1,6 @@
 #include <ivf/debug_draw.h>
 #include <ivf/render_context.h>
+#include <ivf/glsl_es.h>
 #include <ivf/shader_manager.h>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -56,11 +57,15 @@ void DebugDraw::init()
 
     // Compile inline shader
     auto vert = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vert, 1, &k_vertSrc, nullptr);
+    const std::string vertCode = prepareShaderSource(k_vertSrc); // GLSL ES on OpenGL ES
+    const char *vertPtr = vertCode.c_str();
+    glShaderSource(vert, 1, &vertPtr, nullptr);
     glCompileShader(vert);
 
     auto frag = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag, 1, &k_fragSrc, nullptr);
+    const std::string fragCode = prepareShaderSource(k_fragSrc);
+    const char *fragPtr = fragCode.c_str();
+    glShaderSource(frag, 1, &fragPtr, nullptr);
     glCompileShader(frag);
 
     m_program = glCreateProgram();

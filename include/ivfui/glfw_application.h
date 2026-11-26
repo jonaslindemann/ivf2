@@ -29,6 +29,7 @@ namespace ivfui {
 class GLFWApplication {
 private:
     std::vector<GLFWWindowPtr> m_windows; ///< List of managed GLFW windows.
+    int m_error = 0;                      ///< Last error reported by a window (exit code of loop()).
 
 public:
     /**
@@ -54,10 +55,19 @@ public:
     void addWindow(GLFWWindowPtr window);
 
     /**
-     * @brief Run the main application loop.
-     * @return int Exit code.
+     * @brief Run the main application loop until all windows are closed.
+     *
+     * In a browser (Emscripten) the page drives the frames: loop() hands frame() to the
+     * browser and does not return; the application stays alive with the page.
+     * @return int Exit code: the last error a window reported, 0 if none.
      */
     int loop();
+
+    /**
+     * @brief Draw one frame of every open window (no event polling).
+     * @return false when all windows are closed.
+     */
+    bool frame();
 
     /**
      * @brief Poll for windowing and input events.

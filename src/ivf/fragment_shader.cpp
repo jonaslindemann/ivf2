@@ -35,7 +35,8 @@ bool FragmentShader::compile()
     // Create new shader from source
     
     m_id = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* source = m_shaderCode.c_str();
+    const std::string code = this->compileSource(); // GLSL ES on OpenGL ES
+    const char* source = code.c_str();
     glShaderSource(m_id, 1, &source, 0);
     glCompileShader(m_id);
     

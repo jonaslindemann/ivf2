@@ -81,7 +81,7 @@ private:
     int m_lastError;            ///< Last error code.
     UiRendererPtr m_uiRenderer; ///< UI renderer for this window.
     ivf::RenderContextPtr m_renderContext; ///< ivf resources of this window's GL context.
-    int m_swapInterval{-1};     ///< Swap interval last set for this window (-1 = not set).
+    [[maybe_unused]] int m_swapInterval{-1}; ///< Swap interval last set (-1 = not set; unused in web builds).
 
     // Scroll
     double m_scrollX;           ///< Last scroll X offset.

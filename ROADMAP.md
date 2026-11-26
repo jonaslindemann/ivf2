@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **Next: 3.2 Python bindings** |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: step 1 done (preset `wasm`, `hello_ivf` in the browser); **next: step 2** (GLES compatibility). 3.2 Python bindings after the web target |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -823,6 +823,51 @@ clearest way to stand out.
    windowing; publish wheels. Opens the library to scientists, students and Jupyter users.
 3. **Web target.** Emscripten build (GLES 3 / WebGL2) so examples run in the browser -
    the best possible showcase in the documentation.
+
+   **Plan.** The same libraries compiled to WebAssembly with Emscripten, rendering through
+   WebGL2 (OpenGL ES 3.0); no separate renderer. A `wasm` CMake preset uses vcpkg's
+   `wasm32-emscripten` triplet (GLFW from Emscripten itself; ImGui, glm, FreeType, stb,
+   cgltf from vcpkg) with assimp, audio, MIDI and ivfmusic off. glad stays: on the web
+   `RenderContext::create()` loads it through a shim that reports GL 3.3 and forwards to
+   Emscripten, so headers and call sites stay unchanged; the few desktop-only calls
+   (`glPolygonMode`, multisampled textures, border clamping, debug output) check
+   `RenderContext::isGles()`. Shaders keep `#version 330 core`; `Shader` rewrites the
+   version line to `#version 300 es` with default precisions when compiling on GLES, so
+   one source serves both. One window per page (the canvas), no threads (so GitHub Pages
+   can host the builds without special headers). One branch per step, like `ivfvis`.
+
+   1. *Toolchain and first example.* `wasm` preset and vcpkg platform filters; GL loader
+      shim and `isGles()`; shader version translation; `GLFWApplication::run()` split into
+      a per-frame step driven by `emscripten_set_main_loop`; `ivf2_add_example()` builds
+      `.html`/`.js`/`.wasm` with shaders, fonts and assets preloaded and a page template.
+      `hello_ivf` runs in the browser.
+      *Done:* preset `wasm` (vcpkg triplet `wasm32-emscripten`; `glfw3`/`opengl` filtered
+      out, Emscripten's GLFW and WebGL 2 as `glfw`/`OpenGL::GL` targets). `RenderContext`
+      loads glad through a shim reporting GL 3.3 on OpenGL ES; `isGles()`. `ivf/glsl_es.h`:
+      `translateToGlslEs()` (version line first, precisions, `#line`; uniform initialisers
+      removed and set after linking as `UniformDefault`s, since ES has none) used by
+      `Shader`/`Program` and the classes compiling their own shaders; GL-free tests.
+      `GLFWApplication::frame()` runs under `emscripten_set_main_loop`, the canvas follows
+      its CSS size. `ivf2_web_executable()` (page template `cmake/ivf2_web_shell.html`,
+      preloaded `shaders/`, `fonts/` and listed assets, function names kept);
+      `add_ivf2_example(... WEB_ASSETS ...)`. Guarded for GLES: polygon modes, GPU timer
+      queries, debug output. Fixed on the way: constant sampler indices for multitexturing,
+      `SubdivideShape` with newer Clang. `hello_ivf` runs in Chrome (headless, SwiftShader),
+      camera control included.
+   2. *GLES compatibility.* Desktop-only GL replaced or guarded: MSAA through multisampled
+      renderbuffers (also on desktop), shadow map borders in the shader, wireframe,
+      float render targets (`EXT_color_buffer_float`), depth blits; every built-in shader
+      compiles as GLSL ES 3.00 (a GL-free test translates and validates them with
+      glslang where available). Lighting, shadows, PBR, HDR and effects examples run.
+   3. *Examples.* The examples build for the web (a list of exclusions: threads, MIDI,
+      audio, several windows, file dialogs); ImGui and ImPlot; ivfvis (point clouds,
+      volumes); resizing with the page and high-DPI canvases; environment variables
+      (`IVF2_FIXED_TIMESTEP`, ...) from the page URL.
+   4. *CI and documentation.* A CI job builds the web examples (emsdk cached) and smoke
+      tests them in headless Chrome; the docs workflow publishes them under `web/`, guide
+      pages embed or link the live examples, and a "Web" guide page explains building
+      your own app for the browser.
+   5. *Wrap-up.* Gallery with live links, changelog, README.
 4. **Headless and offline rendering.** Render without a visible window (EGL/OSMesa),
    video export through an ffmpeg pipe from `FrameWriter`, deterministic time stepping.
    Useful for figure generation, CI and music videos (`ivfmusic`).
@@ -854,4 +899,5 @@ clearest way to stand out.
 4. Render queue + uniform buffers (2.1, 2.2) - the base for HDR, IBL, shadows. *Render queue
    done; uniform handling is next.*
 5. Scientific visualisation module and Python bindings (3.1, 3.2) - the main differentiators.
-   *Visualisation module done; Python bindings are next.*
+   *Visualisation module done; the web target (3.3) is in progress and comes before the Python
+   bindings.*

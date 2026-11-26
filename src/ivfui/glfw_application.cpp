@@ -9,6 +9,11 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+#include <emscripten/html5.h>
+#endif
+
 using namespace ivf;
 using namespace ivfui;
 
@@ -132,27 +137,51 @@ int GLFWApplication::loop()
 {
     logInfo("Starting main application loop", "GLFWApplication");
 
-    int anyError = 0;
-
-    while (true) {
-        bool hasOpenWindows = false;
-
-        for (auto window : m_windows) {
-            if (window->lastError() != 0)
-                anyError = window->lastError();
-
-            if (!window->isClosing()) {
-                hasOpenWindows = true;
-                window->draw();
-            }
-        }
-
-        if (!hasOpenWindows)
-            break;
-
+#ifdef __EMSCRIPTEN__
+    // The browser calls frame() before each repaint (requestAnimationFrame) and delivers the
+    // input events in between. simulate_infinite_loop: main() is left without running
+    // destructors, so the application and its windows live on with the page.
+    emscripten_set_main_loop_arg(
+        [](void *app) {
+            if (!static_cast<GLFWApplication *>(app)->frame())
+                emscripten_cancel_main_loop();
+        },
+        this, 0, true);
+    return 0;
+#else
+    while (this->frame())
         this->pollEvents();
+    return m_error;
+#endif
+}
+
+bool GLFWApplication::frame()
+{
+    bool hasOpenWindows = false;
+
+    for (auto &window : m_windows)
+    {
+        if (window->lastError() != 0)
+            m_error = window->lastError();
+
+        if (!window->isClosing())
+        {
+            hasOpenWindows = true;
+#ifdef __EMSCRIPTEN__
+            // The canvas is sized by the page (CSS); give its drawing buffer the same size.
+            double cssWidth = 0.0, cssHeight = 0.0;
+            emscripten_get_element_css_size("#canvas", &cssWidth, &cssHeight);
+            int width = 0, height = 0;
+            glfwGetWindowSize(window->ref(), &width, &height);
+            if (cssWidth >= 1.0 && cssHeight >= 1.0 &&
+                (static_cast<int>(cssWidth) != width || static_cast<int>(cssHeight) != height))
+                glfwSetWindowSize(window->ref(), static_cast<int>(cssWidth), static_cast<int>(cssHeight));
+#endif
+            window->draw();
+        }
     }
-    return anyError;
+
+    return hasOpenWindows;
 }
 
 void GLFWApplication::pollEvents()

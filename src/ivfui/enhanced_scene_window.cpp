@@ -167,9 +167,9 @@ void EnhancedSceneWindow::doPreSetup()
 
         // Create a random colored material
         auto material = Material::create();
-        float r = static_cast<float>(rand()) / RAND_MAX;
-        float g = static_cast<float>(rand()) / RAND_MAX;
-        float b = static_cast<float>(rand()) / RAND_MAX;
+        float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        float g = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+        float b = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
         material->setDiffuseColor(glm::vec4(r, g, b, 1.0f));
         sphere->setMaterial(material);
 

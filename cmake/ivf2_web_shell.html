@@ -1,0 +1,69 @@
+<!doctype html>
+<!-- ivf2 web page template (ivf2_web_executable): a full-window canvas with a loading indicator.
+     Emscripten replaces the SCRIPT placeholder at the end with the program's loader. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ivf2</title>
+<link rel="icon" href="data:,">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #191b1f; color: #e6e6e6;
+               font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  #canvas { display: block; width: 100vw; height: 100vh; outline: none; touch-action: none; }
+  #status { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 14px; pointer-events: none; }
+  #status.hidden { display: none; }
+  #status.error { color: #ff8a80; }
+  #bar { width: 220px; height: 3px; background: #33363d; border-radius: 2px; overflow: hidden; }
+  #bar > div { width: 0; height: 100%; background: #f5c400; transition: width 0.15s; }
+  #status.error #bar { display: none; }
+</style>
+</head>
+<body>
+<canvas id="canvas" tabindex="-1"></canvas>
+<div id="status"><div id="message">Loading...</div><div id="bar"><div></div></div></div>
+<script>
+  const statusBox = document.getElementById('status');
+  const message = document.getElementById('message');
+  const bar = document.querySelector('#bar > div');
+  let failed = false;
+
+  function showError(text) {
+    failed = true;
+    message.textContent = text;
+    statusBox.className = 'error';
+  }
+
+  const canvas = document.getElementById('canvas');
+  canvas.addEventListener('contextmenu', (e) => e.preventDefault()); // right button: camera
+  canvas.addEventListener('webglcontextlost', (e) => {
+    e.preventDefault();
+    showError('The WebGL context was lost - reload the page.');
+  });
+
+  var Module = {
+    canvas: canvas,
+    print: (...args) => console.log(args.join(' ')),
+    printErr: (...args) => console.warn(args.join(' ')),
+    setStatus: (text) => {
+      if (failed)
+        return;
+      const progress = text.match(/\((\d+(?:\.\d+)?)\/(\d+)\)/); // "Downloading data... (n/total)"
+      if (progress)
+        bar.style.width = (100 * progress[1] / progress[2]) + '%';
+      if (text) {
+        message.textContent = text.replace(/\s*\(.*\)$/, '');
+        statusBox.className = '';
+      } else
+        statusBox.className = 'hidden';
+    },
+    onAbort: (what) => showError('The program stopped: ' + what),
+  };
+  if (!document.createElement('canvas').getContext('webgl2'))
+    showError('This page needs WebGL 2, which this browser does not provide.');
+  window.addEventListener('error', (e) => showError('Error: ' + e.message));
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>

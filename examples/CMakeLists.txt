@@ -9,13 +9,16 @@ else()
     set(_ivf2_copy copy_directory_if_different)
 endif()
 
-add_custom_target(copy_example_assets ALL
-    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/shaders" "${IVF2_RUNTIME_OUTPUT_DIR}/shaders"
-    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/fonts"   "${IVF2_RUNTIME_OUTPUT_DIR}/fonts"
-    COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${IVF2_RUNTIME_OUTPUT_DIR}/assets"
-    COMMENT "Copying shared runtime data and example assets to ${IVF2_RUNTIME_OUTPUT_DIR}"
-    VERBATIM)
-set_target_properties(copy_example_assets PROPERTIES FOLDER "examples")
+# Web builds pack the data each page needs into its .data file instead (ivf2_web_executable).
+if(NOT EMSCRIPTEN)
+    add_custom_target(copy_example_assets ALL
+        COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/shaders" "${IVF2_RUNTIME_OUTPUT_DIR}/shaders"
+        COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${IVF2_RUNTIME_DATA_DIR}/fonts"   "${IVF2_RUNTIME_OUTPUT_DIR}/fonts"
+        COMMAND ${CMAKE_COMMAND} -E ${_ivf2_copy} "${CMAKE_CURRENT_SOURCE_DIR}/assets" "${IVF2_RUNTIME_OUTPUT_DIR}/assets"
+        COMMENT "Copying shared runtime data and example assets to ${IVF2_RUNTIME_OUTPUT_DIR}"
+        VERBATIM)
+    set_target_properties(copy_example_assets PROPERTIES FOLDER "examples")
+endif()
 
 # Optional example-only dependencies.
 find_package(ReactPhysics3D CONFIG QUIET)
@@ -31,9 +34,13 @@ if(IVF2_USE_PCH)
 endif()
 set_target_properties(ivf2_examples_pch PROPERTIES FOLDER "examples")
 
-# add_ivf2_example(<name> [SOURCES <files...>] [EXTRA_LIBS <targets...>])
+# add_ivf2_example(<name> [SOURCES <files...>] [EXTRA_LIBS <targets...>] [WEB_ASSETS <paths...>])
+#
+# WEB_ASSETS: files or directories below assets/ that the web build (preset wasm) packs
+# into the page's data file; shaders/ and fonts/ are always included. Desktop builds read
+# everything from the copied assets/ directory and ignore it.
 function(add_ivf2_example name)
-    cmake_parse_arguments(ARG "" "" "SOURCES;EXTRA_LIBS" ${ARGN})
+    cmake_parse_arguments(ARG "" "" "SOURCES;EXTRA_LIBS;WEB_ASSETS" ${ARGN})
 
     if(NOT ARG_SOURCES)
         set(ARG_SOURCES ${name}.cpp)
@@ -46,7 +53,11 @@ function(add_ivf2_example name)
         FOLDER "examples"
         DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}"
         VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${name}>")
-    add_dependencies(${name} copy_example_assets)
+    if(EMSCRIPTEN)
+        ivf2_web_executable(${name} ASSETS_ROOT "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/assets" ASSETS ${ARG_WEB_ASSETS})
+    else()
+        add_dependencies(${name} copy_example_assets)
+    endif()
 
     if(IVF2_USE_PCH)
         if(ARG_EXTRA_LIBS)
@@ -57,6 +68,15 @@ function(add_ivf2_example name)
         endif()
     endif()
 endfunction()
+
+# Web builds (preset wasm): the examples ported to the browser so far (ROADMAP phase 3.3).
+if(EMSCRIPTEN)
+    set(IVF2_WEB_EXAMPLES hello_ivf)
+    foreach(_example IN LISTS IVF2_WEB_EXAMPLES)
+        add_subdirectory(${_example})
+    endforeach()
+    return()
+endif()
 
 add_subdirectory(hello_ivf)
 add_subdirectory(hello_pipeline)

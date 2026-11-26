@@ -142,9 +142,26 @@ include(ivfmusic)
 # Dependencies
 # ---------------------------------------------------------------------------
 
-find_package(OpenGL REQUIRED)
-find_package(Threads REQUIRED)
-find_package(glfw3 CONFIG REQUIRED)
+if(EMSCRIPTEN)
+    # Web build (preset wasm): the browser provides OpenGL ES 3.0 as WebGL 2, and Emscripten
+    # its own GLFW for the page's canvas. glad loads the GL functions through
+    # glfwGetProcAddress (RenderContext::create), hence GL_ENABLE_GET_PROC_ADDRESS.
+    add_library(OpenGL::GL INTERFACE IMPORTED GLOBAL)
+    target_link_options(OpenGL::GL INTERFACE
+        "SHELL:-s MIN_WEBGL_VERSION=2" "SHELL:-s MAX_WEBGL_VERSION=2" "SHELL:-s GL_ENABLE_GET_PROC_ADDRESS=1")
+    add_library(glfw INTERFACE IMPORTED GLOBAL)
+    target_link_options(glfw INTERFACE "SHELL:-s USE_GLFW=3")
+    add_library(Threads::Threads INTERFACE IMPORTED GLOBAL) # no threads: pages need no special headers
+    foreach(_option ASSIMP AUDIO MIDI)
+        if(IVF2_WITH_${_option})
+            message(FATAL_ERROR "IVF2_WITH_${_option} is not supported in web builds - use the wasm preset")
+        endif()
+    endforeach()
+else()
+    find_package(OpenGL REQUIRED)
+    find_package(Threads REQUIRED)
+    find_package(glfw3 CONFIG REQUIRED)
+endif()
 find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)

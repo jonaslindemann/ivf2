@@ -101,6 +101,10 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmoni
     if (m_hidden)
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
 
+#ifdef __EMSCRIPTEN__
+    // The page's canvas with a WebGL 2 context (OpenGL ES 3.0); the version hints don't apply.
+    m_window = glfwCreateWindow(width, height, title.c_str(), monitor, shared);
+#else
     // Request the newest OpenGL first: drivers return exactly the requested version, and
     // 4.3+ provides debug output (and compute shaders). macOS supports at most 4.1.
     constexpr int versions[][2] = {{4, 6}, {4, 3}, {4, 1}};
@@ -112,6 +116,7 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmoni
         if (m_window)
             break;
     }
+#endif
     glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); // don't leak the hint to other windows
 
     if (!m_window)
@@ -129,7 +134,7 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmoni
     m_renderContext->makeCurrent();
 
     // Route driver messages (errors, undefined behaviour, performance hints) to the Logger.
-    if (debugContext && !ivf::enableGLDebugOutput())
+    if (debugContext && !ivf::RenderContext::isGles() && !ivf::enableGLDebugOutput())
         ivf::logInfo("OpenGL debug output not available (requires OpenGL 4.3)", "GLFWWindow");
 
     m_uiRenderer = UiRenderer::create(m_window);
@@ -147,6 +152,7 @@ void GLFWWindow::makeCurrent()
         if (glfwGetCurrentContext() != m_window)
             glfwMakeContextCurrent(m_window);
 
+#ifndef __EMSCRIPTEN__ // in a browser the page's repaints pace the frames
         // Exports render as fast as possible instead of at the display refresh rate
         const int interval = m_exporting ? 0 : 1;
         if (interval != m_swapInterval)
@@ -154,6 +160,7 @@ void GLFWWindow::makeCurrent()
             glfwSwapInterval(interval);
             m_swapInterval = interval;
         }
+#endif
     }
 
     if (m_renderContext)
@@ -667,6 +674,10 @@ double ivfui::GLFWWindow::gpuFrameTime() const
 
 void ivfui::GLFWWindow::beginGpuTimer()
 {
+    // OpenGL ES 3 / WebGL 2 have no GL_TIME_ELAPSED queries (only a rarely exposed extension)
+    if (ivf::RenderContext::isGles())
+        return;
+
     // Query objects are freed with the context
     if (m_gpuQueries[0] == 0)
         glGenQueries(k_gpuQueryCount, m_gpuQueries);

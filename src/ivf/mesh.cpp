@@ -594,7 +594,9 @@ void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount, std::span<con
     if (m_clockwise)
         glFrontFace(GL_CW);
 
-    glPolygonMode(GL_FRONT_AND_BACK, m_wireframe ? GL_LINE : GL_FILL);
+    // OpenGL ES (WebGL) has no polygon modes: wireframe meshes are drawn filled there
+    if (!RenderContext::isGles())
+        glPolygonMode(GL_FRONT_AND_BACK, m_wireframe ? GL_LINE : GL_FILL);
 
     auto drawCall = [&](GLsizei instances) {
         gpu->vao->bind();

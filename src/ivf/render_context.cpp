@@ -31,13 +31,52 @@ thread_local RenderContext *t_current = nullptr;
 // be invalid (this matches the old singletons, which were never deleted either).
 RenderContext *g_fallback = nullptr;
 
+// OpenGL ES 3 loaded (one kind of GL per process: the browser's WebGL 2, or desktop GL)
+bool g_gles = false;
+
+// glad's desktop loader reads the version from glGetString(GL_VERSION) and loads only the
+// functions of that version. OpenGL ES 3.0 (WebGL 2) reports "OpenGL ES 3.0", so glad would
+// skip the 3.1-3.3 functions ivf2 uses (uniform blocks, instancing, samplers), although ES 3
+// has them. While loading, the shim below reports 3.3; functions ES lacks stay null.
+using GetStringProc = const GLubyte *(*)(GLenum);
+GLLoadProc g_loader = nullptr;
+GetStringProc g_getString = nullptr;
+
+const GLubyte *esVersionShim(GLenum name)
+{
+    if (name == GL_VERSION)
+        return reinterpret_cast<const GLubyte *>("3.3.0 (OpenGL ES 3.0 via ivf2 loader shim)");
+    return g_getString(name);
+}
+
+void *esLoaderShim(const char *name)
+{
+    if (std::strcmp(name, "glGetString") == 0)
+        return reinterpret_cast<void *>(&esVersionShim);
+    return g_loader(name);
+}
+
 } // namespace
+
+bool RenderContext::isGles()
+{
+    return g_gles;
+}
 
 std::shared_ptr<RenderContext> RenderContext::create(GLLoadProc loader)
 {
     if (loader != nullptr)
     {
-        if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(loader)))
+        g_loader = loader;
+        g_getString = reinterpret_cast<GetStringProc>(loader("glGetString"));
+        const auto *version = g_getString ? reinterpret_cast<const char *>(g_getString(GL_VERSION)) : nullptr;
+        g_gles = version != nullptr && std::strncmp(version, "OpenGL ES", 9) == 0;
+
+        const int loaded = g_gles ? gladLoadGLLoader(reinterpret_cast<GLADloadproc>(&esLoaderShim))
+                                  : gladLoadGLLoader(reinterpret_cast<GLADloadproc>(loader));
+        if (g_gles && g_getString != nullptr)
+            glad_glGetString = reinterpret_cast<PFNGLGETSTRINGPROC>(g_getString); // the real version again
+        if (!loaded)
         {
             logError("Failed to load OpenGL functions", "RenderContext");
             return nullptr;

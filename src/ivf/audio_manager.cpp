@@ -59,7 +59,7 @@ static constexpr float FFT_MAX_FREQ         = 16000.0f;
 // atomic for the write-cursor; individual float writes are not guarded by a
 // mutex because the main thread takes a snapshot copy (see getFFT/getAmplitude).
 // ---------------------------------------------------------------------------
-static inline void pushSample(std::vector<float>& buf,
+[[maybe_unused]] static inline void pushSample(std::vector<float>& buf,
                                std::atomic<size_t>& pos, float sample) noexcept
 {
     buf[pos.fetch_add(1, std::memory_order_relaxed) % buf.size()] = sample;

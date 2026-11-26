@@ -74,6 +74,16 @@ const std::string &Shader::infoLog() const
     return m_infoLog;
 }
 
+std::string Shader::compileSource()
+{
+    return prepareShaderSource(m_shaderCode, &m_uniformDefaults);
+}
+
+const std::vector<UniformDefault> &Shader::uniformDefaults() const
+{
+    return m_uniformDefaults;
+}
+
 GLuint Shader::id() const
 {
     return m_id;

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <ivf/glbase.h>
+#include <ivf/glsl_es.h>
 
 #include <string>
 #include <string_view>
+#include <vector>
 
 namespace ivf {
 
@@ -22,6 +24,13 @@ protected:
     std::string m_shaderCode; ///< Shader source code.
     GLuint m_id;              ///< OpenGL shader object ID.
     std::string m_infoLog;    ///< Compiler output of the last compile().
+    std::vector<UniformDefault> m_uniformDefaults; ///< Uniform initialisers removed for GLSL ES.
+
+    /**
+     * @brief The source to pass to glShaderSource(): translated to GLSL ES on OpenGL ES
+     *        (see ivf/glsl_es.h), which also records uniformDefaults().
+     */
+    std::string compileSource();
 
 public:
     /**
@@ -82,6 +91,12 @@ public:
      * @brief Compiler output (errors and warnings) of the last compile(); empty if there was none.
      */
     const std::string &infoLog() const;
+
+    /**
+     * @brief Uniform initialisers removed by the GLSL ES translation of the last compile()
+     *        (empty on desktop OpenGL). Program::link() sets them after linking.
+     */
+    const std::vector<UniformDefault> &uniformDefaults() const;
 
     /**
      * @brief Get the OpenGL shader object ID.

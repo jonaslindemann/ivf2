@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <imgui.h>
+#include <ivf/glsl_es.h>
 #include <ivf/logger.h>
 #include <ivf/shader_material.h>
 
@@ -52,7 +53,9 @@ unsigned int compileOverlayProgram()
 {
     auto compile = [](GLenum type, const char *source) {
         const GLuint shader = glCreateShader(type);
-        glShaderSource(shader, 1, &source, nullptr);
+        const std::string code = ivf::prepareShaderSource(source); // GLSL ES on OpenGL ES
+        const char *codePtr = code.c_str();
+        glShaderSource(shader, 1, &codePtr, nullptr);
         glCompileShader(shader);
         GLint ok = 0;
         glGetShaderiv(shader, GL_COMPILE_STATUS, &ok);

@@ -128,6 +128,22 @@ uniform sampler2D textures[MAX_TEXTURES];
 uniform int textureBlendModes[MAX_TEXTURES];
 uniform float textureBlendFactors[MAX_TEXTURES];
 
+// Sampler arrays may only be indexed with constants in GLSL ES (WebGL) and GLSL 3.30
+vec4 sampleTextureUnit(int i, vec2 uv)
+{
+    switch (i)
+    {
+    case 1: return texture(textures[1], uv);
+    case 2: return texture(textures[2], uv);
+    case 3: return texture(textures[3], uv);
+    case 4: return texture(textures[4], uv);
+    case 5: return texture(textures[5], uv);
+    case 6: return texture(textures[6], uv);
+    case 7: return texture(textures[7], uv);
+    }
+    return texture(textures[0], uv);
+}
+
 )" IVF_LIGHTS_BLOCK_GLSL R"(
 
 uniform Material material;
@@ -287,7 +303,7 @@ void main()
                         
                         for(int i = 1; i < activeTextureCount && i < MAX_TEXTURES; i++)
                         {
-                            vec4 texSample = texture(textures[i], texCoord);
+                            vec4 texSample = sampleTextureUnit(i, texCoord);
                             finalTexColor = applyTexBlendModeIndexed(
                                 texSample, 
                                 finalTexColor, 

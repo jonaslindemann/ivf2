@@ -2,6 +2,7 @@
 #include <ivf/shader_manager.h>
 #include <ivf/transform_manager.h>
 #include <ivf/render_context.h>
+#include <ivf/glsl_es.h>
 
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -66,7 +67,9 @@ void Skybox::initGPU()
 
     auto compile = [](GLenum type, const char* src) -> GLuint {
         GLuint s = glCreateShader(type);
-        glShaderSource(s, 1, &src, nullptr);
+        const std::string code = ivf::prepareShaderSource(src); // GLSL ES on OpenGL ES
+        const char *codePtr = code.c_str();
+        glShaderSource(s, 1, &codePtr, nullptr);
         glCompileShader(s);
         return s;
     };

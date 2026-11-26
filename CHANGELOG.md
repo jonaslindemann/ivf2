@@ -8,6 +8,24 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ## [Unreleased]
 
+### Added
+
+- Web builds (work in progress, see `ROADMAP.md` phase 3.3): the CMake preset `wasm` compiles
+  the libraries and examples to WebAssembly with Emscripten; programs render with WebGL 2
+  (OpenGL ES 3.0) in a full-window canvas, and `hello_ivf` runs in the browser.
+  `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with
+  its data files preloaded.
+- `RenderContext::isGles()`; `ivf/glsl_es.h`: shaders are translated to GLSL ES 3.00 when
+  compiled on OpenGL ES (version line, default precisions; uniform initialisers become values
+  set after linking, `Shader::uniformDefaults()`). One shader source serves both.
+- `GLFWApplication::frame()`: one frame of every window, used as the browser's main loop.
+
+### Fixed
+
+- `generator::SubdivideShape` did not compile with newer Clang (Emscripten).
+- Multitexturing in the stock and bump shaders indexed the sampler array with a variable,
+  which GLSL 3.30 and GLSL ES do not allow.
+
 ## [2.0.0-alpha.3] - 2026-11-26
 
 The rendering pipeline and scientific visualisation release: scenes are drawn through a render

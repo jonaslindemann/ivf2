@@ -101,6 +101,10 @@ bool Program::link()
             glUniform1iv(shadowMaps, MaxShadowMaps, units);
             glUseProgram(static_cast<GLuint>(previous));
         }
+
+        // Uniform initialisers the GLSL ES translation removed (none on desktop GL)
+        for (const auto &shader : m_shaders)
+            applyUniformDefaults(m_id, shader->uniformDefaults());
     }
 
     return result == GL_TRUE;

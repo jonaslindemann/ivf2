@@ -81,6 +81,25 @@
         "IVF2_WITH_IMPLOT": "OFF",
         "VCPKG_INSTALLED_DIR": "${sourceDir}/build/${presetName}/vcpkg_installed"
       }
+    },
+    {
+      "name": "wasm",
+      "displayName": "WebAssembly (Emscripten, WebGL 2)",
+      "description": "Examples as web pages (.html/.js/.wasm/.data in build/wasm/bin). Needs the Emscripten SDK (EMSDK set, e.g. by emsdk_env) and Ninja. assimp, audio, MIDI and ivfmusic are off. Uses its own vcpkg_installed (triplet wasm32-emscripten).",
+      "inherits": "base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "wasm32-emscripten",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/${presetName}/vcpkg_installed",
+        "IVF2_WITH_ASSIMP": "OFF",
+        "IVF2_WITH_AUDIO": "OFF",
+        "IVF2_WITH_MIDI": "OFF",
+        "IVF2_BUILD_MUSIC": "OFF",
+        "IVF2_BUILD_TESTS": "OFF",
+        "IVF2_INSTALL": "OFF"
+      }
     }
   ],
   "buildPresets": [
@@ -119,6 +138,10 @@
     {
       "name": "minimal",
       "configurePreset": "minimal"
+    },
+    {
+      "name": "wasm",
+      "configurePreset": "wasm"
     }
   ],
   "testPresets": [

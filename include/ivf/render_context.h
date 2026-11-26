@@ -121,6 +121,15 @@ public:
     static void clearCurrent();
 
     /**
+     * @brief True if create() loaded OpenGL ES 3 (WebGL 2 in a browser) instead of desktop OpenGL.
+     *
+     * Shaders are then translated to GLSL ES 3.00 when compiled (prepareShaderSource() in
+     * ivf/glsl_es.h), and desktop-only calls (polygon modes, multisampled textures, debug
+     * output) are skipped or replaced.
+     */
+    static bool isGles();
+
+    /**
      * @brief Set up the default rendering state used by GLFWSceneWindow: the
      *        render-to-texture, basic and PBR shaders (basic is applied), the
      *        default font and one directional light.

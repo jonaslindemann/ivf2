@@ -569,8 +569,10 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
 
     GLboolean depthTest;
     glGetBooleanv(GL_DEPTH_TEST, &depthTest);
-    GLint polygonMode[2];
-    glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+    GLint polygonMode[2] = {GL_FILL, GL_FILL};
+    const bool gles = RenderContext::isGles(); // no polygon modes in OpenGL ES (WebGL)
+    if (!gles)
+        glGetIntegerv(GL_POLYGON_MODE, polygonMode);
     GLboolean cullFace;
     glGetBooleanv(GL_CULL_FACE, &cullFace);
     GLint cullFaceMode = GL_BACK;
@@ -649,7 +651,8 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
     else
         glDisable(GL_DEPTH_TEST);
 
-    glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
+    if (!gles)
+        glPolygonMode(GL_FRONT_AND_BACK, polygonMode[0]);
     glCullFace(static_cast<GLenum>(cullFaceMode));
 
     if (cullFace)

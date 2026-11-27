@@ -8,7 +8,7 @@
 //   --screenshots <dir>  save a JPEG of each page as <dir>/<name>.jpg
 //   --jobs <n>           pages tested at the same time (default 2)
 //   --time <ms>          time each page runs after loading (default 3000)
-//   --size <w>x<h>       browser window size (default 640x360)
+//   --size <w>x<h>       browser window size (default 320x180: SwiftShader's cost is mostly per pixel)
 //
 // A page fails if it shows an error, throws, logs an ERROR or WARN line (ivf::Logger) or a
 // WebGL error, or renders fewer than three frames. shader_check must report "0 failed".
@@ -26,7 +26,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 const args = process.argv.slice(2);
-const options = { screenshots: null, jobs: 2, time: 3000, size: '640x360' };
+const options = { screenshots: null, jobs: 2, time: 3000, size: '320x180' };
 const pages = [];
 let binDir = null;
 for (let i = 0; i < args.length; i++) {
@@ -103,7 +103,10 @@ const baseUrl = `http://127.0.0.1:${server.address().port}`;
 
 // Lines that make a page fail, and harmless ones that match them
 const badLine = /^\[exception\]|^\[log:error\]|^\d\d:\d\d:\d\d\.\d{3} (ERROR|WARN)\b|WebGL: |GL_INVALID|INVALID_|null function/;
-const harmless = /GPU stall due to ReadPixels|favicon\.ico/;
+// The blit message comes from Chrome itself (ANGLE below WebGL, seen once while the canvas was
+// resized in a page that never blits); a blit of ours would fail WebGL's own validation first
+// and log a "WebGL: INVALID_OPERATION" line.
+const harmless = /GPU stall due to ReadPixels|favicon\.ico|^\[log:warning\] \[\.WebGL-\w+\]GL_INVALID_OPERATION: glBlitFramebuffer: Blit feedback loop/;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // One Chrome per page: pages in background tabs would not get animation frames

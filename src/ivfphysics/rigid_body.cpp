@@ -278,3 +278,42 @@ float RigidBody::kineticEnergy() const
     const glm::vec3 inertia = toGlm(m_impl->body->getLocalInertiaTensor());
     return 0.5f * mass() * glm::dot(v, v) + 0.5f * glm::dot(wl * inertia, wl);
 }
+
+void RigidBody::setCollisionFilter(std::uint16_t category, std::uint16_t collidesWith)
+{
+    m_impl->desc.category = category;
+    m_impl->desc.collidesWith = collidesWith;
+    if (!m_impl->collider)
+        return;
+    // Wake the dynamic bodies first: the engine (0.10.2) keeps the pairs of sleeping bodies
+    // apart and fails when a collider of such a pair asks for a new broad-phase check
+    for (const auto &body : m_impl->world->bodies)
+        if (body->impl().desc.type == BodyType::Dynamic)
+            body->impl().body->setIsSleeping(false);
+    m_impl->collider->setCollisionCategoryBits(category);
+    m_impl->collider->setCollideWithMaskBits(collidesWith);
+}
+
+std::uint16_t RigidBody::collisionCategory() const
+{
+    return m_impl->desc.category;
+}
+
+std::uint16_t RigidBody::collisionMask() const
+{
+    return m_impl->desc.collidesWith;
+}
+
+void RigidBody::setTrigger(bool trigger)
+{
+    m_impl->desc.trigger = trigger;
+    if (!m_impl->collider)
+        return;
+    m_impl->body->setIsSleeping(false);
+    m_impl->collider->setIsTrigger(trigger);
+}
+
+bool RigidBody::isTrigger() const
+{
+    return m_impl->desc.trigger;
+}

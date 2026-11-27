@@ -10,6 +10,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <cstdint>
 #include <memory>
 
 namespace ivf {
@@ -37,6 +38,9 @@ struct BodyDesc {
     float angularDamping{0.05f};      ///< Angular velocity damping (>= 0).
     bool gravity{true};               ///< Affected by the world's gravity.
     bool canSleep{true};              ///< May go to sleep when it comes to rest.
+    std::uint16_t category{0x0001};   ///< Collision category bits (see `RigidBody::setCollisionFilter()`).
+    std::uint16_t collidesWith{0xFFFF}; ///< Categories the body collides with.
+    bool trigger{false};              ///< A trigger: reports overlaps (`PhysicsWorld::setTriggerCallback()`) but does not collide.
 };
 
 /**
@@ -152,6 +156,25 @@ public:
 
     /** @brief Allow or forbid sleeping. */
     void setCanSleep(bool canSleep);
+
+    /**
+     * @brief Collision filtering: two bodies collide if each one's category is in the
+     *        other's mask (`(a.category & b.collidesWith) && (b.category & a.collidesWith)`).
+     *
+     * Use one bit per group, e.g. 1 for the scene, 2 for projectiles, and let projectiles
+     * pass through each other with `collidesWith = 0xFFFF & ~2`. Raycasts take a mask too.
+     */
+    void setCollisionFilter(std::uint16_t category, std::uint16_t collidesWith);
+    [[nodiscard]] std::uint16_t collisionCategory() const;
+    [[nodiscard]] std::uint16_t collisionMask() const;
+
+    /**
+     * @brief Make the body a trigger: it reports overlaps (`PhysicsWorld::setTriggerCallback()`)
+     *        but nothing collides with it. Usually static or kinematic (a dynamic trigger falls
+     *        through everything).
+     */
+    void setTrigger(bool trigger);
+    [[nodiscard]] bool isTrigger() const;
 
     /** @brief Kinetic energy, 0.5 m v^2 + 0.5 w^T I w. */
     [[nodiscard]] float kineticEnergy() const;

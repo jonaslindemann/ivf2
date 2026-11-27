@@ -183,6 +183,14 @@ ivf::Result<ShapePtr> Shape::convexHull(const std::vector<glm::vec3> &points)
     auto impl = std::make_unique<Impl>();
     impl->type = ShapeType::ConvexHull;
     impl->points = hull.vertices;
+    for (const auto &face : hull.faces)
+        for (std::size_t i = 0; i < face.size(); ++i)
+        {
+            const std::uint32_t v0 = face[i];
+            const std::uint32_t v1 = face[(i + 1) % face.size()];
+            if (v0 < v1) // each edge once (the neighbouring face has it the other way round)
+                impl->edges.emplace_back(v0, v1);
+        }
     std::vector<std::uint32_t> indices;
     std::vector<rp3d::PolygonVertexArray::PolygonFace> faces;
     for (const auto &face : hull.faces)

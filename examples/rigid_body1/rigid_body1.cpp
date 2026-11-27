@@ -9,6 +9,8 @@
  *  - a PhysicsWorld stepped with the window's frame time (fixed steps, interpolated nodes)
  *  - a static ground plane and dynamic boxes, spheres, capsules and capped cylinders whose
  *    shapes come from the nodes (Shape::fromNode(): a cylinder becomes a convex hull)
+ *  - drag bodies with the left mouse button (DragController), T throws a ball at the mouse
+ *    (throwBody()), V shows colliders and contacts (drawDebug())
  *  - D drops another body, P pauses, S steps once, R resets to the start
  */
 
@@ -22,6 +24,7 @@
 
 #include <array>
 #include <string>
+#include <vector>
 
 using namespace ivf;
 using namespace ivfui;
@@ -31,6 +34,11 @@ class RigidBodyWindow : public GLFWSceneWindow {
 private:
     PhysicsWorldPtr m_world;
     std::array<MaterialPtr, 4> m_materials;
+    MaterialPtr m_ballMaterial;
+    DragControllerPtr m_drag;
+    std::vector<RigidBodyPtr> m_thrown;
+    DebugViewOptions m_debugOptions;
+    bool m_debugView{false};
     int m_dropped{0};
 
 public:
@@ -110,6 +118,13 @@ public:
         this->add(ground);
         m_world->addBody(ground, Shape::plane(), {.type = BodyType::Static, .friction = 0.8f});
 
+        // Dragging with the mouse: a spring pulls the grabbed point of a body
+        m_drag = DragController::create(m_world);
+        m_ballMaterial = Material::create();
+        m_ballMaterial->setDiffuseColor(glm::vec4(0.9f, 0.9f, 0.95f, 1.0f));
+        m_ballMaterial->setSpecularColor(glm::vec4(0.8f, 0.8f, 0.8f, 1.0f));
+        m_ballMaterial->setShininess(80.0f);
+
         // A loose pile: four layers of bodies, slightly offset and tilted so they tumble
         for (int layer = 0; layer < 4; ++layer)
             for (int i = 0; i < 4; ++i)
@@ -131,6 +146,57 @@ public:
     void onUpdate() override
     {
         m_world->step(frameTime());
+        auto debug = renderContext()->debugDraw();
+        if (m_debugView)
+            drawDebug(*m_world, *debug, m_debugOptions);
+        drawDebug(*m_drag, *debug);
+    }
+
+    /** A heavy ball thrown from the camera through the mouse position. */
+    void throwBall()
+    {
+        auto ball = Sphere::create(0.3);
+        ball->setMaterial(m_ballMaterial);
+        this->add(ball);
+        auto body = m_world->addBody(ball, Shape::sphere(0.3f), {.mass = 4.0f, .bounciness = 0.3f});
+        throwBody(body, cameraRay(mouseX(), mouseY()), 25.0f);
+        m_thrown.push_back(body);
+    }
+
+    /** Back to the start; thrown balls are removed. */
+    void resetScene()
+    {
+        m_drag->release();
+        for (const auto &body : m_thrown)
+        {
+            scene()->remove(body->node());
+            m_world->removeBody(body);
+        }
+        m_thrown.clear();
+        m_world->reset();
+    }
+
+    void onMouseButton(int button, int action, int mods) override
+    {
+        if (button == GLFW_MOUSE_BUTTON_LEFT)
+        {
+            if (action == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse &&
+                m_drag->grab(cameraRay(mouseX(), mouseY())))
+                cameraManipulator()->setManipulationBlocked(true); // the mouse drags the body, not the camera
+            else if (action == GLFW_RELEASE && m_drag->isDragging())
+            {
+                m_drag->release();
+                cameraManipulator()->setManipulationBlocked(false);
+            }
+        }
+        GLFWSceneWindow::onMouseButton(button, action, mods);
+    }
+
+    void onMousePosition(double x, double y) override
+    {
+        if (m_drag->isDragging())
+            m_drag->drag(cameraRay(x, y));
+        GLFWSceneWindow::onMousePosition(x, y);
     }
 
     void dropBody()
@@ -150,9 +216,13 @@ public:
             m_world->stepOnce();
         ImGui::SameLine();
         if (ImGui::Button("Reset (R)"))
-            m_world->reset();
+            resetScene();
         if (ImGui::Button("Drop a body (D)"))
             dropBody();
+        ImGui::SameLine();
+        if (ImGui::Button("Throw a ball (T)"))
+            throwBall();
+        ImGui::TextDisabled("Drag bodies with the left mouse button");
 
         float timeScale = static_cast<float>(m_world->timeScale());
         if (ImGui::SliderFloat("Time scale", &timeScale, 0.0f, 2.0f))
@@ -161,8 +231,19 @@ public:
         if (ImGui::SliderFloat("Gravity", &g.y, -20.0f, 0.0f))
             m_world->setGravity(g);
 
+        ImGui::SeparatorText("Debug view");
+        ImGui::Checkbox("Show (V)", &m_debugView);
+        ImGui::SameLine();
+        ImGui::Checkbox("Contacts", &m_debugOptions.contacts);
+        ImGui::SameLine();
+        ImGui::Checkbox("Velocities", &m_debugOptions.velocities);
+
+        const PhysicsStats stats = m_world->stats();
+        ImGui::SeparatorText("Statistics");
         ImGui::Text("Time %.2f s, %llu steps", m_world->time(), static_cast<unsigned long long>(m_world->stepCount()));
-        ImGui::Text("Bodies %zu, awake %d", m_world->bodies().size(), m_world->awakeBodyCount());
+        ImGui::Text("Bodies %d, dynamic %d, awake %d", stats.bodies, stats.dynamicBodies, stats.awakeBodies);
+        ImGui::Text("Contacts %d (%d points)", stats.contacts, stats.contactPoints);
+        ImGui::Text("Update %.2f ms (%d steps)", stats.averageUpdateTimeMs, stats.stepsLastUpdate);
         ImGui::End();
     }
 
@@ -175,9 +256,13 @@ public:
             else if (key == GLFW_KEY_S)
                 m_world->stepOnce();
             else if (key == GLFW_KEY_R)
-                m_world->reset();
+                resetScene();
             else if (key == GLFW_KEY_D)
                 dropBody();
+            else if (key == GLFW_KEY_T)
+                throwBall();
+            else if (key == GLFW_KEY_V)
+                m_debugView = !m_debugView;
         }
         GLFWSceneWindow::onKey(key, scancode, action, mods);
     }

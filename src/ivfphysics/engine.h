@@ -11,7 +11,10 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
+#include <functional>
 #include <memory>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace rp3d = reactphysics3d;
@@ -82,6 +85,7 @@ struct ivfphysics::Shape::Impl {
     float height{0.0f};
     std::vector<glm::vec3> points;
     std::vector<glm::uvec3> triangles;
+    std::vector<glm::uvec2> edges; ///< Convex hull edges (debug view).
     glm::vec3 offsetPosition{0.0f};
     glm::quat offsetRotation{1.0f, 0.0f, 0.0f, 0.0f};
 
@@ -94,6 +98,7 @@ struct ivfphysics::Shape::Impl {
 
 struct ivfphysics::RigidBody::Impl {
     PhysicsWorld::Impl *world{nullptr}; ///< Null once removed.
+    std::weak_ptr<RigidBody> self;
     rp3d::RigidBody *body{nullptr};
     rp3d::Collider *collider{nullptr};
     std::shared_ptr<ivf::TransformNode> node;
@@ -101,6 +106,8 @@ struct ivfphysics::RigidBody::Impl {
     BodyDesc desc;
     rp3d::Transform previous;   ///< Transform before the last step (interpolation).
     rp3d::Transform initial;    ///< Transform when added (reset()).
+    glm::vec3 previousLinear{0.0f};  ///< Velocities before the last step (impact speeds).
+    glm::vec3 previousAngular{0.0f};
 
     /** Set the density from desc.mass and update mass, centre of mass and inertia. */
     void applyMass();
@@ -108,9 +115,57 @@ struct ivfphysics::RigidBody::Impl {
     [[nodiscard]] glm::vec3 inverseInertiaWorld(const glm::vec3 &v) const;
 };
 
+namespace ivfphysics::detail {
+
+/** Receives the engine's contact and overlap reports during a step and queues them. */
+class EventListener : public rp3d::EventListener {
+public:
+    explicit EventListener(PhysicsWorld::Impl &world) : m_world(world)
+    {}
+    void onContact(const rp3d::CollisionCallback::CallbackData &data) override;
+    void onTrigger(const rp3d::OverlapCallback::CallbackData &data) override;
+
+private:
+    PhysicsWorld::Impl &m_world;
+};
+
+/** Two bodies touching (or overlapping, for triggers) since an earlier step. */
+struct ActivePair {
+    RigidBodyPtr body1;
+    RigidBodyPtr body2;
+    bool trigger{false};
+};
+
+} // namespace ivfphysics::detail
+
 struct ivfphysics::PhysicsWorld::Impl {
     std::shared_ptr<detail::Engine> engine{detail::engine()};
+    detail::EventListener listener{*this};
     rp3d::PhysicsWorld *world{nullptr};
+    std::unordered_map<const rp3d::Body *, RigidBodyPtr> lookup; ///< Engine body to body.
+
+    // Events of the current step, delivered after it
+    ContactCallback contactCallback;
+    TriggerCallback triggerCallback;
+    std::vector<Contact> pendingContacts;
+    std::vector<TriggerEvent> pendingTriggers;
+    std::vector<detail::ActivePair> active; ///< In the order they began (deterministic End order).
+    std::vector<ContactPoint> contactPoints;  ///< Of the latest step.
+    int contactPairs{0};
+
+    std::vector<std::pair<int, std::function<void(double)>>> stepCallbacks;
+    int nextCallbackId{1};
+
+    int stepsLastUpdate{0};
+    double updateTimeMs{0.0};
+    double averageUpdateTimeMs{0.0};
+
+    [[nodiscard]] RigidBodyPtr find(const rp3d::Body *body) const
+    {
+        auto it = lookup.find(body);
+        return it != lookup.end() ? it->second : nullptr;
+    }
+
     PhysicsSettings settings;
     std::vector<RigidBodyPtr> bodies;
     double accumulator{0.0};

@@ -5,14 +5,17 @@
  * @brief A simulated world of rigid bodies attached to scene nodes.
  */
 
+#include <ivfphysics/events.h>
 #include <ivfphysics/rigid_body.h>
 #include <ivfphysics/shape.h>
 
+#include <ivf/ray.h>
 #include <ivf/result.h>
 
 #include <glm/glm.hpp>
 
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -31,6 +34,7 @@ struct PhysicsSettings {
     int positionIterations{5};             ///< Position solver iterations per step.
     bool sleeping{true};                   ///< Let bodies at rest sleep.
     bool interpolate{true};                ///< Show nodes between the last two steps (smooth at any frame rate).
+    bool stayEvents{false};                ///< Also report contacts and overlaps that continue (`ContactPhase::Stay`).
 };
 
 /**
@@ -44,6 +48,10 @@ struct PhysicsSettings {
  * sequence of calls gives the same result, which visual tests rely on (use the window's
  * `frameTime()`, which is fixed with `IVF2_FIXED_TIMESTEP`). No OpenGL is involved: worlds
  * can be stepped in tests or on a thread of their own.
+ *
+ * Contacts and trigger overlaps are collected during each fixed step and passed to the
+ * callbacks after it, outside the engine, so callbacks may add and remove bodies. Queries
+ * (`raycast()`) and body values use the state of the latest step.
  *
  * @code
  * auto world = ivfphysics::PhysicsWorld::create();
@@ -135,6 +143,44 @@ public:
     /** @brief Number of awake dynamic bodies. */
     [[nodiscard]] int awakeBodyCount() const;
 
+    /**
+     * @brief The nearest body hit by @p ray (its direction need not be unit length).
+     * @return An empty hit (false) if nothing is hit within `options.maxDistance`.
+     */
+    [[nodiscard]] RaycastHit raycast(const ivf::Ray &ray, const RaycastOptions &options = {}) const;
+
+    /** @brief All bodies hit by @p ray, nearest first (one hit per body). */
+    [[nodiscard]] std::vector<RaycastHit> raycastAll(const ivf::Ray &ray, const RaycastOptions &options = {}) const;
+
+    /**
+     * @brief Called after each fixed step for every contact that began or ended in it (and
+     *        continued, with `PhysicsSettings::stayEvents`). Pass nullptr to remove.
+     *
+     * Removing a body reports End for its contacts after the next step.
+     */
+    void setContactCallback(ContactCallback callback);
+
+    /** @brief Called after each fixed step for bodies entering or leaving triggers (see `setContactCallback()`). */
+    void setTriggerCallback(TriggerCallback callback);
+
+    /** @brief Contact points of all touching bodies after the latest step (for drawing). */
+    [[nodiscard]] const std::vector<ContactPoint> &contactPoints() const;
+
+    /**
+     * @brief Call @p callback before every fixed step with the step length (s).
+     *
+     * Forces applied in it act during that step: the place for springs, thrusters, wind
+     * (forces are cleared after each step). `DragController` uses it.
+     * @return An id for `removeStepCallback()`.
+     */
+    int addStepCallback(std::function<void(double)> callback);
+
+    /** @brief Remove a callback added with `addStepCallback()`. */
+    void removeStepCallback(int id);
+
+    /** @brief Body, contact and timing statistics. */
+    [[nodiscard]] PhysicsStats stats() const;
+
     /** @brief Engine data (implementation detail of ivfphysics). */
     [[nodiscard]] Impl &impl() const
     {
@@ -144,6 +190,7 @@ public:
 private:
     explicit PhysicsWorld(const PhysicsSettings &settings);
     void runStep();
+    void deliverEvents();
     void syncNodes(double alpha);
     std::unique_ptr<Impl> m_impl;
 };

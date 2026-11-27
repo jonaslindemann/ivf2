@@ -4,6 +4,7 @@
 #include <ivf/transform_node.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <stdexcept>
 
@@ -75,7 +76,143 @@ void detachBody(RigidBody::Impl &body)
     body.collider = nullptr;
 }
 
+/** Index of the active pair of @p a and @p b (either order), or -1. */
+int findActive(const std::vector<detail::ActivePair> &active, const RigidBodyPtr &a, const RigidBodyPtr &b, bool trigger)
+{
+    for (std::size_t i = 0; i < active.size(); ++i)
+    {
+        const auto &p = active[i];
+        if (p.trigger == trigger && ((p.body1 == a && p.body2 == b) || (p.body1 == b && p.body2 == a)))
+            return static_cast<int>(i);
+    }
+    return -1;
+}
+
+/** Velocity of @p body at @p point before the last step. */
+glm::vec3 previousVelocityAt(const RigidBody &body, const glm::vec3 &point)
+{
+    const auto &b = body.impl();
+    if (b.desc.type == BodyType::Static)
+        return glm::vec3(0.0f);
+    return b.previousLinear + glm::cross(b.previousAngular, point - body.centerOfMass());
+}
+
 } // namespace
+
+const char *ivfphysics::toString(ContactPhase phase)
+{
+    switch (phase)
+    {
+    case ContactPhase::Begin:
+        return "Begin";
+    case ContactPhase::Stay:
+        return "Stay";
+    case ContactPhase::End:
+        break;
+    }
+    return "End";
+}
+
+// ---------------------------------------------------------------------------
+// Events (called by the engine inside PhysicsWorld::update())
+// ---------------------------------------------------------------------------
+
+void detail::EventListener::onContact(const rp3d::CollisionCallback::CallbackData &data)
+{
+    using EventType = rp3d::CollisionCallback::ContactPair::EventType;
+    auto &w = m_world;
+    for (rp3d::uint32 i = 0; i < data.getNbContactPairs(); ++i)
+    {
+        const auto pair = data.getContactPair(i);
+        const EventType type = pair.getEventType();
+        auto body1 = w.find(pair.getBody1());
+        auto body2 = w.find(pair.getBody2());
+        if (!body1 || !body2)
+            continue;
+
+        if (type == EventType::ContactExit)
+        {
+            const int index = findActive(w.active, body1, body2, false);
+            if (index < 0)
+                continue; // already ended when a body was removed
+            w.active.erase(w.active.begin() + index);
+            if (w.contactCallback)
+                w.pendingContacts.push_back({ContactPhase::End, std::move(body1), std::move(body2), {}, 0.0f});
+            continue;
+        }
+
+        // Begin or Stay: the contact points, in world coordinates
+        const rp3d::Transform toWorld = pair.getCollider1()->getLocalToWorldTransform();
+        const std::size_t first = w.contactPoints.size();
+        for (rp3d::uint32 j = 0; j < pair.getNbContactPoints(); ++j)
+        {
+            const auto point = pair.getContactPoint(j);
+            w.contactPoints.push_back({toGlm(toWorld * point.getLocalPointOnCollider1()), toGlm(point.getWorldNormal()),
+                                       static_cast<float>(point.getPenetrationDepth())});
+        }
+        w.contactPairs++;
+
+        ContactPhase phase = ContactPhase::Stay;
+        if (type == EventType::ContactStart && findActive(w.active, body1, body2, false) < 0)
+        {
+            phase = ContactPhase::Begin;
+            w.active.push_back({body1, body2, false});
+        }
+        if (!w.contactCallback || (phase == ContactPhase::Stay && !w.settings.stayEvents))
+            continue;
+
+        Contact contact{phase, std::move(body1), std::move(body2), {}, 0.0f};
+        contact.points.assign(w.contactPoints.begin() + static_cast<std::ptrdiff_t>(first), w.contactPoints.end());
+        for (const auto &p : contact.points)
+        {
+            const glm::vec3 relative =
+                previousVelocityAt(*contact.body1, p.position) - previousVelocityAt(*contact.body2, p.position);
+            contact.impactSpeed = std::max(contact.impactSpeed, glm::dot(relative, p.normal));
+        }
+        w.pendingContacts.push_back(std::move(contact));
+    }
+}
+
+void detail::EventListener::onTrigger(const rp3d::OverlapCallback::CallbackData &data)
+{
+    using EventType = rp3d::OverlapCallback::OverlapPair::EventType;
+    auto &w = m_world;
+    for (rp3d::uint32 i = 0; i < data.getNbOverlappingPairs(); ++i)
+    {
+        const auto pair = data.getOverlappingPair(i);
+        auto body1 = w.find(pair.getBody1());
+        auto body2 = w.find(pair.getBody2());
+        if (!body1 || !body2)
+            continue;
+        // The trigger first
+        if (!body1->isTrigger())
+            std::swap(body1, body2);
+
+        ContactPhase phase = ContactPhase::Stay;
+        const int index = findActive(w.active, body1, body2, true);
+        switch (pair.getEventType())
+        {
+        case EventType::OverlapStart:
+            if (index < 0)
+            {
+                phase = ContactPhase::Begin;
+                w.active.push_back({body1, body2, true});
+            }
+            break;
+        case EventType::OverlapStay:
+            break;
+        case EventType::OverlapExit:
+            if (index < 0)
+                continue;
+            phase = ContactPhase::End;
+            w.active.erase(w.active.begin() + index);
+            break;
+        }
+        if (!w.triggerCallback || (phase == ContactPhase::Stay && !w.settings.stayEvents))
+            continue;
+        w.pendingTriggers.push_back({phase, std::move(body1), std::move(body2)});
+    }
+}
 
 // ---------------------------------------------------------------------------
 // PhysicsWorld
@@ -94,6 +231,7 @@ PhysicsWorld::PhysicsWorld(const PhysicsSettings &settings) : m_impl(std::make_u
     ws.defaultPositionSolverNbIterations = static_cast<rp3d::uint16>(std::max(s.positionIterations, 1));
     ws.isSleepingEnabled = s.sleeping;
     m_impl->world = m_impl->engine->common.createPhysicsWorld(ws);
+    m_impl->world->setEventListener(&m_impl->listener);
 }
 
 std::shared_ptr<PhysicsWorld> PhysicsWorld::create(const PhysicsSettings &settings)
@@ -146,6 +284,13 @@ RigidBodyPtr PhysicsWorld::addBody(const std::shared_ptr<ivf::TransformNode> &no
     const auto &shapeImpl = shape->impl();
     impl->collider = impl->body->addCollider(
         shapeImpl.shape, rp3d::Transform(toRp(shapeImpl.offsetPosition), toRp(shapeImpl.offsetRotation)));
+    // Only when not the defaults: each setter asks the broad phase to recheck the collider
+    if (desc.category != 0x0001)
+        impl->collider->setCollisionCategoryBits(desc.category);
+    if (desc.collidesWith != 0xFFFF)
+        impl->collider->setCollideWithMaskBits(desc.collidesWith);
+    if (desc.trigger)
+        impl->collider->setIsTrigger(true);
     auto &material = impl->collider->getMaterial();
     material.setFrictionCoefficient(std::max(desc.friction, 0.0f));
     material.setBounciness(std::clamp(desc.bounciness, 0.0f, 1.0f));
@@ -157,8 +302,11 @@ RigidBodyPtr PhysicsWorld::addBody(const std::shared_ptr<ivf::TransformNode> &no
     impl->body->enableGravity(desc.gravity);
     impl->body->setIsAllowedToSleep(desc.canSleep);
 
+    const rp3d::Body *engineBody = impl->body;
     auto body = RigidBodyPtr(new RigidBody(std::move(impl)));
+    body->impl().self = body;
     m_impl->bodies.push_back(body);
+    m_impl->lookup[engineBody] = body;
     return body;
 }
 
@@ -178,6 +326,24 @@ void PhysicsWorld::removeBody(const RigidBodyPtr &bodyRef)
         return;
     auto &bodies = m_impl->bodies;
     bodies.erase(std::remove(bodies.begin(), bodies.end(), body), bodies.end());
+    m_impl->lookup.erase(body->impl().body);
+
+    // The engine reports nothing for removed bodies: end their contacts here
+    auto &active = m_impl->active;
+    for (auto it = active.begin(); it != active.end();)
+    {
+        if (it->body1 != body && it->body2 != body)
+        {
+            ++it;
+            continue;
+        }
+        if (it->trigger && m_impl->triggerCallback)
+            m_impl->pendingTriggers.push_back({ContactPhase::End, it->body1, it->body2});
+        else if (!it->trigger && m_impl->contactCallback)
+            m_impl->pendingContacts.push_back({ContactPhase::End, it->body1, it->body2, {}, 0.0f});
+        it = active.erase(it);
+    }
+
     m_impl->world->destroyRigidBody(body->impl().body);
     detachBody(body->impl());
 }
@@ -203,12 +369,48 @@ RigidBodyPtr PhysicsWorld::bodyOf(const std::shared_ptr<ivf::TransformNode> &nod
 
 void PhysicsWorld::runStep()
 {
-    const auto h = static_cast<rp3d::decimal>(m_impl->settings.fixedTimeStep);
+    const double h = m_impl->settings.fixedTimeStep;
+
+    // Step callbacks may add or remove callbacks and bodies
+    const auto callbacks = m_impl->stepCallbacks;
+    for (const auto &[id, callback] : callbacks)
+        if (callback)
+            callback(h);
+
     for (auto &body : m_impl->bodies)
-        body->impl().previous = body->impl().body->getTransform();
-    m_impl->world->update(h);
+    {
+        auto &b = body->impl();
+        b.previous = b.body->getTransform();
+        b.previousLinear = toGlm(b.body->getLinearVelocity());
+        b.previousAngular = toGlm(b.body->getAngularVelocity());
+    }
+    m_impl->contactPoints.clear();
+    m_impl->contactPairs = 0;
+    m_impl->world->update(static_cast<rp3d::decimal>(h));
     m_impl->steps++;
-    m_impl->time = static_cast<double>(m_impl->steps) * m_impl->settings.fixedTimeStep;
+    m_impl->time = static_cast<double>(m_impl->steps) * h;
+    deliverEvents();
+}
+
+void PhysicsWorld::deliverEvents()
+{
+    // Taken out first: callbacks may remove bodies, which queues further events
+    auto contacts = std::move(m_impl->pendingContacts);
+    auto triggers = std::move(m_impl->pendingTriggers);
+    m_impl->pendingContacts.clear();
+    m_impl->pendingTriggers.clear();
+    if (m_impl->contactCallback)
+    {
+        const auto callback = m_impl->contactCallback;
+        for (const auto &contact : contacts)
+            callback(contact);
+    }
+    if (m_impl->triggerCallback)
+    {
+        const auto callback = m_impl->triggerCallback;
+        for (const auto &event : triggers)
+            callback(event);
+    }
 }
 
 void PhysicsWorld::syncNodes(double alpha)
@@ -235,8 +437,10 @@ void PhysicsWorld::syncNodes(double alpha)
 
 int PhysicsWorld::step(double dt)
 {
+    m_impl->stepsLastUpdate = 0;
     if (m_impl->paused || !(dt > 0.0) || !std::isfinite(dt))
         return 0;
+    const auto start = std::chrono::steady_clock::now();
 
     // The simulation runs up to one step ahead of the shown time: the accumulator is the
     // shown time minus the simulated time, in (-h, 0] after the steps, and the nodes are
@@ -286,6 +490,10 @@ int PhysicsWorld::step(double dt)
         }
     }
     syncNodes(1.0 + m_impl->accumulator / h);
+
+    m_impl->stepsLastUpdate = n;
+    m_impl->updateTimeMs = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - start).count();
+    m_impl->averageUpdateTimeMs += 0.05 * (m_impl->updateTimeMs - m_impl->averageUpdateTimeMs);
     return n;
 }
 
@@ -372,4 +580,125 @@ int PhysicsWorld::awakeBodyCount() const
     return static_cast<int>(std::count_if(m_impl->bodies.begin(), m_impl->bodies.end(), [](const RigidBodyPtr &b) {
         return b->impl().desc.type == BodyType::Dynamic && !b->impl().body->isSleeping();
     }));
+}
+
+// ---------------------------------------------------------------------------
+// Queries, callbacks, statistics
+// ---------------------------------------------------------------------------
+
+namespace {
+
+class RayCollector : public rp3d::RaycastCallback {
+public:
+    RayCollector(const PhysicsWorld::Impl &world, const RaycastOptions &options, float length, bool all)
+        : m_world(world), m_options(options), m_length(length), m_all(all)
+    {}
+
+    rp3d::decimal notifyRaycastHit(const rp3d::RaycastInfo &info) override
+    {
+        auto body = m_world.find(info.body);
+        if (!body || (!m_options.triggers && info.collider->getIsTrigger()) || (m_options.skip && m_options.skip(body)))
+            return rp3d::decimal(-1); // ignore, go on
+        RaycastHit hit{std::move(body), toGlm(info.worldPoint), toGlm(info.worldNormal),
+                       static_cast<float>(info.hitFraction) * m_length};
+        if (m_all)
+        {
+            hits.push_back(std::move(hit));
+            return rp3d::decimal(1); // all hits
+        }
+        if (hits.empty() || hit.distance < hits.front().distance)
+            hits.assign(1, std::move(hit));
+        return info.hitFraction; // only nearer hits from now on
+    }
+
+    std::vector<RaycastHit> hits;
+
+private:
+    const PhysicsWorld::Impl &m_world;
+    const RaycastOptions &m_options;
+    float m_length;
+    bool m_all;
+};
+
+std::vector<RaycastHit> castRay(const PhysicsWorld::Impl &world, const ivf::Ray &ray, const RaycastOptions &options,
+                                bool all)
+{
+    const float length = glm::length(ray.direction);
+    if (!(length > 0.0f) || !(options.maxDistance > 0.0f))
+        return {};
+    const glm::vec3 end = ray.origin + ray.direction / length * options.maxDistance;
+    RayCollector collector(world, options, options.maxDistance, all);
+    world.world->raycast(rp3d::Ray(toRp(ray.origin), toRp(end)), &collector, options.mask);
+    return std::move(collector.hits);
+}
+
+} // namespace
+
+RaycastHit PhysicsWorld::raycast(const ivf::Ray &ray, const RaycastOptions &options) const
+{
+    auto hits = castRay(*m_impl, ray, options, false);
+    return hits.empty() ? RaycastHit{} : std::move(hits.front());
+}
+
+std::vector<RaycastHit> PhysicsWorld::raycastAll(const ivf::Ray &ray, const RaycastOptions &options) const
+{
+    auto hits = castRay(*m_impl, ray, options, true);
+    std::stable_sort(hits.begin(), hits.end(),
+                     [](const RaycastHit &a, const RaycastHit &b) { return a.distance < b.distance; });
+    // One hit per body: the nearest
+    std::vector<RaycastHit> unique;
+    for (auto &hit : hits)
+        if (std::none_of(unique.begin(), unique.end(), [&](const RaycastHit &u) { return u.body == hit.body; }))
+            unique.push_back(std::move(hit));
+    return unique;
+}
+
+void PhysicsWorld::setContactCallback(ContactCallback callback)
+{
+    m_impl->contactCallback = std::move(callback);
+}
+
+void PhysicsWorld::setTriggerCallback(TriggerCallback callback)
+{
+    m_impl->triggerCallback = std::move(callback);
+}
+
+const std::vector<ContactPoint> &PhysicsWorld::contactPoints() const
+{
+    return m_impl->contactPoints;
+}
+
+int PhysicsWorld::addStepCallback(std::function<void(double)> callback)
+{
+    const int id = m_impl->nextCallbackId++;
+    m_impl->stepCallbacks.emplace_back(id, std::move(callback));
+    return id;
+}
+
+void PhysicsWorld::removeStepCallback(int id)
+{
+    auto &callbacks = m_impl->stepCallbacks;
+    callbacks.erase(std::remove_if(callbacks.begin(), callbacks.end(), [id](const auto &c) { return c.first == id; }),
+                    callbacks.end());
+}
+
+PhysicsStats PhysicsWorld::stats() const
+{
+    PhysicsStats stats;
+    stats.bodies = static_cast<int>(m_impl->bodies.size());
+    for (const auto &body : m_impl->bodies)
+    {
+        const auto &b = body->impl();
+        if (b.desc.type != BodyType::Dynamic)
+            continue;
+        stats.dynamicBodies++;
+        if (!b.body->isSleeping())
+            stats.awakeBodies++;
+    }
+    stats.contacts = m_impl->contactPairs;
+    stats.contactPoints = static_cast<int>(m_impl->contactPoints.size());
+    stats.stepsLastUpdate = m_impl->stepsLastUpdate;
+    stats.updateTimeMs = m_impl->updateTimeMs;
+    stats.averageUpdateTimeMs = m_impl->averageUpdateTimeMs;
+    return stats;
 }

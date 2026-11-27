@@ -20,6 +20,15 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   velocities. Shapes: box, sphere, capsule, plane, convex hull (built by ivfphysics, robust for
   coplanar mesh points; large meshes are reduced to their extreme points), triangle mesh, and
   `Shape::fromNode()` from primitives and meshes. Unit tests run without OpenGL.
+  Queries and events: `raycast()`/`raycastAll()` (body, point, normal, distance; category mask,
+  triggers, skip), contact callbacks (Begin/End, optional Stay, contact points and impact speed)
+  and trigger bodies with enter/leave callbacks, delivered after each step so they may add and
+  remove bodies; collision categories and masks (`BodyDesc::category`/`collidesWith`,
+  `setCollisionFilter()`); step callbacks for forces applied every fixed step; `stats()`.
+  Interaction: `DragController` (drag a body with camera rays through a mass-independent damped
+  spring) and `throwBody()`. `drawDebug()` draws colliders, contact points, velocities and the drag
+  spring through `DebugDraw`. `rigid_body1` drags bodies with the mouse, throws balls (T) and shows
+  the debug view (V) and statistics.
 - Web builds (work in progress, see `ROADMAP.md` phase 3.3): the CMake preset `wasm` compiles
   the libraries and examples to WebAssembly with Emscripten; programs render with WebGL 2
   (OpenGL ES 3.0) in a full-window canvas. `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with

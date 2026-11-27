@@ -1,4 +1,5 @@
-// ivfphysics without OpenGL: worlds, bodies, shapes, stepping, node sync, determinism, reset.
+// ivfphysics without OpenGL: worlds, bodies, shapes, stepping, node sync, determinism, reset,
+// raycasts, contact and trigger events, collision filters, step callbacks, dragging, throwing.
 
 #include "test_main.h"
 
@@ -378,6 +379,292 @@ IVF_TEST(material_and_settings)
     IVF_CHECK(world->gravity() == glm::vec3(0.0f));
     world->setTimeScale(0.5);
     IVF_CHECK(world->step(1.0 / 60.0) == 2);
+}
+
+IVF_TEST(raycast_finds_nearest_and_all)
+{
+    auto world = PhysicsWorld::create();
+    addGround(*world);
+    auto near1 = world->addBody(cubeAt({0.0f, 0.5f, 0.0f}), Shape::box(glm::vec3(0.5f)), {});
+    auto far1 = world->addBody(cubeAt({4.0f, 0.5f, 0.0f}), Shape::box(glm::vec3(0.5f)), {.category = 0x0002});
+
+    const ivf::Ray ray{{-10.0f, 0.5f, 0.0f}, {2.0f, 0.0f, 0.0f}}; // direction need not be unit length
+    auto hit = world->raycast(ray);
+    IVF_CHECK(static_cast<bool>(hit));
+    IVF_CHECK(hit.body == near1);
+    IVF_CHECK_NEAR(hit.distance, 9.5f, 1e-3);
+    IVF_CHECK(near(hit.point, {-0.5f, 0.5f, 0.0f}));
+    IVF_CHECK(near(hit.normal, {-1.0f, 0.0f, 0.0f}));
+
+    const auto all = world->raycastAll(ray);
+    IVF_CHECK(all.size() == 2);
+    IVF_CHECK(all.size() == 2 && all[0].body == near1 && all[1].body == far1);
+    IVF_CHECK(all.size() == 2 && all[0].distance < all[1].distance);
+
+    // Category mask, skip, range, miss
+    IVF_CHECK(world->raycast(ray, {.mask = 0x0002}).body == far1);
+    IVF_CHECK(world->raycast(ray, {.skip = [&](const RigidBodyPtr &b) { return b == near1; }}).body == far1);
+    IVF_CHECK(!world->raycast(ray, {.maxDistance = 5.0f}));
+    IVF_CHECK(!world->raycast({{0.0f, 5.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}));
+    IVF_CHECK(!world->raycast({{0.0f, 5.0f, 0.0f}, {0.0f, 0.0f, 0.0f}}));
+
+    // Straight down onto the ground beside the boxes
+    auto ground = world->raycast({{2.0f, 5.0f, 0.0f}, {0.0f, -1.0f, 0.0f}});
+    IVF_CHECK(ground && ground.body->type() == BodyType::Static);
+    IVF_CHECK_NEAR(ground.distance, 5.0f, 1e-3);
+
+    // Bodies that moved are hit where they are now
+    near1->setPosition({0.0f, 3.0f, 0.0f});
+    IVF_CHECK(world->raycast(ray).body == far1);
+}
+
+IVF_TEST(contact_events_begin_and_end)
+{
+    auto world = PhysicsWorld::create();
+    auto ground = addGround(*world);
+    auto ballNode = cubeAt({0.0f, 2.5f, 0.0f});
+    auto ball = world->addBody(ballNode, Shape::sphere(0.5f), {.bounciness = 0.0f});
+
+    std::vector<Contact> events;
+    world->setContactCallback([&](const Contact &c) { events.push_back(c); });
+
+    for (int i = 0; i < 120; ++i)
+        world->step(1.0 / 60.0);
+    // It lands (and may bounce a little: Begin, End, Begin); Stay is not reported by default
+    IVF_CHECK(!events.empty());
+    if (!events.empty())
+    {
+        const auto &c = events.front();
+        IVF_CHECK(c.phase == ContactPhase::Begin);
+        IVF_CHECK(c.other(ball) == ground && c.other(ground) == ball);
+        IVF_CHECK(!c.points.empty());
+        // Dropped from 2 m: about sqrt(2 g h) = 6.3 m/s
+        IVF_CHECK(c.impactSpeed > 5.5f && c.impactSpeed < 6.6f);
+        IVF_CHECK(!c.points.empty() && std::fabs(c.points[0].position.y) < 0.05f);
+        IVF_CHECK(events.back().phase == ContactPhase::Begin);
+    }
+    for (const auto &c : events)
+        IVF_CHECK(c.phase != ContactPhase::Stay);
+    // At rest the ball sleeps: falling asleep ends nothing, but sleeping contacts are not listed
+    IVF_CHECK(ball->isSleeping());
+
+    // Lifted off the ground: End
+    ball->setPosition({0.0f, 3.0f, 0.0f});
+    world->stepOnce();
+    IVF_CHECK(!events.empty() && events.back().phase == ContactPhase::End);
+    IVF_CHECK(world->stats().contacts == 0);
+
+    // Removing a body in contact ends its contacts after the next step
+    for (int i = 0; i < 120; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK(events.back().phase == ContactPhase::Begin);
+    const auto count = events.size();
+    world->removeBody(ball);
+    IVF_CHECK(events.size() == count); // not before the step
+    world->stepOnce();
+    IVF_CHECK(events.size() == count + 1 && events.back().phase == ContactPhase::End && events.back().body1 &&
+              events.back().body2);
+
+    // Stay events when asked for
+    auto stayWorld = PhysicsWorld::create({.stayEvents = true});
+    addGround(*stayWorld);
+    stayWorld->addBody(cubeAt({0.0f, 0.5f, 0.0f}), Shape::box(glm::vec3(0.5f)), {.canSleep = false});
+    int begins = 0;
+    int stays = 0;
+    stayWorld->setContactCallback([&](const Contact &c) {
+        begins += c.phase == ContactPhase::Begin;
+        stays += c.phase == ContactPhase::Stay;
+    });
+    for (int i = 0; i < 10; ++i)
+        stayWorld->stepOnce();
+    // The first step finds the pair, the second its contact
+    IVF_CHECK(begins == 1);
+    IVF_CHECK(stays == 8);
+    IVF_CHECK(stayWorld->stats().contacts == 1);
+    IVF_CHECK(stayWorld->stats().contactPoints == 4);
+    IVF_CHECK(stayWorld->contactPoints().size() == 4);
+}
+
+IVF_TEST(callbacks_may_remove_bodies)
+{
+    auto world = PhysicsWorld::create();
+    addGround(*world);
+    std::vector<RigidBodyPtr> balls;
+    for (int i = 0; i < 4; ++i)
+        balls.push_back(world->addBody(cubeAt({2.0f * static_cast<float>(i), 1.0f, 0.0f}), Shape::sphere(0.5f), {}));
+
+    // Each ball is removed when it lands
+    int ends = 0;
+    world->setContactCallback([&](const Contact &c) {
+        if (c.phase == ContactPhase::End)
+        {
+            ends++;
+            return;
+        }
+        for (const auto &body : {c.body1, c.body2})
+            if (body->type() == BodyType::Dynamic && body->isValid())
+                world->removeBody(body);
+    });
+    for (int i = 0; i < 120; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK(world->bodies().size() == 1);
+    IVF_CHECK(ends == 4);
+    for (const auto &b : balls)
+        IVF_CHECK(!b->isValid());
+}
+
+IVF_TEST(trigger_reports_enter_and_leave)
+{
+    auto world = PhysicsWorld::create();
+    addGround(*world);
+    auto zone = world->addBody(ivf::Box::create(), Shape::box({2.0f, 0.5f, 2.0f}),
+                               {.type = BodyType::Static, .trigger = true});
+    zone->setPosition({0.0f, 3.0f, 0.0f});
+    IVF_CHECK(zone->isTrigger());
+    auto ballNode = cubeAt({0.0f, 6.0f, 0.0f});
+    auto ball = world->addBody(ballNode, Shape::sphere(0.25f), {.bounciness = 0.0f});
+
+    std::vector<TriggerEvent> events;
+    int contacts = 0;
+    world->setTriggerCallback([&](const TriggerEvent &e) { events.push_back(e); });
+    world->setContactCallback([&](const Contact &c) {
+        if (c.phase == ContactPhase::Begin && (c.body1 == zone || c.body2 == zone))
+            contacts++;
+    });
+    for (int i = 0; i < 180; ++i)
+        world->step(1.0 / 60.0);
+
+    // It fell through the trigger onto the ground
+    IVF_CHECK_NEAR(ballNode->pos().y, 0.25f, 0.02);
+    IVF_CHECK(contacts == 0);
+    IVF_CHECK(events.size() == 2);
+    if (events.size() == 2)
+    {
+        IVF_CHECK(events[0].phase == ContactPhase::Begin && events[0].trigger == zone && events[0].other == ball);
+        IVF_CHECK(events[1].phase == ContactPhase::End && events[1].trigger == zone && events[1].other == ball);
+    }
+
+    // Raycasts pass through triggers unless asked
+    const ivf::Ray down{{0.0f, 10.0f, 0.0f}, {0.0f, -1.0f, 0.0f}};
+    IVF_CHECK(world->raycast(down).body == ball);
+    IVF_CHECK(world->raycast(down, {.triggers = true}).body == zone);
+}
+
+IVF_TEST(collision_filter_lets_groups_pass)
+{
+    auto world = PhysicsWorld::create();
+    addGround(*world);
+    auto lowerNode = cubeAt({0.0f, 0.5f, 0.0f});
+    auto upperNode = cubeAt({0.0f, 2.5f, 0.0f});
+    auto lower = world->addBody(lowerNode, Shape::box(glm::vec3(0.5f)), {.collidesWith = 0xFFFF & ~0x0002});
+    auto upper = world->addBody(upperNode, Shape::box(glm::vec3(0.5f)), {.category = 0x0002});
+    IVF_CHECK(upper->collisionCategory() == 0x0002 && upper->collisionMask() == 0xFFFF);
+    IVF_CHECK(lower->collisionMask() == (0xFFFF & ~0x0002));
+
+    for (int i = 0; i < 120; ++i)
+        world->step(1.0 / 60.0);
+    // Passed through the lower box onto the ground
+    IVF_CHECK_NEAR(upperNode->pos().y, 0.5f, 0.02);
+    IVF_CHECK_NEAR(lowerNode->pos().y, 0.5f, 0.02);
+
+    // Filters can change: now they collide and push apart
+    lower->setCollisionFilter(0x0001, 0xFFFF);
+    upper->setPosition({0.0f, 2.5f, 0.0f});
+    for (int i = 0; i < 120; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK_NEAR(upperNode->pos().y, 1.5f, 0.05);
+}
+
+IVF_TEST(step_callbacks_and_statistics)
+{
+    auto world = PhysicsWorld::create();
+    addGround(*world);
+    auto body = world->addBody(cubeAt({0.0f, 0.5f, 0.0f}), Shape::box(glm::vec3(0.5f)), {});
+
+    int calls = 0;
+    double total = 0.0;
+    const int id = world->addStepCallback([&](double h) {
+        calls++;
+        total += h;
+        body->applyForce({0.0f, 2.0f * 9.81f, 0.0f}); // lifts the 1 kg box at 9.81 m/s^2
+    });
+    IVF_CHECK(world->step(1.0 / 60.0) == 4);
+    IVF_CHECK(calls == 4);
+    IVF_CHECK_NEAR(total, 1.0 / 60.0, 1e-9);
+    for (int i = 0; i < 59; ++i)
+        world->step(1.0 / 60.0);
+    // 1 s at 9.81 m/s^2 upwards: about 4.9 m
+    IVF_CHECK_NEAR(body->position().y, 0.5f + 4.9f, 0.1);
+
+    world->removeStepCallback(id);
+    world->step(1.0 / 60.0);
+    IVF_CHECK(calls == 240);
+
+    const auto stats = world->stats();
+    IVF_CHECK(stats.bodies == 2);
+    IVF_CHECK(stats.dynamicBodies == 1);
+    IVF_CHECK(stats.awakeBodies == 1);
+    IVF_CHECK(stats.stepsLastUpdate == 4);
+    IVF_CHECK(stats.updateTimeMs >= 0.0);
+}
+
+IVF_TEST(drag_controller_pulls_body)
+{
+    auto world = PhysicsWorld::create();
+    addGround(*world);
+    auto boxNode = cubeAt({0.0f, 0.5f, 0.0f});
+    auto box = world->addBody(boxNode, Shape::box(glm::vec3(0.5f)), {.mass = 5.0f});
+    auto drag = DragController::create(world);
+
+    // The ground cannot be grabbed, nor empty space
+    IVF_CHECK(!drag->grab({{3.0f, 5.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}));
+    IVF_CHECK(!drag->grab({{0.0f, 5.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}));
+    IVF_CHECK(!drag->isDragging());
+
+    // Grab the front face, then pull up and to the side
+    IVF_CHECK(drag->grab({{0.0f, 0.5f, -5.0f}, {0.0f, 0.0f, 1.0f}}));
+    IVF_CHECK(drag->isDragging() && drag->body() == box);
+    IVF_CHECK_NEAR(drag->distance(), 4.5f, 1e-3);
+    IVF_CHECK(near(drag->anchor(), {0.0f, 0.5f, -0.5f}));
+    drag->drag({{0.0f, 0.5f, -5.0f}, glm::normalize(glm::vec3(1.0f, 2.0f, 4.5f))});
+    const glm::vec3 target = drag->target();
+    IVF_CHECK_NEAR(glm::length(target - glm::vec3(0.0f, 0.5f, -5.0f)), 4.5f, 1e-3);
+    for (int i = 0; i < 180; ++i)
+        world->step(1.0 / 60.0);
+    // Hangs from the grabbed point (gravity sags it by about g / (2 pi f)^2 = 1 cm)
+    IVF_CHECK(glm::length(drag->anchor() - target) < 0.05f);
+    IVF_CHECK(box->position().y > 1.0f);
+
+    // Released, it falls back down
+    drag->release();
+    IVF_CHECK(!drag->isDragging());
+    for (int i = 0; i < 180; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK_NEAR(boxNode->pos().y, 0.5f, 0.05);
+
+    // A removed body is let go
+    IVF_CHECK(drag->grab({box->position() + glm::vec3(0.0f, 5.0f, 0.0f), {0.0f, -1.0f, 0.0f}}));
+    world->removeBody(box);
+    world->stepOnce();
+    IVF_CHECK(!drag->isDragging());
+
+    // The controller unregisters when destroyed
+    drag.reset();
+    world->stepOnce();
+}
+
+IVF_TEST(throw_body_along_ray)
+{
+    auto world = PhysicsWorld::create({.gravity = {0.0f, 0.0f, 0.0f}});
+    auto ballNode = cubeAt({0.0f, 0.0f, 0.0f});
+    auto ball = world->addBody(ballNode, Shape::sphere(0.25f), {.linearDamping = 0.0f, .angularDamping = 0.0f});
+    throwBody(ball, {{1.0f, 2.0f, 3.0f}, {0.0f, 0.0f, -2.0f}}, 10.0f, {0.0f, 5.0f, 0.0f});
+    IVF_CHECK(near(ballNode->pos(), {1.0f, 2.0f, 3.0f}));
+    IVF_CHECK(near(ball->linearVelocity(), {0.0f, 0.0f, -10.0f}));
+    IVF_CHECK(near(ball->angularVelocity(), {0.0f, 5.0f, 0.0f}));
+    for (int i = 0; i < 30; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK(near(ballNode->pos(), {1.0f, 2.0f, -2.0f}, 1e-2f));
 }
 
 IVF_TEST_MAIN()

@@ -38,6 +38,7 @@ inline int runAll()
         int before = failures();
         c.fn();
         std::printf("[%s] %s\n", failures() == before ? " OK " : "FAIL", c.name);
+        std::fflush(stdout); // a crash in a later test keeps this line
     }
     std::printf("%zu test(s), %d failed check(s)\n", registry().size(), failures());
     return failures() == 0 ? 0 : 1;

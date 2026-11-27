@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **3.7 physics module in progress** (`ivfphysics`: step 1, world, bodies and shapes, done; next step 2, queries, events and interaction). 3.2 Python bindings later |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **3.7 physics module in progress** (`ivfphysics`: step 1, world, bodies and shapes, done; step 2, queries, events and interaction, done; next step 3, joints and compound bodies). 3.2 Python bindings later |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -992,6 +992,17 @@ clearest way to stand out.
       without physics.
    2. *Queries, events and interaction.* Raycasts, contact events, triggers, collision
       filtering, `DragController`, `throwBody()`, debug view and statistics; tests.
+      *Done:* `events.h` (`Contact`, `TriggerEvent`, `RaycastHit`, `PhysicsStats`),
+      `interaction.h` (`DragController`, `throwBody()`), `debug_view.h` (`drawDebug()`).
+      The engine's reports are queued during a step and delivered after it; active pairs are
+      tracked by ivfphysics, so removing a body reports End for its contacts (the engine does
+      not) and the order of events is deterministic. Contacts begin one step after the bodies
+      meet (the first step finds the pair) and are not listed while both bodies sleep; falling
+      asleep ends nothing. `PhysicsWorld::addStepCallback()` runs before every fixed step: the
+      drag spring (acceleration-based, so every body follows alike) uses it. ReactPhysics3D
+      0.10.2 crashes when filter bits change on a collider of a sleeping pair, so
+      `setCollisionFilter()` wakes the dynamic bodies first. `rigid_body1` gained mouse dragging,
+      throwing and the debug view. `test_ivfphysics`: 20 cases.
    3. *Joints and compound bodies.* The four joint types with limits and motors, breaking,
       compound shapes; tests (a pendulum keeps its length, hinge limits hold).
    4. *The sandbox.* `physics_sandbox1` with presets, interaction, panels and the `ivfvis`

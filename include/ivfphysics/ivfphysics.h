@@ -8,6 +8,9 @@
  * (ReactPhysics3D) is private to the library: applications need no physics headers.
  */
 
+#include <ivfphysics/debug_view.h>
+#include <ivfphysics/events.h>
+#include <ivfphysics/interaction.h>
 #include <ivfphysics/physics_world.h>
 #include <ivfphysics/rigid_body.h>
 #include <ivfphysics/shape.h>

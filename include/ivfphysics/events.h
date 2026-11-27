@@ -37,9 +37,9 @@ struct ContactPoint {
  */
 struct Contact {
     ContactPhase phase{ContactPhase::Begin};
-    RigidBodyPtr body1;
-    RigidBodyPtr body2;
-    std::vector<ContactPoint> points; ///< Contact points (none for End).
+    RigidBodyPtr body1{};
+    RigidBodyPtr body2{};
+    std::vector<ContactPoint> points{}; ///< Contact points (none for End).
     /**
      * @brief Speed at which the bodies approached each other along the normal before the
      *        step (>= 0): how hard they hit. Useful for sounds and damage.
@@ -56,8 +56,8 @@ struct Contact {
 /** @brief A body entering or leaving a trigger (`PhysicsWorld::setTriggerCallback()`). */
 struct TriggerEvent {
     ContactPhase phase{ContactPhase::Begin};
-    RigidBodyPtr trigger; ///< The trigger body.
-    RigidBodyPtr other;   ///< The body that entered or left it (may be a trigger too).
+    RigidBodyPtr trigger{}; ///< The trigger body.
+    RigidBodyPtr other{};   ///< The body that entered or left it (may be a trigger too).
 };
 
 using ContactCallback = std::function<void(const Contact &)>;
@@ -69,12 +69,12 @@ struct RaycastOptions {
     std::uint16_t mask{0xFFFF};  ///< Collision categories that can be hit.
     bool triggers{false};        ///< Also hit trigger bodies.
     /// Leave bodies out (return true to skip), e.g. the one being dragged.
-    std::function<bool(const RigidBodyPtr &)> skip;
+    std::function<bool(const RigidBodyPtr &)> skip{};
 };
 
 /** @brief A raycast hit. Converts to false if nothing was hit. */
 struct RaycastHit {
-    RigidBodyPtr body;        ///< The body hit.
+    RigidBodyPtr body{};      ///< The body hit.
     glm::vec3 point{0.0f};    ///< Hit point (world coordinates).
     glm::vec3 normal{0.0f};   ///< Surface normal at the hit point.
     float distance{0.0f};     ///< Distance from the ray origin.

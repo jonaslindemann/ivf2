@@ -86,6 +86,7 @@ void PostProcessor::initialize()
 
     m_historyIndex = 0;
 
+    glBindTexture(GL_TEXTURE_2D, 0); // not left on a unit (WebGL feedback loop checks)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     this->initQuad();
@@ -267,6 +268,14 @@ active[i]->uniformFloat("time", m_time);
 
     // The composite we just produced becomes next frame's previous frame.
     m_historyIndex = cur;
+
+    // Unbind what the chain bound: the scene depth (unit 2) is attached to the scene's
+    // framebuffer, and WebGL refuses draws into it while a sampler can see it (feedback loop).
+    for (GLenum unit : {GL_TEXTURE2, GL_TEXTURE1, GL_TEXTURE0})
+    {
+        glActiveTexture(unit);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 } // namespace ivf

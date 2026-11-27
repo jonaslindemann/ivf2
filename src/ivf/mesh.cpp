@@ -448,6 +448,13 @@ void Mesh::upload(GpuCopy &copy)
     previous.texCoords = std::move(copy.texCoords);
     previous.indices = std::move(copy.indices);
 
+    if (copy.wireIndices != 0) // rebuilt from the new data when needed
+    {
+        glDeleteBuffers(1, &copy.wireIndices);
+        copy.wireIndices = 0;
+        copy.wireVersion = 0;
+    }
+
     ivf::clearError(); // flush any accumulated GL errors from before the upload
     copy.vao = std::make_unique<VertexArray>();
     copy.vao->bind();
@@ -506,6 +513,9 @@ void Mesh::release(GpuCopy &copy)
             buffers.push_back(buffer->release());
     if (copy.indices)
         buffers.push_back(copy.indices->release());
+    if (copy.wireIndices != 0)
+        buffers.push_back(copy.wireIndices);
+    copy.wireIndices = 0;
     copy.vao.reset();
     copy.vertices.reset();
     copy.colors.reset();
@@ -527,6 +537,36 @@ void Mesh::release(GpuCopy &copy)
         destroy();
     else
         copy.context->deleteLater(destroy); // runs when that context is current again
+}
+
+void Mesh::updateWireIndices(GpuCopy &copy)
+{
+    if (copy.wireIndices != 0 && copy.wireVersion == m_dataVersion)
+        return;
+
+    // Each triangle's three edges (shared edges twice: simpler, and invisible)
+    std::vector<GLuint> lines;
+    auto triangle = [&](GLuint a, GLuint b, GLuint c) { lines.insert(lines.end(), {a, b, b, c, c, a}); };
+    if (m_indices != nullptr && m_indices->cols() == 3)
+    {
+        for (GLuint i = 0; i < m_indices->rows(); i++)
+            triangle(m_indices->at(i, 0), m_indices->at(i, 1), m_indices->at(i, 2));
+    }
+    else if (m_indices == nullptr)
+    {
+        for (GLuint v = 0; v + 2 < m_verts->rows(); v += 3)
+            triangle(v, v + 1, v + 2);
+    }
+
+    if (copy.wireIndices == 0)
+        glGenBuffers(1, &copy.wireIndices);
+    glBindVertexArray(0); // binding an element buffer would change the bound vertex array
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, copy.wireIndices);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(lines.size() * sizeof(GLuint)), lines.data(),
+                 GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    copy.wireCount = static_cast<GLsizei>(lines.size());
+    copy.wireVersion = m_dataVersion;
 }
 
 void Mesh::draw()
@@ -572,14 +612,20 @@ void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount, std::span<con
     if (m_material != nullptr)
         m_material->apply();
 
-    if ((m_polygonOffsetFactor != 0.0f) || (m_polygonOffsetUnits != 0.0f))
+    const bool gles = RenderContext::isGles();
+
+    // Offset for wireframe lines over filled geometry (OpenGL ES offsets only filled polygons)
+    if (!gles)
     {
-        glEnable(GL_POLYGON_OFFSET_LINE);
-        glPolygonOffset(m_polygonOffsetFactor, m_polygonOffsetUnits);
-    }
-    else
-    {
-        glDisable(GL_POLYGON_OFFSET_LINE);
+        if ((m_polygonOffsetFactor != 0.0f) || (m_polygonOffsetUnits != 0.0f))
+        {
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glPolygonOffset(m_polygonOffsetFactor, m_polygonOffsetUnits);
+        }
+        else
+        {
+            glDisable(GL_POLYGON_OFFSET_LINE);
+        }
     }
 
     if (m_depthFunc != GL_LESS)
@@ -594,12 +640,32 @@ void Mesh::drawImpl(RenderContext &context, GLsizei instanceCount, std::span<con
     if (m_clockwise)
         glFrontFace(GL_CW);
 
-    // OpenGL ES (WebGL) has no polygon modes: wireframe meshes are drawn filled there
-    if (!RenderContext::isGles())
+    // OpenGL ES (WebGL) has no polygon modes: there wireframe triangles are drawn as their
+    // edges (GL_LINES from a second index buffer)
+    const bool esWireframe = gles && m_wireframe && m_primType == GL_TRIANGLES;
+    if (!gles)
         glPolygonMode(GL_FRONT_AND_BACK, m_wireframe ? GL_LINE : GL_FILL);
+    else if (esWireframe)
+        updateWireIndices(*gpu);
 
     auto drawCall = [&](GLsizei instances) {
         gpu->vao->bind();
+        if (esWireframe)
+        {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gpu->wireIndices);
+            if (instances > 0)
+                glDrawElementsInstanced(GL_LINES, gpu->wireCount, GL_UNSIGNED_INT, 0, instances);
+            else
+                glDrawElements(GL_LINES, gpu->wireCount, GL_UNSIGNED_INT, 0);
+            // The vertex array keeps its own element buffer
+            if (gpu->indices)
+                gpu->indices->bind();
+            else
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            gpu->vao->unbind();
+            context.countDrawCall();
+            return;
+        }
         // GL_ERR expands to several statements, so keep the braces
         if (m_indices != nullptr)
         {

@@ -30,9 +30,10 @@ void BufferSelection::resize(int width, int height)
         return;
 
     glBindTexture(GL_TEXTURE_2D, m_colorTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
     glBindRenderbuffer(GL_RENDERBUFFER, m_depthRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 }
 
 void BufferSelection::refresh()
@@ -87,12 +88,15 @@ void BufferSelection::initialize(int width, int height)
 
     glGenFramebuffers(1, &m_fbo);
     glGenTextures(1, &m_colorTexture);
+    // RGBA8 and a sized depth format: also valid in OpenGL ES 3 (WebGL 2), where reading
+    // pixels back is only guaranteed as RGBA
     glBindTexture(GL_TEXTURE_2D, m_colorTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glGenRenderbuffers(1, &m_depthRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_depthRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, width, height);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
@@ -125,9 +129,9 @@ void BufferSelection::begin()
 
 unsigned int BufferSelection::idAtPixel(int x, int y)
 {
-    unsigned char pixel[3];
+    unsigned char pixel[4];
 
-    glReadPixels(x, m_height - y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, pixel);
+    glReadPixels(x, m_height - y, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, pixel);
 
     uint32_t id = pixel[0] | (pixel[1] << 8) | (pixel[2] << 16);
 
@@ -149,14 +153,14 @@ std::vector<Node*> BufferSelection::nodesInRegion(int x0, int y0, int x1, int y1
     // Flip Y: OpenGL origin is bottom-left
     int glY = m_height - by - 1;
 
-    std::vector<unsigned char> pixels(static_cast<size_t>(rw) * rh * 3);
-    glReadPixels(lx, glY, rw, rh, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+    std::vector<unsigned char> pixels(static_cast<size_t>(rw) * rh * 4);
+    glReadPixels(lx, glY, rw, rh, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
 
     std::unordered_set<unsigned int> seen;
     std::vector<Node*> result;
 
     for (int i = 0; i < rw * rh; ++i) {
-        unsigned int id = pixels[i*3] | (pixels[i*3+1] << 8) | (pixels[i*3+2] << 16);
+        unsigned int id = pixels[i*4] | (pixels[i*4+1] << 8) | (pixels[i*4+2] << 16);
         if (id == 0 || seen.count(id)) continue;
         seen.insert(id);
         Node* n = nodeFromId(id);

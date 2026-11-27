@@ -415,7 +415,8 @@ bool Volume::copySceneDepth(Gpu &gpu, int width, int height)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, stencil ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT,
                                GL_TEXTURE_2D, gpu.depthTexture, 0);
-        glDrawBuffer(GL_NONE);
+        const GLenum none = GL_NONE;
+        glDrawBuffers(1, &none); // glDrawBuffer() is not in OpenGL ES
         glReadBuffer(GL_NONE);
         glBindFramebuffer(GL_READ_FRAMEBUFFER, static_cast<GLuint>(drawFbo));
         gpu.depthWidth = width;

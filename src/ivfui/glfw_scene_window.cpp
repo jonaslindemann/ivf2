@@ -187,6 +187,13 @@ void ivfui::GLFWSceneWindow::applyMsaaSamples()
 {
     GLint maxSamples = 1;
     glGetIntegerv(GL_MAX_SAMPLES, &maxSamples);
+    // OpenGL ES may allow fewer samples for float formats (the first value is the highest)
+    if (ivf::RenderContext::isGles() && glGetInternalformativ != nullptr)
+    {
+        GLint formatMax = 0;
+        glGetInternalformativ(GL_RENDERBUFFER, GL_RGBA16F, GL_SAMPLES, 1, &formatMax);
+        maxSamples = std::min(maxSamples, formatMax);
+    }
     const int samples = std::min(m_msaaSamples, int(maxSamples));
     if (samples > 1)
     {

@@ -2,6 +2,7 @@
 #include <ivf/gl_debug.h>
 
 #include <ivf/logger.h>
+#include <ivf/render_context.h>
 
 #include <iostream>
 
@@ -32,10 +33,20 @@ void ShadowMap::initialize()
     // Try these parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    if (RenderContext::isGles())
+    {
+        // No border clamping in OpenGL ES 3.0 (WebGL 2); ivfShadowFactor() rejects coordinates
+        // outside the map and clamps inside each tile itself.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    }
     // Turn OFF comparison mode for debugging
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
 
@@ -45,13 +56,15 @@ void ShadowMap::initialize()
     glLabel(GL_FRAMEBUFFER, m_fbo, "ivf shadow map");
     glLabel(GL_TEXTURE, m_depthTexture, "ivf shadow map depth");
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthTexture, 0);
-    glDrawBuffer(GL_NONE);
+    const GLenum none = GL_NONE;
+    glDrawBuffers(1, &none); // glDrawBuffer() is not in OpenGL ES
     glReadBuffer(GL_NONE);
 
     // Check framebuffer status
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         logErrorfc("ShadowMap", "Shadow map framebuffer is not complete!");
 
+    glBindTexture(GL_TEXTURE_2D, 0); // not left on a unit (WebGL feedback loop checks)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

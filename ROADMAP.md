@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: step 1 done (preset `wasm`, `hello_ivf` in the browser); **next: step 2** (GLES compatibility). 3.2 Python bindings after the web target |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: steps 1-2 done (preset `wasm`, GLES compatibility; 22 examples run in the browser); **next: step 3** (examples). 3.2 Python bindings after the web target |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -859,6 +859,21 @@ clearest way to stand out.
       float render targets (`EXT_color_buffer_float`), depth blits; every built-in shader
       compiles as GLSL ES 3.00 (a GL-free test translates and validates them with
       glslang where available). Lighting, shadows, PBR, HDR and effects examples run.
+      *Done:* MSAA through multisampled renderbuffers on every platform (sample count limited
+      by the RGBA16F format on ES); shadow maps clamp to edge on ES (the shader already
+      rejects coordinates outside the map), `glDrawBuffers` instead of `glDrawBuffer`; no
+      seamless-cube-map switch, `GL_PROGRAM_POINT_SIZE` or `GL_POLYGON_OFFSET_LINE` on ES;
+      wireframe on ES as `GL_LINES` from a per-copy edge index buffer; colour picking buffer
+      RGBA8 (ES reads back RGBA only). WebGL refuses draws into a texture a sampler can see
+      (desktop drivers tolerate it): render targets, the output step, the effect chain and
+      the shadow pass now unbind their textures. Shaders fixed for GLSL ES (`textureSize()`
+      as `ivec2`, integer `pow()` exponents, interface blocks). Instead of glslang, which
+      is not always installed, `tests/web/shader_check` compiles all 58 built-in and file
+      shaders with the browser's WebGL 2 compiler. 22 examples run in Chrome without WebGL
+      errors: shadows (cascaded, point, spot, PCSS), PBR/IBL, glTF, HDR/FXAA, reflections,
+      SSAO, SSR, depth of field, bloom, fog, transparency, textures, bump mapping, skybox.
+      Float render targets rely on `EXT_color_buffer_float` (enabled automatically; all
+      current desktop browsers have it).
    3. *Examples.* The examples build for the web (a list of exclusions: threads, MIDI,
       audio, several windows, file dialogs); ImGui and ImPlot; ivfvis (point clouds,
       volumes); resizing with the page and high-DPI canvases; environment variables

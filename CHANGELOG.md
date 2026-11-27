@@ -14,17 +14,30 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   the libraries and examples to WebAssembly with Emscripten; programs render with WebGL 2
   (OpenGL ES 3.0) in a full-window canvas, and `hello_ivf` runs in the browser.
   `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with
-  its data files preloaded.
+  its data files preloaded. 22 examples run in the browser, among them shadows (cascaded,
+  point and spot), PBR with image-based lighting, glTF, HDR, reflections and the post-processing
+  effects; `shader_check` (`tests/web`) compiles every built-in shader with WebGL 2.
 - `RenderContext::isGles()`; `ivf/glsl_es.h`: shaders are translated to GLSL ES 3.00 when
   compiled on OpenGL ES (version line, default precisions; uniform initialisers become values
   set after linking, `Shader::uniformDefaults()`). One shader source serves both.
 - `GLFWApplication::frame()`: one frame of every window, used as the browser's main loop.
+
+### Changed
+
+- Multisampled offscreen rendering uses a multisampled renderbuffer instead of a multisampled
+  texture (same result; available in OpenGL ES 3 too).
+- The colour picking buffer (`BufferSelection`) is RGBA8 with a 24-bit depth buffer.
+- Render targets, the output step and the post-processing chain no longer leave their textures
+  bound to texture units after use.
 
 ### Fixed
 
 - `generator::SubdivideShape` did not compile with newer Clang (Emscripten).
 - Multitexturing in the stock and bump shaders indexed the sampler array with a variable,
   which GLSL 3.30 and GLSL ES do not allow.
+- Blur, pixelation and halftone effects used `textureSize()` (an integer vector) as a float
+  vector; `default.frag` and `standard_lighting.fs` passed an integer exponent to `pow()`; the
+  phong sample shaders in `data/shaders` used interface blocks. All are now valid GLSL ES too.
 
 ## [2.0.0-alpha.3] - 2026-11-26
 

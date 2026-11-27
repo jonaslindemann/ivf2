@@ -585,6 +585,16 @@ void LightManager::renderShadowMaps(RenderContext &context, const RenderQueue &q
     GLint previousFramebuffer = 0;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previousFramebuffer);
 
+    // Unbind the shadow maps from their sampler units while rendering into them: WebGL refuses
+    // draws into a texture that a sampler of the program can see (feedback loop). apply()
+    // binds them again for the main pass.
+    for (int i = 0; i < MaxShadowMaps; ++i)
+    {
+        glActiveTexture(GL_TEXTURE0 + ShadowMapUnit + static_cast<GLuint>(i));
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    glActiveTexture(GL_TEXTURE0);
+
     // Set shadow rendering state
 
     glEnable(GL_DEPTH_TEST);

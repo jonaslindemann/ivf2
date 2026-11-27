@@ -4,12 +4,9 @@
 layout (location = 0) out vec4 color;
 
 // Input from vertex shader
-in VS_OUT
-{
-    vec3 N;
-    vec3 L;
-    vec3 V;
-} fs_in;
+in vec3 vs_N;
+in vec3 vs_L;
+in vec3 vs_V;
 
 // Material properties
 uniform vec3 diffuse_albedo = vec3(0.5, 0.2, 0.7);
@@ -20,9 +17,9 @@ uniform vec3 ambient = vec3(0.1, 0.1, 0.1);
 void main(void)
 {
     // Normalize the incoming N, L and V vectors
-    vec3 N = normalize(fs_in.N);
-    vec3 L = normalize(fs_in.L);
-    vec3 V = normalize(fs_in.V);
+    vec3 N = normalize(vs_N);
+    vec3 L = normalize(vs_L);
+    vec3 V = normalize(vs_V);
 
     // Calculate R locally
     vec3 R = reflect(-L, N);

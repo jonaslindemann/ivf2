@@ -429,8 +429,9 @@ Result<void> EnvironmentMap::precompute(GLuint equirectTexture, int cubemapSize)
 
     StateGuard guard;
 
-    // Filtering across cube faces (seams would show in the blurred mips)
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+    // Filtering across cube faces (seams would show in the blurred mips); always on in OpenGL ES
+    if (!RenderContext::isGles())
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     GLuint vao = 0, fbo = 0;
     glGenVertexArrays(1, &vao);

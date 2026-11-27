@@ -226,6 +226,9 @@ set_property(GLOBAL APPEND PROPERTY IVF2_EXPORTED_TARGETS ivf2)
 
 if(IVF2_BUILD_EXAMPLES)
     add_subdirectory(examples)
+    if(EMSCRIPTEN)
+        add_subdirectory(tests/web) # browser checks (shader_check)
+    endif()
 endif()
 
 if(IVF2_BUILD_TESTS)

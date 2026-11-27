@@ -23,7 +23,7 @@ private:
     GLuint m_multisampledDepthBuffer; ///< Multisampled depth buffer attachment.
 
     GLuint m_colorTexture;             ///< Color texture attachment.
-    GLuint m_multisampledColorTexture; ///< Multisampled color texture attachment.
+    GLuint m_multisampledColorTexture; ///< Multisampled color attachment (a renderbuffer).
 
     GLuint m_quadVAO; ///< Vertex array object for screen quad.
     GLuint m_quadVBO; ///< Vertex buffer object for screen quad.

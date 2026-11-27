@@ -71,7 +71,10 @@ endfunction()
 
 # Web builds (preset wasm): the examples ported to the browser so far (ROADMAP phase 3.3).
 if(EMSCRIPTEN)
-    set(IVF2_WEB_EXAMPLES hello_ivf)
+    set(IVF2_WEB_EXAMPLES
+        hello_ivf hello_pipeline primitives1 lighting1 textures1 bump1 skybox1 transparency1
+        shadows1 cascaded_shadows1 point_shadows1 hdr1 ibl1 gltf1 reflection1
+        effects1 fog1 dof1 mip_bloom1 ssao1 ssr1 deformer1)
     foreach(_example IN LISTS IVF2_WEB_EXAMPLES)
         add_subdirectory(${_example})
     endforeach()

@@ -470,8 +470,11 @@ void PointCloud::doDrawPass(const ivf::DrawContext &context)
         glBindTexture(GL_TEXTURE_2D, g.texture);
     }
 
-    const GLboolean pointSizeWas = glIsEnabled(GL_PROGRAM_POINT_SIZE);
-    glEnable(GL_PROGRAM_POINT_SIZE);
+    // gl_PointSize from the shader: a switch in desktop GL, always on in OpenGL ES
+    const bool gles = ivf::RenderContext::isGles();
+    const GLboolean pointSizeWas = gles ? GL_TRUE : glIsEnabled(GL_PROGRAM_POINT_SIZE);
+    if (!gles)
+        glEnable(GL_PROGRAM_POINT_SIZE);
     glBindVertexArray(g.vao);
     glDrawArrays(GL_POINTS, 0, g.count);
     context.context.countDrawCall();

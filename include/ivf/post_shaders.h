@@ -239,7 +239,7 @@ uniform float blurRadius;
 
 // Gaussian blur
 vec3 applyBlur(sampler2D tex, vec2 texCoord) {
-    vec2 texelSize = 1.0 / textureSize(tex, 0);
+    vec2 texelSize = 1.0 / vec2(textureSize(tex, 0));
     vec3 result = vec3(0.0);
     float total = 0.0;
     
@@ -366,7 +366,7 @@ uniform float time;
 
 
 vec3 applyPixelation(sampler2D tex, vec2 texCoord) {
-    vec2 texSize = textureSize(tex, 0);
+    vec2 texSize = vec2(textureSize(tex, 0));
     vec2 pixel = floor(texCoord * texSize / pixelSize) * pixelSize / texSize;
     return texture(tex, pixel).rgb;
 }
@@ -388,7 +388,7 @@ uniform float time;
 
 
 vec3 applyEdgeDetection(sampler2D tex, vec2 texCoord) {
-    vec2 texelSize = 1.0 / textureSize(tex, 0);
+    vec2 texelSize = 1.0 / vec2(textureSize(tex, 0));
     vec3 center = texture(tex, texCoord).rgb;
     vec3 left = texture(tex, texCoord - vec2(texelSize.x, 0.0)).rgb;
     vec3 right = texture(tex, texCoord + vec2(texelSize.x, 0.0)).rgb;
@@ -691,7 +691,7 @@ float dotMask(vec2 coord, float value, float cell, float a)
 
 void main()
 {
-    vec2 coord = TexCoords * textureSize(screenTexture, 0);
+    vec2 coord = TexCoords * vec2(textureSize(screenTexture, 0));
     float cell = max(dotSize, 1.0);
     vec3 col = texture(screenTexture, TexCoords).rgb;
 

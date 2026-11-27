@@ -17,10 +17,7 @@ uniform float specular_power = 128.0;
 uniform vec3 ambient = vec3(0.1, 0.1, 0.1);
 
 // Outputs to the fragment shader
-out VS_OUT
-{
-    vec3 color;
-} vs_out;
+out vec3 vs_color;
 
 void main(void)
 {
@@ -62,12 +59,12 @@ void main(void)
 
 		// Send the color output to the fragment shader
 
-		vs_out.color = ambient + diffuse + specular;
+		vs_color = ambient + diffuse + specular;
 
 	}
 	else
 	{
-		vs_out.color = vec3(1.0, 1.0, 0.0);	
+		vs_color = vec3(1.0, 1.0, 0.0);	
 	}
 
     // Calculate the clip-space position of each vertex

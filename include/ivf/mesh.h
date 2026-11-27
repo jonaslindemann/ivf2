@@ -85,6 +85,9 @@ private:
         std::uint64_t vertexVersion{0};       ///< m_vertexVersion when uploaded.
         std::uint64_t normalVersion{0};       ///< m_normalVersion when uploaded.
         std::uint64_t colorVersion{0};        ///< m_colorVersion when uploaded.
+        GLuint wireIndices{0};                ///< Triangle edges as GL_LINES (wireframe on OpenGL ES).
+        GLsizei wireCount{0};                 ///< Number of indices in wireIndices.
+        std::uint64_t wireVersion{0};         ///< m_dataVersion when wireIndices was built.
 };
     std::vector<std::unique_ptr<GpuCopy>> m_gpu; ///< One GPU copy per context that drew the mesh.
 
@@ -124,6 +127,8 @@ bool m_clockwise{false};          ///< Front faces are clockwise (decided in end
     void upload(GpuCopy &copy);
     /// Release the GL objects of @p copy in the right context.
     static void release(GpuCopy &copy);
+    /// Edges of the triangles as a GL_LINES index buffer (built on first use, per data version).
+    void updateWireIndices(GpuCopy &copy);
 
 public:
     /**

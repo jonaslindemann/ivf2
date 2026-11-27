@@ -69,12 +69,12 @@ void FrameBuffer::attachDepthBuffer(GLuint &buffer)
 
 void ivf::FrameBuffer::attachMultisampledColorTexture()
 {
-    // Multisampled color buffer
-    glGenTextures(1, &m_multisampledColorTexture);
-    glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_multisampledColorTexture);
-    glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_samples, GL_RGBA16F, m_width, m_height, GL_TRUE);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_multisampledColorTexture,
-                           0);
+    // Multisampled color buffer: a renderbuffer, which OpenGL ES 3 (WebGL 2) supports too
+    // (multisampled textures need GL 3.2 / ES 3.1). It is only read through the blit in end().
+    glGenRenderbuffers(1, &m_multisampledColorTexture);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_multisampledColorTexture);
+    glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_samples, GL_RGBA16F, m_width, m_height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, m_multisampledColorTexture);
 }
 
 void ivf::FrameBuffer::attachMultisampledDepthBuffer()
@@ -128,6 +128,9 @@ void ivf::FrameBuffer::initialize()
         this->attachDepthBuffer(m_depthBuffer);
     }
 
+    // Don't leave the new attachments bound to a texture unit: WebGL refuses draws into a
+    // texture that a sampler of the program can see (feedback loop)
+    glBindTexture(GL_TEXTURE_2D, 0);
     this->unbind();
 }
 
@@ -148,7 +151,7 @@ void ivf::FrameBuffer::drop()
     // multisampling has just been turned off
     glDeleteBuffers(1, &m_quadVBO);
     glDeleteVertexArrays(1, &m_quadVAO);
-    glDeleteTextures(1, &m_multisampledColorTexture);
+    glDeleteRenderbuffers(1, &m_multisampledColorTexture);
     glDeleteRenderbuffers(1, &m_multisampledDepthBuffer);
     glDeleteFramebuffers(1, &m_multisampledFrameBuffer);
     glDeleteTextures(1, &m_colorTexture);
@@ -244,6 +247,10 @@ void ivf::FrameBuffer::draw()
 
     glViewport(0, 0, m_width, m_height);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // The scene is drawn into this texture next frame: WebGL refuses that while a sampler
+    // can see it (feedback loop)
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     glEnable(GL_DEPTH_TEST);
 }

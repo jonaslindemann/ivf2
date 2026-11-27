@@ -27,8 +27,8 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   `setCollisionFilter()`); step callbacks for forces applied every fixed step; `stats()`.
   Interaction: `DragController` (drag a body with camera rays through a mass-independent damped
   spring) and `throwBody()`. `drawDebug()` draws colliders, contact points, velocities and the drag
-  spring through `DebugDraw`. `rigid_body1` drags bodies with the mouse, throws balls (T) and shows
-  the debug view (V) and statistics.
+  spring through `DebugDraw`. `rigid_body1` drags bodies with the mouse, throws balls (Space) and shows
+  the debug view (L) and statistics.
   Joints: ball and socket (cone limit), hinge and slider (limits, motors) and fixed joints between
   two bodies or a body and the world (`addHingeJoint(body, nullptr, anchor, axis)`), breakable above
   a force or torque (`JointDesc`, break callback; `reset()` mends them), with reaction forces,
@@ -36,6 +36,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   nestable) give one body several colliders. The debug view draws joints. New example
   `physics_joints1`: a hinged bridge, a pendulum chain, a motor-driven windmill with a compound
   rotor, a piston, a welded tower to knock apart and a table.
+  New example `physics_sandbox1`, the complete physics application: five presets (brick wall,
+  domino run, tower and wrecking ball, Newton's cradle and chain, ramp course), dragging, throwing,
+  sliders for gravity, friction, bounciness and speed, bodies coloured by speed with an `ivfvis`
+  colormap and colour bar, PBR materials under a procedural sky; `IVF2_SANDBOX_PRESET` picks the
+  preset (also as a page URL parameter in the browser).
 - Web builds (work in progress, see `ROADMAP.md` phase 3.3): the CMake preset `wasm` compiles
   the libraries and examples to WebAssembly with Emscripten; programs render with WebGL 2
   (OpenGL ES 3.0) in a full-window canvas. `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with

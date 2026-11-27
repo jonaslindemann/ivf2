@@ -9,9 +9,9 @@
  *  - a PhysicsWorld stepped with the window's frame time (fixed steps, interpolated nodes)
  *  - a static ground plane and dynamic boxes, spheres, capsules and capped cylinders whose
  *    shapes come from the nodes (Shape::fromNode(): a cylinder becomes a convex hull)
- *  - drag bodies with the left mouse button (DragController), T throws a ball at the mouse
- *    (throwBody()), V shows colliders and contacts (drawDebug())
- *  - D drops another body, P pauses, S steps once, R resets to the start
+ *  - drag bodies with the left mouse button (DragController), Space throws a ball at the mouse
+ *    (throwBody()), L shows colliders and contacts (drawDebug())
+ *  - D drops another body, P pauses, N steps once, R resets to the start
  */
 
 #include <imgui.h>
@@ -214,7 +214,7 @@ public:
         if (ImGui::Button(m_world->isPaused() ? "Run (P)" : "Pause (P)"))
             m_world->setPaused(!m_world->isPaused());
         ImGui::SameLine();
-        if (ImGui::Button("Step (S)"))
+        if (ImGui::Button("Step (N)"))
             m_world->stepOnce();
         ImGui::SameLine();
         if (ImGui::Button("Reset (R)"))
@@ -222,7 +222,7 @@ public:
         if (ImGui::Button("Drop a body (D)"))
             dropBody();
         ImGui::SameLine();
-        if (ImGui::Button("Throw a ball (T)"))
+        if (ImGui::Button("Throw a ball (Space)"))
             throwBall();
         ImGui::TextDisabled("Drag bodies with the left mouse button");
 
@@ -234,7 +234,7 @@ public:
             m_world->setGravity(g);
 
         ImGui::SeparatorText("Debug view");
-        ImGui::Checkbox("Show (V)", &m_debugView);
+        ImGui::Checkbox("Show (L)", &m_debugView);
         ImGui::SameLine();
         ImGui::Checkbox("Contacts", &m_debugOptions.contacts);
         ImGui::SameLine();
@@ -255,15 +255,15 @@ public:
         {
             if (key == GLFW_KEY_P)
                 m_world->setPaused(!m_world->isPaused());
-            else if (key == GLFW_KEY_S)
+            else if (key == GLFW_KEY_N)
                 m_world->stepOnce();
             else if (key == GLFW_KEY_R)
                 resetScene();
             else if (key == GLFW_KEY_D)
                 dropBody();
-            else if (key == GLFW_KEY_T)
+            else if (key == GLFW_KEY_SPACE)
                 throwBall();
-            else if (key == GLFW_KEY_V)
+            else if (key == GLFW_KEY_L)
                 m_debugView = !m_debugView;
         }
         GLFWSceneWindow::onKey(key, scancode, action, mods);

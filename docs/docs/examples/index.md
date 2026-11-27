@@ -131,3 +131,4 @@ The `ivfvis` examples; see [Scientific Visualisation](../visualisation/index.md)
 | `debug_draw1` | Immediate-mode debug lines and shapes | |
 | `rigid_body1` | Rigid-body physics with ivfphysics | |
 | `physics_joints1` | Joints, motors, breakable welds and compound bodies | |
+| `physics_sandbox1` | An interactive physics sandbox: presets, throwing, dragging, bodies coloured by speed | |

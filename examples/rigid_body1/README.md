@@ -13,13 +13,13 @@ falls onto the ground and tumbles.
 - The bodies move their nodes; the scene is drawn as usual.
 - The left mouse button drags bodies: a `DragController` grabs the body under the camera ray
   (`cameraRay(x, y)`) and pulls the grabbed point with a damped spring; the camera is blocked
-  while dragging. **T** throws a heavy ball through the mouse position (`throwBody()`).
-- **V** shows the debug view (`drawDebug()`): collider wireframes coloured by body type and
+  while dragging. **Space** throws a heavy ball through the mouse position (`throwBody()`).
+- **L** shows the debug view (`drawDebug()`): collider wireframes coloured by body type and
   sleep state, contact points with normals, optionally velocities. The panel lists the world's
   statistics (`stats()`: bodies, awake bodies, contacts, update time).
 
-Keys: **D** drops another body, **T** throws a ball, **V** toggles the debug view, **P** pauses,
-**S** runs a single step, **R** resets the scene to the start (thrown balls are removed). The
+Keys: **D** drops another body, **Space** throws a ball, **L** toggles the debug view, **P** pauses,
+**N** runs a single step, **R** resets the scene to the start (thrown balls are removed). The
 panel also has sliders for the time scale and gravity.
 
 ```cpp

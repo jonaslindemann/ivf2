@@ -12,12 +12,12 @@ Joints connect bodies to each other or to the world. Each is created from an anc
 - **Piston**: a heavy block on a slider with limits (`setLimits(0, 3)`) and a motor that the
   example reverses at the ends of the stroke; it pushes crates.
 - **Welded tower**: blocks held by fixed joints with a break force and torque
-  (`JointDesc{.breakForce = 400, .breakTorque = 150}`). Throw balls at it (**T**): welds that
+  (`JointDesc{.breakForce = 400, .breakTorque = 150}`). Throw balls at it (**Space**): welds that
   take too much break, and the panel counts them (`setJointBreakCallback()`). **R** resets the
   scene and mends them.
 - **Table**: one body with a compound shape of a top and four legs, under a crate.
 
-The debug view (**V**) shows the joints: anchors, axes and the lines to the joined bodies;
+The debug view (**L**) shows the joints: anchors, axes and the lines to the joined bodies;
 colliders and contacts can be added in the panel. Bodies can be dragged with the left mouse
 button, **P** pauses.
 

@@ -9,9 +9,9 @@
  *  - a pendulum chain of ball and socket joints
  *  - a windmill: a compound cross on a hinge driven by a motor
  *  - a piston: a slider with limits and a motor that reverses at the ends
- *  - a welded tower: fixed joints that break when hit hard (throw a ball with T)
+ *  - a welded tower: fixed joints that break when hit hard (throw a ball with Space)
  *  - a table: one body with a compound shape (top and four legs)
- *  Drag bodies with the left mouse button; V toggles the debug view, R resets (mends the welds).
+ *  Drag bodies with the left mouse button; L toggles the debug view, R resets (mends the welds).
  */
 
 #include <imgui.h>
@@ -361,12 +361,12 @@ public:
         if (ImGui::Button("Reset (R)"))
             resetScene();
         ImGui::SameLine();
-        if (ImGui::Button("Throw a ball (T)"))
+        if (ImGui::Button("Throw a ball (Space)"))
             throwBall();
         ImGui::TextDisabled("Drag bodies with the left mouse button");
 
         ImGui::SeparatorText("Debug view");
-        ImGui::Checkbox("Show (V)", &m_debugView);
+        ImGui::Checkbox("Show (L)", &m_debugView);
         ImGui::Checkbox("Joints", &m_debugOptions.joints);
         ImGui::SameLine();
         ImGui::Checkbox("Colliders", &m_debugOptions.colliders);
@@ -389,9 +389,9 @@ public:
                 m_world->setPaused(!m_world->isPaused());
             else if (key == GLFW_KEY_R)
                 resetScene();
-            else if (key == GLFW_KEY_T)
+            else if (key == GLFW_KEY_SPACE)
                 throwBall();
-            else if (key == GLFW_KEY_V)
+            else if (key == GLFW_KEY_L)
                 m_debugView = !m_debugView;
         }
         GLFWSceneWindow::onKey(key, scancode, action, mods);

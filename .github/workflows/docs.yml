@@ -1,7 +1,9 @@
 name: Deploy Docs to GitHub Pages
 
-# Rebuilds the site only when something it is generated from changes
-# (the user guide, or the sources Doxygen reads: see INPUT in Doxyfile).
+# Rebuilds the site only when something it is generated from changes (the user guide, the
+# sources Doxygen reads - see INPUT in Doxyfile - or what the web examples are built from).
+# The examples compiled for the browser (web.yml) are published under web/; the site is
+# deployed only if they build and pass their smoke test, so the live links never break.
 on:
   push:
     branches: [main]
@@ -18,8 +20,15 @@ on:
       - 'src/ivfvis/**'
       - 'src/ivfmath/**'
       - 'examples/**'
+      - 'data/**'
+      - 'cmake/**'
+      - 'tests/web/**'
+      - 'CMakeLists.txt'
+      - 'CMakePresets.json'
+      - 'vcpkg.json'
       - 'Doxyfile'
       - '.github/workflows/docs.yml'
+      - '.github/workflows/web.yml'
   workflow_dispatch:
 
 permissions:
@@ -32,7 +41,12 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  web:
+    name: Web examples
+    uses: ./.github/workflows/web.yml
+
   build:
+    needs: web
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -52,6 +66,12 @@ jobs:
 
       - name: Build Zensical site
         run: python -m zensical build --clean --config-file docs/zensical.toml
+
+      - name: Add the web examples
+        uses: actions/download-artifact@v8
+        with:
+          name: web-examples
+          path: docs/site/web
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

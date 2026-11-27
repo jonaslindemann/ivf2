@@ -18,6 +18,12 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   `shader_check` (`tests/web`) compiles every built-in shader with WebGL 2. The canvas follows
   the size of its parent element and uses device pixels on high-DPI screens; `IVF2_*` query
   parameters in the page URL become environment variables (`page.html?IVF2_FIXED_TIMESTEP=0.016`).
+  The installed package works in Emscripten projects (`find_package(ivf2)`; `ivf2Emscripten.cmake`).
+  Guide page "Running in the Browser".
+- The examples run live in the browser: CI builds them (`.github/workflows/web.yml`, for pull
+  requests and releases), tests every page in headless Chrome (`tests/web/smoke_test.mjs`) and
+  publishes them with the documentation at <https://jonaslindemann.github.io/ivf2/web/>, with a
+  start page from `docs/tools/make_gallery.py --web`. Guide pages link to their live examples.
 - `RenderContext::isGles()`; `ivf/glsl_es.h`: shaders are translated to GLSL ES 3.00 when
   compiled on OpenGL ES (version line, default precisions; uniform initialisers become values
   set after linking, `Shader::uniformDefaults()`). One shader source serves both.
@@ -48,6 +54,11 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - Blur, pixelation and halftone effects used `textureSize()` (an integer vector) as a float
   vector; `default.frag` and `standard_lighting.fs` passed an integer exponent to `pow()`; the
   phong sample shaders in `data/shaders` used interface blocks. All are now valid GLSL ES too.
+- Shader compile time: the shadow filter code (`shadow_glsl`) was inlined once per shadow map
+  at every call, and sampled the maps with implicit derivatives inside loops. Now only the
+  fetch branches on the map (`ivfShadowFetch()`, `textureLod()`) and multitexturing uses
+  `textureGrad()`. With ANGLE's Direct3D backend (WebGL on Windows) the stock shader links in
+  about 7 s instead of 25 s; desktop drivers and SwiftShader compile faster too. Same images.
 
 ## [2.0.0-alpha.3] - 2026-11-26
 

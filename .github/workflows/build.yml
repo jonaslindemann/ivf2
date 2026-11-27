@@ -8,6 +8,9 @@
 #   "Run workflow" button ... full matrix
 #   release.yml (version tag) full matrix; the release is created only if it passes
 #
+# The full matrix also builds the examples for the browser and smoke tests them in headless
+# Chrome (web.yml, job "Web"); docs.yml does the same before publishing them.
+#
 # A commit message containing [skip ci] skips the build altogether.
 
 name: Build
@@ -43,6 +46,7 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
+      web: ${{ steps.plan.outputs.web }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -79,15 +83,26 @@ jobs:
           if [ "$EVENT" = "push" ] && [ "$REF" = "refs/heads/main" ]; then
             echo "Push to main: quick build (Linux GCC only, no visual tests)"
             matrix=$(jq -c '[.[] | select(.name == "Linux (GCC)") | .["visual-tests"] = false]' matrix.json)
+            web=false
           elif [ "$EVENT" = "schedule" ] && \
                [ "$(git log -1 --format=%ct)" -lt "$(( $(date +%s) - 86400 ))" ]; then
             echo "Nightly: no new commits in the last 24 hours, nothing to build"
             matrix='[]'
+            web=false
           else
             echo "$EVENT ($REF): full matrix"
             matrix=$(jq -c '.' matrix.json)
+            web=true
           fi
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "web=$web" >> "$GITHUB_OUTPUT"
+
+  # The examples in the browser (Emscripten, WebGL 2), with the full matrix only
+  web:
+    name: Web
+    needs: plan
+    if: needs.plan.outputs.web == 'true'
+    uses: ./.github/workflows/web.yml
 
   build:
     name: ${{ matrix.name }}

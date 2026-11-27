@@ -103,20 +103,21 @@ uniform sampler2D textures[MAX_TEXTURES];
 uniform int   textureBlendModes[MAX_TEXTURES];
 uniform float textureBlendFactors[MAX_TEXTURES];
 
-// Sampler arrays may only be indexed with constants in GLSL ES (WebGL) and GLSL 3.30
-vec4 sampleTextureUnit(int i, vec2 uv)
+// Sampler arrays may only be indexed with constants in GLSL ES (WebGL) and GLSL 3.30. Called
+// in a loop: explicit derivatives (taken outside it) keep compilers from unrolling the loop.
+vec4 sampleTextureUnit(int i, vec2 uv, vec2 dx, vec2 dy)
 {
     switch (i)
     {
-    case 1: return texture(textures[1], uv);
-    case 2: return texture(textures[2], uv);
-    case 3: return texture(textures[3], uv);
-    case 4: return texture(textures[4], uv);
-    case 5: return texture(textures[5], uv);
-    case 6: return texture(textures[6], uv);
-    case 7: return texture(textures[7], uv);
+    case 1: return textureGrad(textures[1], uv, dx, dy);
+    case 2: return textureGrad(textures[2], uv, dx, dy);
+    case 3: return textureGrad(textures[3], uv, dx, dy);
+    case 4: return textureGrad(textures[4], uv, dx, dy);
+    case 5: return textureGrad(textures[5], uv, dx, dy);
+    case 6: return textureGrad(textures[6], uv, dx, dy);
+    case 7: return textureGrad(textures[7], uv, dx, dy);
     }
-    return texture(textures[0], uv);
+    return textureGrad(textures[0], uv, dx, dy);
 }
 
 )" IVF_LIGHTS_BLOCK_GLSL R"(
@@ -252,10 +253,12 @@ void main()
 
                     if (useMultiTexturing && activeTextureCount > 1)
                     {
+                        vec2 uvDx = dFdx(texCoord);
+                        vec2 uvDy = dFdy(texCoord);
                         finalTexColor = texture(textures[0], texCoord);
                         for (int i = 1; i < activeTextureCount && i < MAX_TEXTURES; i++)
                         {
-                            vec4 texSample = sampleTextureUnit(i, texCoord);
+                            vec4 texSample = sampleTextureUnit(i, texCoord, uvDx, uvDy);
                             finalTexColor  = applyTexBlendModeIndexed(
                                 texSample, finalTexColor,
                                 textureBlendModes[i], textureBlendFactors[i]);

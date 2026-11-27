@@ -6,6 +6,7 @@
 # Components (optional features), e.g. find_package(ivf2 REQUIRED COMPONENTS Assimp):
 #           Assimp, FreeType, Audio, Midi, Music
 # Functions: ivf2_copy_runtime_files(<target> [ASSETS <dirs...>])
+#            ivf2_web_executable(<target> [ASSETS_ROOT <dir>] [ASSETS ...]) (web builds)
 #            ivfmusic_add_executable(<name> SOURCES ... [ASSETS <dir>])
 # Variables: IVF2_RUNTIME_DATA_DIR (installed shaders/ and fonts/)
 
@@ -13,9 +14,14 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(OpenGL)
-find_dependency(Threads)
-find_dependency(glfw3 CONFIG)
+if(EMSCRIPTEN)
+    # Web build: WebGL 2 and Emscripten's GLFW (ivf2_web_executable() makes the pages)
+    include("${CMAKE_CURRENT_LIST_DIR}/ivf2Emscripten.cmake")
+else()
+    find_dependency(OpenGL)
+    find_dependency(Threads)
+    find_dependency(glfw3 CONFIG)
+endif()
 find_dependency(glm CONFIG)
 find_dependency(imgui CONFIG)
 find_dependency(nlohmann_json CONFIG)

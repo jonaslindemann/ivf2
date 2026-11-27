@@ -75,18 +75,45 @@ int ivfShadowTileIndex(int slot, vec3 worldPos)
     return -1;
 }
 
+// Sampler arrays need constant indices in GLSL 3.30 and GLSL ES, hence the branches. Only the
+// fetch branches on the map: the filter code below then exists once per call site instead of
+// once per map, which keeps shader compilers fast (ANGLE's D3D backend behind WebGL on Windows
+// took minutes to link the stock shader otherwise). textureLod: the maps have no mipmaps, and
+// implicit derivatives in the filter loops would make compilers unroll them.
+float ivfShadowFetch(int slot, vec2 uv)
+{
+    if (slot == 1)
+        return textureLod(shadowMaps[1], uv, 0.0).r;
+    if (slot == 2)
+        return textureLod(shadowMaps[2], uv, 0.0).r;
+    if (slot == 3)
+        return textureLod(shadowMaps[3], uv, 0.0).r;
+    return textureLod(shadowMaps[0], uv, 0.0).r;
+}
+
+vec2 ivfShadowMapSize(int slot)
+{
+    if (slot == 1)
+        return vec2(textureSize(shadowMaps[1], 0));
+    if (slot == 2)
+        return vec2(textureSize(shadowMaps[2], 0));
+    if (slot == 3)
+        return vec2(textureSize(shadowMaps[3], 0));
+    return vec2(textureSize(shadowMaps[0], 0));
+}
+
 // Depth comparable with the receiver's: the stored depth (directional) or the linear
 // distance along the view axis (point face, spot)
-float ivfShadowDepth(sampler2D map, vec2 uv, int type, vec2 nearFar)
+float ivfShadowDepth(int slot, vec2 uv, int type, vec2 nearFar)
 {
-    float d = texture(map, uv).r;
+    float d = ivfShadowFetch(slot, uv);
     if (type < 2)
         return d;
     float z = d * 2.0 - 1.0;
     return 2.0 * nearFar.x * nearFar.y / (nearFar.y + nearFar.x - z * (nearFar.y - nearFar.x));
 }
 
-float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
+float ivfShadow(int slot, vec3 worldPos, vec3 N, vec3 L)
 {
     int tile = ivfShadowTileIndex(slot, worldPos);
     if (tile < 0)
@@ -134,7 +161,7 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
     float rows = atlas.z;
     vec2 tileOrigin = vec2(mod(float(tile), cols), floor(float(tile) / cols)) / vec2(cols, rows);
     vec2 tileSize = vec2(1.0 / cols, 1.0 / rows);
-    vec2 texel = 1.0 / vec2(textureSize(map, 0));
+    vec2 texel = 1.0 / ivfShadowMapSize(slot);
     vec2 lo = tileOrigin + 0.5 * texel;
     vec2 hi = tileOrigin + tileSize - 0.5 * texel;
     vec2 uv = tileOrigin + proj.xy * tileSize;
@@ -165,7 +192,7 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
         slope = sqrt(1.0 - ndl * ndl) / ndl * texelWorld / worldPerDepth;
 
     if (filterMode == 0)
-        return current - bias > ivfShadowDepth(map, clamp(uv, lo, hi), type, nearFar) ? 1.0 : 0.0;
+        return current - bias > ivfShadowDepth(slot, clamp(uv, lo, hi), type, nearFar) ? 1.0 : 0.0;
 
     if (filterMode == 1)
     {
@@ -175,7 +202,7 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
         {
             for (int y = -radius; y <= radius; ++y)
             {
-                float d = ivfShadowDepth(map, clamp(uv + vec2(x, y) * texel, lo, hi), type, nearFar);
+                float d = ivfShadowDepth(slot, clamp(uv + vec2(x, y) * texel, lo, hi), type, nearFar);
                 shadow += current - bias - slope * length(vec2(x, y)) > d ? 1.0 : 0.0;
                 n += 1.0;
             }
@@ -195,7 +222,7 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
     for (int i = 0; i < 16; ++i)
     {
         vec2 offset = rotation * ivfPoisson[i] * searchTexels;
-        float d = ivfShadowDepth(map, clamp(uv + offset * texel, lo, hi), type, nearFar);
+        float d = ivfShadowDepth(slot, clamp(uv + offset * texel, lo, hi), type, nearFar);
         if (d < current - bias - slope * length(offset))
         {
             blockerSum += d;
@@ -213,24 +240,18 @@ float ivfShadow(sampler2D map, int slot, vec3 worldPos, vec3 N, vec3 L)
     for (int i = 0; i < 16; ++i)
     {
         vec2 offset = rotation * ivfPoisson[i] * filterTexels;
-        float d = ivfShadowDepth(map, clamp(uv + offset * texel, lo, hi), type, nearFar);
+        float d = ivfShadowDepth(slot, clamp(uv + offset * texel, lo, hi), type, nearFar);
         shadow += current - bias - slope * length(offset) > d ? 1.0 : 0.0;
     }
     return shadow / 16.0;
 }
 
-// 0 = lit, 1 = shadowed. Sampler arrays need constant indices in GLSL 3.30, hence the branches.
+// 0 = lit, 1 = shadowed
 float ivfShadowFactor(int slot, vec3 worldPos, vec3 N, vec3 toLight)
 {
-    if (slot == 0)
-        return ivfShadow(shadowMaps[0], 0, worldPos, N, toLight);
-    if (slot == 1)
-        return ivfShadow(shadowMaps[1], 1, worldPos, N, toLight);
-    if (slot == 2)
-        return ivfShadow(shadowMaps[2], 2, worldPos, N, toLight);
-    if (slot == 3)
-        return ivfShadow(shadowMaps[3], 3, worldPos, N, toLight);
-    return 0.0;
+    if (slot < 0 || slot >= IVF_MAX_SHADOW_MAPS)
+        return 0.0;
+    return ivfShadow(slot, worldPos, N, toLight);
 }
 )";
 

@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: steps 1-3 done (preset `wasm`, GLES compatibility, 67 examples run in the browser); **next: step 4** (CI job, docs with live examples). 3.2 Python bindings after the web target |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: steps 1-4 done (preset `wasm`, GLES compatibility, 67 examples run in the browser, CI smoke test and live examples in the docs); **next: step 5** (wrap-up: gallery with live links, README). 3.2 Python bindings after the web target |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -897,6 +897,24 @@ clearest way to stand out.
       tests them in headless Chrome; the docs workflow publishes them under `web/`, guide
       pages embed or link the live examples, and a "Web" guide page explains building
       your own app for the browser.
+      *Done:* `.github/workflows/web.yml` (reusable; from `build.yml` with the full matrix and
+      from `docs.yml`) installs the emsdk (cached with its system libraries), builds preset
+      `wasm` with ccache and a separate vcpkg cache, opens every page in headless Chrome
+      (`tests/web/smoke_test.mjs`: starts, renders frames, no errors or WebGL warnings;
+      `shader_check` reports 0 failures) and uploads the pages and screenshots. `docs.yml`
+      deploys only if that passes and publishes the pages under `web/` on GitHub Pages
+      (<https://jonaslindemann.github.io/ivf2/web/>), with a start page from
+      `make_gallery.py --web`; the script also keeps a generated "Run in the browser" box on
+      the 34 guide pages the Example Index links examples to. Guide page "Running in the
+      Browser" (building, URL settings, hosting, portable code, testing). The installed package
+      works in Emscripten projects (`ivf2Emscripten.cmake` replaces the OpenGL/GLFW/Threads
+      lookups), tested in CI by building `tests/package/web_app.cpp` as a page. Found on the
+      way: with ANGLE's D3D backend (WebGL on Windows) the stock shader took ~25 s to link,
+      because the shadow filter was inlined once per shadow map and sampled with implicit
+      derivatives in loops; now ~7 s (only the fetch branches on the map, `textureLod()`,
+      `textureGrad()` for multitexturing), and SwiftShader starts the shadow examples 4x faster.
+      Open: evaluating the shadow filter once per map instead of once per light loop would
+      bring the link time to about 2 s (needs a shader API change: shadows computed in `main()`).
    5. *Wrap-up.* Gallery with live links, changelog, README.
 4. **Headless and offline rendering.** Render without a visible window (EGL/OSMesa),
    video export through an ffmpeg pipe from `FrameWriter`, deterministic time stepping.

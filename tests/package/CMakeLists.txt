@@ -19,6 +19,12 @@ add_executable(package_test main.cpp)
 target_link_libraries(package_test PRIVATE ivf2::ivf2)
 ivf2_copy_runtime_files(package_test)
 
+# A scene window; in a web build (Emscripten) also a page, web_app.html (see web.yml)
+add_executable(web_app web_app.cpp)
+target_link_libraries(web_app PRIVATE ivf2::ivf2)
+ivf2_copy_runtime_files(web_app)
+ivf2_web_executable(web_app)
+
 if(TARGET ivf2::ivfvis)
     add_executable(package_test_vis main.cpp)
     target_link_libraries(package_test_vis PRIVATE ivf2::ivf2 ivf2::ivfvis)

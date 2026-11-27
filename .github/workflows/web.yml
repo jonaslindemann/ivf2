@@ -1,0 +1,164 @@
+# Web build: the examples compiled to WebAssembly (preset wasm: Emscripten, WebGL 2).
+#
+# Builds the pages, opens each one in headless Chrome (tests/web/smoke_test.mjs: it must start,
+# render frames and log no errors; shader_check compiles every shader with WebGL 2) and
+# uploads two artifacts:
+#
+#   web-examples ...... the pages and their start page index.html (docs/tools/make_gallery.py
+#                       --web), published under web/ next to the documentation by docs.yml
+#   web-screenshots ... a picture of each page as the smoke test saw it (SwiftShader)
+#
+# Called by build.yml (pull requests, nightly, manual runs, releases) and docs.yml; can also be
+# started by itself ("Run workflow").
+
+name: Web
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Emscripten version (the build is tested with this one; see docs/docs/getting_started/web.md)
+  EMSDK_VERSION: 3.1.70
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  web:
+    name: Web (Emscripten)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build pkg-config
+          google-chrome --version
+
+      # Emscripten SDK: cached with the system libraries it builds on first use
+      - name: Restore Emscripten SDK
+        id: emsdk-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/emsdk
+          key: emsdk-${{ env.EMSDK_VERSION }}-ubuntu-24.04
+
+      - name: Install Emscripten SDK
+        if: steps.emsdk-cache.outputs.cache-hit != 'true'
+        run: |
+          git clone --quiet https://github.com/emscripten-core/emsdk.git "$RUNNER_TEMP/emsdk"
+          cd "$RUNNER_TEMP/emsdk"
+          ./emsdk install "$EMSDK_VERSION"
+          ./emsdk activate "$EMSDK_VERSION"
+
+      # vcpkg at the baseline of vcpkg.json (as in build.yml); the wasm32-emscripten packages
+      # are cached separately from the desktop ones
+      - name: Set up vcpkg
+        run: |
+          baseline=$(jq -r '."builtin-baseline"' vcpkg.json)
+          git clone --quiet https://github.com/microsoft/vcpkg.git "$RUNNER_TEMP/vcpkg"
+          git -C "$RUNNER_TEMP/vcpkg" checkout --quiet "$baseline"
+          "$RUNNER_TEMP/vcpkg/bootstrap-vcpkg.sh" -disableMetrics
+          mkdir -p "$RUNNER_TEMP/vcpkg-cache"
+          echo "VCPKG_ROOT=$RUNNER_TEMP/vcpkg" >> "$GITHUB_ENV"
+          echo "VCPKG_DEFAULT_BINARY_CACHE=$RUNNER_TEMP/vcpkg-cache" >> "$GITHUB_ENV"
+
+      - name: Restore vcpkg binary cache
+        id: vcpkg-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: vcpkg-wasm-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json', 'overlay-ports/**') }}-${{ env.EMSDK_VERSION }}
+          restore-keys: vcpkg-wasm-
+
+      - name: Set up ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ccache-wasm-${{ env.EMSDK_VERSION }}
+          max-size: 500M
+          save: ${{ github.event_name != 'pull_request' }}
+
+      - name: Configure
+        env:
+          CCACHE_COMPILERCHECK: content   # emcc/em++ are scripts: hash what they run, not their time stamps
+        run: |
+          source "$RUNNER_TEMP/emsdk/emsdk_env.sh" > /dev/null
+          cmake --preset wasm -DIVF2_WARNINGS_AS_ERRORS=ON -DIVF2_INSTALL=ON \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Save vcpkg binary cache
+        if: always() && steps.vcpkg-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/vcpkg-cache
+          key: ${{ steps.vcpkg-cache.outputs.cache-primary-key }}
+
+      - name: Build
+        env:
+          CCACHE_COMPILERCHECK: content
+        run: |
+          source "$RUNNER_TEMP/emsdk/emsdk_env.sh" > /dev/null
+          cmake --build --preset wasm --parallel
+
+      - name: Save Emscripten SDK
+        if: always() && steps.emsdk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ${{ runner.temp }}/emsdk
+          key: ${{ steps.emsdk-cache.outputs.cache-primary-key }}
+
+      # A separate project using the installed web build (find_package(ivf2)), as described
+      # in the guide "Running in the Browser": tests/package/web_app.cpp becomes web_app.html
+      - name: Package consumer test
+        run: |
+          source "$RUNNER_TEMP/emsdk/emsdk_env.sh" > /dev/null
+          cmake --install build/wasm --prefix "$RUNNER_TEMP/ivf2-web"
+          cmake -S tests/package -B "$RUNNER_TEMP/package-web" -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_TOOLCHAIN_FILE="$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake" \
+            -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE="$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake" \
+            -DVCPKG_TARGET_TRIPLET=wasm32-emscripten \
+            -DVCPKG_MANIFEST_MODE=OFF -DVCPKG_INSTALLED_DIR="$GITHUB_WORKSPACE/build/wasm/vcpkg_installed" \
+            -Divf2_DIR="$RUNNER_TEMP/ivf2-web/lib/cmake/ivf2"
+          cmake --build "$RUNNER_TEMP/package-web"
+          node tests/web/smoke_test.mjs "$RUNNER_TEMP/package-web" web_app
+
+      # The published pages: every example (not the test pages) and a start page
+      - name: Collect pages
+        run: |
+          mkdir -p web-site
+          for page in build/wasm/bin/*.html; do
+            name=$(basename "$page" .html)
+            [ "$name" = shader_check ] && continue
+            cp build/wasm/bin/"$name".{html,js,wasm,data} web-site/
+          done
+          python3 docs/tools/make_gallery.py --web web-site
+          du -sh web-site
+
+      - name: Smoke test in headless Chrome
+        run: |
+          source "$RUNNER_TEMP/emsdk/emsdk_env.sh" > /dev/null
+          node tests/web/smoke_test.mjs build/wasm/bin --jobs 3 --screenshots web-screenshots
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-screenshots
+          path: web-screenshots/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload pages
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-examples
+          path: web-site/
+          retention-days: 3

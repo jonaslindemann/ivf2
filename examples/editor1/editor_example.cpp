@@ -76,7 +76,6 @@ public:
 
         // Set some OpenGL state variables
 
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Force filled polygons
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
 

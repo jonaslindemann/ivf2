@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: steps 1-2 done (preset `wasm`, GLES compatibility; 22 examples run in the browser); **next: step 3** (examples). 3.2 Python bindings after the web target |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: steps 1-3 done (preset `wasm`, GLES compatibility, 67 examples run in the browser); **next: step 4** (CI job, docs with live examples). 3.2 Python bindings after the web target |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -878,6 +878,21 @@ clearest way to stand out.
       audio, several windows, file dialogs); ImGui and ImPlot; ivfvis (point clouds,
       volumes); resizing with the page and high-DPI canvases; environment variables
       (`IVF2_FIXED_TIMESTEP`, ...) from the page URL.
+      *Done:* the web build uses the normal example list minus `IVF2_WEB_EXCLUDED_EXAMPLES`
+      (`multi_window1`, `embedding1`: several windows or a host-owned loop; `audio_reactive1`,
+      `music_scene1`: audio; `assimp1`: assimp and a native file dialog), so new examples
+      build for the browser by default; examples that load files list them in `WEB_ASSETS`.
+      67 examples run in Chrome without WebGL errors, among them ImGui and ImPlot panels,
+      every `ivfvis` example (point clouds, volumes, VTK/CSV/`.npy` readers), text, picking,
+      hot reload (in the page's memory file system) and ReactPhysics3D (`rigid_body1`).
+      Fixed for OpenGL ES: sized `GL_R8`/`GL_RG8` formats for glyphs and one/two-channel
+      images, no `GL_CONTEXT_FLAGS` query, no `glPolygonMode` in two examples. The canvas
+      follows its parent element (`#viewport` in the page template) and Emscripten's GLFW
+      scales it to device pixels (`GLFW_SCALE_TO_MONITOR`); `RenderContext::pixelRatio()`
+      lets `OverlayNode` (colour bars, axis labels) and pixel-sized point clouds keep their
+      size and stay sharp on high-DPI screens, which also fixes them on macOS Retina.
+      `ivf2_web_pre.js` (`--pre-js`) turns `IVF2_*` URL query parameters into environment
+      variables before `main()`.
    4. *CI and documentation.* A CI job builds the web examples (emsdk cached) and smoke
       tests them in headless Chrome; the docs workflow publishes them under `web/`, guide
       pages embed or link the live examples, and a "Web" guide page explains building

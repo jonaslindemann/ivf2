@@ -215,7 +215,7 @@ private:
             m_pool.push_back(ivf::TextNode::create());
         auto &text = m_pool[index];
         text->setSize(static_cast<float>(size));
-        text->setResolution(size);
+        text->setResolution(static_cast<int>(std::lround(static_cast<float>(size) * pixelRatio())));
         text->setColor(m_axes.textColor());
         text->setAlignX(ivf::TextAlignX::LEFT);
         text->setAlignY(ivf::TextAlignY::BOTTOM);

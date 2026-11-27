@@ -103,6 +103,10 @@ GLFWWindow::GLFWWindow(int width, int height, const std::string &title, GLFWmoni
 
 #ifdef __EMSCRIPTEN__
     // The page's canvas with a WebGL 2 context (OpenGL ES 3.0); the version hints don't apply.
+    // Scale to monitor: the drawing buffer gets device pixels (devicePixelRatio times the CSS
+    // size), so high-DPI screens are sharp; window and mouse coordinates stay in CSS pixels,
+    // as on macOS Retina displays.
+    glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
     m_window = glfwCreateWindow(width, height, title.c_str(), monitor, shared);
 #else
     // Request the newest OpenGL first: drivers return exactly the requested version, and
@@ -357,6 +361,16 @@ void GLFWWindow::draw()
     // Make this window the current context
 
     this->makeCurrent();
+
+    // Framebuffer pixels per window unit (high-DPI displays): overlays lay out in window units
+    if (m_renderContext)
+    {
+        int windowWidth = 0, windowHeight = 0, fbWidth = 0, fbHeight = 0;
+        glfwGetWindowSize(m_window, &windowWidth, &windowHeight);
+        glfwGetFramebufferSize(m_window, &fbWidth, &fbHeight);
+        if (windowWidth > 0 && fbWidth > 0)
+            m_renderContext->setPixelRatio(static_cast<float>(fbWidth) / static_cast<float>(windowWidth));
+    }
 
     // IVF2_SCREENSHOT: capture the last frame before IVF2_EXIT_AFTER_FRAMES closes the window
     if (!m_autoScreenshot.empty() && m_autoExitFrames > 0 && m_drawnFrames == m_autoExitFrames - 1)

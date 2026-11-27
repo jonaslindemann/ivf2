@@ -65,6 +65,7 @@ install(FILES
     "${PROJECT_BINARY_DIR}/ivf2ConfigVersion.cmake"
     "${PROJECT_SOURCE_DIR}/cmake/ivf2Helpers.cmake"
     "${PROJECT_SOURCE_DIR}/cmake/ivf2_web_shell.html"
+    "${PROJECT_SOURCE_DIR}/cmake/ivf2_web_pre.js"
     "${PROJECT_SOURCE_DIR}/cmake/ivfmusic.cmake"
     DESTINATION ${IVF2_INSTALL_CMAKEDIR})
 

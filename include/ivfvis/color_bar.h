@@ -115,6 +115,7 @@ private:
     // Layout of the last rebuild
     int m_builtWidth{0};
     int m_builtHeight{0};
+    float m_builtPixelRatio{1.0f};
     std::uint64_t m_builtColormap{0};
     std::uint64_t m_settings{1};
     std::uint64_t m_builtSettings{0};

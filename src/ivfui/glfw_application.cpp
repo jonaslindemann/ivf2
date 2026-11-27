@@ -12,6 +12,13 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
+
+// Size of the canvas's parent element in CSS pixels (0 x 0 without a parent)
+EM_JS(void, canvasParentSize, (int *width, int *height), {
+    const parent = Module['canvas'] && Module['canvas'].parentElement;
+    HEAP32[width >> 2] = parent ? Math.floor(parent.clientWidth) : 0;
+    HEAP32[height >> 2] = parent ? Math.floor(parent.clientHeight) : 0;
+});
 #endif
 
 using namespace ivf;
@@ -168,14 +175,14 @@ bool GLFWApplication::frame()
         {
             hasOpenWindows = true;
 #ifdef __EMSCRIPTEN__
-            // The canvas is sized by the page (CSS); give its drawing buffer the same size.
-            double cssWidth = 0.0, cssHeight = 0.0;
-            emscripten_get_element_css_size("#canvas", &cssWidth, &cssHeight);
+            // The page sizes the canvas's parent element; the window (the canvas, in CSS pixels)
+            // follows it. Not the canvas itself: on high-DPI screens GLFW fixes its CSS size.
+            int cssWidth = 0, cssHeight = 0;
+            canvasParentSize(&cssWidth, &cssHeight);
             int width = 0, height = 0;
             glfwGetWindowSize(window->ref(), &width, &height);
-            if (cssWidth >= 1.0 && cssHeight >= 1.0 &&
-                (static_cast<int>(cssWidth) != width || static_cast<int>(cssHeight) != height))
-                glfwSetWindowSize(window->ref(), static_cast<int>(cssWidth), static_cast<int>(cssHeight));
+            if (cssWidth > 0 && cssHeight > 0 && (cssWidth != width || cssHeight != height))
+                glfwSetWindowSize(window->ref(), cssWidth, cssHeight);
 #endif
             window->draw();
         }

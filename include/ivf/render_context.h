@@ -185,6 +185,24 @@ public:
     }
 
     /**
+     * @brief Framebuffer pixels per window unit (default 1).
+     *
+     * Above 1 on high-DPI displays (macOS Retina, browsers with a devicePixelRatio above 1),
+     * where the framebuffer has more pixels than the window has units. The window sets it
+     * before drawing; OverlayNode lays out in window units and renders text with it.
+     */
+    void setPixelRatio(float ratio)
+    {
+        m_pixelRatio = ratio > 0.0f ? ratio : 1.0f;
+    }
+
+    /** @brief See setPixelRatio(). */
+    [[nodiscard]] float pixelRatio() const
+    {
+        return m_pixelRatio;
+    }
+
+    /**
      * @brief Upload model matrices as InstanceAttributes (white colour, zero data) to the
      *        context's instance buffer and return the buffer.
      *
@@ -299,6 +317,7 @@ private:
     std::optional<bool> m_wideLines; ///< Queried on first use.
     Counters m_counters;             ///< See counters().
     bool m_autoInstancing{true};     ///< See setAutoInstancing().
+    float m_pixelRatio{1.0f};        ///< See setPixelRatio().
     GLuint m_instanceBuffer{0};      ///< See uploadInstanceTransforms().
     std::size_t m_instanceCapacity{0};             ///< Allocated size of m_instanceBuffer, in instances.
     std::vector<InstanceAttributes> m_instanceScratch; ///< Records being uploaded.

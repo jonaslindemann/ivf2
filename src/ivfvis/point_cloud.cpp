@@ -430,9 +430,12 @@ void PointCloud::doDrawPass(const ivf::DrawContext &context)
     GLint viewport[4] = {0, 0, 1, 1};
     glGetIntegerv(GL_VIEWPORT, viewport);
     const float viewportHeight = static_cast<float>(viewport[3]);
+    // Sizes in pixels are window units: pixelRatio() framebuffer pixels each on high-DPI displays
+    const float pixelRatio = context.context.pixelRatio();
+    const bool worldSize = m_sizeMode == PointSizeMode::World;
     if (context.pass == ivf::RenderPass::Main)
     {
-        m_lastProjectionScale = context.projection[1][1] * viewportHeight * 0.5f;
+        m_lastProjectionScale = context.projection[1][1] * viewportHeight / pixelRatio * 0.5f;
         m_lastOrthographic = context.projection[3][3] > 0.5f;
     }
 
@@ -440,8 +443,8 @@ void PointCloud::doDrawPass(const ivf::DrawContext &context)
     shaders->setCurrentProgram(program);
 
     program->uniformMatrix4("model", context.item.world);
-    program->uniformFloat("pointSize", m_pointSize);
-    program->uniformBool("worldSize", m_sizeMode == PointSizeMode::World);
+    program->uniformFloat("pointSize", worldSize ? m_pointSize : m_pointSize * pixelRatio);
+    program->uniformBool("worldSize", worldSize);
     program->uniformFloat("viewportHeight", viewportHeight);
     program->uniformInt("shape", static_cast<int>(m_shape));
     program->uniformBool("useColormap", useColormap);

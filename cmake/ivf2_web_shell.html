@@ -1,6 +1,8 @@
 <!doctype html>
 <!-- ivf2 web page template (ivf2_web_executable): a full-window canvas with a loading indicator.
-     Emscripten replaces the SCRIPT placeholder at the end with the program's loader. -->
+     Emscripten replaces the SCRIPT placeholder at the end with the program's loader. The
+     program sizes the canvas to its parent element (#viewport), so a page can place and size
+     that element as it likes. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -10,7 +12,8 @@
 <style>
   html, body { margin: 0; height: 100%; overflow: hidden; background: #191b1f; color: #e6e6e6;
                font: 15px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
-  #canvas { display: block; width: 100vw; height: 100vh; outline: none; touch-action: none; }
+  #viewport { position: fixed; inset: 0; overflow: hidden; }
+  #canvas { display: block; width: 100%; height: 100%; outline: none; touch-action: none; }
   #status { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center;
             justify-content: center; gap: 14px; pointer-events: none; padding: 0 10%; text-align: center; }
   #status.hidden { display: none; }
@@ -21,7 +24,7 @@
 </style>
 </head>
 <body>
-<canvas id="canvas" tabindex="-1"></canvas>
+<div id="viewport"><canvas id="canvas" tabindex="-1"></canvas></div>
 <div id="status"><div id="message">Loading...</div><div id="bar"><div></div></div></div>
 <script>
   const statusBox = document.getElementById('status');

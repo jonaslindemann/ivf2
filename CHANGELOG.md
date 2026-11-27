@@ -12,18 +12,25 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 - Web builds (work in progress, see `ROADMAP.md` phase 3.3): the CMake preset `wasm` compiles
   the libraries and examples to WebAssembly with Emscripten; programs render with WebGL 2
-  (OpenGL ES 3.0) in a full-window canvas, and `hello_ivf` runs in the browser.
-  `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with
-  its data files preloaded. 22 examples run in the browser, among them shadows (cascaded,
-  point and spot), PBR with image-based lighting, glTF, HDR, reflections and the post-processing
-  effects; `shader_check` (`tests/web`) compiles every built-in shader with WebGL 2.
+  (OpenGL ES 3.0) in a full-window canvas. `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with
+  its data files preloaded. All examples except `multi_window1`, `embedding1`, `audio_reactive1`,
+  `music_scene1` and `assimp1` build for the browser, ImGui/ImPlot panels and `ivfvis` included;
+  `shader_check` (`tests/web`) compiles every built-in shader with WebGL 2. The canvas follows
+  the size of its parent element and uses device pixels on high-DPI screens; `IVF2_*` query
+  parameters in the page URL become environment variables (`page.html?IVF2_FIXED_TIMESTEP=0.016`).
 - `RenderContext::isGles()`; `ivf/glsl_es.h`: shaders are translated to GLSL ES 3.00 when
   compiled on OpenGL ES (version line, default precisions; uniform initialisers become values
   set after linking, `Shader::uniformDefaults()`). One shader source serves both.
 - `GLFWApplication::frame()`: one frame of every window, used as the browser's main loop.
+- `RenderContext::pixelRatio()`: framebuffer pixels per window unit (above 1 on high-DPI displays),
+  set by `GLFWWindow` each frame; `OverlayNode::pixelRatio()`.
 
 ### Changed
 
+- `OverlayNode` lays out in window units instead of framebuffer pixels (`onLayout()`,
+  `viewportWidth()`, `project()`), so overlays keep their size on high-DPI displays (macOS Retina,
+  browsers); `ColorBar` and `Axes3D` render their labels at `pixelRatio()` times the resolution.
+  `PointCloud` sizes in pixels are window units too. Unchanged on ordinary displays.
 - Multisampled offscreen rendering uses a multisampled renderbuffer instead of a multisampled
   texture (same result; available in OpenGL ES 3 too).
 - The colour picking buffer (`BufferSelection`) is RGBA8 with a 24-bit depth buffer.
@@ -32,6 +39,9 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Fixed
 
+- Glyph textures and one- or two-channel images used the unsized internal formats `GL_RED`/`GL_RG`,
+  which OpenGL ES rejects; they are `GL_R8`/`GL_RG8` now (what desktop drivers chose anyway).
+- `RenderContext::wideLinesSupported()` queried `GL_CONTEXT_FLAGS`, which OpenGL ES does not have.
 - `generator::SubdivideShape` did not compile with newer Clang (Emscripten).
 - Multitexturing in the stock and bump shaders indexed the sampler array with a variable,
   which GLSL 3.30 and GLSL ES do not allow.

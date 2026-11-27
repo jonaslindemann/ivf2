@@ -9,6 +9,8 @@
 #include <glad/glad.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <cmath>
+
 using namespace ivf;
 
 OverlayNode::OverlayNode()
@@ -45,6 +47,11 @@ int OverlayNode::viewportHeight() const
     return m_height;
 }
 
+float OverlayNode::pixelRatio() const
+{
+    return m_pixelRatio;
+}
+
 void OverlayNode::onLayout(int /*width*/, int /*height*/)
 {
 }
@@ -79,10 +86,13 @@ void OverlayNode::doDrawPass(const DrawContext &context)
     if (context.pass != RenderPass::Main)
         return;
 
+    // Lay out in window units: on high-DPI displays the viewport has pixelRatio() times as
+    // many pixels, and the pixel camera below spreads the units over all of them
     GLint viewport[4] = {0, 0, 0, 0};
     glGetIntegerv(GL_VIEWPORT, viewport);
-    m_width = viewport[2];
-    m_height = viewport[3];
+    m_pixelRatio = context.context.pixelRatio();
+    m_width = static_cast<int>(std::lround(static_cast<float>(viewport[2]) / m_pixelRatio));
+    m_height = static_cast<int>(std::lround(static_cast<float>(viewport[3]) / m_pixelRatio));
     if (m_width <= 0 || m_height <= 0)
         return;
 

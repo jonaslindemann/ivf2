@@ -233,7 +233,6 @@ public:
         this->cameraManipulator()->saveState();
 
         // Set OpenGL state
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
 

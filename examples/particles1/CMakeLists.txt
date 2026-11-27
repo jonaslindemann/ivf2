@@ -1,1 +1,1 @@
-add_ivf2_example(particles1 SOURCES particles1.cpp)
+add_ivf2_example(particles1 SOURCES particles1.cpp WEB_ASSETS particle.jpeg)

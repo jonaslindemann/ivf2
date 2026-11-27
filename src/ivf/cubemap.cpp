@@ -57,7 +57,8 @@ Result<void> Cubemap::loadFace(GLenum target, std::string_view path)
     }
 
     GLenum fmt = (ch == 4) ? GL_RGBA : (ch == 3) ? GL_RGB : GL_RED;
-    glTexImage2D(target, 0, fmt, w, h, 0, fmt, GL_UNSIGNED_BYTE, data);
+    GLint internal = (ch == 4) ? GL_RGBA : (ch == 3) ? GL_RGB : GL_R8; // ES has no unsized GL_RED
+    glTexImage2D(target, 0, internal, w, h, 0, fmt, GL_UNSIGNED_BYTE, data);
     ivf::freeImage(data);
     return {};
 }

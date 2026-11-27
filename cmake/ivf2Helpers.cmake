@@ -50,7 +50,9 @@ endfunction()
 # root's name (ASSETS_ROOT .../assets, ASSETS textures/brick.png -> assets/textures/brick.png);
 # an absolute directory appears under its own name. Load only what the page needs: the
 # whole data file is downloaded before the program starts. SHELL replaces the page
-# template (ivf2_web_shell.html: a full-window canvas with a loading indicator).
+# template (ivf2_web_shell.html: a full-window canvas with a loading indicator). Query
+# parameters named IVF2_* in the page URL become environment variables (ivf2_web_pre.js),
+# e.g. page.html?IVF2_FIXED_TIMESTEP=0.016.
 
 set(_IVF2_HELPERS_DIR "${CMAKE_CURRENT_LIST_DIR}")
 
@@ -105,8 +107,9 @@ function(ivf2_web_executable target)
     target_link_options(${target} PRIVATE
         ${_preload}
         "--shell-file=${ARG_SHELL}"
+        "--pre-js=${_IVF2_HELPERS_DIR}/ivf2_web_pre.js"
         "SHELL:-s ALLOW_MEMORY_GROWTH=1"
         "SHELL:-s STACK_SIZE=2MB"
         --profiling-funcs) # function names in browser stack traces
-    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS "${ARG_SHELL}")
+    set_property(TARGET ${target} APPEND PROPERTY LINK_DEPENDS "${ARG_SHELL}" "${_IVF2_HELPERS_DIR}/ivf2_web_pre.js")
 endfunction()

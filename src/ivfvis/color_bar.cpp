@@ -200,12 +200,14 @@ void ColorBar::onLayout(int width, int height)
         clear();
         return;
     }
-    if (width == m_builtWidth && height == m_builtHeight && m_settings == m_builtSettings &&
+    if (width == m_builtWidth && height == m_builtHeight && pixelRatio() == m_builtPixelRatio &&
+        m_settings == m_builtSettings &&
         m_colormap.get() == m_builtFor && m_colormap->version() == m_builtColormap)
         return;
     rebuild(width, height);
     m_builtWidth = width;
     m_builtHeight = height;
+    m_builtPixelRatio = pixelRatio();
     m_builtSettings = m_settings;
     m_builtFor = m_colormap.get();
     m_builtColormap = m_colormap->version();
@@ -340,7 +342,7 @@ void ColorBar::rebuild(int width, int height)
 
     auto setupText = [&](const ivf::TextNodePtr &text, const std::string &string, int size) {
         text->setSize(static_cast<float>(size));
-        text->setResolution(size);
+        text->setResolution(static_cast<int>(std::lround(static_cast<float>(size) * pixelRatio())));
         text->setColor(m_textColor);
         text->setText(string);
         text->setAlignX(ivf::TextAlignX::LEFT);

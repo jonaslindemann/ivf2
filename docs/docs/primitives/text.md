@@ -55,7 +55,7 @@ The text's colour comes from its material, so it is lit like other surfaces. For
 
 ## Text on screen
 
-For labels in window pixels (HUDs, legends), put text nodes in an [`OverlayNode`](../visualisation/colormaps.md#overlays): one unit is then one pixel. Set the resolution to the size, so each glyph texel lands on one pixel and the text stays sharp:
+For labels in window pixels (HUDs, legends), put text nodes in an [`OverlayNode`](../visualisation/colormaps.md#overlays): one unit is then one window pixel. Set the resolution to the size, so each glyph texel lands on one pixel and the text stays sharp (on high-DPI displays, where a window pixel covers `pixelRatio()` screen pixels, use the size times the overlay's `pixelRatio()`):
 
 ```cpp
 label->setSize(14.0f);

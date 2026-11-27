@@ -19,13 +19,16 @@ namespace ivf {
  * @brief Group whose children are drawn in pixel coordinates over the 3D scene.
  *
  * The children use an orthographic camera with the origin at the bottom left of the
- * viewport, x to the right and y up, one unit per pixel. They are drawn in the order they
+ * viewport, x to the right and y up, one unit per window pixel (on high-DPI displays a
+ * window unit covers pixelRatio() framebuffer pixels, so overlays keep their size on screen).
+ * They are drawn in the order they
  * were added, without depth testing and with alpha blending, after everything else in the
  * main pass (layer RenderLayer::Overlay). Overlays are not drawn into shadow maps,
  * reflections or the selection buffer, and are not picked.
  *
  * Children should use unlit materials (Material::setUseLighting(false)); text nodes look
- * sharpest with TextNode::setResolution() equal to their size and whole-pixel positions.
+ * sharpest with TextNode::setResolution() equal to their size times pixelRatio() and
+ * whole-unit positions.
  *
  * @code
  * auto hud = ivf::OverlayNode::create();
@@ -53,17 +56,23 @@ public:
     /** @brief Adds one draw item for the whole overlay; the children are drawn by it. */
     void collect(RenderQueue &queue, const CollectState &state) override;
 
-    /** @brief Width of the viewport at the last draw (0 before the first). */
+    /** @brief Width of the viewport in window units at the last draw (0 before the first). */
     [[nodiscard]] int viewportWidth() const;
 
-    /** @brief Height of the viewport at the last draw (0 before the first). */
+    /** @brief Height of the viewport in window units at the last draw (0 before the first). */
     [[nodiscard]] int viewportHeight() const;
+
+    /**
+     * @brief Framebuffer pixels per overlay unit at the last draw (RenderContext::pixelRatio(),
+     * 1 before the first draw and on ordinary displays). Text resolution: size * pixelRatio().
+     */
+    [[nodiscard]] float pixelRatio() const;
 
 protected:
     void doDrawPass(const DrawContext &context) override;
 
     /**
-     * @brief Called before the children are drawn, with the viewport size in pixels.
+     * @brief Called before the children are drawn, with the viewport size in window units.
      *
      * Override to place children relative to the window edges.
      */
@@ -80,7 +89,7 @@ protected:
 
     /**
      * @brief Where point @p p (in the coordinates of the overlay's parent) appears: x and y
-     * in overlay pixels (origin bottom left), z the depth (0 near to 1 far). std::nullopt if
+     * in overlay units (origin bottom left), z the depth (0 near to 1 far). std::nullopt if
      * the point is behind the camera. For labels attached to 3D points, in onLayout().
      */
     [[nodiscard]] std::optional<glm::vec3> project(const glm::vec3 &p) const;
@@ -88,6 +97,7 @@ protected:
 private:
     int m_width{0};
     int m_height{0};
+    float m_pixelRatio{1.0f};
     glm::mat4 m_view{1.0f};
     glm::mat4 m_projection{1.0f};
     glm::mat4 m_parentWorld{1.0f};

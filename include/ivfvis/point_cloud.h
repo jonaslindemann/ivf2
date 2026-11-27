@@ -157,7 +157,7 @@ private:
     float m_maxSizeFactor{1.0f};
 
     // Camera of the last main-pass draw, for picking points sized in pixels
-    float m_lastProjectionScale{0.0f}; ///< projection[1][1] * viewport height / 2
+    float m_lastProjectionScale{0.0f}; ///< projection[1][1] * viewport height (window units) / 2
     bool m_lastOrthographic{false};
 
     std::vector<std::unique_ptr<Gpu>> m_gpu;

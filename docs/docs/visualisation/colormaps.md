@@ -113,7 +113,7 @@ The tick functions are available on their own for axes and labels: `niceTicks(mi
 
 ## Overlays
 
-`ColorBar` is built on `ivf::OverlayNode`, a group whose children are drawn in window pixel coordinates (origin at the bottom left, y up) after the 3D scene, without depth testing. Overlays are not drawn into shadow maps, reflections or the selection buffer, and are not picked. Use one for your own HUD elements:
+`ColorBar` is built on `ivf::OverlayNode`, a group whose children are drawn in window pixel coordinates (origin at the bottom left, y up) after the 3D scene, without depth testing. On high-DPI displays (macOS Retina, browsers with a device pixel ratio above 1) a window pixel covers `pixelRatio()` framebuffer pixels, so overlays keep their size on screen; text renders sharpest at `setResolution(size * pixelRatio())`. Overlays are not drawn into shadow maps, reflections or the selection buffer, and are not picked. Use one for your own HUD elements:
 
 ```cpp
 auto hud = ivf::OverlayNode::create();
@@ -129,4 +129,4 @@ hud->add(label);
 scene->add(hud);
 ```
 
-Subclasses place their children in `onLayout(width, height)`, which receives the viewport size before each draw; `project(point)` gives the pixel position of a 3D point, for [labels that follow objects](axes.md#labels-at-3d-points).Overlays are part of the scene image, so effects and the window's tone mapping apply to them too.
+Subclasses place their children in `onLayout(width, height)`, which receives the viewport size before each draw; `project(point)` gives the pixel position of a 3D point, for [labels that follow objects](axes.md#labels-at-3d-points). Overlays are part of the scene image, so effects and the window's tone mapping apply to them too.

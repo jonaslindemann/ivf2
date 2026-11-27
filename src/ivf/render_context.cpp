@@ -330,7 +330,8 @@ bool RenderContext::wideLinesSupported()
     if (!m_wideLines)
     {
         GLint flags = 0;
-        glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
+        if (!isGles()) // ES has no context flags (nor forward-compatible contexts)
+            glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
         GLfloat range[2] = {1.0f, 1.0f};
         glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, range);
         m_wideLines = (flags & GL_CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT) == 0 && range[1] > 1.0f;

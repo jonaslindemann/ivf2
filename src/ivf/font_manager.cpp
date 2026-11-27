@@ -116,7 +116,8 @@ const GlyphMap *FontManager::glyphs(int pixelSize)
         GLuint texture = 0;
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, static_cast<GLsizei>(face->glyph->bitmap.width),
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, // sized: OpenGL ES rejects plain GL_RED
+                     static_cast<GLsizei>(face->glyph->bitmap.width),
                      static_cast<GLsizei>(face->glyph->bitmap.rows), 0, GL_RED, GL_UNSIGNED_BYTE,
                      face->glyph->bitmap.buffer);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

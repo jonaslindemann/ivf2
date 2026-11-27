@@ -121,13 +121,15 @@ void Texture::setImage(int width, int height, int channels, const unsigned char 
     GLint ifmt;
     switch (channels)
     {
+    // One and two channels with a sized internal format: OpenGL ES (WebGL) has no unsized
+    // GL_RED/GL_RG (desktop GL chooses the same 8-bit formats for them)
     case 1:
         fmt = GL_RED;
-        ifmt = GL_RED;
+        ifmt = m_type == GL_UNSIGNED_BYTE ? GL_R8 : GL_RED;
         break;
     case 2:
         fmt = GL_RG;
-        ifmt = GL_RG;
+        ifmt = m_type == GL_UNSIGNED_BYTE ? GL_RG8 : GL_RG;
         break;
     case 3:
         fmt = GL_RGB;

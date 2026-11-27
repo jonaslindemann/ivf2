@@ -95,6 +95,8 @@ void drawShape(const Shape &shape, const Painter &painter, const DebugViewOption
         for (const auto &e : s.edges)
             painter.line(s.points[e.x], s.points[e.y]);
         break;
+    case ShapeType::Compound:
+        break; // drawn part by part
     case ShapeType::TriangleMesh:
         if (static_cast<int>(s.triangles.size()) > options.maxTriangles)
         {
@@ -144,10 +146,12 @@ void ivfphysics::drawDebug(const PhysicsWorld &world, ivf::DebugDraw &draw, cons
             else if (b.body->isSleeping())
                 color = options.sleepingColor;
 
-            const auto &s = b.shape->impl();
-            const Painter painter{draw, position + rotation * s.offsetPosition, glm::normalize(rotation * s.offsetRotation),
-                                  color};
-            drawShape(*b.shape, painter, options);
+            for (const auto &placed : detail::placedShapes(*b.shape))
+            {
+                const Painter painter{draw, position + rotation * placed.position,
+                                      glm::normalize(rotation * placed.rotation), color};
+                drawShape(*placed.shape, painter, options);
+            }
         }
 
         if (b.desc.type != BodyType::Dynamic)
@@ -161,6 +165,25 @@ void ivfphysics::drawDebug(const PhysicsWorld &world, ivf::DebugDraw &draw, cons
         }
         if (options.centersOfMass)
             draw.axes(com, 0.2f);
+    }
+
+    if (options.joints)
+    {
+        for (const auto &joint : world.joints())
+        {
+            if (joint->isBroken())
+                continue;
+            const glm::vec3 anchor = joint->anchor();
+            draw.sphere(anchor, 0.06f, options.jointColor, 0.0f, 8);
+            draw.line(anchor, joint->body1()->centerOfMass(), options.jointColor);
+            if (auto other = joint->body2())
+                draw.line(anchor, other->centerOfMass(), options.jointColor);
+            if (joint->type() == JointType::Hinge || joint->type() == JointType::Slider)
+            {
+                const glm::vec3 axis = 0.4f * joint->axis();
+                draw.line(anchor - axis, anchor + axis, options.jointColor);
+            }
+        }
     }
 
     if (options.contacts)

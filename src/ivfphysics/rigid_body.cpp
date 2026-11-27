@@ -16,7 +16,8 @@ void RigidBody::Impl::applyMass()
         return;
     const float volume = std::max(shape->volume(), 1e-9f);
     const float mass = std::max(desc.mass, 1e-6f);
-    collider->getMaterial().setMassDensity(mass / volume);
+    for (auto *collider : colliders)
+        collider->getMaterial().setMassDensity(mass / volume);
     body->updateMassPropertiesFromColliders();
 }
 
@@ -57,7 +58,7 @@ BodyType RigidBody::type() const
 
 void RigidBody::setType(BodyType type)
 {
-    if (type == BodyType::Dynamic && m_impl->shape->type() == ShapeType::TriangleMesh)
+    if (type == BodyType::Dynamic && m_impl->shape->isConcave())
     {
         ivf::logWarning("A triangle mesh body cannot be dynamic", "Physics");
         return;
@@ -200,8 +201,8 @@ float RigidBody::friction() const
 void RigidBody::setFriction(float friction)
 {
     m_impl->desc.friction = std::max(friction, 0.0f);
-    if (m_impl->collider)
-        m_impl->collider->getMaterial().setFrictionCoefficient(m_impl->desc.friction);
+    for (auto *collider : m_impl->colliders)
+        collider->getMaterial().setFrictionCoefficient(m_impl->desc.friction);
 }
 
 float RigidBody::bounciness() const
@@ -212,8 +213,8 @@ float RigidBody::bounciness() const
 void RigidBody::setBounciness(float bounciness)
 {
     m_impl->desc.bounciness = std::clamp(bounciness, 0.0f, 1.0f);
-    if (m_impl->collider)
-        m_impl->collider->getMaterial().setBounciness(m_impl->desc.bounciness);
+    for (auto *collider : m_impl->colliders)
+        collider->getMaterial().setBounciness(m_impl->desc.bounciness);
 }
 
 float RigidBody::linearDamping() const
@@ -283,15 +284,18 @@ void RigidBody::setCollisionFilter(std::uint16_t category, std::uint16_t collide
 {
     m_impl->desc.category = category;
     m_impl->desc.collidesWith = collidesWith;
-    if (!m_impl->collider)
+    if (!m_impl->body)
         return;
     // Wake the dynamic bodies first: the engine (0.10.2) keeps the pairs of sleeping bodies
     // apart and fails when a collider of such a pair asks for a new broad-phase check
     for (const auto &body : m_impl->world->bodies)
         if (body->impl().desc.type == BodyType::Dynamic)
             body->impl().body->setIsSleeping(false);
-    m_impl->collider->setCollisionCategoryBits(category);
-    m_impl->collider->setCollideWithMaskBits(collidesWith);
+    for (auto *collider : m_impl->colliders)
+    {
+        collider->setCollisionCategoryBits(category);
+        collider->setCollideWithMaskBits(collidesWith);
+    }
 }
 
 std::uint16_t RigidBody::collisionCategory() const
@@ -307,10 +311,11 @@ std::uint16_t RigidBody::collisionMask() const
 void RigidBody::setTrigger(bool trigger)
 {
     m_impl->desc.trigger = trigger;
-    if (!m_impl->collider)
+    if (!m_impl->body)
         return;
     m_impl->body->setIsSleeping(false);
-    m_impl->collider->setIsTrigger(trigger);
+    for (auto *collider : m_impl->colliders)
+        collider->setIsTrigger(trigger);
 }
 
 bool RigidBody::isTrigger() const

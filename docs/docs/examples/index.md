@@ -130,3 +130,4 @@ The `ivfvis` examples; see [Scientific Visualisation](../visualisation/index.md)
 | `hot_reload1` | A model, a texture and a shader that reload when their files are saved | [Hot Reload](../advanced/hot_reload.md) |
 | `debug_draw1` | Immediate-mode debug lines and shapes | |
 | `rigid_body1` | Rigid-body physics with ivfphysics | |
+| `physics_joints1` | Joints, motors, breakable welds and compound bodies | |

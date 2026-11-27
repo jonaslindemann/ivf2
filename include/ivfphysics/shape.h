@@ -29,6 +29,7 @@ enum class ShapeType {
     Capsule,      ///< Capsule along the local Y axis.
     ConvexHull,   ///< Convex hull of a point set.
     TriangleMesh, ///< Arbitrary triangles; static and kinematic bodies only.
+    Compound,     ///< Several shapes, each placed by its offset (`Shape::compound()`).
 };
 
 /** @brief Readable name of a shape type, e.g. "convex hull". */
@@ -102,6 +103,31 @@ public:
      * ...) gives the convex hull of its vertices, or a triangle mesh with @p concave
      * (static bodies). The node's scale is baked in.
      */
+    /**
+     * @brief A shape made of @p parts, each placed in the body by its offset (`setOffset()`).
+     *
+     * For bodies that no single convex shape fits: a table (top and legs), a hammer, an
+     * L-shaped bracket. The mass is spread over the parts by volume, so the centre of mass
+     * and inertia follow from the parts. The compound's own offset moves all parts; parts may
+     * be compounds themselves. A part that is a triangle mesh makes the body static.
+     *
+     * @code
+     * auto top = ivfphysics::Shape::box({1.0f, 0.05f, 0.6f});
+     * top->setOffset({0.0f, 0.75f, 0.0f});
+     * std::vector<ivfphysics::ShapePtr> parts{top};
+     * for (float x : {-0.9f, 0.9f})
+     *     for (float z : {-0.5f, 0.5f})
+     *     {
+     *         auto leg = ivfphysics::Shape::box({0.05f, 0.35f, 0.05f});
+     *         leg->setOffset({x, 0.35f, z});
+     *         parts.push_back(leg);
+     *     }
+     * auto table = ivfphysics::Shape::compound(parts);
+     * @endcode
+     * @throws std::invalid_argument if @p parts is empty or contains nullptr.
+     */
+    [[nodiscard]] static std::shared_ptr<Shape> compound(const std::vector<std::shared_ptr<Shape>> &parts);
+
     [[nodiscard]] static ivf::Result<std::shared_ptr<Shape>> fromNode(const std::shared_ptr<ivf::TransformNode> &node,
                                                                       bool concave = false);
 
@@ -126,6 +152,12 @@ public:
 
     /** @brief Triangles (TriangleMesh), empty otherwise. */
     [[nodiscard]] const std::vector<glm::uvec3> &triangles() const;
+
+    /** @brief The parts of a compound shape, empty otherwise. */
+    [[nodiscard]] const std::vector<std::shared_ptr<Shape>> &parts() const;
+
+    /** @brief True if the shape is a triangle mesh or a compound with one among its parts. */
+    [[nodiscard]] bool isConcave() const;
 
     /** @brief Volume (used to turn a body's mass into a density). */
     [[nodiscard]] float volume() const;

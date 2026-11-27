@@ -73,7 +73,7 @@ void detachBody(RigidBody::Impl &body)
 {
     body.world = nullptr;
     body.body = nullptr;
-    body.collider = nullptr;
+    body.colliders.clear();
 }
 
 /** Index of the active pair of @p a and @p b (either order), or -1. */
@@ -135,6 +135,8 @@ void detail::EventListener::onContact(const rp3d::CollisionCallback::CallbackDat
             const int index = findActive(w.active, body1, body2, false);
             if (index < 0)
                 continue; // already ended when a body was removed
+            if (--w.active[static_cast<std::size_t>(index)].colliderPairs > 0)
+                continue; // other parts still touch
             w.active.erase(w.active.begin() + index);
             if (w.contactCallback)
                 w.pendingContacts.push_back({ContactPhase::End, std::move(body1), std::move(body2), {}, 0.0f});
@@ -153,10 +155,16 @@ void detail::EventListener::onContact(const rp3d::CollisionCallback::CallbackDat
         w.contactPairs++;
 
         ContactPhase phase = ContactPhase::Stay;
-        if (type == EventType::ContactStart && findActive(w.active, body1, body2, false) < 0)
+        if (type == EventType::ContactStart)
         {
-            phase = ContactPhase::Begin;
-            w.active.push_back({body1, body2, false});
+            const int index = findActive(w.active, body1, body2, false);
+            if (index >= 0)
+                w.active[static_cast<std::size_t>(index)].colliderPairs++;
+            else
+            {
+                phase = ContactPhase::Begin;
+                w.active.push_back({body1, body2, false, 1});
+            }
         }
         if (!w.contactCallback || (phase == ContactPhase::Stay && !w.settings.stayEvents))
             continue;
@@ -193,16 +201,18 @@ void detail::EventListener::onTrigger(const rp3d::OverlapCallback::CallbackData 
         switch (pair.getEventType())
         {
         case EventType::OverlapStart:
-            if (index < 0)
+            if (index >= 0)
+                w.active[static_cast<std::size_t>(index)].colliderPairs++;
+            else
             {
                 phase = ContactPhase::Begin;
-                w.active.push_back({body1, body2, true});
+                w.active.push_back({body1, body2, true, 1});
             }
             break;
         case EventType::OverlapStay:
             break;
         case EventType::OverlapExit:
-            if (index < 0)
+            if (index < 0 || --w.active[static_cast<std::size_t>(index)].colliderPairs > 0)
                 continue;
             phase = ContactPhase::End;
             w.active.erase(w.active.begin() + index);
@@ -245,6 +255,13 @@ PhysicsWorld::~PhysicsWorld()
     m_impl->engine->common.destroyPhysicsWorld(m_impl->world);
     for (auto &body : m_impl->bodies)
         detachBody(body->impl());
+    for (auto &joint : m_impl->joints)
+    {
+        auto &j = joint->impl();
+        j.world = nullptr;
+        j.joint = nullptr;
+        j.worldBody = nullptr;
+    }
 }
 
 const PhysicsSettings &PhysicsWorld::settings() const
@@ -266,7 +283,7 @@ RigidBodyPtr PhysicsWorld::addBody(const std::shared_ptr<ivf::TransformNode> &no
     impl->node = node;
     impl->shape = shape;
     impl->desc = desc;
-    if (desc.type == BodyType::Dynamic && shape->type() == ShapeType::TriangleMesh)
+    if (desc.type == BodyType::Dynamic && shape->isConcave())
     {
         ivf::logWarning("A triangle mesh cannot be dynamic - the body of '" + node->name() + "' is static", "Physics");
         impl->desc.type = BodyType::Static;
@@ -281,19 +298,23 @@ RigidBodyPtr PhysicsWorld::addBody(const std::shared_ptr<ivf::TransformNode> &no
     impl->previous = transform;
     impl->body = m_impl->world->createRigidBody(transform);
 
-    const auto &shapeImpl = shape->impl();
-    impl->collider = impl->body->addCollider(
-        shapeImpl.shape, rp3d::Transform(toRp(shapeImpl.offsetPosition), toRp(shapeImpl.offsetRotation)));
-    // Only when not the defaults: each setter asks the broad phase to recheck the collider
-    if (desc.category != 0x0001)
-        impl->collider->setCollisionCategoryBits(desc.category);
-    if (desc.collidesWith != 0xFFFF)
-        impl->collider->setCollideWithMaskBits(desc.collidesWith);
-    if (desc.trigger)
-        impl->collider->setIsTrigger(true);
-    auto &material = impl->collider->getMaterial();
-    material.setFrictionCoefficient(std::max(desc.friction, 0.0f));
-    material.setBounciness(std::clamp(desc.bounciness, 0.0f, 1.0f));
+    // One collider per part of a compound shape
+    for (const auto &placed : detail::placedShapes(*shape))
+    {
+        auto *collider = impl->body->addCollider(placed.shape->impl().shape,
+                                                 rp3d::Transform(toRp(placed.position), toRp(placed.rotation)));
+        // Only when not the defaults: each setter asks the broad phase to recheck the collider
+        if (desc.category != 0x0001)
+            collider->setCollisionCategoryBits(desc.category);
+        if (desc.collidesWith != 0xFFFF)
+            collider->setCollideWithMaskBits(desc.collidesWith);
+        if (desc.trigger)
+            collider->setIsTrigger(true);
+        auto &material = collider->getMaterial();
+        material.setFrictionCoefficient(std::max(desc.friction, 0.0f));
+        material.setBounciness(std::clamp(desc.bounciness, 0.0f, 1.0f));
+        impl->colliders.push_back(collider);
+    }
 
     impl->body->setType(detail::toRp(impl->desc.type));
     impl->applyMass();
@@ -324,6 +345,11 @@ void PhysicsWorld::removeBody(const RigidBodyPtr &bodyRef)
     const RigidBodyPtr body = bodyRef; // bodyRef may be an element of the list erased below
     if (!body || body->impl().world != m_impl.get())
         return;
+    // Its joints first: the engine destroys them with the body
+    const auto joints = m_impl->joints;
+    for (const auto &joint : joints)
+        if (joint->impl().body1 == body || joint->impl().body2 == body)
+            removeJoint(joint);
     auto &bodies = m_impl->bodies;
     bodies.erase(std::remove(bodies.begin(), bodies.end(), body), bodies.end());
     m_impl->lookup.erase(body->impl().body);
@@ -377,6 +403,31 @@ void PhysicsWorld::runStep()
         if (callback)
             callback(h);
 
+    // Hinge motors (the engine's own hinge motor diverges in 0.10.2): the torque that brings the
+    // relative speed about the axis to the motor speed in this step, at most the motor's torque
+    for (const auto &joint : m_impl->joints)
+    {
+        auto &j = joint->impl();
+        if (j.type != JointType::Hinge || !j.motor || !j.joint)
+            continue;
+        const RigidBodyPtr &moving = j.body2 ? j.body2 : j.body1;
+        const RigidBodyPtr reference = j.body2 ? j.body1 : nullptr;
+        const glm::vec3 axis = joint->axis();
+        auto inverseInertia = [&](const RigidBodyPtr &b) {
+            return b && b->type() == BodyType::Dynamic ? glm::dot(axis, b->impl().inverseInertiaWorld(axis)) : 0.0f;
+        };
+        const float k = inverseInertia(moving) + inverseInertia(reference);
+        if (!(k > 0.0f))
+            continue;
+        const float relative = glm::dot(moving->angularVelocity() - (reference ? reference->angularVelocity() : glm::vec3(0.0f)), axis);
+        const float torque =
+            std::clamp((j.motorSpeed - relative) / (k * static_cast<float>(h)), -j.maxMotor, j.maxMotor);
+        if (moving->type() == BodyType::Dynamic)
+            moving->applyTorque(torque * axis);
+        if (reference && reference->type() == BodyType::Dynamic)
+            reference->applyTorque(-torque * axis);
+    }
+
     for (auto &body : m_impl->bodies)
     {
         auto &b = body->impl();
@@ -387,6 +438,28 @@ void PhysicsWorld::runStep()
     m_impl->contactPoints.clear();
     m_impl->contactPairs = 0;
     m_impl->world->update(static_cast<rp3d::decimal>(h));
+
+    // Joint forces of this step; joints over their limits break
+    for (const auto &joint : m_impl->joints)
+    {
+        auto &j = joint->impl();
+        if (!j.joint)
+            continue;
+        j.force = toGlm(j.joint->getReactionForce(static_cast<rp3d::decimal>(h)));
+        j.torque = toGlm(j.joint->getReactionTorque(static_cast<rp3d::decimal>(h)));
+        const bool overForce = j.desc.breakForce > 0.0f && glm::length(j.force) > j.desc.breakForce;
+        const bool overTorque = j.desc.breakTorque > 0.0f && glm::length(j.torque) > j.desc.breakTorque;
+        if (overForce || overTorque)
+        {
+            j.destroyJoint();
+            j.broken = true;
+            j.body1->wakeUp();
+            if (j.body2)
+                j.body2->wakeUp();
+            m_impl->pendingBreaks.push_back(joint);
+        }
+    }
+
     m_impl->steps++;
     m_impl->time = static_cast<double>(m_impl->steps) * h;
     deliverEvents();
@@ -410,6 +483,14 @@ void PhysicsWorld::deliverEvents()
         const auto callback = m_impl->triggerCallback;
         for (const auto &event : triggers)
             callback(event);
+    }
+    auto breaks = std::move(m_impl->pendingBreaks);
+    m_impl->pendingBreaks.clear();
+    if (m_impl->jointBreakCallback)
+    {
+        const auto callback = m_impl->jointBreakCallback;
+        for (const auto &joint : breaks)
+            callback(joint);
     }
 }
 
@@ -539,6 +620,15 @@ void PhysicsWorld::reset()
             b.body->setIsSleeping(false);
         detail::setNodeTransform(*b.node, toGlm(b.initial.getPosition()), toGlm(b.initial.getOrientation()));
     }
+    for (auto &joint : m_impl->joints)
+    {
+        auto &j = joint->impl();
+        if (j.broken)
+            j.create();
+        j.force = glm::vec3(0.0f);
+        j.torque = glm::vec3(0.0f);
+    }
+    m_impl->pendingBreaks.clear();
     m_impl->accumulator = 0.0;
     m_impl->time = 0.0;
     m_impl->steps = 0;
@@ -701,4 +791,103 @@ PhysicsStats PhysicsWorld::stats() const
     stats.updateTimeMs = m_impl->updateTimeMs;
     stats.averageUpdateTimeMs = m_impl->averageUpdateTimeMs;
     return stats;
+}
+
+// ---------------------------------------------------------------------------
+// Joints
+// ---------------------------------------------------------------------------
+
+JointPtr PhysicsWorld::addJoint(JointType type, const RigidBodyPtr &body1, const RigidBodyPtr &body2,
+                                const glm::vec3 &anchor, const glm::vec3 &axis, const JointDesc &desc)
+{
+    auto inWorld = [&](const RigidBodyPtr &b) { return b && b->impl().world == m_impl.get() && b->isValid(); };
+    if (!inWorld(body1) || (body2 && !inWorld(body2)) || body1 == body2)
+        throw std::invalid_argument("PhysicsWorld: a joint needs a body of this world and another one (or nullptr)");
+    if ((type == JointType::Hinge || type == JointType::Slider) && !(glm::dot(axis, axis) > 0.0f))
+        throw std::invalid_argument("PhysicsWorld: the joint axis must not be zero");
+
+    auto impl = std::make_unique<Joint::Impl>();
+    impl->world = m_impl.get();
+    impl->type = type;
+    impl->body1 = body1;
+    impl->body2 = body2;
+    impl->desc = desc;
+    impl->desc.breakForce = std::max(desc.breakForce, 0.0f);
+    impl->desc.breakTorque = std::max(desc.breakTorque, 0.0f);
+
+    // Anchor and axis in body1 coordinates: the joint can be rebuilt (reset()) from them
+    const glm::quat q1 = body1->rotation();
+    impl->localAnchor = glm::inverse(q1) * (anchor - body1->position());
+    if (glm::dot(axis, axis) > 0.0f)
+        impl->localAxis = glm::inverse(q1) * glm::normalize(axis);
+
+    // Held to the world: a static engine body (no collider) as the first engine body, mirrored
+    // through the anchor. The engine takes a ball and socket joint's cone axis from its first body
+    // to the anchor and from the anchor to its second: so both point from the anchor to the body
+    if (!body2)
+        impl->worldBody = m_impl->world->createRigidBody(
+            rp3d::Transform(toRp(2.0f * anchor - body1->position()), toRp(body1->rotation())));
+    if (impl->worldBody)
+        impl->worldBody->setType(rp3d::BodyType::STATIC);
+
+    auto joint = JointPtr(new Joint(std::move(impl)));
+    joint->impl().self = joint;
+    joint->impl().create();
+    body1->wakeUp();
+    if (body2)
+        body2->wakeUp();
+    m_impl->joints.push_back(joint);
+    return joint;
+}
+
+JointPtr PhysicsWorld::addBallSocketJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                                          const JointDesc &desc)
+{
+    return addJoint(JointType::BallSocket, body1, body2, anchor, glm::vec3(0.0f), desc);
+}
+
+JointPtr PhysicsWorld::addHingeJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                                     const glm::vec3 &axis, const JointDesc &desc)
+{
+    return addJoint(JointType::Hinge, body1, body2, anchor, axis, desc);
+}
+
+JointPtr PhysicsWorld::addSliderJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                                      const glm::vec3 &axis, const JointDesc &desc)
+{
+    return addJoint(JointType::Slider, body1, body2, anchor, axis, desc);
+}
+
+JointPtr PhysicsWorld::addFixedJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                                     const JointDesc &desc)
+{
+    return addJoint(JointType::Fixed, body1, body2, anchor, glm::vec3(0.0f), desc);
+}
+
+void PhysicsWorld::removeJoint(const JointPtr &jointRef)
+{
+    const JointPtr joint = jointRef; // may be an element of the list erased below
+    if (!joint || joint->impl().world != m_impl.get())
+        return;
+    auto &j = joint->impl();
+    j.destroyJoint();
+    if (j.worldBody)
+        m_impl->world->destroyRigidBody(j.worldBody);
+    j.worldBody = nullptr;
+    j.world = nullptr;
+    j.body1->wakeUp();
+    if (j.body2)
+        j.body2->wakeUp();
+    auto &joints = m_impl->joints;
+    joints.erase(std::remove(joints.begin(), joints.end(), joint), joints.end());
+}
+
+const std::vector<JointPtr> &PhysicsWorld::joints() const
+{
+    return m_impl->joints;
+}
+
+void PhysicsWorld::setJointBreakCallback(std::function<void(const JointPtr &)> callback)
+{
+    m_impl->jointBreakCallback = std::move(callback);
 }

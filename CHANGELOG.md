@@ -29,6 +29,13 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
   spring) and `throwBody()`. `drawDebug()` draws colliders, contact points, velocities and the drag
   spring through `DebugDraw`. `rigid_body1` drags bodies with the mouse, throws balls (T) and shows
   the debug view (V) and statistics.
+  Joints: ball and socket (cone limit), hinge and slider (limits, motors) and fixed joints between
+  two bodies or a body and the world (`addHingeJoint(body, nullptr, anchor, axis)`), breakable above
+  a force or torque (`JointDesc`, break callback; `reset()` mends them), with reaction forces,
+  angles and translations. Compound shapes (`Shape::compound()`, parts placed by their offsets,
+  nestable) give one body several colliders. The debug view draws joints. New example
+  `physics_joints1`: a hinged bridge, a pendulum chain, a motor-driven windmill with a compound
+  rotor, a piston, a welded tower to knock apart and a table.
 - Web builds (work in progress, see `ROADMAP.md` phase 3.3): the CMake preset `wasm` compiles
   the libraries and examples to WebAssembly with Emscripten; programs render with WebGL 2
   (OpenGL ES 3.0) in a full-window canvas. `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with

@@ -2,6 +2,7 @@
 
 // Private to ivfphysics: the ReactPhysics3D side of shapes, bodies and worlds.
 
+#include <ivfphysics/joint.h>
 #include <ivfphysics/physics_world.h>
 #include <ivfphysics/rigid_body.h>
 #include <ivfphysics/shape.h>
@@ -75,6 +76,16 @@ glm::quat nodeRotation(const ivf::TransformNode &node);
 /** Set the node to @p position and @p rotation (clearing its Euler angles and axis rotation). */
 void setNodeTransform(ivf::TransformNode &node, const glm::vec3 &position, const glm::quat &rotation);
 
+/** A shape with an engine collision shape and where it sits in the body. */
+struct PlacedShape {
+    const Shape *shape{nullptr};
+    glm::vec3 position{0.0f};
+    glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
+};
+
+/** The leaf shapes of @p shape (itself, or the parts of compounds) with their placement in the body. */
+std::vector<PlacedShape> placedShapes(const Shape &shape);
+
 } // namespace ivfphysics::detail
 
 struct ivfphysics::Shape::Impl {
@@ -86,6 +97,7 @@ struct ivfphysics::Shape::Impl {
     std::vector<glm::vec3> points;
     std::vector<glm::uvec3> triangles;
     std::vector<glm::uvec2> edges; ///< Convex hull edges (debug view).
+    std::vector<ShapePtr> parts;   ///< Compound parts.
     glm::vec3 offsetPosition{0.0f};
     glm::quat offsetRotation{1.0f, 0.0f, 0.0f, 0.0f};
 
@@ -100,7 +112,7 @@ struct ivfphysics::RigidBody::Impl {
     PhysicsWorld::Impl *world{nullptr}; ///< Null once removed.
     std::weak_ptr<RigidBody> self;
     rp3d::RigidBody *body{nullptr};
-    rp3d::Collider *collider{nullptr};
+    std::vector<rp3d::Collider *> colliders; ///< One per (compound) part.
     std::shared_ptr<ivf::TransformNode> node;
     ShapePtr shape;
     BodyDesc desc;
@@ -134,6 +146,7 @@ struct ActivePair {
     RigidBodyPtr body1;
     RigidBodyPtr body2;
     bool trigger{false};
+    int colliderPairs{1}; ///< Touching collider pairs (compound bodies touch with several).
 };
 
 } // namespace ivfphysics::detail
@@ -152,6 +165,10 @@ struct ivfphysics::PhysicsWorld::Impl {
     std::vector<detail::ActivePair> active; ///< In the order they began (deterministic End order).
     std::vector<ContactPoint> contactPoints;  ///< Of the latest step.
     int contactPairs{0};
+
+    std::vector<JointPtr> joints;
+    std::function<void(const JointPtr &)> jointBreakCallback;
+    std::vector<JointPtr> pendingBreaks;
 
     std::vector<std::pair<int, std::function<void(double)>>> stepCallbacks;
     int nextCallbackId{1};
@@ -174,4 +191,32 @@ struct ivfphysics::PhysicsWorld::Impl {
     double alpha{1.0};
     double timeScale{1.0};
     bool paused{false};
+};
+
+struct ivfphysics::Joint::Impl {
+    PhysicsWorld::Impl *world{nullptr}; ///< Null once removed.
+    std::weak_ptr<Joint> self;
+    JointType type{JointType::Fixed};
+    RigidBodyPtr body1;
+    RigidBodyPtr body2;                     ///< Null: held to the world.
+    rp3d::RigidBody *worldBody{nullptr};    ///< Static engine body at the anchor when body2 is null.
+    rp3d::Joint *joint{nullptr};            ///< Null while broken.
+    glm::vec3 localAnchor{0.0f};            ///< Anchor in body1 coordinates.
+    glm::vec3 localAxis{0.0f, 1.0f, 0.0f};  ///< Axis in body1 coordinates.
+    JointDesc desc;
+    bool limits{false};
+    float lower{0.0f};
+    float upper{0.0f};
+    float cone{0.0f};
+    bool motor{false};
+    float motorSpeed{0.0f};
+    float maxMotor{0.0f};
+    bool broken{false};
+    glm::vec3 force{0.0f};
+    glm::vec3 torque{0.0f};
+
+    /** Build the engine joint from the settings, at the bodies' current poses. */
+    void create();
+    /** Destroy the engine joint (not the world body). */
+    void destroyJoint();
 };

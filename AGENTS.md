@@ -129,7 +129,7 @@ The `generator` library is included via `#include <generator/generator.hpp>` (Z-
 
 ### Physics
 
-Rigid body physics is in the `ivfphysics` library (ReactPhysics3D, private; `IVF2_BUILD_PHYSICS`); `examples/rigid_body1/` is the minimal example.
+Rigid body physics is in the `ivfphysics` library (ReactPhysics3D, private; `IVF2_BUILD_PHYSICS`); `examples/rigid_body1/` is the minimal example, `examples/physics_joints1/` shows joints and compound bodies.
 
 ## Dependencies (vcpkg.json)
 

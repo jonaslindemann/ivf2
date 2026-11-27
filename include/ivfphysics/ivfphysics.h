@@ -11,6 +11,7 @@
 #include <ivfphysics/debug_view.h>
 #include <ivfphysics/events.h>
 #include <ivfphysics/interaction.h>
+#include <ivfphysics/joint.h>
 #include <ivfphysics/physics_world.h>
 #include <ivfphysics/rigid_body.h>
 #include <ivfphysics/shape.h>

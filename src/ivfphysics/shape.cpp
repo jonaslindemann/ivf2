@@ -81,6 +81,8 @@ const char *ivfphysics::toString(ShapeType type)
         return "convex hull";
     case ShapeType::TriangleMesh:
         return "triangle mesh";
+    case ShapeType::Compound:
+        return "compound";
     }
     return "unknown";
 }
@@ -107,6 +109,8 @@ Shape::Impl::~Impl()
         case ShapeType::TriangleMesh:
             common.destroyConcaveMeshShape(static_cast<rp3d::ConcaveMeshShape *>(shape));
             break;
+        case ShapeType::Compound:
+            break; // no engine shape: the parts have theirs
         }
     }
     if (convexMesh)
@@ -266,6 +270,44 @@ ivf::Result<ShapePtr> Shape::triangleMesh(const std::shared_ptr<ivf::Mesh> &mesh
     return triangleMesh(positions, triangles);
 }
 
+ShapePtr Shape::compound(const std::vector<ShapePtr> &parts)
+{
+    if (parts.empty())
+        throw std::invalid_argument("ivfphysics::Shape::compound: no parts");
+    for (const auto &part : parts)
+        if (!part)
+            throw std::invalid_argument("ivfphysics::Shape::compound: a part is nullptr");
+    auto impl = std::make_unique<Impl>();
+    impl->type = ShapeType::Compound;
+    impl->parts = parts;
+    return ShapePtr(new Shape(std::move(impl)));
+}
+
+namespace {
+
+void collectPlaced(const Shape &shape, const glm::vec3 &position, const glm::quat &rotation,
+                   std::vector<detail::PlacedShape> &out)
+{
+    const glm::vec3 p = position + rotation * shape.offsetPosition();
+    const glm::quat q = glm::normalize(rotation * shape.offsetRotation());
+    if (shape.type() != ShapeType::Compound)
+    {
+        out.push_back({&shape, p, q});
+        return;
+    }
+    for (const auto &part : shape.parts())
+        collectPlaced(*part, p, q, out);
+}
+
+} // namespace
+
+std::vector<detail::PlacedShape> detail::placedShapes(const Shape &shape)
+{
+    std::vector<PlacedShape> out;
+    collectPlaced(shape, glm::vec3(0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), out);
+    return out;
+}
+
 ivf::Result<ShapePtr> Shape::fromNode(const std::shared_ptr<ivf::TransformNode> &node, bool concave)
 {
     if (!node)
@@ -352,6 +394,18 @@ const std::vector<glm::uvec3> &Shape::triangles() const
     return m_impl->triangles;
 }
 
+const std::vector<ShapePtr> &Shape::parts() const
+{
+    return m_impl->parts;
+}
+
+bool Shape::isConcave() const
+{
+    if (m_impl->type == ShapeType::TriangleMesh)
+        return true;
+    return std::any_of(m_impl->parts.begin(), m_impl->parts.end(), [](const ShapePtr &p) { return p->isConcave(); });
+}
+
 float Shape::volume() const
 {
     const auto &s = *m_impl;
@@ -366,23 +420,32 @@ float Shape::volume() const
     case ShapeType::ConvexHull:
     case ShapeType::TriangleMesh:
         return static_cast<float>(s.shape->getVolume());
+    case ShapeType::Compound: {
+        float volume = 0.0f;
+        for (const auto &part : s.parts)
+            volume += part->volume();
+        return volume;
+    }
     }
     return 0.0f;
 }
 
 std::pair<glm::vec3, glm::vec3> Shape::bounds() const
 {
-    const rp3d::AABB local = m_impl->shape->getLocalBounds();
-    const glm::vec3 lo = detail::toGlm(local.getMin());
-    const glm::vec3 hi = detail::toGlm(local.getMax());
     glm::vec3 bmin(std::numeric_limits<float>::max());
     glm::vec3 bmax(std::numeric_limits<float>::lowest());
-    for (int i = 0; i < 8; ++i)
+    for (const auto &placed : detail::placedShapes(*this))
     {
-        const glm::vec3 corner((i & 1) ? hi.x : lo.x, (i & 2) ? hi.y : lo.y, (i & 4) ? hi.z : lo.z);
-        const glm::vec3 p = m_impl->offsetPosition + m_impl->offsetRotation * corner;
-        bmin = glm::min(bmin, p);
-        bmax = glm::max(bmax, p);
+        const rp3d::AABB local = placed.shape->impl().shape->getLocalBounds();
+        const glm::vec3 lo = detail::toGlm(local.getMin());
+        const glm::vec3 hi = detail::toGlm(local.getMax());
+        for (int i = 0; i < 8; ++i)
+        {
+            const glm::vec3 corner((i & 1) ? hi.x : lo.x, (i & 2) ? hi.y : lo.y, (i & 4) ? hi.z : lo.z);
+            const glm::vec3 p = placed.position + placed.rotation * corner;
+            bmin = glm::min(bmin, p);
+            bmax = glm::max(bmax, p);
+        }
     }
     return {bmin, bmax};
 }

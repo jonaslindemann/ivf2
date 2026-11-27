@@ -90,7 +90,7 @@ struct PhysicsStats {
     int bodies{0};        ///< All bodies.
     int dynamicBodies{0}; ///< Dynamic bodies.
     int awakeBodies{0};   ///< Dynamic bodies not sleeping.
-    int contacts{0};      ///< Touching body pairs after the last step.
+    int contacts{0};      ///< Touching pairs of colliders after the last step (compound bodies have several colliders).
     int contactPoints{0}; ///< Their contact points.
     int stepsLastUpdate{0}; ///< Fixed steps run by the last `step()` call.
     double updateTimeMs{0.0}; ///< Wall time of the last `step()` call (ms), events included.

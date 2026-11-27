@@ -6,6 +6,7 @@
  */
 
 #include <ivfphysics/events.h>
+#include <ivfphysics/joint.h>
 #include <ivfphysics/rigid_body.h>
 #include <ivfphysics/shape.h>
 
@@ -90,10 +91,10 @@ public:
     /** @brief Add a body with the shape of @p node (`Shape::fromNode()`). */
     ivf::Result<RigidBodyPtr> addBody(const std::shared_ptr<ivf::TransformNode> &node, const BodyDesc &desc = {});
 
-    /** @brief Remove @p body; it becomes invalid. The node stays where it is. */
+    /** @brief Remove @p body and its joints; it becomes invalid. The node stays where it is. */
     void removeBody(const RigidBodyPtr &body);
 
-    /** @brief Remove all bodies. */
+    /** @brief Remove all bodies (and joints). */
     void clear();
 
     /** @brief All bodies, in the order they were added. */
@@ -123,7 +124,7 @@ public:
     /**
      * @brief Put every body back where it was added, at rest, and set the time to zero.
      *
-     * Body properties changed since (mass, friction, ...) are kept.
+     * Body properties changed since (mass, friction, ...) are kept; broken joints are mended.
      */
     void reset();
 
@@ -142,6 +143,35 @@ public:
 
     /** @brief Number of awake dynamic bodies. */
     [[nodiscard]] int awakeBodyCount() const;
+
+    /**
+     * @brief Join @p body1 and @p body2 at @p anchor (world coordinates): both rotate freely
+     *        about the shared point. With @p body2 nullptr, @p body1 hangs from the world there.
+     * @throws std::invalid_argument for a body that is not valid in this world, or the same body twice.
+     */
+    JointPtr addBallSocketJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                                const JointDesc &desc = {});
+
+    /** @brief A hinge at @p anchor rotating about @p axis (world coordinates); see `addBallSocketJoint()`. */
+    JointPtr addHingeJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                           const glm::vec3 &axis, const JointDesc &desc = {});
+
+    /** @brief A slider at @p anchor moving along @p axis (world coordinates); see `addBallSocketJoint()`. */
+    JointPtr addSliderJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                            const glm::vec3 &axis, const JointDesc &desc = {});
+
+    /** @brief Fix the bodies to each other (or @p body1 to the world) as they are now; see `addBallSocketJoint()`. */
+    JointPtr addFixedJoint(const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                           const JointDesc &desc = {});
+
+    /** @brief Remove @p joint; it becomes invalid. */
+    void removeJoint(const JointPtr &joint);
+
+    /** @brief All joints, in the order they were added. */
+    [[nodiscard]] const std::vector<JointPtr> &joints() const;
+
+    /** @brief Called after a step for each joint that broke in it. Pass nullptr to remove. */
+    void setJointBreakCallback(std::function<void(const JointPtr &)> callback);
 
     /**
      * @brief The nearest body hit by @p ray (its direction need not be unit length).
@@ -190,6 +220,8 @@ public:
 private:
     explicit PhysicsWorld(const PhysicsSettings &settings);
     void runStep();
+    JointPtr addJoint(JointType type, const RigidBodyPtr &body1, const RigidBodyPtr &body2, const glm::vec3 &anchor,
+                      const glm::vec3 &axis, const JointDesc &desc);
     void deliverEvents();
     void syncNodes(double alpha);
     std::unique_ptr<Impl> m_impl;

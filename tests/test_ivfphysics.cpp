@@ -1,5 +1,6 @@
 // ivfphysics without OpenGL: worlds, bodies, shapes, stepping, node sync, determinism, reset,
-// raycasts, contact and trigger events, collision filters, step callbacks, dragging, throwing.
+// raycasts, contact and trigger events, collision filters, step callbacks, dragging, throwing,
+// joints (limits, motors, breaking) and compound bodies.
 
 #include "test_main.h"
 
@@ -13,7 +14,9 @@
 
 #include <glm/gtc/quaternion.hpp>
 
+#include <algorithm>
 #include <cmath>
+#include <string>
 #include <vector>
 
 using namespace ivfphysics;
@@ -684,6 +687,225 @@ IVF_TEST(throw_body_along_ray)
     for (int i = 0; i < 30; ++i)
         world->step(1.0 / 60.0);
     IVF_CHECK(near(ballNode->pos(), {1.0f, 2.0f, -2.0f}, 1e-2f));
+}
+
+IVF_TEST(pendulum_keeps_its_length)
+{
+    for (const bool hinge : {false, true})
+    {
+        auto world = PhysicsWorld::create();
+        auto bobNode = cubeAt({2.0f, 5.0f, 0.0f});
+        auto bob = world->addBody(bobNode, Shape::sphere(0.2f), {.angularDamping = 0.0f, .canSleep = false});
+        const glm::vec3 pivot(0.0f, 5.0f, 0.0f);
+        auto joint = hinge ? world->addHingeJoint(bob, nullptr, pivot, {0.0f, 0.0f, 1.0f})
+                           : world->addBallSocketJoint(bob, nullptr, pivot);
+        IVF_CHECK(joint->isValid() && !joint->isBroken());
+        IVF_CHECK(joint->type() == (hinge ? JointType::Hinge : JointType::BallSocket));
+        IVF_CHECK(joint->body1() == bob && joint->body2() == nullptr);
+        IVF_CHECK(near(joint->anchor(), pivot));
+
+        float lowest = 10.0f;
+        float maxError = 0.0f;
+        bool crossed = false;
+        for (int i = 0; i < 180; ++i)
+        {
+            world->step(1.0 / 60.0);
+            maxError = std::max(maxError, std::fabs(glm::length(bobNode->pos() - pivot) - 2.0f));
+            lowest = std::min(lowest, bobNode->pos().y);
+            crossed = crossed || bobNode->pos().x < -1.0f;
+        }
+        IVF_CHECK(maxError < 0.02f);
+        IVF_CHECK_NEAR(lowest, 3.0f, 0.05); // swings through the bottom, 2 below the pivot
+        IVF_CHECK(crossed);                // and up the other side
+        // The joint holds the bob: at the bottom more than its weight
+        IVF_CHECK(glm::length(joint->reactionForce()) > 0.0f);
+        if (hinge)
+            IVF_CHECK(std::fabs(bobNode->pos().z) < 1e-3f); // stays in its plane
+    }
+}
+
+IVF_TEST(hinge_limits_and_motor)
+{
+    // A horizontal arm on a hinge at its end: gravity turns it down until the limit holds it
+    auto world = PhysicsWorld::create();
+    auto armNode = cubeAt({1.0f, 5.0f, 0.0f});
+    auto arm = world->addBody(armNode, Shape::box({1.0f, 0.1f, 0.1f}), {});
+    auto hinge = world->addHingeJoint(arm, nullptr, {0.0f, 5.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+    hinge->setLimits(-0.5f, 0.5f);
+    IVF_CHECK(hinge->limitsEnabled());
+    IVF_CHECK_NEAR(hinge->lowerLimit(), -0.5f, 1e-6);
+    for (int i = 0; i < 180; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK_NEAR(std::fabs(hinge->angle()), 0.5f, 0.03);
+    IVF_CHECK(armNode->pos().y < 5.0f);
+
+    // Limits that do not contain 0 are clamped to it
+    hinge->setLimits(0.2f, 0.4f);
+    IVF_CHECK(hinge->lowerLimit() == 0.0f && hinge->upperLimit() == 0.4f);
+
+    // A motor turns a free wheel at its speed (no gravity)
+    auto spinWorld = PhysicsWorld::create({.gravity = {0.0f, 0.0f, 0.0f}});
+    auto wheel = spinWorld->addBody(cubeAt({0.0f, 0.0f, 0.0f}), Shape::box({0.5f, 0.5f, 0.1f}), {.angularDamping = 0.0f});
+    auto axle = spinWorld->addHingeJoint(wheel, nullptr, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f});
+    axle->setMotor(2.0f, 100.0f);
+    IVF_CHECK(axle->motorEnabled());
+    for (int i = 0; i < 30; ++i)
+        spinWorld->step(1.0 / 60.0);
+    IVF_CHECK_NEAR(wheel->angularVelocity().z, 2.0f, 0.05);
+    IVF_CHECK_NEAR(axle->angle(), 1.0f, 0.05); // 0.5 s at 2 rad/s
+    axle->setMotorEnabled(false);
+    IVF_CHECK(!axle->motorEnabled());
+}
+
+IVF_TEST(slider_limits_and_motor)
+{
+    auto world = PhysicsWorld::create({.gravity = {0.0f, 0.0f, 0.0f}});
+    auto cartNode = cubeAt({0.0f, 1.0f, 0.0f});
+    auto cart = world->addBody(cartNode, Shape::box(glm::vec3(0.25f)), {});
+    auto rail = world->addSliderJoint(cart, nullptr, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f, 0.0f});
+    rail->setLimits(-1.0f, 2.0f);
+    rail->setMotor(3.0f, 50.0f);
+    for (int i = 0; i < 90; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK_NEAR(rail->translation(), 2.0f, 0.03);
+    IVF_CHECK(near(cartNode->pos(), {2.0f, 1.0f, 0.0f}, 0.03f));
+    rail->setMotor(-3.0f, 50.0f);
+    for (int i = 0; i < 90; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK_NEAR(rail->translation(), -1.0f, 0.03);
+
+    // Pushed sideways, it stays on its rail and does not turn
+    cart->applyImpulse({0.0f, 5.0f, 5.0f});
+    cart->setAngularVelocity({3.0f, 3.0f, 3.0f});
+    for (int i = 0; i < 30; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK(std::fabs(cartNode->pos().y - 1.0f) < 0.02f && std::fabs(cartNode->pos().z) < 0.02f);
+    IVF_CHECK(near(cartNode->rotation(), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1e-3f));
+}
+
+IVF_TEST(ball_socket_cone_limit)
+{
+    auto world = PhysicsWorld::create();
+    auto bobNode = cubeAt({0.0f, 3.0f, 0.0f});
+    auto bob = world->addBody(bobNode, Shape::sphere(0.2f), {.canSleep = false});
+    auto joint = world->addBallSocketJoint(bob, nullptr, {0.0f, 5.0f, 0.0f});
+    joint->setConeLimit(0.3f);
+    IVF_CHECK(joint->limitsEnabled() && joint->coneLimit() == 0.3f);
+    bob->applyImpulse({4.0f, 0.0f, 2.0f});
+    float widest = 0.0f;
+    for (int i = 0; i < 120; ++i)
+    {
+        world->step(1.0 / 60.0);
+        const glm::vec3 d = glm::normalize(bobNode->pos() - glm::vec3(0.0f, 5.0f, 0.0f));
+        widest = std::max(widest, std::acos(std::clamp(-d.y, -1.0f, 1.0f)));
+    }
+    IVF_CHECK(widest > 0.2f && widest < 0.36f);
+}
+
+IVF_TEST(joints_break_and_mend)
+{
+    auto world = PhysicsWorld::create();
+    auto boxNode = cubeAt({0.0f, 5.0f, 0.0f});
+    auto box = world->addBody(boxNode, Shape::box(glm::vec3(0.25f)), {.mass = 1.0f});
+    auto weld = world->addFixedJoint(box, nullptr, {0.0f, 5.25f, 0.0f}, {.breakForce = 30.0f});
+    IVF_CHECK(weld->breakForce() == 30.0f);
+    std::vector<JointPtr> broken;
+    world->setJointBreakCallback([&](const JointPtr &j) { broken.push_back(j); });
+
+    for (int i = 0; i < 60; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK(!weld->isBroken());
+    IVF_CHECK(near(boxNode->pos(), {0.0f, 5.0f, 0.0f}, 0.01f));
+    IVF_CHECK_NEAR(glm::length(weld->reactionForce()), 9.81f, 0.3); // holds its weight
+
+    // Five times heavier: 49 N is more than the weld takes
+    box->setMass(5.0f);
+    for (int i = 0; i < 60; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK(weld->isBroken() && weld->isValid());
+    IVF_CHECK(broken.size() == 1 && broken.front() == weld);
+    IVF_CHECK(boxNode->pos().y < 4.0f);
+
+    // reset() puts the box back and mends the weld
+    world->reset();
+    IVF_CHECK(!weld->isBroken());
+    box->setMass(1.0f);
+    for (int i = 0; i < 60; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK(near(boxNode->pos(), {0.0f, 5.0f, 0.0f}, 0.01f));
+
+    // Removing a body removes its joints
+    auto other = world->addBody(cubeAt({1.0f, 5.0f, 0.0f}), Shape::box(glm::vec3(0.25f)), {});
+    auto link = world->addBallSocketJoint(box, other, {0.5f, 5.0f, 0.0f});
+    IVF_CHECK(world->joints().size() == 2);
+    world->removeBody(other);
+    IVF_CHECK(world->joints().size() == 1 && !link->isValid());
+    world->removeJoint(weld);
+    IVF_CHECK(world->joints().empty() && !weld->isValid());
+    world->step(1.0 / 60.0);
+
+    // Joints outlive their world safely
+    JointPtr orphan;
+    {
+        auto w = PhysicsWorld::create();
+        auto b = w->addBody(cubeAt({0.0f, 0.0f, 0.0f}), Shape::sphere(0.5f), {});
+        orphan = w->addHingeJoint(b, nullptr, glm::vec3(0.0f), {0.0f, 1.0f, 0.0f});
+    }
+    IVF_CHECK(!orphan->isValid());
+    IVF_CHECK(orphan->angle() == 0.0f);
+}
+
+IVF_TEST(compound_bodies)
+{
+    // A table: top and four legs, dropped onto the ground
+    auto top = Shape::box({1.0f, 0.05f, 0.6f});
+    top->setOffset({0.0f, 0.75f, 0.0f});
+    std::vector<ShapePtr> parts{top};
+    for (const float x : {-0.9f, 0.9f})
+        for (const float z : {-0.5f, 0.5f})
+        {
+            auto leg = Shape::box({0.05f, 0.35f, 0.05f});
+            leg->setOffset({x, 0.35f, z});
+            parts.push_back(leg);
+        }
+    auto table = Shape::compound(parts);
+    IVF_CHECK(table->type() == ShapeType::Compound && table->parts().size() == 5);
+    IVF_CHECK(std::string(toString(ShapeType::Compound)) == "compound");
+    IVF_CHECK_NEAR(table->volume(), 0.24f + 4.0f * 0.007f, 1e-4);
+    const auto [lo, hi] = table->bounds();
+    IVF_CHECK(near(lo, {-1.0f, 0.0f, -0.6f}) && near(hi, {1.0f, 0.8f, 0.6f}));
+    IVF_CHECK(!table->isConcave());
+
+    auto world = PhysicsWorld::create();
+    addGround(*world);
+    auto tableNode = cubeAt({0.0f, 1.0f, 0.0f});
+    auto body = world->addBody(tableNode, table, {.mass = 10.0f});
+    // Most of the mass is in the top: the centre of mass is high
+    IVF_CHECK(body->centerOfMass().y - tableNode->pos().y > 0.6f);
+
+    int begins = 0;
+    int ends = 0;
+    world->setContactCallback([&](const Contact &c) {
+        begins += c.phase == ContactPhase::Begin;
+        ends += c.phase == ContactPhase::End;
+    });
+    for (int i = 0; i < 120; ++i)
+        world->step(1.0 / 60.0);
+    // Stands on its legs (the top 0.75 above the floor), one contact for four legs
+    IVF_CHECK_NEAR(tableNode->pos().y, 0.0f, 0.02);
+    IVF_CHECK(near(tableNode->rotation(), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1e-2f));
+    IVF_CHECK(begins - ends == 1);
+    IVF_CHECK(world->raycast({{0.0f, 5.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}).body == body);
+    IVF_CHECK_NEAR(world->raycast({{0.0f, 5.0f, 0.0f}, {0.0f, -1.0f, 0.0f}}).distance, 4.2f, 0.03);
+
+    // Nested compounds are flattened; a triangle mesh part makes a body static
+    auto nested = Shape::compound({table, Shape::sphere(0.2f)});
+    IVF_CHECK(nested->bounds().second.y >= 0.8f - 1e-4f);
+    auto mesh = Shape::triangleMesh({{0, 0, 0}, {1, 0, 0}, {0, 0, 1}}, {{0, 1, 2}});
+    IVF_CHECK(mesh.has_value());
+    auto concave = Shape::compound({Shape::sphere(0.2f), *mesh});
+    IVF_CHECK(concave->isConcave());
+    IVF_CHECK(world->addBody(cubeAt({5.0f, 1.0f, 0.0f}), concave, {})->type() == BodyType::Static);
 }
 
 IVF_TEST_MAIN()

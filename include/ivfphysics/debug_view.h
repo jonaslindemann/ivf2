@@ -2,7 +2,7 @@
 
 /**
  * @file debug_view.h
- * @brief Colliders, contacts and velocities drawn as lines through `ivf::DebugDraw`.
+ * @brief Colliders, contacts, joints and velocities drawn as lines through `ivf::DebugDraw`.
  */
 
 #include <ivfphysics/interaction.h>
@@ -23,6 +23,7 @@ struct DebugViewOptions {
     bool contacts{true};       ///< Contact points with their normals.
     bool velocities{false};    ///< Linear velocity arrows from the centres of mass.
     bool centersOfMass{false}; ///< Small axes at the centres of mass.
+    bool joints{true};         ///< Joint anchors, axes and the lines to the joined bodies.
     float contactSize{0.05f};  ///< Size of the contact point crosses.
     float normalLength{0.3f};  ///< Length of the contact normals.
     float velocityScale{0.1f}; ///< Arrow length per unit of speed.
@@ -35,6 +36,7 @@ struct DebugViewOptions {
     glm::vec4 triggerColor{1.0f, 0.35f, 1.0f, 1.0f};
     glm::vec4 contactColor{1.0f, 0.2f, 0.2f, 1.0f};
     glm::vec4 velocityColor{1.0f, 1.0f, 0.3f, 1.0f};
+    glm::vec4 jointColor{0.3f, 1.0f, 1.0f, 1.0f};
 };
 
 /**

@@ -11,7 +11,7 @@
 //   --size <w>x<h>       browser window size (default 320x180: SwiftShader's cost is mostly per pixel)
 //
 // A page fails if it shows an error, throws, logs an ERROR or WARN line (ivf::Logger) or a
-// WebGL error, or renders fewer than three frames. shader_check must report "0 failed".
+// WebGL error, or renders fewer than two frames after loading (the main loop runs). shader_check must report "0 failed".
 // Needs Node 22+ (the emsdk's node is fine) and Chrome or Chromium: CHROME or CHROME_BIN
 // names the executable, otherwise the usual install locations are tried. WebGL runs on
 // SwiftShader, so no GPU is needed. Exits with 1 if a page fails.
@@ -60,7 +60,7 @@ const [width, height] = options.size.split('x').map(Number);
 const runTime = Number(options.time);
 const loadTimeout = 90000; // downloading and compiling a page can be slow on CI runners
 const frameTimeout = 60000;
-const minFrames = 3;
+const minFrames = 2; // heavy pages draw a frame every ~30 s with SwiftShader on CI runners
 if (options.screenshots)
     fs.mkdirSync(options.screenshots, { recursive: true });
 

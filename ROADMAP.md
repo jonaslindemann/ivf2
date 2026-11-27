@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target in progress**: steps 1-4 done (preset `wasm`, GLES compatibility, 67 examples run in the browser, CI smoke test and live examples in the docs); **next: step 5** (wrap-up: gallery with live links, README). 3.2 Python bindings after the web target |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **Next: 3.2 Python bindings**. 3.2 Python bindings after the web target |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -916,6 +916,11 @@ clearest way to stand out.
       Open: evaluating the shadow filter once per map instead of once per light loop would
       bring the link time to about 2 s (needs a shader API change: shadows computed in `main()`).
    5. *Wrap-up.* Gallery with live links, changelog, README.
+      *Done:* the Example Gallery has a "Run" badge on each of the 67 web examples
+      (`make_gallery.py`), the landing page and the Example Index link the live examples, the
+      README has a web section, a link at the top and the docs badge. The web target is complete;
+      open follow-ups: shadows evaluated once per map (shader link time on Windows), ccache hits
+      for the web build (precompiled headers), mobile browsers not yet tested.
 4. **Headless and offline rendering.** Render without a visible window (EGL/OSMesa),
    video export through an ffmpeg pipe from `FrameWriter`, deterministic time stepping.
    Useful for figure generation, CI and music videos (`ivfmusic`).
@@ -947,5 +952,4 @@ clearest way to stand out.
 4. Render queue + uniform buffers (2.1, 2.2) - the base for HDR, IBL, shadows. *Render queue
    done; uniform handling is next.*
 5. Scientific visualisation module and Python bindings (3.1, 3.2) - the main differentiators.
-   *Visualisation module done; the web target (3.3) is in progress and comes before the Python
-   bindings.*
+   *Visualisation module and web target (3.3) done; the Python bindings (3.2) are next.*

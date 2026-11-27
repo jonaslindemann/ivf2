@@ -229,7 +229,12 @@ def main():
         'hover for a short description. The pictures are the reference images of the visual tests, '
         'so they show exactly what each program renders.',
         '',
+        f'**▶ Run** opens the example in your browser (WebGL 2), built from the current sources; '
+        f'all of them are on the [start page of the live examples]({LIVE_URL}). '
+        'See [Running in the Browser](../getting_started/web.md).',
+        '',
     ]
+    web = set(web_examples())
     missing = []
     for title, rows in parse_index():
         tiles = []
@@ -240,7 +245,10 @@ def main():
                 continue
             target = link or f'{SOURCE_URL}{name}'
             title_text = description.replace('"', "'")
-            tiles.append(f'- [![{name}]({image}) {name}]({target} "{title_text}")')
+            tile = f'- [![{name}]({image}) {name}]({target} "{title_text}")'
+            if name in web:
+                tile += f' [▶ Run]({LIVE_URL}{name}.html){{ .ivf-run title="Run {name} in the browser" }}'
+            tiles.append(tile)
         if not tiles:
             continue
         lines += [f'## {title}', '', '<div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>', '']

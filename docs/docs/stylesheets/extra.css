@@ -191,3 +191,31 @@ body,
   font-weight: 400;
   font-size: 0.65rem;
 }
+
+/* Example Gallery: "Run" badge over a tile's picture, linking to the live web example */
+.md-typeset .ivf-gallery li {
+  position: relative;
+}
+
+.md-typeset .ivf-gallery a.ivf-run {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  display: inline-block;
+  padding: 0.05rem 0.4rem;
+  border: none;
+  border-radius: 0.6rem;
+  background-color: rgba(25, 27, 31, 0.85);
+  color: var(--md-primary-fg-color);
+  font-family: var(--md-text-font-family, sans-serif);
+  font-size: 0.6rem;
+  font-weight: 700;
+  transform: none;
+}
+
+.md-typeset .ivf-gallery a.ivf-run:hover,
+.md-typeset .ivf-gallery a.ivf-run:focus-visible {
+  background-color: var(--md-primary-fg-color);
+  color: #191B1F;
+  transform: none;
+}

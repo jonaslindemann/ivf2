@@ -14,6 +14,8 @@ Run them from that folder, or anywhere else as long as the `shaders/`, `fonts/` 
 
 The sources are in `examples/<name>/`. The [Example Gallery](gallery.md) shows a picture of each.
 
+All examples except `multi_window1`, `embedding1`, `audio_reactive1`, `music_scene1` and `assimp1` also run [in your browser](https://jonaslindemann.github.io/ivf2/web/), built by CI from the current sources (see [Running in the Browser](../getting_started/web.md)).
+
 ## Getting started
 
 | Example | Shows | Guide |

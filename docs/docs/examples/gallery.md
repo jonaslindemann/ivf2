@@ -4,12 +4,14 @@
 
 Every example with a picture of what it draws, grouped like the [Example Index](index.md). Click a picture for the guide that explains it (or the source, if there is no guide); hover for a short description. The pictures are the reference images of the visual tests, so they show exactly what each program renders.
 
+**▶ Run** opens the example in your browser (WebGL 2), built from the current sources; all of them are on the [start page of the live examples](https://jonaslindemann.github.io/ivf2/web/). See [Running in the Browser](../getting_started/web.md).
+
 ## Getting started
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
-- [![hello_ivf](../images/gallery/hello_ivf.jpg) hello_ivf](../getting_started/basic_concepts.md "A scene built by hand in a plain GLFWWindow: shaders, lights, a scene graph and drawing it yourself")
-- [![hello_pipeline](../images/gallery/hello_pipeline.jpg) hello_pipeline](../getting_started/basic_concepts.md "The minimal rendering pipeline, step by step")
+- [![hello_ivf](../images/gallery/hello_ivf.jpg) hello_ivf](../getting_started/basic_concepts.md "A scene built by hand in a plain GLFWWindow: shaders, lights, a scene graph and drawing it yourself") [▶ Run](https://jonaslindemann.github.io/ivf2/web/hello_ivf.html){ .ivf-run title="Run hello_ivf in the browser" }
+- [![hello_pipeline](../images/gallery/hello_pipeline.jpg) hello_pipeline](../getting_started/basic_concepts.md "The minimal rendering pipeline, step by step") [▶ Run](https://jonaslindemann.github.io/ivf2/web/hello_pipeline.html){ .ivf-run title="Run hello_pipeline in the browser" }
 
 </div>
 
@@ -17,17 +19,17 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
-- [![primitives1](../images/gallery/primitives1.jpg) primitives1](primitives_examples.md "All the basic primitives")
-- [![extrusions1](../images/gallery/extrusions1.jpg) extrusions1](primitives_examples.md "Profiles swept along paths")
-- [![transforms1](../images/gallery/transforms1.jpg) transforms1](primitives_examples.md "A grid of arrows with random orientations")
-- [![text1](../images/gallery/text1.jpg) text1](../primitives/text.md "3D text with live editing")
-- [![custom_mesh1](../images/gallery/custom_mesh1.jpg) custom_mesh1](https://github.com/jonaslindemann/ivf2/tree/main/examples/custom_mesh1 "DynamicMesh for generated geometry: a Lissajous curve and a Lorenz attractor")
-- [![instancing1](../images/gallery/instancing1.jpg) instancing1](https://github.com/jonaslindemann/ivf2/tree/main/examples/instancing1 "Thousands of copies of a mesh with InstancedMeshNode")
-- [![auto_instancing1](../images/gallery/auto_instancing1.jpg) auto_instancing1](../core/nodes.md#instancenode-class "InstanceNode copies merged into instanced draw calls automatically; on/off switch and statistics")
-- [![bbox1](../images/gallery/bbox1.jpg) bbox1](../core/nodes.md "Bounding boxes of nested nodes")
-- [![deformer1](../images/gallery/deformer1.jpg) deformer1](../core/deformers.md "Twist and bend deformers with inspectors")
-- [![deformer2](../images/gallery/deformer2.jpg) deformer2](../core/deformers.md "Layered wave deformers for a water surface")
-- [![deformer3](../images/gallery/deformer3.jpg) deformer3](../core/deformers.md "Random and noise deformers")
+- [![primitives1](../images/gallery/primitives1.jpg) primitives1](primitives_examples.md "All the basic primitives") [▶ Run](https://jonaslindemann.github.io/ivf2/web/primitives1.html){ .ivf-run title="Run primitives1 in the browser" }
+- [![extrusions1](../images/gallery/extrusions1.jpg) extrusions1](primitives_examples.md "Profiles swept along paths") [▶ Run](https://jonaslindemann.github.io/ivf2/web/extrusions1.html){ .ivf-run title="Run extrusions1 in the browser" }
+- [![transforms1](../images/gallery/transforms1.jpg) transforms1](primitives_examples.md "A grid of arrows with random orientations") [▶ Run](https://jonaslindemann.github.io/ivf2/web/transforms1.html){ .ivf-run title="Run transforms1 in the browser" }
+- [![text1](../images/gallery/text1.jpg) text1](../primitives/text.md "3D text with live editing") [▶ Run](https://jonaslindemann.github.io/ivf2/web/text1.html){ .ivf-run title="Run text1 in the browser" }
+- [![custom_mesh1](../images/gallery/custom_mesh1.jpg) custom_mesh1](https://github.com/jonaslindemann/ivf2/tree/main/examples/custom_mesh1 "DynamicMesh for generated geometry: a Lissajous curve and a Lorenz attractor") [▶ Run](https://jonaslindemann.github.io/ivf2/web/custom_mesh1.html){ .ivf-run title="Run custom_mesh1 in the browser" }
+- [![instancing1](../images/gallery/instancing1.jpg) instancing1](https://github.com/jonaslindemann/ivf2/tree/main/examples/instancing1 "Thousands of copies of a mesh with InstancedMeshNode") [▶ Run](https://jonaslindemann.github.io/ivf2/web/instancing1.html){ .ivf-run title="Run instancing1 in the browser" }
+- [![auto_instancing1](../images/gallery/auto_instancing1.jpg) auto_instancing1](../core/nodes.md#instancenode-class "InstanceNode copies merged into instanced draw calls automatically; on/off switch and statistics") [▶ Run](https://jonaslindemann.github.io/ivf2/web/auto_instancing1.html){ .ivf-run title="Run auto_instancing1 in the browser" }
+- [![bbox1](../images/gallery/bbox1.jpg) bbox1](../core/nodes.md "Bounding boxes of nested nodes") [▶ Run](https://jonaslindemann.github.io/ivf2/web/bbox1.html){ .ivf-run title="Run bbox1 in the browser" }
+- [![deformer1](../images/gallery/deformer1.jpg) deformer1](../core/deformers.md "Twist and bend deformers with inspectors") [▶ Run](https://jonaslindemann.github.io/ivf2/web/deformer1.html){ .ivf-run title="Run deformer1 in the browser" }
+- [![deformer2](../images/gallery/deformer2.jpg) deformer2](../core/deformers.md "Layered wave deformers for a water surface") [▶ Run](https://jonaslindemann.github.io/ivf2/web/deformer2.html){ .ivf-run title="Run deformer2 in the browser" }
+- [![deformer3](../images/gallery/deformer3.jpg) deformer3](../core/deformers.md "Random and noise deformers") [▶ Run](https://jonaslindemann.github.io/ivf2/web/deformer3.html){ .ivf-run title="Run deformer3 in the browser" }
 
 </div>
 
@@ -35,22 +37,22 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
-- [![textures1](../images/gallery/textures1.jpg) textures1](texture_examples.md "Image textures and texture modes")
-- [![textures2](../images/gallery/textures2.jpg) textures2](../core/materials_and_textures.md "Multitexturing with blend modes")
-- [![textures3](../images/gallery/textures3.jpg) textures3](https://github.com/jonaslindemann/ivf2/tree/main/examples/textures3 "Textures generated on the GPU")
-- [![textures4](../images/gallery/textures4.jpg) textures4](../core/pbr_and_ibl.md "PBRMaterial: a grid of spheres from rough to smooth and dielectric to metal")
-- [![ibl1](../images/gallery/ibl1.jpg) ibl1](../core/pbr_and_ibl.md "PBR spheres lit by an HDR environment (procedural sky or .hdr file), with the environment as skybox")
-- [![procedural1](../images/gallery/procedural1.jpg) procedural1](https://github.com/jonaslindemann/ivf2/tree/main/examples/procedural1 "Textures generated on the CPU: noise, marble, wood")
-- [![procedural2](../images/gallery/procedural2.jpg) procedural2](https://github.com/jonaslindemann/ivf2/tree/main/examples/procedural2 "Animated GPU procedural textures")
-- [![bump1](../images/gallery/bump1.jpg) bump1](https://github.com/jonaslindemann/ivf2/tree/main/examples/bump1 "Normal maps with BumpMaterial")
-- [![shader_material1](../images/gallery/shader_material1.jpg) shader_material1](../core/shader_materials.md "Your own GLSL shaders on nodes, reloaded on save")
-- [![reflection1](../images/gallery/reflection1.jpg) reflection1](../core/shader_materials.md#watermaterial "Reflecting water with PlanarReflection and WaterMaterial")
-- [![skybox1](../images/gallery/skybox1.jpg) skybox1](https://github.com/jonaslindemann/ivf2/tree/main/examples/skybox1 "A cubemap sky behind the scene")
-- [![lighting1](../images/gallery/lighting1.jpg) lighting1](../core/lighting.md "Point, directional and spot lights with editing windows")
-- [![shadows1](../images/gallery/shadows1.jpg) shadows1](../advanced/shadows.md "Shadow mapping from a directional light")
-- [![cascaded_shadows1](../images/gallery/cascaded_shadows1.jpg) cascaded_shadows1](../advanced/shadows.md#cascaded-shadow-maps "Cascaded shadow maps and PCF/PCSS soft shadows for a sun over a large scene")
-- [![point_shadows1](../images/gallery/point_shadows1.jpg) point_shadows1](../advanced/shadows.md#point-lights "Point lights casting soft shadows in all directions, and a spot light, onto PBR materials")
-- [![transparency1](../images/gallery/transparency1.jpg) transparency1](../core/materials_and_textures.md#transparency "Transparent materials, a transparent group and a glow orb, sorted back to front")
+- [![textures1](../images/gallery/textures1.jpg) textures1](texture_examples.md "Image textures and texture modes") [▶ Run](https://jonaslindemann.github.io/ivf2/web/textures1.html){ .ivf-run title="Run textures1 in the browser" }
+- [![textures2](../images/gallery/textures2.jpg) textures2](../core/materials_and_textures.md "Multitexturing with blend modes") [▶ Run](https://jonaslindemann.github.io/ivf2/web/textures2.html){ .ivf-run title="Run textures2 in the browser" }
+- [![textures3](../images/gallery/textures3.jpg) textures3](https://github.com/jonaslindemann/ivf2/tree/main/examples/textures3 "Textures generated on the GPU") [▶ Run](https://jonaslindemann.github.io/ivf2/web/textures3.html){ .ivf-run title="Run textures3 in the browser" }
+- [![textures4](../images/gallery/textures4.jpg) textures4](../core/pbr_and_ibl.md "PBRMaterial: a grid of spheres from rough to smooth and dielectric to metal") [▶ Run](https://jonaslindemann.github.io/ivf2/web/textures4.html){ .ivf-run title="Run textures4 in the browser" }
+- [![ibl1](../images/gallery/ibl1.jpg) ibl1](../core/pbr_and_ibl.md "PBR spheres lit by an HDR environment (procedural sky or .hdr file), with the environment as skybox") [▶ Run](https://jonaslindemann.github.io/ivf2/web/ibl1.html){ .ivf-run title="Run ibl1 in the browser" }
+- [![procedural1](../images/gallery/procedural1.jpg) procedural1](https://github.com/jonaslindemann/ivf2/tree/main/examples/procedural1 "Textures generated on the CPU: noise, marble, wood") [▶ Run](https://jonaslindemann.github.io/ivf2/web/procedural1.html){ .ivf-run title="Run procedural1 in the browser" }
+- [![procedural2](../images/gallery/procedural2.jpg) procedural2](https://github.com/jonaslindemann/ivf2/tree/main/examples/procedural2 "Animated GPU procedural textures") [▶ Run](https://jonaslindemann.github.io/ivf2/web/procedural2.html){ .ivf-run title="Run procedural2 in the browser" }
+- [![bump1](../images/gallery/bump1.jpg) bump1](https://github.com/jonaslindemann/ivf2/tree/main/examples/bump1 "Normal maps with BumpMaterial") [▶ Run](https://jonaslindemann.github.io/ivf2/web/bump1.html){ .ivf-run title="Run bump1 in the browser" }
+- [![shader_material1](../images/gallery/shader_material1.jpg) shader_material1](../core/shader_materials.md "Your own GLSL shaders on nodes, reloaded on save") [▶ Run](https://jonaslindemann.github.io/ivf2/web/shader_material1.html){ .ivf-run title="Run shader_material1 in the browser" }
+- [![reflection1](../images/gallery/reflection1.jpg) reflection1](../core/shader_materials.md#watermaterial "Reflecting water with PlanarReflection and WaterMaterial") [▶ Run](https://jonaslindemann.github.io/ivf2/web/reflection1.html){ .ivf-run title="Run reflection1 in the browser" }
+- [![skybox1](../images/gallery/skybox1.jpg) skybox1](https://github.com/jonaslindemann/ivf2/tree/main/examples/skybox1 "A cubemap sky behind the scene") [▶ Run](https://jonaslindemann.github.io/ivf2/web/skybox1.html){ .ivf-run title="Run skybox1 in the browser" }
+- [![lighting1](../images/gallery/lighting1.jpg) lighting1](../core/lighting.md "Point, directional and spot lights with editing windows") [▶ Run](https://jonaslindemann.github.io/ivf2/web/lighting1.html){ .ivf-run title="Run lighting1 in the browser" }
+- [![shadows1](../images/gallery/shadows1.jpg) shadows1](../advanced/shadows.md "Shadow mapping from a directional light") [▶ Run](https://jonaslindemann.github.io/ivf2/web/shadows1.html){ .ivf-run title="Run shadows1 in the browser" }
+- [![cascaded_shadows1](../images/gallery/cascaded_shadows1.jpg) cascaded_shadows1](../advanced/shadows.md#cascaded-shadow-maps "Cascaded shadow maps and PCF/PCSS soft shadows for a sun over a large scene") [▶ Run](https://jonaslindemann.github.io/ivf2/web/cascaded_shadows1.html){ .ivf-run title="Run cascaded_shadows1 in the browser" }
+- [![point_shadows1](../images/gallery/point_shadows1.jpg) point_shadows1](../advanced/shadows.md#point-lights "Point lights casting soft shadows in all directions, and a spot light, onto PBR materials") [▶ Run](https://jonaslindemann.github.io/ivf2/web/point_shadows1.html){ .ivf-run title="Run point_shadows1 in the browser" }
+- [![transparency1](../images/gallery/transparency1.jpg) transparency1](../core/materials_and_textures.md#transparency "Transparent materials, a transparent group and a glow orb, sorted back to front") [▶ Run](https://jonaslindemann.github.io/ivf2/web/transparency1.html){ .ivf-run title="Run transparency1 in the browser" }
 
 </div>
 
@@ -58,13 +60,13 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
-- [![effects1](../images/gallery/effects1.jpg) effects1](../effects/index.md "Every stylisation effect, switchable from a panel")
-- [![hdr1](../images/gallery/hdr1.jpg) hdr1](../effects/hdr.md "Lights brighter than white with tone mapping (None, Reinhard, ACES, AgX), exposure, bloom in HDR, FXAA and MSAA")
-- [![fog1](../images/gallery/fog1.jpg) fog1](../effects/blur.md#fog "Distance and height fog")
-- [![dof1](../images/gallery/dof1.jpg) dof1](../effects/blur.md#depth-of-field "Depth of field")
-- [![ssao1](../images/gallery/ssao1.jpg) ssao1](../effects/screen_space.md#ambient-occlusion "Screen-space ambient occlusion")
-- [![ssr1](../images/gallery/ssr1.jpg) ssr1](../effects/screen_space.md#screen-space-reflections "Screen-space reflections on a polished floor, with SSAO")
-- [![mip_bloom1](../images/gallery/mip_bloom1.jpg) mip_bloom1](../effects/blur.md#mipbloomeffect "Wide bloom with glow, mist and sky materials and a guided camera")
+- [![effects1](../images/gallery/effects1.jpg) effects1](../effects/index.md "Every stylisation effect, switchable from a panel") [▶ Run](https://jonaslindemann.github.io/ivf2/web/effects1.html){ .ivf-run title="Run effects1 in the browser" }
+- [![hdr1](../images/gallery/hdr1.jpg) hdr1](../effects/hdr.md "Lights brighter than white with tone mapping (None, Reinhard, ACES, AgX), exposure, bloom in HDR, FXAA and MSAA") [▶ Run](https://jonaslindemann.github.io/ivf2/web/hdr1.html){ .ivf-run title="Run hdr1 in the browser" }
+- [![fog1](../images/gallery/fog1.jpg) fog1](../effects/blur.md#fog "Distance and height fog") [▶ Run](https://jonaslindemann.github.io/ivf2/web/fog1.html){ .ivf-run title="Run fog1 in the browser" }
+- [![dof1](../images/gallery/dof1.jpg) dof1](../effects/blur.md#depth-of-field "Depth of field") [▶ Run](https://jonaslindemann.github.io/ivf2/web/dof1.html){ .ivf-run title="Run dof1 in the browser" }
+- [![ssao1](../images/gallery/ssao1.jpg) ssao1](../effects/screen_space.md#ambient-occlusion "Screen-space ambient occlusion") [▶ Run](https://jonaslindemann.github.io/ivf2/web/ssao1.html){ .ivf-run title="Run ssao1 in the browser" }
+- [![ssr1](../images/gallery/ssr1.jpg) ssr1](../effects/screen_space.md#screen-space-reflections "Screen-space reflections on a polished floor, with SSAO") [▶ Run](https://jonaslindemann.github.io/ivf2/web/ssr1.html){ .ivf-run title="Run ssr1 in the browser" }
+- [![mip_bloom1](../images/gallery/mip_bloom1.jpg) mip_bloom1](../effects/blur.md#mipbloomeffect "Wide bloom with glow, mist and sky materials and a guided camera") [▶ Run](https://jonaslindemann.github.io/ivf2/web/mip_bloom1.html){ .ivf-run title="Run mip_bloom1 in the browser" }
 
 </div>
 
@@ -72,14 +74,29 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
-- [![animation1](../images/gallery/animation1.jpg) animation1](../animation/basic_animation.md "Animating in onUpdate()")
-- [![animation2](../images/gallery/animation2.jpg) animation2](../animation/lissajous.md "A Lissajous curve with parameter sliders")
-- [![animation3](../images/gallery/animation3.jpg) animation3](../animation/keyframe_animation.md "Spline and keyframe animation with traces")
-- [![tweening1](../images/gallery/tweening1.jpg) tweening1](../animation/choosing.md#tweens "Tweens with every easing curve")
-- [![timeline1](../images/gallery/timeline1.jpg) timeline1](../animation/choosing.md#scene-timelines "A sequence of three scripted scenes")
-- [![camera_anim1](../images/gallery/camera_anim1.jpg) camera_anim1](../animation/camera_animation.md "Camera fly-through with shake")
-- [![time_control1](../images/gallery/time_control1.jpg) time_control1](../core/time_controller.md "Pause, slow motion and time scaling for a whole scene")
-- [![behaviors1](../images/gallery/behaviors1.jpg) behaviors1](https://github.com/jonaslindemann/ivf2/tree/main/examples/behaviors1 "Reusable behaviours attached to nodes: spin, pulse, follow a spline")
+- [![animation1](../images/gallery/animation1.jpg) animation1](../animation/basic_animation.md "Animating in onUpdate()") [▶ Run](https://jonaslindemann.github.io/ivf2/web/animation1.html){ .ivf-run title="Run animation1 in the browser" }
+- [![animation2](../images/gallery/animation2.jpg) animation2](../animation/lissajous.md "A Lissajous curve with parameter sliders") [▶ Run](https://jonaslindemann.github.io/ivf2/web/animation2.html){ .ivf-run title="Run animation2 in the browser" }
+- [![animation3](../images/gallery/animation3.jpg) animation3](../animation/keyframe_animation.md "Spline and keyframe animation with traces") [▶ Run](https://jonaslindemann.github.io/ivf2/web/animation3.html){ .ivf-run title="Run animation3 in the browser" }
+- [![tweening1](../images/gallery/tweening1.jpg) tweening1](../animation/choosing.md#tweens "Tweens with every easing curve") [▶ Run](https://jonaslindemann.github.io/ivf2/web/tweening1.html){ .ivf-run title="Run tweening1 in the browser" }
+- [![timeline1](../images/gallery/timeline1.jpg) timeline1](../animation/choosing.md#scene-timelines "A sequence of three scripted scenes") [▶ Run](https://jonaslindemann.github.io/ivf2/web/timeline1.html){ .ivf-run title="Run timeline1 in the browser" }
+- [![camera_anim1](../images/gallery/camera_anim1.jpg) camera_anim1](../animation/camera_animation.md "Camera fly-through with shake") [▶ Run](https://jonaslindemann.github.io/ivf2/web/camera_anim1.html){ .ivf-run title="Run camera_anim1 in the browser" }
+- [![time_control1](../images/gallery/time_control1.jpg) time_control1](../core/time_controller.md "Pause, slow motion and time scaling for a whole scene") [▶ Run](https://jonaslindemann.github.io/ivf2/web/time_control1.html){ .ivf-run title="Run time_control1 in the browser" }
+- [![behaviors1](../images/gallery/behaviors1.jpg) behaviors1](https://github.com/jonaslindemann/ivf2/tree/main/examples/behaviors1 "Reusable behaviours attached to nodes: spin, pulse, follow a spline") [▶ Run](https://jonaslindemann.github.io/ivf2/web/behaviors1.html){ .ivf-run title="Run behaviors1 in the browser" }
+
+</div>
+
+## Scientific visualisation
+
+<div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
+
+- [![vis_colormaps1](../images/gallery/vis_colormaps1.jpg) vis_colormaps1](../visualisation/colormaps.md "The built-in colormaps on a height field, vertex colouring from grid data, and a colour bar") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_colormaps1.html){ .ivf-run title="Run vis_colormaps1 in the browser" }
+- [![vis_points1](../images/gallery/vis_points1.jpg) vis_points1](../visualisation/point_clouds.md "Half a million points of the Lorenz attractor, coloured by speed on the GPU; sizes, shapes, transparency and point picking") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_points1.html){ .ivf-run title="Run vis_points1 in the browser" }
+- [![vis_scalar1](../images/gallery/vis_scalar1.jpg) vis_scalar1](../visualisation/scalar_fields.md "Isosurfaces (a translucent shell and a surface coloured by height) and contoured slice planes through a 3D field, with live sliders") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_scalar1.html){ .ivf-run title="Run vis_scalar1 in the browser" }
+- [![vis_vectors1](../images/gallery/vis_vectors1.jpg) vis_vectors1](../visualisation/vector_fields.md "Arrow glyphs and field-line tubes of a magnetic dipole, coloured on a log scale; click an arrow for its vector") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_vectors1.html){ .ivf-run title="Run vis_vectors1 in the browser" }
+- [![vis_volume1](../images/gallery/vis_volume1.jpg) vis_volume1](../visualisation/volumes.md "Volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_volume1.html){ .ivf-run title="Run vis_volume1 in the browser" }
+- [![vis_axes1](../images/gallery/vis_axes1.jpg) vis_axes1](../visualisation/axes.md "A surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_axes1.html){ .ivf-run title="Run vis_axes1 in the browser" }
+- [![vis_readers1](../images/gallery/vis_readers1.jpg) vis_readers1](../visualisation/readers.md "Reading a CSV table as a point cloud, a NumPy array as an isosurface and a VTK XML mesh coloured by curvature") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_readers1.html){ .ivf-run title="Run vis_readers1 in the browser" }
+- [![vis_dashboard1](../images/gallery/vis_dashboard1.jpg) vis_dashboard1](../visualisation/plots.md "A 3D slice linked to ImPlot plots: a probe profile and a histogram whose drag lines set the colour range") [▶ Run](https://jonaslindemann.github.io/ivf2/web/vis_dashboard1.html){ .ivf-run title="Run vis_dashboard1 in the browser" }
 
 </div>
 
@@ -87,12 +104,12 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
-- [![flow_field1](../images/gallery/flow_field1.jpg) flow_field1](../creative/flow_field.md "8 000 particles steered by curl noise")
-- [![particles1](../images/gallery/particles1.jpg) particles1](https://github.com/jonaslindemann/ivf2/tree/main/examples/particles1 "Interactive fire and sparks with ParticleSystem")
+- [![flow_field1](../images/gallery/flow_field1.jpg) flow_field1](../creative/flow_field.md "8 000 particles steered by curl noise") [▶ Run](https://jonaslindemann.github.io/ivf2/web/flow_field1.html){ .ivf-run title="Run flow_field1 in the browser" }
+- [![particles1](../images/gallery/particles1.jpg) particles1](https://github.com/jonaslindemann/ivf2/tree/main/examples/particles1 "Interactive fire and sparks with ParticleSystem") [▶ Run](https://jonaslindemann.github.io/ivf2/web/particles1.html){ .ivf-run title="Run particles1 in the browser" }
 - [![audio_reactive1](../images/gallery/audio_reactive1.jpg) audio_reactive1](https://github.com/jonaslindemann/ivf2/tree/main/examples/audio_reactive1 "Visuals reacting to music or the microphone")
 - [![music_scene1](../images/gallery/music_scene1.jpg) music_scene1](../creative/music_scenes.md "A scene driven by a song, with automation and a camera path")
-- [![frame_export1](../images/gallery/frame_export1.jpg) frame_export1](https://github.com/jonaslindemann/ivf2/tree/main/examples/frame_export1 "Exporting a PNG sequence at an exact frame rate for video")
-- [![solar_system](../images/gallery/solar_system.jpg) solar_system](https://github.com/jonaslindemann/ivf2/tree/main/examples/solar_system "A small solar system simulation with its own control panel")
+- [![frame_export1](../images/gallery/frame_export1.jpg) frame_export1](https://github.com/jonaslindemann/ivf2/tree/main/examples/frame_export1 "Exporting a PNG sequence at an exact frame rate for video") [▶ Run](https://jonaslindemann.github.io/ivf2/web/frame_export1.html){ .ivf-run title="Run frame_export1 in the browser" }
+- [![solar_system](../images/gallery/solar_system.jpg) solar_system](https://github.com/jonaslindemann/ivf2/tree/main/examples/solar_system "A small solar system simulation with its own control panel") [▶ Run](https://jonaslindemann.github.io/ivf2/web/solar_system.html){ .ivf-run title="Run solar_system in the browser" }
 
 </div>
 
@@ -100,26 +117,18 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
 
-- [![selection1](../images/gallery/selection1.jpg) selection1](../advanced/selection.md "Highlighting objects under the mouse")
-- [![picking1](../images/gallery/picking1.jpg) picking1](../advanced/selection.md#ray-picking "Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model")
-- [![vis_dashboard1](../images/gallery/vis_dashboard1.jpg) vis_dashboard1](../visualisation/plots.md "ivfvis: a 3D slice linked to ImPlot plots - a probe profile and a histogram whose drag lines set the colour range")
-- [![vis_readers1](../images/gallery/vis_readers1.jpg) vis_readers1](../visualisation/readers.md "ivfvis: reading a CSV table as a point cloud, a NumPy array as an isosurface and a VTK XML mesh coloured by curvature")
-- [![vis_axes1](../images/gallery/vis_axes1.jpg) vis_axes1](../visualisation/axes.md "ivfvis: a surface plot with 3D axes: grid walls, ticks and labels in data units that follow the camera")
-- [![vis_volume1](../images/gallery/vis_volume1.jpg) vis_volume1](../visualisation/volumes.md "ivfvis: volume rendering of a CT-like scan with an opacity transfer function, mixed with an opaque isosurface and a floor")
-- [![vis_vectors1](../images/gallery/vis_vectors1.jpg) vis_vectors1](../visualisation/vector_fields.md "ivfvis: arrow glyphs and field-line tubes of a magnetic dipole, coloured on a log scale; click an arrow for its vector")
-- [![vis_scalar1](../images/gallery/vis_scalar1.jpg) vis_scalar1](../visualisation/scalar_fields.md "ivfvis: isosurfaces (a translucent shell and a surface coloured by height) and contoured slice planes through a 3D field, with live sliders")
-- [![vis_points1](../images/gallery/vis_points1.jpg) vis_points1](../visualisation/point_clouds.md "ivfvis: half a million points of the Lorenz attractor, coloured by speed on the GPU; sizes, shapes, transparency and point picking")
-- [![vis_colormaps1](../images/gallery/vis_colormaps1.jpg) vis_colormaps1](../visualisation/colormaps.md "ivfvis: the built-in colormaps on a height field, vertex colouring from grid data, and a colour bar")
-- [![editor1](../images/gallery/editor1.jpg) editor1](../advanced/selection.md#the-3d-cursor-position "Starting point for an editor: floor grid and the 3D mouse position")
-- [![ui1](../images/gallery/ui1.jpg) ui1](../ui/ui_windows.md "ImGui windows combined with a scene")
-- [![ui2](../images/gallery/ui2.jpg) ui2](../ui/ui_windows.md "ImGui windows combined with a scene")
-- [![scene_ui1](../images/gallery/scene_ui1.jpg) scene_ui1](../ui/ui_windows.md "ImGui windows combined with a scene")
+- [![selection1](../images/gallery/selection1.jpg) selection1](../advanced/selection.md "Highlighting objects under the mouse") [▶ Run](https://jonaslindemann.github.io/ivf2/web/selection1.html){ .ivf-run title="Run selection1 in the browser" }
+- [![picking1](../images/gallery/picking1.jpg) picking1](../advanced/selection.md#ray-picking "Ray picking: hit points, normals and triangles on primitives, instances and an animated glTF model") [▶ Run](https://jonaslindemann.github.io/ivf2/web/picking1.html){ .ivf-run title="Run picking1 in the browser" }
+- [![editor1](../images/gallery/editor1.jpg) editor1](../advanced/selection.md#the-3d-cursor-position "Starting point for an editor: floor grid and the 3D mouse position") [▶ Run](https://jonaslindemann.github.io/ivf2/web/editor1.html){ .ivf-run title="Run editor1 in the browser" }
+- [![ui1](../images/gallery/ui1.jpg) ui1](../ui/ui_windows.md "ImGui windows combined with a scene") [▶ Run](https://jonaslindemann.github.io/ivf2/web/ui1.html){ .ivf-run title="Run ui1 in the browser" }
+- [![ui2](../images/gallery/ui2.jpg) ui2](../ui/ui_windows.md "ImGui windows combined with a scene") [▶ Run](https://jonaslindemann.github.io/ivf2/web/ui2.html){ .ivf-run title="Run ui2 in the browser" }
+- [![scene_ui1](../images/gallery/scene_ui1.jpg) scene_ui1](../ui/ui_windows.md "ImGui windows combined with a scene") [▶ Run](https://jonaslindemann.github.io/ivf2/web/scene_ui1.html){ .ivf-run title="Run scene_ui1 in the browser" }
 - [![multi_window1](../images/gallery/multi_window1.jpg) multi_window1](../advanced/render_context.md "Two windows, each with its own scene, lights and user interface")
-- [![gltf1](../images/gallery/gltf1.jpg) gltf1](../advanced/model_loading.md#gltf-models "A glTF 2.0 model with PBR textures, alpha, a skinned tentacle, morph targets and animations (or any .glb given on the command line)")
+- [![gltf1](../images/gallery/gltf1.jpg) gltf1](../advanced/model_loading.md#gltf-models "A glTF 2.0 model with PBR textures, alpha, a skinned tentacle, morph targets and animations (or any .glb given on the command line)") [▶ Run](https://jonaslindemann.github.io/ivf2/web/gltf1.html){ .ivf-run title="Run gltf1 in the browser" }
 - [![assimp1](../images/gallery/assimp1.jpg) assimp1](../advanced/model_loading.md "Opening any model file through a file dialog")
-- [![serialization1](../images/gallery/serialization1.jpg) serialization1](https://github.com/jonaslindemann/ivf2/tree/main/examples/serialization1 "Saving, loading and clearing a scene as JSON")
-- [![hot_reload1](../images/gallery/hot_reload1.jpg) hot_reload1](../advanced/hot_reload.md "A model, a texture and a shader that reload when their files are saved")
-- [![debug_draw1](../images/gallery/debug_draw1.jpg) debug_draw1](https://github.com/jonaslindemann/ivf2/tree/main/examples/debug_draw1 "Immediate-mode debug lines and shapes")
-- [![rigid_body1](../images/gallery/rigid_body1.jpg) rigid_body1](https://github.com/jonaslindemann/ivf2/tree/main/examples/rigid_body1 "Rigid-body physics with ReactPhysics3D")
+- [![serialization1](../images/gallery/serialization1.jpg) serialization1](https://github.com/jonaslindemann/ivf2/tree/main/examples/serialization1 "Saving, loading and clearing a scene as JSON") [▶ Run](https://jonaslindemann.github.io/ivf2/web/serialization1.html){ .ivf-run title="Run serialization1 in the browser" }
+- [![hot_reload1](../images/gallery/hot_reload1.jpg) hot_reload1](../advanced/hot_reload.md "A model, a texture and a shader that reload when their files are saved") [▶ Run](https://jonaslindemann.github.io/ivf2/web/hot_reload1.html){ .ivf-run title="Run hot_reload1 in the browser" }
+- [![debug_draw1](../images/gallery/debug_draw1.jpg) debug_draw1](https://github.com/jonaslindemann/ivf2/tree/main/examples/debug_draw1 "Immediate-mode debug lines and shapes") [▶ Run](https://jonaslindemann.github.io/ivf2/web/debug_draw1.html){ .ivf-run title="Run debug_draw1 in the browser" }
+- [![rigid_body1](../images/gallery/rigid_body1.jpg) rigid_body1](https://github.com/jonaslindemann/ivf2/tree/main/examples/rigid_body1 "Rigid-body physics with ReactPhysics3D") [▶ Run](https://jonaslindemann.github.io/ivf2/web/rigid_body1.html){ .ivf-run title="Run rigid_body1 in the browser" }
 
 </div>

@@ -6,6 +6,8 @@ ivf2 is a modern C++23 library for real-time 3D graphics, visualisation and crea
 
 ivf2 is a complete rewrite of [ivfplusplus](https://github.com/jonaslindemann/ivfplusplus), the C++ OpenGL wrapper behind [ObjectiveFrame](https://jonaslindemann.github.io/objectiveframe/). It aims to be easy to start with and easy to extend, for teaching, research visualisation and generative art alike.
 
+[Run the examples in your browser](https://jonaslindemann.github.io/ivf2/web/){ .md-button .md-button--primary } The same C++ code compiled to WebAssembly, rendering with WebGL 2; see [Running in the Browser](getting_started/web.md).
+
 ## Highlights
 
 Physically based materials lit by HDR environments, soft shadows from the sun and from lamps, ambient occlusion and reflections, and an HDR image with filmic tone mapping:

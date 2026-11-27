@@ -23,7 +23,8 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 - The examples run live in the browser: CI builds them (`.github/workflows/web.yml`, for pull
   requests and releases), tests every page in headless Chrome (`tests/web/smoke_test.mjs`) and
   publishes them with the documentation at <https://jonaslindemann.github.io/ivf2/web/>, with a
-  start page from `docs/tools/make_gallery.py --web`. Guide pages link to their live examples.
+  start page from `docs/tools/make_gallery.py --web`. Guide pages link to their live examples,
+  and every tile of the Example Gallery has a "Run" badge; README section on web builds.
 - `RenderContext::isGles()`; `ivf/glsl_es.h`: shaders are translated to GLSL ES 3.00 when
   compiled on OpenGL ES (version line, default precisions; uniform initialisers become values
   set after linking, `Shader::uniformDefaults()`). One shader source serves both.

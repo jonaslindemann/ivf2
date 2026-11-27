@@ -2,8 +2,12 @@
 
 [![Build](https://github.com/jonaslindemann/ivf2/actions/workflows/build.yml/badge.svg)](https://github.com/jonaslindemann/ivf2/actions/workflows/build.yml)
 [![CodeQL](https://github.com/jonaslindemann/ivf2/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/jonaslindemann/ivf2/actions/workflows/codeql-analysis.yml)
+[![Docs](https://github.com/jonaslindemann/ivf2/actions/workflows/docs.yml/badge.svg)](https://github.com/jonaslindemann/ivf2/actions/workflows/docs.yml)
 
 Lightweight scene graph library and wrapper over modern OpenGL. 
+
+**[Run the examples in your browser](https://jonaslindemann.github.io/ivf2/web/)** - the same
+C++ code compiled to WebAssembly, rendering with WebGL 2.
 
 ![alt text](docs/docs/images/logo.png "Logo")
 
@@ -17,12 +21,16 @@ Lightweight scene graph library and wrapper over modern OpenGL.
 - **Unified library target** (`ivf2::ivf2`) for easy integration
 - **Automatic asset management** - shaders, fonts, and models copied automatically
 - **Cross-platform** - Windows, Linux, and macOS support
+- **Runs in the browser** - the preset `wasm` builds applications as web pages with
+  Emscripten and WebGL 2 (ImGui panels and `ivfvis` included); CI tests every example in
+  headless Chrome and publishes them as [live examples](https://jonaslindemann.github.io/ivf2/web/)
 - **Scientific visualisation** (`ivf2::ivfvis`) - data on grids and at points shown as point
   clouds, isosurfaces, slices, glyphs, streamlines and volumes, with colormaps, colour bars, 3D
   axes, readers for CSV, NumPy and VTK files, and 2D plots with ImPlot
 - **Music-driven scenes** (`ivf2::ivfmusic`) - song playback as the master clock, bar-keyed automation with live reload, note events from Renoise songs, presentation mode and frame export
 - **Rich examples** demonstrating lighting, animations, physics, UI, and more - see the
-  [Example Gallery](https://interactive-visualisation-framework-2.readthedocs.io/en/latest/examples/gallery/)
+  [Example Gallery](https://interactive-visualisation-framework-2.readthedocs.io/en/latest/examples/gallery/),
+  or run them [in your browser](https://jonaslindemann.github.io/ivf2/web/)
 
 # Documentation
 
@@ -191,6 +199,22 @@ application's assets:
 ```cmake
 ivfmusic_add_executable(my_scene SOURCES main.cpp ASSETS ${CMAKE_CURRENT_SOURCE_DIR}/assets)
 ```
+
+## In the browser (WebAssembly)
+
+With the [Emscripten SDK](https://emscripten.org) active (ivf2 is tested with 3.1.70) and Ninja
+on the path:
+
+```
+cmake --preset wasm
+cmake --build --preset wasm
+python -m http.server -d build/wasm/bin 8000    # then open http://localhost:8000/hello_ivf.html
+```
+
+Every example except five (several windows, audio, Assimp) becomes a page in `build/wasm/bin/`.
+`ivf2_web_executable(<target> ASSETS ...)` builds your own application as a page, also with an
+installed ivf2 (`find_package(ivf2)`). See
+[Running in the Browser](https://interactive-visualisation-framework-2.readthedocs.io/en/latest/getting_started/web/).
 
 ## Adding an example to this repository
 

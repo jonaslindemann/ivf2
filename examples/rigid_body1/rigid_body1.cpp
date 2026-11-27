@@ -109,14 +109,16 @@ public:
 
         m_world = PhysicsWorld::create();
 
-        // Ground: a thin box for the eye (half extents), a plane for the physics at its top, y = 0
+        // Ground: a thin static box (half extents) with its top at y = 0. Its shape comes from the
+        // node, so bodies pushed over the edge fall off
         auto ground = Box::create({12.0f, 0.1f, 12.0f});
         ground->setPos({0.0f, -0.1f, 0.0f});
         auto groundMaterial = Material::create();
         groundMaterial->setDiffuseColor(glm::vec4(0.55f, 0.55f, 0.5f, 1.0f));
         ground->setMaterial(groundMaterial);
         this->add(ground);
-        m_world->addBody(ground, Shape::plane(), {.type = BodyType::Static, .friction = 0.8f});
+        if (auto body = m_world->addBody(ground, {.type = BodyType::Static, .friction = 0.8f}); !body)
+            logError("Could not add the ground: " + body.error().message);
 
         // Dragging with the mouse: a spring pulls the grabbed point of a body
         m_drag = DragController::create(m_world);

@@ -381,6 +381,25 @@ IVF_TEST(material_and_settings)
     IVF_CHECK(world->step(1.0 / 60.0) == 2);
 }
 
+IVF_TEST(bodies_fall_off_a_finite_ground)
+{
+    // Ground from a box node (half extents 2 x 0.1 x 2, top at y = 0): it has edges, unlike a plane
+    auto world = PhysicsWorld::create();
+    auto ground = ivf::Box::create({2.0f, 0.1f, 2.0f});
+    ground->setPos({0.0f, -0.1f, 0.0f});
+    IVF_CHECK(world->addBody(ground, {.type = BodyType::Static}).has_value());
+
+    auto inside = cubeAt({0.0f, 0.5f, 0.0f});
+    world->addBody(inside, Shape::box(glm::vec3(0.5f)), {});
+    auto slider = cubeAt({1.0f, 0.5f, 0.0f});
+    auto body = world->addBody(slider, Shape::box(glm::vec3(0.5f)), {.friction = 0.0f});
+    body->setLinearVelocity({4.0f, 0.0f, 0.0f});
+    for (int i = 0; i < 120; ++i)
+        world->step(1.0 / 60.0);
+    IVF_CHECK_NEAR(inside->pos().y, 0.5f, 0.02);
+    IVF_CHECK(slider->pos().y < -2.0f);
+}
+
 IVF_TEST(raycast_finds_nearest_and_all)
 {
     auto world = PhysicsWorld::create();

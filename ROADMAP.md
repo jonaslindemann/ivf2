@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **Next: 3.2 Python bindings**. 3.2 Python bindings after the web target |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **Next: 3.7 physics module** (`ivfphysics`, with an interactive physics sandbox example). 3.2 Python bindings later |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -929,7 +929,64 @@ clearest way to stand out.
 6. **GPU compute.** Compute-shader particles and fields where GL 4.3 is available,
    transform-feedback fallback for macOS.
 7. **Physics module.** Wrap the ReactPhysics3D integration from `examples/rigid_body1`
-   into an optional `ivfphysics` library (rigid bodies synced to `TransformNode`).
+   into an optional `ivfphysics` library (rigid bodies synced to `TransformNode`), built
+   together with a larger example: an interactive physics sandbox, the first "complete
+   application" among the examples and a showcase for the live web examples.
+
+   **Plan.** A library `ivf2::ivfphysics` (namespace `ivfphysics`, option
+   `IVF2_BUILD_PHYSICS`, vcpkg feature `physics` with ReactPhysics3D, which then leaves the
+   `examples` feature), built like `ivfvis`: it depends on `ivf` only (not `ivfui`), its
+   examples are named `physics_*`, and it builds for the web too (ReactPhysics3D already does,
+   see `rigid_body1`). Public headers do not include ReactPhysics3D: bodies, shapes and joints
+   are ivf2 types implemented over it (pimpl), so applications need no physics headers and
+   the engine could be replaced later (Jolt) without changing the API. The physics state is
+   GL-free, so unit tests can step worlds without a window.
+
+   - `PhysicsWorld::create(settings)`: gravity, solver iterations, sleeping; owns the engine.
+     `step(dt)` runs fixed substeps (default 1/240 s) from an accumulator and interpolates the
+     node transforms between them, so motion is smooth at any frame rate and identical for
+     the same inputs (deterministic: required by the visual tests and `IVF2_FIXED_TIMESTEP`).
+     `pause()`, `stepOnce()`, `reset()` to the state the bodies were added in.
+   - Bodies are attached to nodes: `world->addBody(node, shape, {mass, friction, bounciness,
+     type})` returns a `RigidBodyPtr`; dynamic bodies drive the node's position and rotation,
+     kinematic bodies follow the node, static bodies are fixed. `Shape::box/sphere/capsule/
+     plane/convexHull(mesh)/triangleMesh(mesh)` and `Shape::fromNode(node)`, which derives
+     the shape from the primitive (`Cube`, `Box`, `Sphere`, `Capsule`, `Cylinder` as a convex
+     hull, a `MeshNode`'s meshes). Compound bodies from several shapes.
+   - Forces, impulses, velocities; collision categories and masks; triggers.
+   - Queries and events: `raycast()` (closest hit or all, with body, point, normal) and
+     contact callbacks (begin, stay, end; contact points and impulse), queued during the step
+     and delivered after it so callbacks may add and remove bodies.
+   - Joints: ball and socket, hinge (limits, motor), slider (limits, motor), fixed; breakable
+     above a force.
+   - Interaction (in `ivfphysics`, GL-free; a camera ray in): `DragController` pulls a body
+     at the grabbed point with a damped spring (the usual "mouse spring"), `throwBody()`
+     launches a body along a ray.
+   - Debug view: colliders, contact points and normals, joint axes, sleeping bodies through
+     `DebugDraw`; statistics (bodies, awake bodies, contacts, step time).
+
+   **The example, `physics_sandbox1`:** presets selected in an ImGui panel (brick wall,
+   domino run, tower to knock over, Newton's cradle and a pendulum chain with joints, a ramp
+   course); click to throw spheres along the view direction, drag bodies with the mouse,
+   pause / step / reset, sliders for gravity, friction, bounciness and simulation speed. Bodies
+   are coloured by speed with an `ivfvis` colormap and colour bar, with optional velocity
+   arrows and contact points. Shadows, PBR materials and an environment map. Deterministic
+   (fixed step, seeded randomness), so it gets a visual test, and it runs in the browser.
+
+   1. *Library and bodies.* Target, option, vcpkg feature, package component `Physics`,
+      `header_check_ivfphysics`; `PhysicsWorld` with fixed substeps and interpolation; bodies
+      on nodes; box, sphere, capsule, plane, convex hull and triangle mesh shapes,
+      `Shape::fromNode()`; forces and impulses. `rigid_body1` rewritten on `ivfphysics` (as
+      the minimal example). GL-free tests: a falling box lands where it should, node sync,
+      the same run twice gives the same transforms, reset.
+   2. *Queries, events and interaction.* Raycasts, contact events, triggers, collision
+      filtering, `DragController`, `throwBody()`, debug view and statistics; tests.
+   3. *Joints and compound bodies.* The four joint types with limits and motors, breaking,
+      compound shapes; tests (a pendulum keeps its length, hinge limits hold).
+   4. *The sandbox.* `physics_sandbox1` with presets, interaction, panels and the `ivfvis`
+      colouring; visual test reference; runs in the browser (smoke test).
+   5. *Documentation and wrap-up.* Guide section "Physics" (world and bodies, shapes, events,
+      joints, interaction), example pages and gallery, changelog, README.
 8. **Editor.** Grow `editor1` into a scene editor with gizmos (ImGuizmo), undo/redo, and
    save/load via `SceneSerializer`.
 
@@ -952,4 +1009,6 @@ clearest way to stand out.
 4. Render queue + uniform buffers (2.1, 2.2) - the base for HDR, IBL, shadows. *Render queue
    done; uniform handling is next.*
 5. Scientific visualisation module and Python bindings (3.1, 3.2) - the main differentiators.
-   *Visualisation module and web target (3.3) done; the Python bindings (3.2) are next.*
+   *Visualisation module and web target (3.3) done.*
+6. Physics module with an interactive sandbox example (3.7) - completes the base
+   functionality before the Python bindings (3.2), which follow it.

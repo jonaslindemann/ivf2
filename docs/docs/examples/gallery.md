@@ -130,5 +130,6 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 - [![hot_reload1](../images/gallery/hot_reload1.jpg) hot_reload1](../advanced/hot_reload.md "A model, a texture and a shader that reload when their files are saved") [▶ Run](https://jonaslindemann.github.io/ivf2/web/hot_reload1.html){ .ivf-run title="Run hot_reload1 in the browser" }
 - [![debug_draw1](../images/gallery/debug_draw1.jpg) debug_draw1](https://github.com/jonaslindemann/ivf2/tree/main/examples/debug_draw1 "Immediate-mode debug lines and shapes") [▶ Run](https://jonaslindemann.github.io/ivf2/web/debug_draw1.html){ .ivf-run title="Run debug_draw1 in the browser" }
 - [![rigid_body1](../images/gallery/rigid_body1.jpg) rigid_body1](https://github.com/jonaslindemann/ivf2/tree/main/examples/rigid_body1 "Rigid-body physics with ivfphysics") [▶ Run](https://jonaslindemann.github.io/ivf2/web/rigid_body1.html){ .ivf-run title="Run rigid_body1 in the browser" }
+- [![physics_joints1](../images/gallery/physics_joints1.jpg) physics_joints1](https://github.com/jonaslindemann/ivf2/tree/main/examples/physics_joints1 "Joints, motors, breakable welds and compound bodies") [▶ Run](https://jonaslindemann.github.io/ivf2/web/physics_joints1.html){ .ivf-run title="Run physics_joints1 in the browser" }
 
 </div>

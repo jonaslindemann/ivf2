@@ -15,6 +15,7 @@ option(IVF2_BUILD_TESTS "Build the ivf2 unit tests (CTest)" ${_ivf2_top_level})
 option(IVF2_VISUAL_TESTS "Visual regression tests: render examples and compare with reference images (CTest label visual)" OFF)
 option(IVF2_BUILD_MUSIC "Build the ivfmusic library (music-driven scenes)" ON)
 option(IVF2_BUILD_VIS "Build the ivfvis library (scientific visualisation)" ON)
+option(IVF2_BUILD_PHYSICS "Build the ivfphysics library (rigid body physics with ReactPhysics3D)" ON)
 option(IVF2_WITH_VTK_XML "Read VTK XML files (.vtu, .vti) in ivfvis (requires miniz and pugixml)" ON)
 option(IVF_WITH_RENOISE "Read Renoise songs (.xrns) in ivfmusic (requires miniz and pugixml)" ON)
 option(IVF2_WITH_ASSIMP "Model loading with assimp (ivf::ModelLoader)" ON)
@@ -57,8 +58,8 @@ if(_ivf2_top_level)
     if(IVF2_WITH_IMPLOT)
         list(APPEND VCPKG_MANIFEST_FEATURES "implot")
     endif()
-    if(IVF2_BUILD_EXAMPLES)
-        list(APPEND VCPKG_MANIFEST_FEATURES "examples")
+    if(IVF2_BUILD_PHYSICS)
+        list(APPEND VCPKG_MANIFEST_FEATURES "physics")
     endif()
     if(IVF2_BUILD_MUSIC AND IVF_WITH_RENOISE)
         list(APPEND VCPKG_MANIFEST_FEATURES "renoise")
@@ -200,6 +201,9 @@ if((IVF2_BUILD_MUSIC AND IVF_WITH_RENOISE) OR (IVF2_BUILD_VIS AND IVF2_WITH_VTK_
     find_package(miniz CONFIG REQUIRED)
     find_package(pugixml CONFIG REQUIRED)
 endif()
+if(IVF2_BUILD_PHYSICS)
+    find_package(ReactPhysics3D CONFIG REQUIRED) # private to ivfphysics
+endif()
 
 # ---------------------------------------------------------------------------
 # Libraries
@@ -207,7 +211,7 @@ endif()
 
 add_subdirectory(src)
 
-# Unified convenience target: everything except ivfmusic and ivfvis.
+# Unified convenience target: everything except ivfmusic, ivfvis and ivfphysics.
 add_library(ivf2 INTERFACE)
 add_library(ivf2::ivf2 ALIAS ivf2)
 target_link_libraries(ivf2 INTERFACE ivfui ivf ivfmath generator glad)
@@ -240,6 +244,7 @@ if(_ivf2_top_level)
     message(STATUS "  Tests ............... ${IVF2_BUILD_TESTS} (visual: ${IVF2_VISUAL_TESTS})")
     message(STATUS "  ivfmusic ............ ${IVF2_BUILD_MUSIC} (Renoise: ${IVF_WITH_RENOISE})")
     message(STATUS "  ivfvis .............. ${IVF2_BUILD_VIS} (VTK XML: ${IVF2_WITH_VTK_XML})")
+    message(STATUS "  ivfphysics .......... ${IVF2_BUILD_PHYSICS}")
     message(STATUS "  assimp (models) ..... ${IVF2_WITH_ASSIMP}")
     message(STATUS "  FreeType (text) ..... ${IVF2_WITH_FREETYPE}")
     message(STATUS "  miniaudio (audio) ... ${IVF2_WITH_AUDIO}")

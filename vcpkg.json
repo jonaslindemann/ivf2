@@ -54,8 +54,8 @@
         "rtmidi"
       ]
     },
-    "examples": {
-      "description": "Dependencies used only by the example programs",
+    "physics": {
+      "description": "Rigid body physics (ivfphysics) - CMake option IVF2_BUILD_PHYSICS",
       "dependencies": [
         "reactphysics3d"
       ]

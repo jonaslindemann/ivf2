@@ -1,427 +1,197 @@
 /**
  * @file rigid_body1.cpp
- * @brief ReactPhysics3D rigid body physics example
+ * @brief Rigid body physics with ivfphysics: bodies on scene nodes.
  * @author Jonas Lindemann
  * @example rigid_body1.cpp
  * @ingroup physics_examples
  *
- * This example demonstrates using ReactPhysics3D for rigid body physics simulation.
- * It creates a scene with falling boxes affected by gravity.
+ * The minimal ivfphysics example:
+ *  - a PhysicsWorld stepped with the window's frame time (fixed steps, interpolated nodes)
+ *  - a static ground plane and dynamic boxes, spheres, capsules and capped cylinders whose
+ *    shapes come from the nodes (Shape::fromNode(): a cylinder becomes a convex hull)
+ *  - D drops another body, P pauses, S steps once, R resets to the start
  */
 
-#include <cmath>
-#include <iostream>
-#include <memory>
-#include <vector>
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-
+#include <imgui.h>
 #include <ivf/gl.h>
+#include <ivf/logger.h>
 #include <ivf/nodes.h>
 #include <ivfui/ui.h>
-#include <ivfui/scene_inspector.h>
 
-#include <ivf/node_visitor.h>
-#include <ivf/stock_shaders.h>
+#include <ivfphysics/ivfphysics.h>
 
-#include <reactphysics3d/reactphysics3d.h>
-
-#include "physics_object.h"
-#include "physics_box.h"
+#include <array>
+#include <string>
 
 using namespace ivf;
 using namespace ivfui;
-using namespace std;
+using namespace ivfphysics;
 
-// Contact event listener to verify contact detection and resolution
-class ContactListener : public rp3d::EventListener {
+class RigidBodyWindow : public GLFWSceneWindow {
 private:
-    int m_contactCount = 0;
-    int m_totalContactsThisFrame = 0;
-    bool m_hasLoggedContact = false;
+    PhysicsWorldPtr m_world;
+    std::array<MaterialPtr, 4> m_materials;
+    int m_dropped{0};
 
 public:
-    void onContact(const rp3d::CollisionCallback::CallbackData &callbackData) override
-    {
-        m_totalContactsThisFrame = 0;
-
-        // Iterate through all contact pairs
-        for (uint32_t p = 0; p < callbackData.getNbContactPairs(); p++)
-        {
-            rp3d::CollisionCallback::ContactPair contactPair = callbackData.getContactPair(p);
-
-            // Iterate through all contact points
-            for (uint32_t c = 0; c < contactPair.getNbContactPoints(); c++)
-            {
-                rp3d::CollisionCallback::ContactPoint contactPoint = contactPair.getContactPoint(c);
-                m_totalContactsThisFrame++;
-
-                // Log first contact for debugging (only once to avoid spam)
-                if (!m_hasLoggedContact)
-                {
-                    rp3d::Vector3 normal = contactPoint.getWorldNormal();
-                    float penetrationDepth = contactPoint.getPenetrationDepth();
-
-                    std::cout << "\n=== FIRST CONTACT DETECTED ===" << std::endl;
-                    std::cout << "  Contact Normal: (" << normal.x << ", " << normal.y << ", " << normal.z << ")"
-                              << std::endl;
-                    std::cout << "  Penetration Depth: " << penetrationDepth << std::endl;
-                    std::cout << "================================\n" << std::endl;
-                    m_hasLoggedContact = true;
-                }
-            }
-        }
-
-        m_contactCount = m_totalContactsThisFrame;
-    }
-
-    int getContactCount() const
-    {
-        return m_contactCount;
-    }
-
-    void reset()
-    {
-        m_contactCount = 0;
-        m_totalContactsThisFrame = 0;
-        m_hasLoggedContact = false;
-    }
-};
-
-class ExampleWindow : public GLFWSceneWindow {
-private:
-    static void applyPhysicsTransform(const PhysicsBoxPtr &physicsBox, const BoxPtr &visualBox)
-    {
-        visualBox->setPos(physicsBox->getPosition());
-
-        glm::quat rot = glm::normalize(physicsBox->getRotation());
-        float angle = glm::degrees(glm::angle(rot));
-        glm::vec3 axis = glm::axis(rot);
-
-        if (!std::isfinite(axis.x) || !std::isfinite(axis.y) || !std::isfinite(axis.z))
-            axis = glm::vec3(0.0f, 1.0f, 0.0f);
-
-        visualBox->setEulerAngles(glm::vec3(0.0f));
-        visualBox->setRotAxis(axis);
-        visualBox->setRotAngle(angle);
-    }
-
-    rp3d::PhysicsCommon m_physicsCommon;
-    rp3d::PhysicsWorld *m_world;
-
-    std::vector<PhysicsBoxPtr> m_physicsBoxes;
-    std::vector<BoxPtr> m_visualBoxes;
-
-    PhysicsBoxPtr m_ground;
-    BoxPtr m_groundVisual;
-    DirectionalLightPtr m_dirLight0;
-
-    std::shared_ptr<ContactListener> m_contactListener;
-    int m_frameCount = 0;
-
-    bool m_paused = false;
-
-public:
-    ExampleWindow(int width, int height, std::string title) : GLFWSceneWindow(width, height, title)
+    RigidBodyWindow(int width, int height, const std::string &title) : GLFWSceneWindow(width, height, title)
     {}
 
-    static std::shared_ptr<ExampleWindow> create(int width, int height, std::string title)
+    static std::shared_ptr<RigidBodyWindow> create(int width, int height, const std::string &title)
     {
-        return std::make_shared<ExampleWindow>(width, height, title);
+        return std::make_shared<RigidBodyWindow>(width, height, title);
     }
 
-    void setupPhysics()
+    /** A node of one of four kinds at @p pos, with a body whose shape comes from the node. */
+    void addBody(int kind, const glm::vec3 &pos, const glm::vec3 &eulerAngles = glm::vec3(0.0f))
     {
-        std::cout << "\n=== PHYSICS SETUP ===" << std::endl;
-
-        // Create a physics world with gravity
-        rp3d::PhysicsWorld::WorldSettings settings;
-        settings.defaultVelocitySolverNbIterations = 20; // Reduced from 60
-        settings.defaultPositionSolverNbIterations = 10; // Reduced from 60
-        settings.gravity = rp3d::Vector3(0, -9.81f, 0);
-        settings.isSleepingEnabled = true;
-        settings.defaultSleepLinearVelocity = 0.1f;  // Lower threshold for sleeping
-        settings.defaultSleepAngularVelocity = 0.2f; // Lower threshold for sleeping
-        settings.defaultTimeBeforeSleep = 0.5f;      // Time before body can sleep
-
-        m_world = m_physicsCommon.createPhysicsWorld(settings);
-
-        // Create and register contact listener
-        m_contactListener = std::make_shared<ContactListener>();
-        m_world->setEventListener(m_contactListener.get());
-
-        std::cout << "Physics World Configuration:" << std::endl;
-        std::cout << "  Gravity: (0, -9.81, 0)" << std::endl;
-        std::cout << "  Velocity Solver Iterations: " << m_world->getNbIterationsVelocitySolver() << std::endl;
-        std::cout << "  Position Solver Iterations: " << m_world->getNbIterationsPositionSolver() << std::endl;
-        std::cout << "  Sleeping Enabled: " << (m_world->isSleepingEnabled() ? "Yes" : "No") << std::endl;
-
-        // Create ground plane (static box)
-        std::cout << "\nCreating Ground:" << std::endl;
-        const glm::vec3 groundHalfExtents(20.0f, 0.5f, 20.0f);
-        m_ground = PhysicsBox::create(m_world, m_physicsCommon, groundHalfExtents,
-                                      glm::vec3(0.0f, -0.5f, 0.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 0.0f);
-        m_ground->setRestitution(0.0f);
-        m_ground->setFriction(1.0f);
-
-        std::cout << "  Position: (0, -0.5, 0)" << std::endl;
-        std::cout << "  Half-extents: (20, 0.5, 20) -> Full size: (40, 1, 40)" << std::endl;
-        std::cout << "  Mass: " << m_ground->getMass() << " (STATIC)" << std::endl;
-        std::cout << "  Restitution: " << m_ground->getRestitution() << std::endl;
-        std::cout << "  Friction: " << m_ground->getFriction() << std::endl;
-
-        std::cout << "\n=== PHYSICS SETUP COMPLETE ===" << std::endl;
-        std::cout << "Waiting for first contact...\n" << std::endl;
-    }
-
-    void setupVisuals()
-    {
-        // Create materials
-        auto boxMaterial = Material::create();
-        boxMaterial->setDiffuseColor(glm::vec4(0.8f, 0.3f, 0.2f, 1.0f));
-
-        auto groundMaterial = Material::create();
-        groundMaterial->setDiffuseColor(glm::vec4(0.3f, 0.6f, 0.3f, 1.0f));
-
-        // Create visual ground (using Box instead of Cube for vec3 size support)
-        m_groundVisual = Box::create(m_ground->getSize());
-        m_groundVisual->setPos(m_ground->getPosition());
-        m_groundVisual->setMaterial(groundMaterial);
-        this->add(m_groundVisual);
-
-        // Create visual boxes for each physics box
-
-        /*
-        for (auto &physicsBox : m_physicsBoxes)
+        TransformNodePtr node;
+        switch (kind % 4)
         {
-            auto visualBox = Box::create(glm::vec3(1.0f, 1.0f, 1.0f)); // Full size (half-extents * 2)
-            visualBox->setMaterial(boxMaterial);
-            m_visualBoxes.push_back(visualBox);
-            this->add(visualBox);
+        case 0:
+            node = Box::create({0.4f, 0.4f, 0.4f}); // half extents
+            break;
+        case 1:
+            node = Sphere::create(0.45);
+            break;
+        case 2:
+            node = Capsule::create(0.3, 0.4);
+            break;
+        default:
+            node = CappedCylinder::create(0.4, 0.8);
+            break;
         }
-        */
+        node->setPos(pos);
+        node->setEulerAngles(eulerAngles);
+        node->setMaterial(m_materials[kind % 4]);
+        this->add(node);
+
+        auto body = m_world->addBody(node, {.mass = 1.0f, .friction = 0.6f, .bounciness = 0.2f});
+        if (!body)
+            logError("Could not add a body: " + body.error().message);
     }
 
-    virtual int onSetup() override
+    int onSetup() override
     {
-        auto lightManager = renderContext()->lights();
-        lightManager->clearLights();
-        lightManager->setUseShadows(true);
-        lightManager->setAutoCalcBBox(false);
-        lightManager->setSceneBoundingBox(glm::vec3(-20.0, -20.0, -20.0), glm::vec3(20.0, 20.0, 20.0));
+        auto lights = renderContext()->lights();
+        lights->clearLights();
+        lights->setUseShadows(true);
+        lights->setAutoCalcBBox(false);
+        lights->setSceneBoundingBox(glm::vec3(-12.0f, -1.0f, -12.0f), glm::vec3(12.0f, 12.0f, 12.0f));
 
-        m_dirLight0 = lightManager->addDirectionalLight();
-        m_dirLight0->setAmbientColor(glm::vec3(0.3, 0.3, 0.3));
-        m_dirLight0->setDiffuseColor(glm::vec3(1.0, 1.0, 1.0));
-        m_dirLight0->setSpecularColor(glm::vec3(1.0, 1.0, 1.0));
-        m_dirLight0->setDirection(glm::vec3(-0.5, -1.0, -0.5));
-        m_dirLight0->setEnabled(true);
-        m_dirLight0->setCastShadows(true);
-        m_dirLight0->setShadowMapSize(4096, 4096);
-        m_dirLight0->setShadowStrength(0.3f); // Set shadow strength (0.0 to 1.0) for the directional light
-        lightManager->apply();
+        auto sun = lights->addDirectionalLight();
+        sun->setAmbientColor(glm::vec3(0.3f));
+        sun->setDiffuseColor(glm::vec3(1.0f));
+        sun->setSpecularColor(glm::vec3(1.0f));
+        sun->setDirection(glm::vec3(-0.5f, -1.0f, -0.4f));
+        sun->setCastShadows(true);
+        sun->setShadowMapSize(2048, 2048);
+        sun->setShadowStrength(0.6f);
+        lights->apply();
 
-        this->setupPhysics();
+        const std::array<glm::vec4, 4> colors{glm::vec4(0.85f, 0.35f, 0.2f, 1.0f), glm::vec4(0.25f, 0.55f, 0.85f, 1.0f),
+                                              glm::vec4(0.95f, 0.75f, 0.2f, 1.0f), glm::vec4(0.4f, 0.75f, 0.35f, 1.0f)};
+        for (std::size_t i = 0; i < colors.size(); ++i)
+        {
+            m_materials[i] = Material::create();
+            m_materials[i]->setDiffuseColor(colors[i]);
+            m_materials[i]->setSpecularColor(glm::vec4(0.4f, 0.4f, 0.4f, 1.0f));
+            m_materials[i]->setShininess(40.0f);
+        }
 
-        // this->enableHeadlight();
-        this->setAxisVisible(true);
+        m_world = PhysicsWorld::create();
 
-        // Setup camera
-        this->cameraManipulator()->setCameraPosition(glm::vec3(15.0f, 10.0f, 15.0f));
-        this->cameraManipulator()->setFarZ(1000.0f);
-        this->cameraManipulator()->saveState();
+        // Ground: a thin box for the eye (half extents), a plane for the physics at its top, y = 0
+        auto ground = Box::create({12.0f, 0.1f, 12.0f});
+        ground->setPos({0.0f, -0.1f, 0.0f});
+        auto groundMaterial = Material::create();
+        groundMaterial->setDiffuseColor(glm::vec4(0.55f, 0.55f, 0.5f, 1.0f));
+        ground->setMaterial(groundMaterial);
+        this->add(ground);
+        m_world->addBody(ground, Shape::plane(), {.type = BodyType::Static, .friction = 0.8f});
 
-        // Set OpenGL state
-        glEnable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
+        // A loose pile: four layers of bodies, slightly offset and tilted so they tumble
+        for (int layer = 0; layer < 4; ++layer)
+            for (int i = 0; i < 4; ++i)
+                for (int j = 0; j < 4; ++j)
+                {
+                    const float x = -2.4f + 1.6f * static_cast<float>(i) + 0.2f * static_cast<float>(layer % 2);
+                    const float z = -2.4f + 1.6f * static_cast<float>(j) + 0.15f * static_cast<float>(layer);
+                    const glm::vec3 tilt(15.0f * static_cast<float>(i - j), 20.0f * static_cast<float>(layer),
+                                         10.0f * static_cast<float>(j));
+                    addBody(i + j + layer, {x, 2.0f + 1.6f * static_cast<float>(layer), z}, tilt);
+                }
 
-        this->setupVisuals();
-
+        cameraManipulator()->setCameraPosition(glm::vec3(10.0f, 8.0f, 12.0f));
+        cameraManipulator()->setCameraTarget(glm::vec3(0.0f, 1.0f, 0.0f));
+        cameraManipulator()->saveState();
         return 0;
     }
 
-    virtual void onUpdate() override
+    void onUpdate() override
     {
-        if (m_paused)
-            return;
-
-        // Use smaller timesteps for better stability
-        const float frameTime = 1.0f / 60.0f;
-        const int numSubSteps = 8; // Subdivide each frame
-        const float subStepTime = frameTime / numSubSteps;
-
-        for (int i = 0; i < numSubSteps; i++)
-        {
-            m_world->update(subStepTime);
-        }
-
-        m_frameCount++;
-
-        // Update visual positions from physics
-        m_ground->updateFromPhysics();
-
-        for (size_t i = 0; i < m_physicsBoxes.size(); i++)
-        {
-            m_physicsBoxes[i]->updateFromPhysics();
-            applyPhysicsTransform(m_physicsBoxes[i], m_visualBoxes[i]);
-        }
+        m_world->step(frameTime());
     }
 
-    virtual void onAddMenuItems(UiMenu *menu) override
+    void dropBody()
     {
-        auto resetItem = UiMenuItem::create("Reset Scene", "", [this]() { this->resetScene(); });
-        menu->addItem(resetItem);
+        const float x = static_cast<float>(ivf::random(-2.0, 2.0));
+        const float z = static_cast<float>(ivf::random(-2.0, 2.0));
+        addBody(m_dropped++, {x, 9.0f, z}, {30.0f, 45.0f, 0.0f});
     }
 
-    virtual void onDrawUi() override
+    void onDrawUi() override
     {
-        if (ImGui::Button("Reset Scene"))
-        {
-            this->resetScene();
-        }
+        ImGui::Begin("Physics");
+        if (ImGui::Button(m_world->isPaused() ? "Run (P)" : "Pause (P)"))
+            m_world->setPaused(!m_world->isPaused());
+        ImGui::SameLine();
+        if (ImGui::Button("Step (S)"))
+            m_world->stepOnce();
+        ImGui::SameLine();
+        if (ImGui::Button("Reset (R)"))
+            m_world->reset();
+        if (ImGui::Button("Drop a body (D)"))
+            dropBody();
 
-        ImGui::Separator();
-        ImGui::Text("Physics Diagnostics:");
-        ImGui::Text("Frame: %d", m_frameCount);
+        float timeScale = static_cast<float>(m_world->timeScale());
+        if (ImGui::SliderFloat("Time scale", &timeScale, 0.0f, 2.0f))
+            m_world->setTimeScale(timeScale);
+        glm::vec3 g = m_world->gravity();
+        if (ImGui::SliderFloat("Gravity", &g.y, -20.0f, 0.0f))
+            m_world->setGravity(g);
 
-        ImGui::Separator();
-        ImGui::Text("Contact Information:");
-        if (m_contactListener)
-        {
-            int contactCount = m_contactListener->getContactCount();
-            ImGui::Text("Active Contacts: %d", contactCount);
-
-            if (contactCount == 0)
-            {
-                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "WARNING: No contacts detected!");
-                ImGui::TextWrapped("If boxes are falling through ground, collision detection is not working.");
-            }
-            else
-            {
-                ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), "Contacts detected - solver is working");
-            }
-        }
-
-        ImGui::Separator();
-        ImGui::Text("Solver Configuration:");
-        ImGui::Text("Velocity Iterations: %d", m_world->getNbIterationsVelocitySolver());
-        ImGui::Text("Position Iterations: %d", m_world->getNbIterationsPositionSolver());
-
-        ImGui::Separator();
-        ImGui::Text("Box 0 State:");
-        if (!m_physicsBoxes.empty())
-        {
-            auto &box = m_physicsBoxes[0];
-            glm::vec3 pos = box->getPosition();
-            glm::vec3 vel = box->getVelocity();
-
-            ImGui::Text("Position: (%.2f, %.2f, %.2f)", pos.x, pos.y, pos.z);
-            ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", vel.x, vel.y, vel.z);
-
-            // Check if box has fallen through ground
-            if (pos.y < -2.0f)
-            {
-                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Box fell through ground!");
-                ImGui::TextWrapped("Contact solver is NOT working properly.");
-            }
-        }
-    }
-
-    void resetScene()
-    {
-        std::cout << "\n=== SCENE RESET ===" << std::endl;
-        m_contactListener->reset();
-        m_frameCount = 0;
-
-        // Reset box positions
-        for (int i = 0; i < (int)m_physicsBoxes.size(); i++)
-        {
-            auto quat = glm::angleAxis(static_cast<float>(2.0f * 3.14159f / 16.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-            m_physicsBoxes[i]->setPosition(glm::vec3(-4.0f + i * 2.5f, 5.0f + i * 1.5f, 0.0f));
-            m_physicsBoxes[i]->setRotation(quat);
-            m_physicsBoxes[i]->setVelocity(glm::vec3(0.0f));
-            m_physicsBoxes[i]->setAngularVelocity(glm::vec3(0.0f));
-        }
-
-        std::cout << "Boxes reset. Waiting for first contact..." << std::endl;
-    }
-
-    void addBox()
-    {
-        auto axis = glm::vec3(0.0f, 1.0f, 0.0f);
-        axis = glm::normalize(axis);
-        auto quat = glm::angleAxis(static_cast<float>(0.0f), axis);
-
-        const glm::vec3 boxHalfExtents(1.0f, 1.0f, 1.0f);
-        auto box = PhysicsBox::create(m_world, m_physicsCommon, boxHalfExtents, // 2x2x2 box
-                                      glm::vec3(ivf::random(-10.0, 10.0), 10.0f,
-                                                ivf::random(-10.0, 10.0)),
-                                      quat, 1.0f);
-        box->setRestitution(0.1f);
-        box->setFriction(0.3f);
-
-        m_physicsBoxes.push_back(box);
-
-        auto boxMaterial = Material::create();
-        boxMaterial->setDiffuseColor(glm::vec4(0.8f, 0.3f, 0.2f, 1.0f));
-
-        auto visualBox = Box::create(boxHalfExtents);
-        visualBox->setMaterial(boxMaterial);
-        applyPhysicsTransform(box, visualBox);
-        m_visualBoxes.push_back(visualBox);
-        this->add(visualBox);
+        ImGui::Text("Time %.2f s, %llu steps", m_world->time(), static_cast<unsigned long long>(m_world->stepCount()));
+        ImGui::Text("Bodies %zu, awake %d", m_world->bodies().size(), m_world->awakeBodyCount());
+        ImGui::End();
     }
 
     void onKey(int key, int scancode, int action, int mods) override
     {
-        if (key == GLFW_KEY_R && action == GLFW_PRESS)
+        if (action == GLFW_PRESS)
         {
-            this->resetScene();
-        }
-
-        if (key == GLFW_KEY_P && action == GLFW_PRESS)
-        {
-            m_paused = !m_paused;
-            if (m_paused)
-            {
-                std::cout << "Physics simulation PAUSED." << std::endl;
-            }
-            else
-            {
-                std::cout << "Physics simulation RESUMED." << std::endl;
-            }
-        }
-
-        if (key == GLFW_KEY_D && action == GLFW_PRESS)
-        {
-            this->addBox();
+            if (key == GLFW_KEY_P)
+                m_world->setPaused(!m_world->isPaused());
+            else if (key == GLFW_KEY_S)
+                m_world->stepOnce();
+            else if (key == GLFW_KEY_R)
+                m_world->reset();
+            else if (key == GLFW_KEY_D)
+                dropBody();
         }
         GLFWSceneWindow::onKey(key, scancode, action, mods);
     }
-
-    void onExit()
-    {
-        this->close();
-    }
-
-    void onOpen()
-    {}
 };
-
-typedef std::shared_ptr<ExampleWindow> ExampleWindowPtr;
 
 int main()
 {
     auto app = GLFWApplication::create();
-
     app->hint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     app->hint(GLFW_CONTEXT_VERSION_MINOR, 3);
     app->hint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     app->hint(GLFW_SAMPLES, 4);
 
-    auto window = ExampleWindow::create(1280, 800, "Rigid Body Physics - Contact Solver Test");
-
+    auto window = RigidBodyWindow::create(1280, 800, "Rigid body physics (ivfphysics)");
     app->addWindow(window);
     return app->loop();
 }

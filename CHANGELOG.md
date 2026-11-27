@@ -10,6 +10,16 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Added
 
+- `ivfphysics` (work in progress, see `ROADMAP.md` phase 3.7): rigid body physics for scene nodes,
+  a separate library `ivf2::ivfphysics` (CMake option `IVF2_BUILD_PHYSICS`, vcpkg feature
+  `physics`, package component `Physics`). ReactPhysics3D is private to it: applications need no
+  physics headers. `PhysicsWorld` steps with a fixed time step (default 1/240 s) and interpolates
+  the nodes to the frame time, deterministically; pause, single steps, time scale and `reset()`.
+  `addBody(node, shape, {mass, friction, bounciness, type, ...})` attaches a static, kinematic
+  (follows its node) or dynamic (drives its node) `RigidBody`, with forces, impulses and
+  velocities. Shapes: box, sphere, capsule, plane, convex hull (built by ivfphysics, robust for
+  coplanar mesh points; large meshes are reduced to their extreme points), triangle mesh, and
+  `Shape::fromNode()` from primitives and meshes. Unit tests run without OpenGL.
 - Web builds (work in progress, see `ROADMAP.md` phase 3.3): the CMake preset `wasm` compiles
   the libraries and examples to WebAssembly with Emscripten; programs render with WebGL 2
   (OpenGL ES 3.0) in a full-window canvas. `ivf2_web_executable()` (in `ivf2Helpers.cmake`) builds an application as a web page with
@@ -34,6 +44,8 @@ renamed functions keep a `[[deprecated]]` alias for at least one release.
 
 ### Changed
 
+- `rigid_body1` is rewritten on `ivfphysics` (a pile of boxes, spheres, capsules and cylinders;
+  drop, pause, step, reset). The vcpkg feature `examples` is replaced by `physics`.
 - `OverlayNode` lays out in window units instead of framebuffer pixels (`onLayout()`,
   `viewportWidth()`, `project()`), so overlays keep their size on high-DPI displays (macOS Retina,
   browsers); `ColorBar` and `Axes3D` render their labels at `pixelRatio()` times the resolution.

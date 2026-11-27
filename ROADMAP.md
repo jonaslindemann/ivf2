@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **Next: 3.7 physics module** (`ivfphysics`, with an interactive physics sandbox example). 3.2 Python bindings later |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **3.7 physics module in progress** (`ivfphysics`: step 1, world, bodies and shapes, done; next step 2, queries, events and interaction). 3.2 Python bindings later |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -979,6 +979,17 @@ clearest way to stand out.
       `Shape::fromNode()`; forces and impulses. `rigid_body1` rewritten on `ivfphysics` (as
       the minimal example). GL-free tests: a falling box lands where it should, node sync,
       the same run twice gives the same transforms, reset.
+      *Done:* `include/ivfphysics/` (`PhysicsWorld`, `RigidBody`, `Shape`; engine data behind
+      `Impl` structs in `src/ivfphysics/engine.h`). The simulation runs at most one step ahead
+      of the shown time and nodes are interpolated to it, so whole multiples of the step show
+      the exact state. Convex hulls are built by ivfphysics (`convex_hull.cpp`: incremental, double
+      precision, coplanar faces merged into polygons) and handed to the engine as polyhedra:
+      ReactPhysics3D's own QuickHull asserts on the coplanar points of capped cylinders and
+      boxes. A plane is a 1-unit thick box (the engine has no plane shape). Bodies use world
+      coordinates (nodes without transformed parents); Euler angles and axis rotations of a node
+      are folded into its quaternion when its body is added. `test_ivfphysics` (12 cases),
+      `header_check_ivfphysics`, package consumer `package_test_physics`; `minimal` builds
+      without physics.
    2. *Queries, events and interaction.* Raycasts, contact events, triggers, collision
       filtering, `DragController`, `throwBody()`, debug view and statistics; tests.
    3. *Joints and compound bodies.* The four joint types with limits and motors, breaking,

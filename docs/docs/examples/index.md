@@ -129,4 +129,4 @@ The `ivfvis` examples; see [Scientific Visualisation](../visualisation/index.md)
 | `serialization1` | Saving, loading and clearing a scene as JSON | |
 | `hot_reload1` | A model, a texture and a shader that reload when their files are saved | [Hot Reload](../advanced/hot_reload.md) |
 | `debug_draw1` | Immediate-mode debug lines and shapes | |
-| `rigid_body1` | Rigid-body physics with ReactPhysics3D | |
+| `rigid_body1` | Rigid-body physics with ivfphysics | |

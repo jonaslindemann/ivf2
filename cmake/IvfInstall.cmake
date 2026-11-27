@@ -4,7 +4,7 @@
 #
 #   find_package(ivf2 CONFIG REQUIRED)
 #   add_executable(app main.cpp)
-#   target_link_libraries(app PRIVATE ivf2::ivf2)   # and/or ivf2::ivfmusic, ivf2::ivfvis
+#   target_link_libraries(app PRIVATE ivf2::ivf2)   # and/or ivf2::ivfmusic, ivf2::ivfvis, ivf2::ivfphysics
 #   ivf2_copy_runtime_files(app)                     # shaders/ + fonts/ next to app
 
 include(GNUInstallDirs)
@@ -23,11 +23,14 @@ install(TARGETS ${_ivf2_targets}
     INCLUDES DESTINATION ${IVF2_INSTALL_INCLUDEDIR})
 
 # Public headers, including the bundled glad/KHR, below include/ivf2/.
-foreach(_dir ivf ivfui ivfmath ivfmusic ivfvis generator glad KHR)
+foreach(_dir ivf ivfui ivfmath ivfmusic ivfvis ivfphysics generator glad KHR)
     if(_dir STREQUAL "ivfmusic" AND NOT IVF2_BUILD_MUSIC)
         continue()
     endif()
     if(_dir STREQUAL "ivfvis" AND NOT IVF2_BUILD_VIS)
+        continue()
+    endif()
+    if(_dir STREQUAL "ivfphysics" AND NOT IVF2_BUILD_PHYSICS)
         continue()
     endif()
     install(DIRECTORY "${PROJECT_SOURCE_DIR}/include/${_dir}"

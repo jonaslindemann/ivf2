@@ -30,6 +30,11 @@ if(TARGET ivf2::ivfvis)
     target_link_libraries(package_test_vis PRIVATE ivf2::ivf2 ivf2::ivfvis)
 endif()
 
+if(TARGET ivf2::ivfphysics)
+    add_executable(package_test_physics physics.cpp)
+    target_link_libraries(package_test_physics PRIVATE ivf2::ivfphysics)
+endif()
+
 if(TARGET ivf2::ivfmusic)
     add_executable(package_test_music main.cpp)
     target_link_libraries(package_test_music PRIVATE ivf2::ivfmusic)

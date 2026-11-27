@@ -20,11 +20,8 @@ if(NOT EMSCRIPTEN)
     set_target_properties(copy_example_assets PROPERTIES FOLDER "examples")
 endif()
 
-# Optional example-only dependencies.
-find_package(ReactPhysics3D CONFIG QUIET)
-
 # Shared PCH holder: compiled once, reused by all examples that have no extra libs.
-# Examples with EXTRA_LIBS (assimp, ReactPhysics3D, ...) may get different include
+# Examples with EXTRA_LIBS (ivfvis, ivfphysics, ...) may get different include
 # paths and cannot safely REUSE_FROM this target; they compile their own PCH.
 add_library(ivf2_examples_pch STATIC pch_holder.cpp)
 target_link_libraries(ivf2_examples_pch PRIVATE ivf2::ivf2)
@@ -107,10 +104,8 @@ ivf2_example_subdirectory(deformer1)
 ivf2_example_subdirectory(deformer2)
 ivf2_example_subdirectory(deformer3)
 ivf2_example_subdirectory(editor1)
-if(TARGET ReactPhysics3D::ReactPhysics3D)
+if(TARGET ivf2::ivfphysics)
     ivf2_example_subdirectory(rigid_body1)
-else()
-    message(STATUS "ivf2: ReactPhysics3D not found - skipping rigid_body1 example")
 endif()
 ivf2_example_subdirectory(solar_system)
 ivf2_example_subdirectory(bbox1)

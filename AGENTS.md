@@ -129,11 +129,11 @@ The `generator` library is included via `#include <generator/generator.hpp>` (Z-
 
 ### Physics
 
-ReactPhysics3D integration is in `examples/rigid_body1/`. The framework does not wrap ReactPhysics3D directly — examples show manual integration.
+Rigid body physics is in the `ivfphysics` library (ReactPhysics3D, private; `IVF2_BUILD_PHYSICS`); `examples/rigid_body1/` is the minimal example.
 
 ## Dependencies (vcpkg.json)
 
-GLFW3, OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `examples` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options, GLM (header-only, bundled in `include/glm/`).
+GLFW3, OpenGL, ImGui (docking), Assimp, FreeType, stb, nlohmann-json, miniaudio, RtMidi; vcpkg features `physics` (ReactPhysics3D) and `renoise` (miniz, pugixml) are enabled from the CMake options, GLM (header-only, bundled in `include/glm/`).
 
 ## Shaders
 

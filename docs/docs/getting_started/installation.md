@@ -104,6 +104,7 @@ vcpkg will download and compile all required dependencies on the first run. This
 | `IVF2_WITH_IMPLOT` | ON | 2D plots in ImGui windows with ImPlot (ivfui) |
 | `IVF2_BUILD_VIS` | ON | Build `ivfvis` (scientific visualisation) |
 | `IVF2_WITH_VTK_XML` | ON | VTK XML file reading (.vtu, .vtp, .vti) in ivfvis (miniz, pugixml) |
+| `IVF2_BUILD_PHYSICS` | ON | Build `ivfphysics` (rigid body physics, ReactPhysics3D) |
 | `IVF2_INSTALL` | ON (top level) | Install rules and CMake package |
 | `IVF2_USE_PCH` | ON | Precompiled headers |
 | `IVF2_WARNINGS` | ON (top level) | Warnings for ivf2's own code: `/W4` (MSVC), `-Wall -Wextra -Wpedantic` |

@@ -29,6 +29,9 @@ if(TARGET ivf2::ivfvis)
     target_compile_definitions(test_ivfvis_readers PRIVATE IVF2_TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
                                $<$<BOOL:${IVF2_WITH_VTK_XML}>:IVF2_TEST_VTK_XML>)
 endif()
+if(TARGET ivf2::ivfphysics)
+    ivf2_add_test(test_ivfphysics LIBS ivf2::ivfphysics)
+endif()
 
 # Public headers must compile on their own with only public dependencies.
 include(${CMAKE_CURRENT_SOURCE_DIR}/header_check.cmake)
@@ -40,6 +43,9 @@ if(TARGET ivf2::ivfmusic)
 endif()
 if(TARGET ivf2::ivfvis)
     ivf2_add_header_check(ivfvis)
+endif()
+if(TARGET ivf2::ivfphysics)
+    ivf2_add_header_check(ivfphysics)
 endif()
 
 # Rendered examples compared with reference images (needs IVF2_BUILD_EXAMPLES and a GL driver)

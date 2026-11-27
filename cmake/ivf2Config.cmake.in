@@ -1,10 +1,10 @@
 # ivf2 CMake package configuration
 #
-# Targets:  ivf2::ivf2 (everything except ivfmusic and ivfvis), ivf2::ivf, ivf2::ivfui,
-#           ivf2::ivfmath, ivf2::generator, ivf2::glad, and ivf2::ivfmusic and
-#           ivf2::ivfvis when built.
-# Components (optional features), e.g. find_package(ivf2 REQUIRED COMPONENTS Assimp):
-#           Assimp, FreeType, Audio, Midi, Music
+# Targets:  ivf2::ivf2 (everything except ivfmusic, ivfvis and ivfphysics), ivf2::ivf,
+#           ivf2::ivfui, ivf2::ivfmath, ivf2::generator, ivf2::glad, and ivf2::ivfmusic,
+#           ivf2::ivfvis and ivf2::ivfphysics when built.
+# Components (optional features), e.g. find_package(ivf2 REQUIRED COMPONENTS Physics):
+#           Assimp, FreeType, Audio, Midi, ImPlot, Music, Vis, Physics
 # Functions: ivf2_copy_runtime_files(<target> [ASSETS <dirs...>])
 #            ivf2_web_executable(<target> [ASSETS_ROOT <dir>] [ASSETS ...]) (web builds)
 #            ivfmusic_add_executable(<name> SOURCES ... [ASSETS <dir>])
@@ -50,9 +50,13 @@ set(IVF2_HAS_MUSIC @IVF2_BUILD_MUSIC@)
 set(IVF2_HAS_RENOISE @IVF_WITH_RENOISE@)
 set(IVF2_HAS_VIS @IVF2_BUILD_VIS@)
 set(IVF2_HAS_VTK_XML @IVF2_WITH_VTK_XML@)
+set(IVF2_HAS_PHYSICS @IVF2_BUILD_PHYSICS@)
 if((IVF2_HAS_MUSIC AND IVF2_HAS_RENOISE) OR (IVF2_HAS_VIS AND IVF2_HAS_VTK_XML))
     find_dependency(miniz CONFIG)
     find_dependency(pugixml CONFIG)
+endif()
+if(IVF2_HAS_PHYSICS)
+    find_dependency(ReactPhysics3D CONFIG) # private to the static ivfphysics library
 endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/ivf2Targets.cmake")
@@ -69,5 +73,7 @@ set(ivf2_Audio_FOUND ${IVF2_HAS_AUDIO})
 set(ivf2_Midi_FOUND ${IVF2_HAS_MIDI})
 set(ivf2_ImPlot_FOUND ${IVF2_HAS_IMPLOT})
 set(ivf2_Music_FOUND ${IVF2_HAS_MUSIC})
+set(ivf2_Vis_FOUND ${IVF2_HAS_VIS})
+set(ivf2_Physics_FOUND ${IVF2_HAS_PHYSICS})
 
 check_required_components(ivf2)

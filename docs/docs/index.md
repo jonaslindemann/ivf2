@@ -36,6 +36,15 @@ Scientific visualisation with [ivfvis](visualisation/index.md): data on grids an
 
 </div>
 
+Rigid-body [physics](physics/index.md) with ivfphysics: bodies on scene nodes that fall, collide and tumble, joints with motors and breakable welds, and dragging and throwing with the mouse:
+
+<div class="ivf-gallery ivf-gallery-wide" markdown>
+
+- [![Physics sandbox](images/gallery/physics_sandbox1.jpg) Physics sandbox](physics/interaction.md)
+- [![Joints](images/gallery/physics_joints1.jpg) Joints and compound bodies](physics/joints.md)
+
+</div>
+
 All of these are example programs you can run and change. The [Example Gallery](examples/gallery.md) shows every example; the topics below lead to the guides.
 
 <div class="ivf-gallery" markdown>
@@ -49,6 +58,7 @@ All of these are example programs you can run and change. The [Example Gallery](
 - [![Animation](images/sc_animation3.png) Animation](examples/animation_examples.md)
 - [![Model loading](images/sc_assimp1.png) Models](examples/asset_examples.md)
 - [![Visualisation](images/gallery/vis_axes1.jpg) Visualisation](examples/visualisation_examples.md)
+- [![Physics](images/gallery/rigid_body1.jpg) Physics](examples/physics_examples.md)
 
 </div>
 
@@ -102,6 +112,14 @@ All of these are example programs you can run and change. The [Example Gallery](
 - [3D axes](visualisation/axes.md) with grid walls, ticks and labels that follow the camera
 - [Readers](visualisation/readers.md) for CSV tables, NumPy arrays and VTK files (legacy and XML)
 - [2D plots](visualisation/plots.md) with ImPlot next to the 3D view: profiles, histograms and linked controls
+
+### Physics
+
+- [Rigid bodies](physics/bodies_and_shapes.md) attached to scene nodes: static, kinematic and dynamic, with boxes, spheres, capsules, convex hulls, triangle meshes and compound shapes, or the shape taken from the node
+- [Fixed steps with interpolation](physics/index.md#how-the-simulation-runs): smooth at any frame rate and the same in every run
+- [Raycasts, contact and trigger events](physics/events.md), collision filtering and forces applied every step
+- [Joints](physics/joints.md): ball and socket, hinge, slider and fixed, with limits, motors and break thresholds
+- [Dragging, throwing and a debug view](physics/interaction.md) of colliders, contacts, joints and velocities
 
 ### User interface
 

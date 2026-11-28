@@ -27,6 +27,9 @@ C++ code compiled to WebAssembly, rendering with WebGL 2.
 - **Scientific visualisation** (`ivf2::ivfvis`) - data on grids and at points shown as point
   clouds, isosurfaces, slices, glyphs, streamlines and volumes, with colormaps, colour bars, 3D
   axes, readers for CSV, NumPy and VTK files, and 2D plots with ImPlot
+- **Rigid-body physics** (`ivf2::ivfphysics`) - bodies on scene nodes with fixed steps and
+  interpolation, shapes from nodes, compound shapes, raycasts, contact and trigger events,
+  joints with limits, motors and break thresholds, dragging and throwing with the mouse
 - **Music-driven scenes** (`ivf2::ivfmusic`) - song playback as the master clock, bar-keyed automation with live reload, note events from Renoise songs, presentation mode and frame export
 - **Rich examples** demonstrating lighting, animations, physics, UI, and more - see the
   [Example Gallery](https://interactive-visualisation-framework-2.readthedocs.io/en/latest/examples/gallery/),
@@ -222,7 +225,7 @@ installed ivf2 (`find_package(ivf2)`). See
 ```cmake
 add_ivf2_example(my_example)                                   # uses my_example.cpp
 add_ivf2_example(my_example SOURCES main.cpp utils.cpp)
-add_ivf2_example(physics_demo SOURCES demo.cpp EXTRA_LIBS ReactPhysics3D::ReactPhysics3D)
+add_ivf2_example(physics_demo SOURCES demo.cpp EXTRA_LIBS ivf2::ivfphysics)
 ```
 
 Examples share one output directory; shaders and fonts from `data/` and the assets from `examples/assets/` are copied there once

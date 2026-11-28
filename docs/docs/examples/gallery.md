@@ -100,6 +100,16 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 
 </div>
 
+## Physics
+
+<div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
+
+- [![rigid_body1](../images/gallery/rigid_body1.jpg) rigid_body1](../physics/index.md "A pile of bodies whose shapes come from their nodes; dragging, throwing, the debug view and statistics") [▶ Run](https://jonaslindemann.github.io/ivf2/web/rigid_body1.html){ .ivf-run title="Run rigid_body1 in the browser" }
+- [![physics_joints1](../images/gallery/physics_joints1.jpg) physics_joints1](../physics/joints.md "Joints, motors, breakable welds and compound bodies: a bridge, a chain, a windmill, a piston, a tower and a table") [▶ Run](https://jonaslindemann.github.io/ivf2/web/physics_joints1.html){ .ivf-run title="Run physics_joints1 in the browser" }
+- [![physics_sandbox1](../images/gallery/physics_sandbox1.jpg) physics_sandbox1](../physics/interaction.md "An interactive physics sandbox: presets, throwing, dragging, bodies coloured by speed") [▶ Run](https://jonaslindemann.github.io/ivf2/web/physics_sandbox1.html){ .ivf-run title="Run physics_sandbox1 in the browser" }
+
+</div>
+
 ## Creative coding and sound
 
 <div class="ivf-gallery ivf-gallery-wide ivf-gallery-sheet" markdown>
@@ -129,8 +139,5 @@ Every example with a picture of what it draws, grouped like the [Example Index](
 - [![serialization1](../images/gallery/serialization1.jpg) serialization1](https://github.com/jonaslindemann/ivf2/tree/main/examples/serialization1 "Saving, loading and clearing a scene as JSON") [▶ Run](https://jonaslindemann.github.io/ivf2/web/serialization1.html){ .ivf-run title="Run serialization1 in the browser" }
 - [![hot_reload1](../images/gallery/hot_reload1.jpg) hot_reload1](../advanced/hot_reload.md "A model, a texture and a shader that reload when their files are saved") [▶ Run](https://jonaslindemann.github.io/ivf2/web/hot_reload1.html){ .ivf-run title="Run hot_reload1 in the browser" }
 - [![debug_draw1](../images/gallery/debug_draw1.jpg) debug_draw1](https://github.com/jonaslindemann/ivf2/tree/main/examples/debug_draw1 "Immediate-mode debug lines and shapes") [▶ Run](https://jonaslindemann.github.io/ivf2/web/debug_draw1.html){ .ivf-run title="Run debug_draw1 in the browser" }
-- [![rigid_body1](../images/gallery/rigid_body1.jpg) rigid_body1](https://github.com/jonaslindemann/ivf2/tree/main/examples/rigid_body1 "Rigid-body physics with ivfphysics") [▶ Run](https://jonaslindemann.github.io/ivf2/web/rigid_body1.html){ .ivf-run title="Run rigid_body1 in the browser" }
-- [![physics_joints1](../images/gallery/physics_joints1.jpg) physics_joints1](https://github.com/jonaslindemann/ivf2/tree/main/examples/physics_joints1 "Joints, motors, breakable welds and compound bodies") [▶ Run](https://jonaslindemann.github.io/ivf2/web/physics_joints1.html){ .ivf-run title="Run physics_joints1 in the browser" }
-- [![physics_sandbox1](../images/gallery/physics_sandbox1.jpg) physics_sandbox1](https://github.com/jonaslindemann/ivf2/tree/main/examples/physics_sandbox1 "An interactive physics sandbox: presets, throwing, dragging, bodies coloured by speed") [▶ Run](https://jonaslindemann.github.io/ivf2/web/physics_sandbox1.html){ .ivf-run title="Run physics_sandbox1 in the browser" }
 
 </div>

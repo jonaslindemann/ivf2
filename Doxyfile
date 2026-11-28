@@ -1003,6 +1003,7 @@ INPUT                  = docs/api_mainpage.md \
                          src/ivfmath \
                          include/ivfmusic \
                          src/ivfmusic \
+                         include/ivfphysics \
                          examples
 
 # This tag can be used to specify the character encoding of the source files

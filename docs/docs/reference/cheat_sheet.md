@@ -2,7 +2,7 @@
 
 Everything ivf2 offers, on one page. Each entry links to the guide that covers it. Classes without a guide are documented in the [API Reference](../api/index.md).
 
-All classes are created with `ClassName::create(...)` and returned as `std::shared_ptr`. Core classes live in the `ivf` namespace, windows and UI in `ivfui`, and math helpers in `ivfmath`.
+All classes are created with `ClassName::create(...)` and returned as `std::shared_ptr`. Core classes live in the `ivf` namespace, windows and UI in `ivfui`, math helpers in `ivfmath`, visualisation in `ivfvis` and physics in `ivfphysics`.
 
 ## Windows and application
 
@@ -134,6 +134,18 @@ Added to a `DeformableMeshNode` or `DeformablePrimitive<T>`. See [Deformers](../
 | `AudioManager` | Music playback and audio analysis | `audio_reactive1` example |
 | `MidiController` | MIDI input | [Music-Driven Scenes](../creative/music_scenes.md) |
 | `ivfmusic::Automation`, `SongTransport`, `Score`, `LiveControls` | Song-driven parameters | [Music-Driven Scenes](../creative/music_scenes.md) |
+
+## Physics
+
+| Class | What it is | Guide |
+|-------|------------|-------|
+| `ivfphysics::PhysicsWorld` | Bodies stepped with a fixed time step; raycasts, events, joints, statistics | [Physics](../physics/index.md) |
+| `ivfphysics::RigidBody`, `BodyDesc` | A static, kinematic or dynamic body driving (or following) a `TransformNode` | [Bodies and Shapes](../physics/bodies_and_shapes.md) |
+| `ivfphysics::Shape` | Box, sphere, capsule, plane, convex hull, triangle mesh, compound, or `fromNode()` | [Bodies and Shapes](../physics/bodies_and_shapes.md#shapes) |
+| `ivfphysics::Contact`, `TriggerEvent`, `RaycastHit` | What contact and trigger callbacks and raycasts report | [Queries and Events](../physics/events.md) |
+| `ivfphysics::Joint`, `JointDesc` | Ball and socket, hinge, slider and fixed joints; limits, motors, breaking | [Joints](../physics/joints.md) |
+| `ivfphysics::DragController`, `throwBody()` | Dragging and throwing bodies with camera rays | [Interaction](../physics/interaction.md) |
+| `ivfphysics::drawDebug()` | Colliders, contacts, joints and velocities as debug lines | [Interaction](../physics/interaction.md#the-debug-view) |
 
 ## User interface
 

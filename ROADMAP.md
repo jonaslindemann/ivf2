@@ -4,7 +4,7 @@ A plan for making ivf2 a high-quality, widely usable C++ library for interactive
 visualisation and creative coding. Based on a review of the code base in November 2026
 (~33k lines of library code in `ivf`, `ivfui`, `ivfmath`, `ivfmusic`; 54 examples).
 
-## Status (26 November 2026)
+## Status (28 November 2026)
 
 Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHANGELOG.md`).
 
@@ -13,7 +13,7 @@ Latest release: **2.0.0-alpha.3** (26 November 2026): phases 2 and 3.1 (see `CHA
 | 0 - Build system | Done |
 | 1 - Foundations | Done: CI, render context (step A), private third-party headers and optional dependencies, glm only, diagnostics, `Result<T>` error handling, warnings and API polish, visual regression tests, repository hygiene. Open items listed below |
 | 2 - Rendering | **2.1 render queue done** (steps 1-7). **2.2 uniform handling done** (location cache, camera and lights uniform blocks, automatic instancing; one item per mesh for `MeshNode`). **2.3 HDR pipeline done** (exposure, tone mapping, gamma, FXAA, MSAA control; SMAA open). **2.4 image-based lighting done** (`.exr` open). **2.5 better shadows done**. **2.6 SSAO and screen-space reflections done**. **2.7 glTF 2.0 done** (GPU skinning, glTF lights and cameras open). **2.8 resource hot reload done**. **2.9 CPU picking done**. Phase 2 complete|
-| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **3.7 physics module in progress** (`ivfphysics`: step 1, world, bodies and shapes, done; steps 2, queries, events and interaction, 3, joints and compound bodies, and 4, the sandbox, done; next step 5, documentation). 3.2 Python bindings later |
+| 3 - Differentiators | **3.1 `ivfvis` done** (data model, colormaps, colour bars, point clouds, isosurfaces, slices, glyphs, streamlines, volume rendering, axes, readers, 2D plots). **3.3 web target done** (preset `wasm`, GLES compatibility, 67 examples live in the browser at <https://jonaslindemann.github.io/ivf2/web/>, CI smoke test in headless Chrome, guide "Running in the Browser"). **3.7 physics module done** (`ivfphysics`: world, bodies and shapes; queries, events and interaction; joints and compound bodies; the sandbox `physics_sandbox1`; guide section "Physics"). 3.2 Python bindings next |
 | 4 - Reach | Not started |
 
 **Open items from finished work**
@@ -1030,6 +1030,12 @@ clearest way to stand out.
       The physics examples moved off the scene window's T, S and V shortcuts (Space, N, L).
    5. *Documentation and wrap-up.* Guide section "Physics" (world and bodies, shapes, events,
       joints, interaction), example pages and gallery, changelog, README.
+      *Done:* guide section "Physics" with five pages (overview with a first program and how
+      the simulation runs; bodies and shapes; queries and events; joints and compound bodies;
+      interaction and debugging, with the sandbox's patterns), "Physics Examples", a Physics
+      section in the example index (guide links, so the gallery tiles and "Run in the browser"
+      boxes follow), home page, cheat sheet, README, `include/ivfphysics` in the Doxygen input.
+      The guide's code was compiled and run in a temporary example.
 8. **Editor.** Grow `editor1` into a scene editor with gizmos (ImGuizmo), undo/redo, and
    save/load via `SceneSerializer`.
 
@@ -1054,4 +1060,4 @@ clearest way to stand out.
 5. Scientific visualisation module and Python bindings (3.1, 3.2) - the main differentiators.
    *Visualisation module and web target (3.3) done.*
 6. Physics module with an interactive sandbox example (3.7) - completes the base
-   functionality before the Python bindings (3.2), which follow it.
+   functionality before the Python bindings (3.2), which follow it. *Done.*

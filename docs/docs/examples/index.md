@@ -102,6 +102,16 @@ The `ivfvis` examples; see [Scientific Visualisation](../visualisation/index.md)
 | `vis_readers1` | Reading a CSV table as a point cloud, a NumPy array as an isosurface and a VTK XML mesh coloured by curvature | [Reading Data Files](../visualisation/readers.md) |
 | `vis_dashboard1` | A 3D slice linked to ImPlot plots: a probe profile and a histogram whose drag lines set the colour range | [2D Plots](../visualisation/plots.md) |
 
+## Physics
+
+The `ivfphysics` examples; see [Physics](../physics/index.md) and the [Physics Examples](physics_examples.md).
+
+| Example | Shows | Guide |
+|---------|-------|-------|
+| `rigid_body1` | A pile of bodies whose shapes come from their nodes; dragging, throwing, the debug view and statistics | [Physics](../physics/index.md) |
+| `physics_joints1` | Joints, motors, breakable welds and compound bodies: a bridge, a chain, a windmill, a piston, a tower and a table | [Joints and Compound Bodies](../physics/joints.md) |
+| `physics_sandbox1` | An interactive physics sandbox: presets, throwing, dragging, bodies coloured by speed | [Interaction and Debugging](../physics/interaction.md) |
+
 ## Creative coding and sound
 
 | Example | Shows | Guide |
@@ -129,6 +139,3 @@ The `ivfvis` examples; see [Scientific Visualisation](../visualisation/index.md)
 | `serialization1` | Saving, loading and clearing a scene as JSON | |
 | `hot_reload1` | A model, a texture and a shader that reload when their files are saved | [Hot Reload](../advanced/hot_reload.md) |
 | `debug_draw1` | Immediate-mode debug lines and shapes | |
-| `rigid_body1` | Rigid-body physics with ivfphysics | |
-| `physics_joints1` | Joints, motors, breakable welds and compound bodies | |
-| `physics_sandbox1` | An interactive physics sandbox: presets, throwing, dragging, bodies coloured by speed | |

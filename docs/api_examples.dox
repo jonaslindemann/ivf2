@@ -52,7 +52,7 @@
 
 /** @defgroup physics_examples Physics
  *  @ingroup examples
- *  @brief Rigid bodies with ReactPhysics3D. */
+ *  @brief ivfphysics: rigid bodies, shapes, events, joints, dragging and throwing. */
 
 /** @defgroup file_io_examples Files and models
  *  @ingroup examples
